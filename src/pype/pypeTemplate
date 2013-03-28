@@ -1,0 +1,14 @@
+# -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
+
+"""<REPLACE WITH MODULE NAME>
+
+<REPLACE WITH MODULE DESCRIPTION>
+"""
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+__HeadURL__  = '$HeadURL$'
+
+"""Revision History
+"""

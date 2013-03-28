@@ -1,0 +1,9 @@
+OBJS = data_trial.o  data_trials.o  grid_bitmap.o  main.o  playback_trial.o
+EYELINK_LIB=../../../lib
+EYELINK_INCLUDE=../../../include
+LINKLIBS=-L$(EYELINK_LIB) -leyelink_core -leyelink_core_graphics  -lsdl_util `sdl-config --libs`  -lSDL_mixer -lrt
+CFLAGS=-I$(EYELINK_INCLUDE)
+eyedata: $(OBJS)
+	$(CC) -o eyedata $(OBJS) $(LINKLIBS)
+clean:
+	-rm -rf $(OBJS) eyedata

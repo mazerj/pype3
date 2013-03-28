@@ -1,0 +1,9 @@
+OBJS = comm_listener_loop.o  comm_listener_main.o  comm_listener_record.o
+EYELINK_LIB=../../../lib
+EYELINK_INCLUDE=../../../include
+LINKLIBS=-L$(EYELINK_LIB) -leyelink_core -leyelink_core_graphics  -lsdl_util `sdl-config --libs`   -lSDL_mixer -lrt
+CFLAGS=-I$(EYELINK_INCLUDE)
+comm_listener: $(OBJS)
+	$(CC) -o comm_listener $(OBJS) $(LINKLIBS)
+clean:
+	-rm -rf $(OBJS) comm_listener

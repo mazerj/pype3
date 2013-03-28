@@ -1,0 +1,26 @@
+---------------------------------------------------------------------
+HARDWARE SETUP NOTES -- Sun Sep 15 23:39:22 2002 mazer
+
+DAS-1602/12 (ISA) and DAS-08 (ISA) Pinouts/connections
+
+D/A 0		analog eye-x possiton
+D/A 1		analog eye-y possiton
+D/A 2		photodiode signal
+D/A 3		spike level detection signal
+D/A 4		user defined
+D/A 5		user defined
+D/A 6		user defined
+D/A 7		user defined
+
+DigIN 0		monkey bar/button
+DigIN 1		juice switch
+DigIN 3		<unused>
+DigIN 4		<unused>
+
+DigOUT 0	juice driver or pump control
+DigOUT 1	Plexon PSTH alignment marker
+DigOUT 3	Plexon eXternal trigger (gate)
+DigOUT 4	<unused>
+
+A/D 0		user defined (not implemented)
+A/D 1		user defined (not implemented)

@@ -1,0 +1,24 @@
+#!/bin/sh
+
+if [ "$1" = "-mlab" ]; then
+  shift
+  sudo env PYPEDIR=/auto/share/pype3/`uname -m` $0 $args
+fi
+
+if [ "$1" = "-local" ]; then
+  shift
+  sudo env PYPEDIR=/usr/local/pype3 $0 $*
+fi
+
+if [ "${PYPEDIR-0}" = "0" ]; then
+  echo "`basename $0`: must set \$PYPEDIR first"
+  exit 1
+fi
+
+export PYTHONEXE=$(which python)
+export PYTHONINC=$(ls -d /usr/include/python2.[0-9] | sort | tail -1)
+export PYCOMPILE=$(ls -d /usr/lib/python2.[0-9] | sort | tail -1)/compileall.py
+export PYPEDIR
+export WHO=`/usr/bin/whoami`
+
+/usr/bin/make -f Buildfile $*

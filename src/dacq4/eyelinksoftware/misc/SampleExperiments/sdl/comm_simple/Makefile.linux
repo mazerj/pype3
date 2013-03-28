@@ -1,0 +1,9 @@
+OBJS = comm_simple_main.o  comm_simple_trial.o  simple_trials.o
+EYELINK_LIB=../../../lib
+EYELINK_INCLUDE=../../../include
+LINKLIBS=-L$(EYELINK_LIB) -leyelink_core -leyelink_core_graphics  -lsdl_util `sdl-config --libs`  -lSDL_mixer -lrt
+CFLAGS=-I$(EYELINK_INCLUDE)
+comm_simple: $(OBJS)
+	$(CC) -o comm_simple $(OBJS) $(LINKLIBS)
+clean:
+	-rm -rf $(OBJS) comm_simple 

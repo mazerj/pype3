@@ -1,0 +1,9 @@
+OBJS = main.o  trial.o  trials.o
+EYELINK_LIB=../../../lib
+EYELINK_INCLUDE=../../../include
+LINKLIBS=-L$(EYELINK_LIB) -leyelink_core -leyelink_core_graphics  -lsdl_util `sdl-config --libs`   -lSDL_image -lSDL_mixer -lrt
+CFLAGS=-I$(EYELINK_INCLUDE) `sdl-config --cflags`
+picture: $(OBJS)
+	$(CC) -o picture $(OBJS) $(LINKLIBS)
+clean:
+	-rm -rf $(OBJS) picture

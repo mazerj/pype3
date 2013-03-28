@@ -1,0 +1,20 @@
+#!/bin/sh
+
+sed "s^%%PYPEDIR%%^$PYPEDIR^g" <epydoc.conf >/tmp/$$.conf
+
+epydoc -v --simple-term --config=/tmp/$$.conf \
+	       --exclude=Pmw \
+	       --exclude=pype.stats \
+	       --exclude=pype.pstat \
+	       \
+	       --exclude=pype.candy \
+	       --exclude=pype.gificons \
+	       --exclude=pype.configvars \
+	       --exclude=pype.PlexHeaders \
+	       --exclude=pype.PlexNet \
+	       --exclude=pype.pype2tdt \
+	       --exclude=pype.tdt \
+	       --exclude=pype.ttank \
+
+/bin/rm -f /tmp/$$.conf
+

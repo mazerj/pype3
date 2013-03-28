@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ "$*" = "" ]; then
+  sudo env PYPEDIR=/auto/share/pype3/`uname -m` ./build clobber install docs
+else
+  sudo env PYPEDIR=/auto/share/pype3/`uname -m` ./build $*
+fi

@@ -1,0 +1,6 @@
+#!/bin/sh
+if [ "$*" = "" ]; then
+  sudo env PYPEDIR=/usr/local/pype3 ./build install
+else
+  sudo env PYPEDIR=/usr/local/pype3 ./build $*
+fi

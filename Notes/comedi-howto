@@ -1,0 +1,22 @@
+install the driver load script & add to rc.local:
+
+% cd ../..
+% sudo cp load_cb_pcidas /usr/sbin
+% sudo sh -c 'echo "/usr/sbin/load_cb_pcidas" >> /etc/rc.d/rc.local'
+% sudo ./load_cb_pcidas
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+notes on loading the comedi device drivers for PCI and ISA cards
+
+ISA CARD:
+  sudo modprobe /dev/comedi0 das16
+  sudo /usr/sbin/comedi_config /dev/comedi0 cio-das1602/12 0x260
+
+
+PCI CARD:
+  sudo modprobe /dev/comedi0 cb_pcidas
+  sudo /usr/sbin/comedi_config /dev/comedi0 cb_pcidas <bus,dev>
+
+  note: get <bus,dev> from cat /proc/pci

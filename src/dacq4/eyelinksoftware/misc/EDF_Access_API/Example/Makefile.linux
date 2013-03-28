@@ -1,0 +1,26 @@
+CXX=g++
+CC=gcc
+OPTIMIZE = -O3 -DNDEBUG
+CFLAGS = $(OPTIMIZE) 
+CXXFLAGS = $(OPTIMIZE)
+
+
+INSTALLDIR=.
+
+
+OBJ=main.o \
+    printevent.o printrecordinginfo.o printsample.o
+
+edf2asc: $(OBJ) edf2asc.shared edf2asc.static cleanint
+
+cleanint:
+	rm -rf *.o *.exe Debug Release carb.r edfapilib 'edf2asc debug' 'edf2asc final'
+
+edf2asc.shared:
+	g++ $(OPTIMIZE) -o $(INSTALLDIR)/edf2asc_s $(OBJ) \
+		-L$(INSTALLDIR)/../lib/linux/ -ledfapi -lm -lz
+		
+edf2asc.static:
+	g++ $(OPTIMIZE) -o $(INSTALLDIR)/edf2asc $(OBJ) \
+	                $(INSTALLDIR)/../lib/linux/libedfapi.a -lm -lz
+			

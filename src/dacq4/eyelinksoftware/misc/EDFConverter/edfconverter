@@ -1,0 +1,47 @@
+#!/bin/sh
+find_installdir ()
+{
+  cexec="$0"
+  case "$cexec" in
+    */* | *\\*) ;;
+    *) # Need to look in the PATH.
+      if test "${PATH_SEPARATOR+set}" != set; then
+        PATH_SEPARATOR=:
+      fi
+      save_IFS="$IFS"; IFS="$PATH_SEPARATOR"
+      for dir in $PATH; do
+        IFS="$save_IFS"
+        test -z "$dir" && dir=.
+        for exec_ext in ''; do
+          if test -f "$dir/$cexec$exec_ext"; then
+            cexec="$dir/$cexec$exec_ext"
+            break 2
+          fi
+        done
+      done
+      IFS="$save_IFS"
+      ;;
+  esac
+  # Make absolute.
+  case "$cexec" in
+    /* | ?:/* | ?:\\*) ;;
+    *) cexec=`pwd`/"$cexec" ;;
+  esac
+  # Resolve symlinks.
+  while : ; do
+    lsline=`LC_ALL=C ls -l "$cexec"`
+    case "$lsline" in
+      *" -> "*)
+        cexec=`echo "$cexec" | sed -e 's,/[^/]*$,,'`/`echo "$lsline" | sed -n -e 's,^.* -> \(.*\),\1,p'` ;;
+      *) break ;;
+    esac
+  done
+}
+
+find_installdir
+pth=`echo "$cexec" | sed -e 's,/[^/]*$,,'`
+# Canonicalize.
+pth=`cd "$pth" && pwd`
+export LD_LIBRARY_PATH=${pth}
+java -jar ${pth}/edfconverter.jar
+

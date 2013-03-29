@@ -39,7 +39,7 @@ class Movie(object):
 		self.bg = None
 
 		try:
-			f = open(idir+'/'+index)
+			f = open(os.path.join(idir, index), 'r')
 			lines = f.readlines()
 			f.close()
 
@@ -48,7 +48,7 @@ class Movie(object):
 				if l[0] == '%':
 					continue
 				l = string.split(l)
-				fname = idir + '/' + l[0]
+				fname = os.path.join(idir, l[0])
 				try:
 					s = Sprite(x=x, y=y, fb=fb, depth=0, on=0, fname=fname,
 							   name="i%d"%ix)
@@ -116,7 +116,7 @@ class Movie(object):
 
 def _readindex(fb, x, y, idir, index):
 	try:
-		f = open(idir+'/'+indexfile)
+		f = open(os.path.join(idir, indexfile), 'r')
 		lines = f.readlines()
 		f.close()
 	except IOError:
@@ -135,7 +135,7 @@ def _readindex(fb, x, y, idir, index):
 		if l[0] == '%':
 			continue
 		l = string.split(l)
-		fname = idir + '/' + l[0]
+		fname = os.path.join(idir, l[0])
 		try:
 			s = Sprite(x=x, y=y, fb=fb, depth=0, on=0,
 					   fname=fname, name="i%d" % framenum)

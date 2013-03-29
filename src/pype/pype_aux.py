@@ -411,7 +411,7 @@ def param_expand(s, integer=None):
 	if len(s) < 1:
 		return None
 
-	if s[:1].lower() == 'n':
+    if s.lower().startswith('n'):
 		try:
 			(mu, sigma) = eval(s[1:])
 			return np.random.normal(mu, sigma)
@@ -420,21 +420,21 @@ def param_expand(s, integer=None):
 			# handle unmatched brackets... same below
 			pass
 
-	if s[:1].lower() == 'u':
+    if s.lower().startswith('u'):
 		try:
 			(lo, hi) = eval(s[1:])
 			return np.random.uniform(lo, hi)
 		except:
 			pass
 
-	if s[:1].lower() == 'e':
+    if s.lower().startswith('e'):
 		try:
 			(mu,) = eval(s[1:])
 			return np.random.exponential(mu)
 		except:
 			pass
 
-	if s[:2].lower() == 'te':
+    if s.lower().startswith('te'):
 		try:
 			# te[mu,max] or te[mu,min,max]
 			v = map(int, s[3:-1].split(','))
@@ -451,7 +451,7 @@ def param_expand(s, integer=None):
 		except:
 			pass
 
-	if s[:3].lower() == 'ite':
+    if s.lower().startswith('ite'):
 		try:
 			# ite[mu,max] or ite[mu,min,max]
 			v = map(int, s[4:-1].split(','))
@@ -470,7 +470,7 @@ def param_expand(s, integer=None):
 		except:
 			pass
 
-	if s[:3].lower() == 'edc':
+    if s.lower().startswith('edc'):
 		try:
 			# edc[mu,min,max,nbins] (ACM's exponential dirac comb)
 			v = map(int, s[4:-1].split(','))
@@ -574,7 +574,7 @@ if Numeric is None:
             l = f.readline()
             if not l:
                 return None, None
-            elif l[:3] == '<<<' and l[-4:] == '>>>\n':
+            if l.startswith('<<<') and l.endswith('>>>\n'):
                 return l[3:-4], cPickle.load(f)
 else:
     def labeled_load(f):
@@ -619,7 +619,7 @@ else:
                 l = f.readline()
                 if not l:
                     return None, None
-                elif l[:3] == '<<<' and l[-4:] == '>>>\n':
+                if l.startswith('<<<') and l.endswith('>>>\n'):
                     return l[3:-4], cPickle.load(f)
         finally:
             Numeric.array_constructor = ac

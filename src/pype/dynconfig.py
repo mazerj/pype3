@@ -18,12 +18,12 @@ class DynamicConfig(object):
         self.timestamp = None
         self.fname = fname
 
-        if '/' in fname:
+        if os.sep in fname:
             # absolute or relative path, just open the file
             self.fname = fname
         else:
             # otherwise, it's just a basename --> look in home dir
-            self.fname = os.path.expanduser('~') + '/' + fname
+            self.fname = os.path.join(os.path.expanduser('~'), fname)
 
     def _load(self):
         if not posixpath.exists(self.fname):

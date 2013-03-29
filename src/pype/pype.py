@@ -691,7 +691,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.tk.resizable(0, 0)
 		self.tk.title('pype')
 		self.tk.protocol("WM_DELETE_WINDOW", self._shutdown)
-        self.setgeo(self.tk, default='+20+20')
+        self.setgeo(self.tk, default='+20+20', posonly=1)
 		self._stash_icons()
 
 		if self.config.iget('SPLASH'):
@@ -1678,9 +1678,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		tasks = []
 		taskdescrs = {}
 
-		if not dirname[-1] is '/':
-			dirname = dirname + '/'
-		filelist = glob.glob(dirname + '*.py')
+        dirname = os.path.join(dirname, '')   # ensure trailing delim
+		filelist = glob.glob(os.path.join(dirname, '*.py'))
 
 		for fname in filelist:
 			d = self.readpypeinfo(fname)
@@ -1738,10 +1737,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		for w in [self._named_start, self._temp_start]:
 			w.config(state=DISABLED)
 
-	def loadtask(self, taskname=None, dir=None, ask=None):
+	def loadtask(self, taskname=None, path=None, ask=None):
 		"""(Re)load task from file.
 
-		Load a task, if taskname==None and dir==None then we reload the current
+		Load a task, if taskname==None and path==None then we reload the current
 		task, if possible.  If ask is true, then pop up a dialog box to ask for
 		a filename..
 
@@ -1754,7 +1753,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			(f, mode) = filebox.Open(pattern='*.py')
 			if f is None:
 				return None
-			dir = posixpath.dirname(f)
+			path = posixpath.dirname(f)
 			taskname = posixpath.basename(f)
 			if taskname[-3:] == '.py':
 				taskname = taskname[:-3]
@@ -1763,21 +1762,21 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			if self.task_name is None:
 				return None
 			taskname = self.task_name
-			dir = self.task_dir
+			path = self.task_dir
 
 		try:
-			if dir:
-				(file, pathname, descr) = imp.find_module(taskname, [dir])
+			if path:
+				(file, pathname, descr) = imp.find_module(taskname, [path])
 			else:
-				dir = posixpath.dirname(taskname)
-				if len(dir) == 0:
-					dir = None
+				path = posixpath.dirname(taskname)
+				if len(path) == 0:
+					path = None
 					(file, pathname, descr) = imp.find_module(taskname)
 				else:
 					taskname = posixpath.basename(taskname)
 					if taskname[-3:] == '.py':
 						taskname = taskname[:-3]
-					(file, pathname, descr) = imp.find_module(taskname, [dir])
+					(file, pathname, descr) = imp.find_module(taskname, [path])
 		except ImportError:
 			warn('pype:loadtask',
 				 "Can't find task '%s' on search path.\n" % taskname +
@@ -1813,15 +1812,15 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			if file:
 				file.close()
 
-		if dir is None:
-			dir = string.join(string.split(pathname, '/')[:-1], '/')
+		if path is None:
+            path, base = os.split(pathname)
 
 		if task:
 			self._task_taskname = taskname
-			self._task_dir = dir
+			self._task_dir = path
 
 			self.taskmodule = task
-			self._taskname(taskname, dir)
+			self._taskname(taskname, path)
 			self._task_pathname = pathname
 			self._task_mtime = mtime
 
@@ -2931,7 +2930,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		"""
 		return (dacq_js_x(), dacq_js_y())
 
-	def setgeo(self, w=None, default=None, load=None, loadempty=None, save=None):
+	def setgeo(self, w=None, default=None, load=None, loadempty=None,
+               save=None, posonly=0):
 		"""Manage window geometry database (sticky across sessions).
 
 		:param w: (widget) widget to query -- title string is use as key!
@@ -2945,6 +2945,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				that might appear off screen!
 
 		:param save: (bool) save database to ~/.pyperc/winpos
+
+        :param posonly: (bool) only use position info
 
 		:return: nothing
 		"""
@@ -2982,7 +2984,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				geo = self._winpos[w.title()]
 				if geo[0:3] == '1x1':
 					raise KeyError
-				w.geometry(geo)
+                if posonly:
+                    geo = "".join(re.compile('[+-][0-9]+').findall(geo)[-2:])
+                w.geometry(geo)
 			except KeyError:
 				if default:
 					w.geometry(default)
@@ -3048,12 +3052,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		return self._taskname()
 
 
-	def _taskname(self, taskname=[], dir=[]):
+	def _taskname(self, taskname=[], path=[]):
 		"""Query or set name of task.
 
 		:param taskname: (string) set/clear task name
 
-		:param dir: (string) set/clear task source directory/path
+		:param path: (string) set/clear task source directory/path
 
 		:return: (string) task name (no extension)
 
@@ -3068,7 +3072,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				self.balloon.bind(self._tasknamew, 'no task loaded')
 		else:
 			self.task_name = taskname
-			self.task_dir = dir
+			self.task_dir = path
 			if self.tk:
 				self._tasknamew.configure(text="task: %s" % self.task_name)
 				self.balloon.bind(self._tasknamew,
@@ -4016,7 +4020,7 @@ def subject():
 	except KeyError:
 		return 'none'
 
-def subjectrc(s=""):
+def subjectrc(file=""):
 	"""Query subject-specific config *directory*.
 
 	Each subject should have a private directory for config and state
@@ -4026,9 +4030,9 @@ def subjectrc(s=""):
 	:return: (string) name of subject config directory
 
 	"""
-	return pyperc('_' + subject() + '/' + s)
+	return pyperc(os.path.join('_' + subject(), file))
 
-def pyperc(s=""):
+def pyperc(file=""):
 	"""Query config *directory*.
 
 	By default this is ~/.pyperc, but can be overridden by
@@ -4038,14 +4042,11 @@ def pyperc(s=""):
 
 	"""
 	if os.environ.has_key('PYPERC'):
-		rc = os.environ['PYPERC']
-		if rc[-1] != '/':
-			rc = rc + '/'
+		rcdir = os.environ['PYPERC']
 	else:
-		# this is more portable than os.environ['HOME']
-		rc = os.path.expanduser('~') + '/.pyperc/'
+		rcdir = os.path.join(os.path.expanduser('~'), '.pyperc')
 
-	return rc+s
+	return os.path.join(rcdir, file)
 
 class FixWin(object):
 	"""Fixation Window Encapsulation

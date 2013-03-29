@@ -1813,7 +1813,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				file.close()
 
 		if path is None:
-            path, base = os.split(pathname)
+			path, base = os.split(pathname)
 
 		if task:
 			self._task_taskname = taskname

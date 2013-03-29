@@ -11,7 +11,7 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 """Revision History
 
-Wed Apr  8 21:42:18 1998 mazer
+Wed Apr	 8 21:42:18 1998 mazer
 
 - created
 
@@ -19,15 +19,15 @@ Mon Jan 24 23:15:29 2000 mazer
 
 - added tic/toc functions
 
-Sun Nov  6 13:06:34 2005 mazer
+Sun Nov	 6 13:06:34 2005 mazer
 
 - added stat:stop:step slice syntax to param_expand
 
-Wed Jul  5 16:16:19 2006 mazer
+Wed Jul	 5 16:16:19 2006 mazer
 
 - added =start:stop:step for inclusive ranges
 
-Thu Jan  7 17:22:10 2010 mazer
+Thu Jan	 7 17:22:10 2010 mazer
 
 - hacked labeled_load to override the Numeric array constructor
   function to allow loading 32bit data files on 64bit machines.
@@ -43,9 +43,9 @@ import re
 import string
 import cPickle
 try:
-    import Numeric							# for legacy loads...
+	import Numeric							# for legacy loads...
 except ImportError:
-    Numeric = None
+	Numeric = None
 import numpy as np
 
 _tic = None
@@ -222,7 +222,7 @@ def from_discrete_dist(v):
 
 	Assume v represents somethine like a probability density
 	function, with each scalar in v representing the prob. of
-	that index, choose an index from that distribution.  Note,
+	that index, choose an index from that distribution.	 Note,
 	the sum(v) MUST equal 1!!!
 
 	*NB* Returned values start from 0, i.e. for v=[0.5, 0.5] possible
@@ -411,7 +411,7 @@ def param_expand(s, integer=None):
 	if len(s) < 1:
 		return None
 
-    if s.lower().startswith('n'):
+	if s.lower().startswith('n'):
 		try:
 			(mu, sigma) = eval(s[1:])
 			return np.random.normal(mu, sigma)
@@ -420,21 +420,21 @@ def param_expand(s, integer=None):
 			# handle unmatched brackets... same below
 			pass
 
-    if s.lower().startswith('u'):
+	if s.lower().startswith('u'):
 		try:
 			(lo, hi) = eval(s[1:])
 			return np.random.uniform(lo, hi)
 		except:
 			pass
 
-    if s.lower().startswith('e'):
+	if s.lower().startswith('e'):
 		try:
 			(mu,) = eval(s[1:])
 			return np.random.exponential(mu)
 		except:
 			pass
 
-    if s.lower().startswith('te'):
+	if s.lower().startswith('te'):
 		try:
 			# te[mu,max] or te[mu,min,max]
 			v = map(int, s[3:-1].split(','))
@@ -451,7 +451,7 @@ def param_expand(s, integer=None):
 		except:
 			pass
 
-    if s.lower().startswith('ite'):
+	if s.lower().startswith('ite'):
 		try:
 			# ite[mu,max] or ite[mu,min,max]
 			v = map(int, s[4:-1].split(','))
@@ -470,7 +470,7 @@ def param_expand(s, integer=None):
 		except:
 			pass
 
-    if s.lower().startswith('edc'):
+	if s.lower().startswith('edc'):
 		try:
 			# edc[mu,min,max,nbins] (ACM's exponential dirac comb)
 			v = map(int, s[4:-1].split(','))
@@ -563,66 +563,66 @@ def labeled_dump(label, obj, f, bin=0):
 	cPickle.dump(obj, f, bin)
 
 if Numeric is None:
-    def labeled_load(f):
-        """Wrapper for cPickle.load.
+	def labeled_load(f):
+		"""Wrapper for cPickle.load.
 
-        Inverse of labeled_dump().
+		Inverse of labeled_dump().
 
-        """
+		"""
 
-        while 1:
-            l = f.readline()
-            if not l:
-                return None, None
-            if l.startswith('<<<') and l.endswith('>>>\n'):
-                return l[3:-4], cPickle.load(f)
+		while 1:
+			l = f.readline()
+			if not l:
+				return None, None
+			if l.startswith('<<<') and l.endswith('>>>\n'):
+				return l[3:-4], cPickle.load(f)
 else:
-    def labeled_load(f):
-        """Wrapper for cPickle.load.
+	def labeled_load(f):
+		"""Wrapper for cPickle.load.
 
-        Inverse of labeled_dump(). This one works with old 32bit
-        Numeric-based pypefiles, but requires Numeric be installed!
+		Inverse of labeled_dump(). This one works with old 32bit
+		Numeric-based pypefiles, but requires Numeric be installed!
 
-        """
+		"""
 
-        def local_array_constructor(shape, typecode, thestr,
-                                    Endian=Numeric.LittleEndian):
+		def local_array_constructor(shape, typecode, thestr,
+									Endian=Numeric.LittleEndian):
 
-            # try to guess the word size on the machine that
-            # pickled the data -- 'l' and 'f' are NATIVE types
-            # and native word length is not available, so we have
-            # to infer the native word length based on the actually
-            # data block size and the indicated data block size.
-            #
-            # this is FRAGILE -- could break and only handles the
-            # two cases I'm aware of -- in general, the better
-            # solution is to never create Numeric arrays without
-            # a complete type specification -- ie, use Float32
-            # instead of Float -- and always pass in a typecode.
+			# try to guess the word size on the machine that
+			# pickled the data -- 'l' and 'f' are NATIVE types
+			# and native word length is not available, so we have
+			# to infer the native word length based on the actually
+			# data block size and the indicated data block size.
+			#
+			# this is FRAGILE -- could break and only handles the
+			# two cases I'm aware of -- in general, the better
+			# solution is to never create Numeric arrays without
+			# a complete type specification -- ie, use Float32
+			# instead of Float -- and always pass in a typecode.
 
-            if typecode == 'l':
-                if Numeric.cumproduct(shape) * 4 == len(thestr):
-                    typecode = Numeric.Int32
-                else:
-                    typecode = Numeric.Int64
-            elif typecode == 'f':
-                if Numeric.cumproduct(shape) * 4 == len(thestr):
-                    typecode = Numeric.Float32
-                else:
-                    typecode = Numeric.Float64
-            return ac(shape, typecode, thestr, Endian=Endian)
+			if typecode == 'l':
+				if Numeric.cumproduct(shape) * 4 == len(thestr):
+					typecode = Numeric.Int32
+				else:
+					typecode = Numeric.Int64
+			elif typecode == 'f':
+				if Numeric.cumproduct(shape) * 4 == len(thestr):
+					typecode = Numeric.Float32
+				else:
+					typecode = Numeric.Float64
+			return ac(shape, typecode, thestr, Endian=Endian)
 
-        try:
-            ac = Numeric.array_constructor
-            Numeric.array_constructor = local_array_constructor
-            while 1:
-                l = f.readline()
-                if not l:
-                    return None, None
-                if l.startswith('<<<') and l.endswith('>>>\n'):
-                    return l[3:-4], cPickle.load(f)
-        finally:
-            Numeric.array_constructor = ac
+		try:
+			ac = Numeric.array_constructor
+			Numeric.array_constructor = local_array_constructor
+			while 1:
+				l = f.readline()
+				if not l:
+					return None, None
+				if l.startswith('<<<') and l.endswith('>>>\n'):
+					return l[3:-4], cPickle.load(f)
+		finally:
+			Numeric.array_constructor = ac
 
 def pp_encode(e):
 	"""Pretty-print an event list.

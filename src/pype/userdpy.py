@@ -177,7 +177,7 @@ class UserDisplay(object):
 			self.master.title('userdpy')
 			self.master.iconname('userdpy')
 			if self.app:
-				self.app.setgeo(self.master, default='-0-0')
+				self.app.setgeo(self.master, default='-0-0', posonly=1)
 			else:
 				self.master.geometry('-0+20')
 			self.visible = 1

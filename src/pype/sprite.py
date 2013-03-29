@@ -250,7 +250,7 @@ class FrameBuffer(object):
 		"""
 
 		if not FrameBuffer._init: return
-		
+
 		self.app = app					# store for joybut access..
 		self.eyefn = eyefn
 
@@ -293,7 +293,7 @@ class FrameBuffer(object):
 
 		try:
 			if pygame.display.mode_ok((self.w, self.h), self.flags) == 0:
-				Logger('sprite: mode %dx%d:%s not available.\n' % \
+				Logger('sprite: mode %dx%d:%s not available.\n' %
 					   (self.w, self.h, ppflag(self.flags)))
 				Logger('sprite: available modes are %s\n' % modes)
 				sys.exit(1)
@@ -356,7 +356,7 @@ class FrameBuffer(object):
 	def screen_open(self, init=0):
 		self.screen = pygame.display.set_mode((self.w, self.h), self.flags)
 		pygame.display.set_caption('framebuf')
-		
+
 		if init:
 			# initialize OpenGL subsystem
 			ogl.glOrtho(0.0, self.w, 0.0, self.h, 0.0, 1.0)
@@ -496,9 +496,9 @@ class FrameBuffer(object):
 			e = pygame.event.poll()
 			if e.type == pygame.VIDEOEXPOSE:
 				break
-			
+
 		self.fullscreen = not self.fullscreen
-		
+
 		if wait and self.fullscreen:
 			self.clear()
 			self.string(0, 0, '[hit key/button to clear]', (255,255,255))
@@ -608,7 +608,7 @@ class FrameBuffer(object):
 			pygame.display.flip()
 			if self.app:
 				self.app.encode(MARKFLIP)
-			
+
 		if self.fliptimer is None:
 			self.fliptimer = time.time()
 		else:
@@ -1010,8 +1010,8 @@ class Sprite(object):
 	# used to make unique id for each sprite:
 	_id = 0
 
-	def __init__(self, width=100, height=100, x=0, y=0, depth=0, \
-				 fb=None, on=1, image=None, dx=0, dy=0, fname=None, \
+	def __init__(self, width=100, height=100, x=0, y=0, depth=0,
+				 fb=None, on=1, image=None, dx=0, dy=0, fname=None,
 				 name=None, icolor='black', centerorigin=0,
 				 rotation=0.0, contrast=1.0, scale=1.0):
 		"""Sprite Object -- pype's main tool for graphics generation.
@@ -1141,8 +1141,9 @@ class Sprite(object):
 		self.render(clear=1)
 
 	def __repr__(self):
-		return '<Sprite "%s"@(%d,%d) %x%x depth=%d on=%d>' % \
-			   (self.name, self.x, self.y, self.w, self.h, self.depth, self._on)
+		return ('<Sprite "%s"@(%d,%d) %x%x depth=%d on=%d>' %
+                (self.name, self.x, self.y,
+                 self.w, self.h, self.depth, self._on,))
 
 	def XY(self, xy):
 		"""Correct for centerorigin flag"""
@@ -1214,7 +1215,7 @@ class Sprite(object):
 			(w, h) = pil.size
 			pil = pil.resize((int(round(w*xscale)), int(round(h*yscale))))
 		self.pim = PIL.ImageTk.PhotoImage(pil)
-		
+
 		# NOTE: by making .pim this a object member, it keeps a handle
 		#       on the PhotoImage to prevent GC..
 		return self.pim
@@ -1603,7 +1604,7 @@ class Sprite(object):
 
 		"""
 		pixs = pygame.surfarray.pixels3d(self.im)
-		pixs[::] = (float(meanval) + ((1.0-mult) * \
+		pixs[::] = (float(meanval) + ((1.0-mult) *
 			   (pixs.astype(np.float)-float(meanval)))).astype(np.uint8)
 
 	def thresh(self, threshval):
@@ -1952,9 +1953,8 @@ class PolySprite(object):
 		self.points = np.array(points)
 
 	def __repr__(self):
-		return '<PolySprite "%s"@(%d,%d) #%d depth=%d on=%d>' % \
-			   (self.name, self.x0, self.y0, self._id,
-				self.depth, self._on)
+		return ('<PolySprite "%s"@(%d,%d) #%d depth=%d on=%d>' %
+                (self.name, self.x0, self.y0, self._id, self.depth, self._on))
 
 	def clone(self):
 		return PolySprite(
@@ -2091,7 +2091,7 @@ class DisplayList(object):
 		self.timer = Timer()
 		self.trigger = None
 		self.action = None
-		
+
 
 	def __del__(self):
 		"""Delete method.
@@ -2206,7 +2206,7 @@ class DisplayList(object):
 			self.after()				# clear trigger
 
 			fn(ret, et, args)			# run action
-			
+
 		# clear screen to background..
 		if preclear:
 			if self.bg:
@@ -2245,18 +2245,18 @@ def texture_create(rgbastr, w, h):
 def texture_blit(fb, texture, x, y,
 				 rotation=0, draw=1, contrast=1.0, scale=1.0):
 	"""INTERNAL USE ONLY
-	
+
 	NOTES:
-	
+
 	(x, y) are center coords, where (0,0) is screen center.
-	
+
 	The default settings for scaling of texture mapps are for
 	linear interoplation for both scale up and scale down. These
 	can be set/changed using glTexParameteri() to set
 	GL_TEXTURE_MIN_FILTER (default is GL_NEAREST_MIPMAP_LINEAR)
 	and/or GL_TEXTURE_MAG_FILTER (default is GL_LINEAR). First is
 	for scaling down, second scaling up.
-	
+
 	"""
 
 	(texture, w, h) = texture
@@ -2448,7 +2448,7 @@ def quickfb(w, h, fullscreen=0):
 	return FrameBuffer(os.environ['DISPLAY'],
 					   w, h, fullscreen=fullscreen,
 					   sync=None, mouse=1)
-	
+
 
 def ppflag(flags):
 	flagd = {
@@ -2470,7 +2470,7 @@ def ppflag(flags):
 def drawtest(fb, s):
 	"""Draw standard test pattern.
 	"""
-	
+
 	import pypeversion
 
 	fb.clear((1,1,1))
@@ -2581,7 +2581,7 @@ def tickbox(x, y, width, height, lwidth, color, fb):
 
 
 if __name__ == '__main__':
-	
+
 	def drawtest2(fb):
 		s1 = Sprite(100, 100, -100, 0, fb=fb)
 		s2 = Sprite(100, 100, 100, 0, fb=fb)
@@ -2598,11 +2598,11 @@ if __name__ == '__main__':
 			s2.blit()
 			fb.flip()
 
-	
+
 	fb=quickfb(500,500)
-	
+
 	#drawtest1(fb, None)
 	drawtest2(fb)
-	
+
 	sys.stdout.write('>>>'); sys.stdout.flush()
 	sys.stdin.readline()

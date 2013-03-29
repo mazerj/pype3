@@ -25,7 +25,7 @@ Problem:
 	about 12ms AFTER it was recorded (at 2khz). It seems somewhat
 	sampling rate dependent, but not in any obvious way. Nor is
 	it consistent enough to correct for.
-	
+
 """
 
 import u3
@@ -68,21 +68,21 @@ class SamplerU3(object):
 
 		Since this is threaded and uses signals -- you
 		must instantiate this ONLY in the main thread!!!!
-		
+
 		"""
 		if deviceHandle is None:
 			self.d = u3.U3()			# take first available U3
 		else:
 			self.d = deviceHandle
 		self.samplingRate = samplingRate
-		
+
 		self.frags = []
 		self.nsamps = 0
 		self.running = 0
 		self.nrunning = 0
 		self.errorcount = 0
 		self.fragstart_host = None
-		
+
 		# setup a timer on EIO0 (DB15) -- timers use an EIO or FIO line.
 		# offset of 8 pushed it to the DB15 connector...
 		self.d.configIO(TimerCounterPinOffset=8,
@@ -112,7 +112,7 @@ class SamplerU3(object):
 		self.d.writeRegister(6106, 0)		# Dig IN
 
 		signal.signal(signal.SIGUSR1, self.interrupt_handler)
-		
+
 
 	def stop(self, wait=True):
 		"""Setup a LabJack U3 for multithreaded sampling.
@@ -122,7 +122,7 @@ class SamplerU3(object):
 		wait=False. You can call this multiple times and look at
 		the return value to see if acquisition is stopped (return
 		will be True when stopped).
-		
+
 		"""
 		self.running = 0
 		while wait and self.nrunning > 0:
@@ -133,17 +133,17 @@ class SamplerU3(object):
 		"""Start acquistion threads.
 
 		This launches two threads:
-        
+
 		- One does continuous analog acquisition on FIO0-3/AIN0-3
 		  locked to the host system clock.
 		- The other monitors the two DigialInput lines (FIO6,7) and
 		  sends a SIGUSR1 to the parent if they change state.
 		  Information about the state change is stored in
 		  self.ievent
-          
+
 		Method returns after starting the threads. To stop the
 		threads, use the stop() method.
-        
+
 		"""
 		tad = threading.Thread(target=self.adgo)
 		tdi = threading.Thread(target=self.digo)
@@ -153,7 +153,7 @@ class SamplerU3(object):
 
 	def adgo(self):
 		"""Work function analog input thread.
-		
+
 		"""
 		self.frags = []
 		self.nsamps = 0
@@ -176,8 +176,8 @@ class SamplerU3(object):
 			for r in self.d.streamData():
 				if r is not None:
 					self.nsamps += len(r['AIN0'])
-					ts = clockoffset + \
-						 (np.array(r['AIN224'])<<16) + np.array(r['AIN200'])
+					ts = (clockoffset +
+                          (np.array(r['AIN224'])<<16) + np.array(r['AIN200']))
 					self.frags.append((ts,
 									   np.array(r['AIN0']),
 									   np.array(r['AIN1']),
@@ -185,7 +185,7 @@ class SamplerU3(object):
 									   np.array(r['AIN3']),
 									   ))
 					self.errorcount += r['errors']
-					
+
 				if not self.running:
 					break
 		finally:
@@ -194,9 +194,9 @@ class SamplerU3(object):
 
 	def digo(self, nsamps=None):
 		"""Work function digital input thread.
-		
+
 		"""
-		
+
 		# monitor digital input lines in tight loop in order to
 		# generate an interrupt if something changes..
 		self.idisable()
@@ -224,14 +224,14 @@ class SamplerU3(object):
 
 	def ienable(self):
 		"""Enable interupt genration.
-		
+
 		"""
 		self.ievent = []
 		self.ienabled = True
-		
+
 	def idisable(self):
 		"""Disable interupt genration.
-		
+
 		"""
 		self.ienabled = False
 		self.ievent = []
@@ -248,7 +248,7 @@ class SamplerU3(object):
 		You should be able to call this in mid-acquisition, but
 		in general, you should probably call .go(), .stop() and
 		then .get() if possible.
-		
+
 		"""
 		# reassemble analog datastream from fragment pool
 		ts = np.array([])
@@ -285,7 +285,7 @@ class SamplerU3(object):
 		# self.ievent contains information about what caused the
 		# interrupt: channel, time etc..
 		print self.ievent
-		
+
 	def digout(self, line, state):
 		if line in [0, 1]:
 			self.d.writeRegister(6004+line, state)
@@ -300,7 +300,7 @@ if __name__ == "__main__":
 	from pylab import *
 
 	s = SamplerU3()
-	
+
 	try:
 		while 1:
 			s.go()

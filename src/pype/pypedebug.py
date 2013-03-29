@@ -61,7 +61,7 @@ try:
 			sh = IPython.Shell.IPShellEmbed(user_ns=namespace, banner=banner)
 			sh.IP.rc.confirm_exit = 0
 			sh()
-		
+
 except ImportError:
 	def keyboard(banner='Type EOF/^D to continue', builtin=0):
 		"""Clone of the matlab keyboard() function.
@@ -131,10 +131,9 @@ def get_traceback(show=None):
 	depth = 1
 	for frame in stack:
 		(file, line, fn, text) = frame
-		msg.append('%2d: File "%s", line %s, in %s:\n' % \
-				   (len(stack)-depth, file, line, fn))
-		msg.append('%2d:   %s\n' % \
-				   (len(stack)-depth, text))
+		msg.append('%2d: File "%s", line %s, in %s:\n' % (len(stack)-depth,
+                                                          file, line, fn))
+		msg.append('%2d:   %s\n' % (len(stack)-depth, text))
 		depth = depth + 1
 	msg = string.join(msg)
 	if show:

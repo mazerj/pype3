@@ -630,8 +630,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		# dedicated xserver's for physiology. The following tried
 		# to prevent you from locking up a single-headed machine
 		# by starting in fullscreen mode:
-		if self.config.iget('FULLSCREEN') and \
-			   self.config.get('SDLDPY') == os.environ['DISPLAY']:
+		if (self.config.iget('FULLSCREEN') and
+			   self.config.get('SDLDPY') == os.environ['DISPLAY']):
 			self.config.set('FULLSCREEN', '0', override=1)
 			Logger("pype: FULLSCREEN ignored -- single display mode")
 
@@ -1071,8 +1071,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		Label(itrack1,
 			  text="Use Shift/Ctrl/Meta-Arrows in UserDisplay\n"+
 			       "window to adjust offsets in real-time",
-			  relief=SUNKEN).pack(\
-			expand=0, fill=X, side=TOP, pady=10)
+			  relief=SUNKEN).pack(expand=0, fill=X, side=TOP, pady=10)
 
 		# make sure Notebook is big enough for buttons above to show up
 		#pw.setnaturalsize()
@@ -1127,7 +1126,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		if self.config.iget('FPS') and self.config.iget('FPS') != fps:
 			Logger('pype: error actually FPS does not match requested rate\n' +
-				   '      requested=%dhz actual=%dhz\n' % \
+				   '      requested=%dhz actual=%dhz\n' %
 				   (self.config.iget('FPS'), fps))
 			raise PypeStartupError
 		self.rig_common.set('mon_fps', '%g' % fps)
@@ -1238,10 +1237,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				Logger('pype: no TDTANKDIR set, using C:\\', popup=1)
 				tankdir = 'C:\\'
 			if not tankdir[-1] == '\\':
-				# dir must have trailing \
+				# dir must have trailing backslash
 				tankdir = tankdir + '\\'
-			tankname = subject() + \
-					   '%04d%02d%02d' % time.localtime(time.time())[0:3]
+
+            tankname = subject()
+            tankname += '%04d%02d%02d' % time.localtime(time.time())[0:3]
+
 			try:
 				self.tdt = pype2tdt.Controller(self, tdthost)
 				Logger('pype: connected to tdt @ %s.\n' % tdthost)
@@ -1256,7 +1257,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				self.tdt = None
 				Logger('pype: no connection to tdt @ %s.\n' % tdthost, popup=1)
 
-		Logger('pype: build %s by %s on %s\n' % \
+		Logger('pype: build %s by %s on %s\n' %
 			   (pypeversion.PypeBuildDate, pypeversion.PypeBuildBy,
 				pypeversion.PypeBuildHost) +
 			   'pype: PYPERC=%s\n' % pyperc() +
@@ -1314,9 +1315,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 	def migrate_pypestate(self):
 		fname = subjectrc('pypestate.%s' % self._gethostname())
-		if posixpath.exists(fname) and ask('migrate_pypestate',
-										   'Automigrate %s?' % \
-										   fname, ['yes', 'no']) == 0:
+		if (posixpath.exists(fname) and
+            ask('migrate_pypestate', 'Automigrate %s?' %
+                fname, ['yes', 'no']) == 0):
 			try:
 				d = cPickle.load(open(fname, 'r'))
 				self.tallycount = d['tallycount']
@@ -1414,9 +1415,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				for (pt, slot, n) in results:
 					d = pt._get(evaluate=0)
 					try:
-						self.con('%s(row %d): %s=''%s''' % \
-								 (posixpath.basename(pt._file), n, slot,
-								  d[1][slot]))
+						self.con('%s(row %d): %s=''%s''' %
+                                 (posixpath.basename(pt._file),
+                                  n, slot, d[1][slot]))
 					except KeyError:
 						# skip title slots..
 						pass
@@ -1714,8 +1715,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			tasklabel = '%-15s %s' % (t, taskdescrs[t])
 			menubar.addmenuitem(menulabel, 'command', label=tasklabel,
 								font=('Courier', 10),
-								command=lambda s=self,t=t,d=dirname: \
-								s.loadtask(t, d))
+								command=lambda s=self,t=t,d=dirname:
+                                        s.loadtask(t, d))
 		menubar.addmenuitem(menulabel, 'separator')
 		menubar.addmenuitem(menulabel, 'command', label='Reload current',
 							command=self.loadtask)
@@ -1802,8 +1803,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				task = imp.load_module(taskname, file, pathname, descr)
 				mtime = os.stat(pathname).st_mtime
 			except:
-				err = ('Error loading ''%s'' -- \n' % taskname) + \
-					  get_exception()
+				err = ('Error loading ''%s'' -- \n' % taskname) + get_exception()
 				sys.stderr.write(err)
 				warn('pype:loadtask', err, wait=0, astext=1)
 				return None
@@ -1950,8 +1950,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		eyelink_opts = self.config.get('EYELINK_OPTS')
 		if len(eyelink_opts) > 0:
 			eyelink_opts = eyelink_opts + ':'
-		eyelink_opts = eyelink_opts + 'pupil_crosstalk_fixup=%s' % \
-					   self.config.get('EYELINK_XTALK')
+		eyelink_opts = eyelink_opts + ('pupil_crosstalk_fixup=%s' %
+                                       self.config.get('EYELINK_XTALK'))
 		eyelink_opts = eyelink_opts + ':active_eye=both'
 		eyelink_opts = eyelink_opts + ':link_sample_data=PUPIL,AREA'
 		eyelink_opts = eyelink_opts + ':heuristic_filter=0 0'
@@ -2125,9 +2125,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self._stop.config(state=DISABLED)
 			self.running = 0
 		else:
-			if os.stat(self._task_pathname).st_mtime <> self._task_mtime and \
-			   ask('run task', 'Task has changed\nRun anyway?',
-				   ['yes', 'no']) == 1:
+			if (os.stat(self._task_pathname).st_mtime <> self._task_mtime and
+                ask('run task', 'Task has changed\nRun anyway?',
+                    ['yes', 'no']) == 1):
 				return
 
 			try:
@@ -3450,8 +3450,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		"""
 
-		if (self.record_file == '/dev/null') and \
-			   self.sub_common.queryv('fast_tmp'):
+		if (self.record_file == '/dev/null' and
+                    self.sub_common.queryv('fast_tmp')):
 			fast_tmp = 1
 		else:
 			fast_tmp = 0
@@ -3793,11 +3793,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 					if posixpath.exists(self.record_file):
 						if mode == 'w':
-							Logger('pype: unlinking: %s\n' % \
-								   self.record_file)
+							Logger('pype: unlinking: %s\n' % self.record_file)
 							posix.unlink(self.record_file)
 						elif mode == 'a':
-							Logger('pype: appending to: %s\n' % \
+							Logger('pype: appending to: %s\n' %
 								   self.record_file)
 					break
 
@@ -4260,16 +4259,16 @@ def _get_plexon_events(plex, fc=40000):
 
 		for e in tank:
 			(Type, Channel, Unit, ts, waveform) = e
-			if Type == PlexHeaders.Plex.PL_ExtEventType and \
-				   Channel == PlexHeaders.Plex.PL_StartExtChannel:
+			if (Type == PlexHeaders.Plex.PL_ExtEventType and
+                        Channel == PlexHeaders.Plex.PL_StartExtChannel):
 				if events is not None:
 					Logger("pype: double trigger\n")
 					return None
 				events = []
 				zero_ts = ts
 			elif events is not None:
-				if Type == PlexHeaders.Plex.PL_ExtEventType and \
-					   Channel == PlexHeaders.Plex.PL_StopExtChannel:
+				if (Type == PlexHeaders.Plex.PL_ExtEventType and
+                            Channel == PlexHeaders.Plex.PL_StopExtChannel):
 					hit_stop = 1
 					# drain rest of tank, then return
 				else:

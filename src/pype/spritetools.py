@@ -363,8 +363,8 @@ def polargrat(s, cfreq, rfreq, phase_deg, polarity,
 	x, y = (polarity * s.xx/s.w, s.yy/s.h)
 
 	if logpolar:
-		z = (np.log(np.hypot(x,y)) * cfreq) + \
-			(np.arctan2(y,x) * rfreq / (2.0 * np.pi))
+		z = (np.log(np.hypot(x,y)) * cfreq) + (np.arctan2(y,x) * rfreq /
+                                               (2.0 * np.pi))
 	else:
 		z = (np.hypot(y,x) * cfreq) + (np.arctan2(y,x) * rfreq / (2.0 * np.pi))
 	i = moddepth * np.cos((2.0 * np.pi * z) - (np.pi * phase_deg / 180.0))

@@ -70,8 +70,9 @@ class _SocketServer(_Socket):
 		self.remoteHost = self.remoteHost[0]
 
 	def __str__(self):
-		return '<_SocketServer '+\
-			   str(self.host)+':'+str(self.port)+'>'
+        return "".join(('<_SocketServer ',
+                        str(self.host), ':', str(self.port),
+                        '>',))
 
 class _SocketClient(_Socket):
 	def __init__(self):
@@ -86,8 +87,9 @@ class _SocketClient(_Socket):
 		self.conn.connect((self.remoteHost, self.remotePort))
 
 	def __str__(self):
-		return '<_SocketClient '+\
-			   str(self.remoteHost)+':'+str(self.remotePort)+'>'
+        return "".join(('<_SocketClient ',
+                        str(self.remoteHost), ':', str(self.remotePort),
+                        '>',))
 
 class TTankServer(object):
 	def __init__(self, Server='Local', tk=None):
@@ -106,9 +108,9 @@ class TTankServer(object):
 			except:
 				msg = repr(msg).split('\n')
 			for ln in msg:
-				sys.stderr.write('%02d:%02d:%02d ' % \
+				sys.stderr.write('%02d:%02d:%02d ' %
 								 time.localtime(time.time())[3:6])
-				sys.stderr.write('%s: %s\n' % \
+				sys.stderr.write('%s: %s\n' %
 								 (os.path.basename(sys.argv[0]), ln))
 
 	def connect(self):

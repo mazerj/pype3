@@ -400,8 +400,8 @@ class _Probe(object):
 		y = self.y
 		if self.drift and (self.barmode == BAR):
 			dt = t - self.drift;
-			d = self.drift_amp * \
-				math.sin(self.drift_freq * 2.0 * math.pi * dt / 1000.)
+			d = (self.drift_amp * 
+                 math.sin(self.drift_freq * 2.0 * math.pi * dt / 1000.))
 			y = y + d * math.sin(math.pi * self.a / 180.)
 			x = x + d * math.cos(math.pi * self.a / 180.)
 

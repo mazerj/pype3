@@ -196,9 +196,9 @@ class ParamTable(object):
 					if runlock == _KEEPLOCKED:
 						lockbut = Label(tmpf, text = '')
 					else:
-						lockbut = Button(tmpf, text = '',\
-										 command=lambda n=name: \
-										 self.lockfield(n, toggle=1))
+						lockbut = Button(tmpf, text = '',
+										 command=lambda n=name:
+                                                self.lockfield(n, toggle=1))
 					lockbut.pack(fill=BOTH, expand=1)
 
 					if runlock == _KEEPLOCKED:
@@ -526,8 +526,8 @@ class ParamTable(object):
 				(name, default, validate, descr, runlock) = _unpack_slot(slot)
 				if default is None:
 					continue
-				if type(validate) is types.TupleType or \
-				   type(validate) is types.DictType:
+				if (type(validate) is types.TupleType or
+        				   type(validate) is types.DictType):
 					self._entries[name].invoke(x[name])
 				else:
 					try:
@@ -564,8 +564,8 @@ class ParamTable(object):
 				(name, default, validate, descr, runlock) = _unpack_slot(slot)
 				if default is None:
 					continue
-				if type(validate) is types.TupleType or \
-				   type(validate) is types.DictType:
+				if (type(validate) is types.TupleType or
+        				   type(validate) is types.DictType):
 					self._entries[name].invoke(x[name])
 				else:
 					try:
@@ -701,8 +701,8 @@ if __name__ == '__main__':
 				   file='foobar', allowalt=False)
 
 	Button(root, text = 'info',
-		   command = lambda p=p: \
-		   sys.stdout.write('%s\n'%p.query('yn'))).pack(side='bottom')
+		   command = lambda p=p:
+        		   sys.stdout.write('%s\n'%p.query('yn'))).pack(side='bottom')
 
 	p.load('foobar')
 

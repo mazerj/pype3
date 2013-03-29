@@ -32,7 +32,7 @@ class DynamicConfig(object):
             mtime = os.stat(self.fname)[stat.ST_MTIME]
             if self.timestamp is None or mtime > self.timestamp:
                 if not self.timestamp is None:
-                    sys.stderr.write('Warning: reloaded config "%s"\n' % \
+                    sys.stderr.write('Warning: reloaded config "%s"\n' %
                                      self.fname)
                 self._config = {}
                 for line in open(self.fname, 'r'):

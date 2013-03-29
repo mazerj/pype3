@@ -62,8 +62,8 @@ class Controller(object):
         :return: (mult-val-ret) server, tank, block names
 
         """
-        (self._server, self._tank, self._block) = \
-                       self.tdtconnx.newblock(record=record)
+        (self._server,
+         self._tank, self._block) = self.tdtconnx.newblock(record=record)
         return (self._server, self._tank, self._block)
 
 	def getblock(self):

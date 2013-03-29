@@ -271,14 +271,14 @@ class PypeRecord(object):
 			klist = self.userparams.keys()
 			klist.sort()
 			for k in klist:
-				file.write("userparams['%s']=<%s>\n	 %s\n" % \
+				file.write("userparams['%s']=<%s>\n	 %s\n" %
 						   (k, self.userparams[k], type(self.userparams[k])))
 			file.write("--------------------------------\n")
 			klist = self.params.keys()
 			klist.sort()
 			for k in klist:
-				file.write("params['%s']=<%s>\n	 %s\n" %\
-					  (k, self.params[k], type(self.params[k])))
+				file.write("params['%s']=<%s>\n	 %s\n" %
+                           (k, self.params[k], type(self.params[k])))
 		if rest:
 			file.write("--------------------------------\n")
 			file.write("rest=<%s>\n" % (self.rest,))
@@ -374,11 +374,9 @@ class PypeRecord(object):
 			# photo_times...
 			t = find_events(self.events, EYE_START)
 			if len(t) > 0:
-				if len(self.spike_times) and \
-					   abs(self.spike_times[0] - t[0]) < 5:
+				if len(self.spike_times) and abs(self.spike_times[0] - t[0]) < 5:
 					self.spike_times = self.spike_times[1::]
-				if len(self.photo_times) and \
-					   abs(self.photo_times[0] - t[0]) < 5:
+				if len(self.photo_times) and abs(self.photo_times[0] - t[0]) < 5:
 					self.photo_times = self.photo_times[1::]
 
 			if len(self.rec) > 13 and self.rec[13] is not None:
@@ -439,10 +437,10 @@ class PypeRecord(object):
 						self.eyey = self.eyey / self.params['@eye_ygain']
 						self.israw = 1
 					else:
-						self.eyex = (self.eyex + self.params['@eye_xoff']) / \
-									self.params['@eye_xgain']
-						self.eyey = (self.eyey + self.params['@eye_yoff']) / \
-									self.params['@eye_ygain']
+						self.eyex = ((self.eyex + self.params['@eye_xoff']) /
+                                     self.params['@eye_xgain'])
+						self.eyey = ((self.eyey + self.params['@eye_yoff']) /
+                                     self.params['@eye_ygain'])
 						self.israw = 1
 			else:
 				self.israw = None
@@ -516,8 +514,7 @@ class PypeFile(object):
 				sys.stderr.write('decompressing: %s\n' % fname)
 			self.fname = fname[:-3]
 			self.zfname = fname[::]
-		elif not posixpath.exists(fname) and \
-				 posixpath.exists(fname+'.gz'):
+		elif not posixpath.exists(fname) and posixpath.exists(fname+'.gz'):
 			# if .gz file exists and the named file does not,
 			# try using the .gz file instead...
 			self.fname = fname
@@ -595,14 +592,14 @@ class PypeFile(object):
 					if cache:
 						self.cache.append(p)
 				return p
-			elif rec[0] == 'NOTE' and rec[1] == 'task_is':
+			elif (rec[0] == 'NOTE' and rec[1] == 'task_is'):
 				self.taskname = rec[2]
-			elif rec[0] == 'NOTE' and \
-				 rec[1] == 'pype' and rec[2] == 'run starts':
+			elif (rec[0] == 'NOTE' and rec[1] == 'pype' and
+                  rec[2] == 'run starts'):
 				if runinfo:
 					return 1
-			elif rec[0] == 'NOTE' and \
-				 rec[1] == 'pype' and rec[2] == 'run ends':
+			elif (rec[0] == 'NOTE' and rec[1] == 'pype' and
+                  rec[2] == 'run ends'):
 				pass
 			elif rec[0] == 'NOTE' and rec[1] == 'trialtime':
 				(n, trialtime) = rec[2]
@@ -846,8 +843,8 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 				v = (sum(eyevalid[t2i:t3i]) == 0)
 			else:
 				v = 1
-			fx, fy, fv, lfx, lfy, lfv = \
-				mean(eyex[t2i:t3i]), mean(eyey[t2i:t3i]), v, fx, fy, fv
+			(fx, fy, fv, lfx, lfy, lfv) = (mean(eyex[t2i:t3i]),
+                                           mean(eyey[t2i:t3i]), v, fx, fy, fv)
 			if (not t0i is None) and t3-t2 > 0:
 				SacList.append((t0,  t1,  t2,  t3,
 							    t0i, t1i, t2i, t3i,

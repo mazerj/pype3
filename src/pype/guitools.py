@@ -91,7 +91,7 @@ class DockWindow(Toplevel):
 
 		# make close button really hide..
 		self.protocol("WM_DELETE_WINDOW", self._hide)
-		
+
 		self.withdraw()
 		self._visible = 0
 
@@ -148,7 +148,7 @@ class Logger(object): 					# !SINGLETON CLASS!
 	def __init__(self, text=None, window=None, popup=None, once=None):
 		if not Logger._init:
 			return
-		
+
 		# handle multi-line message recursively..
 		if text:
 			if not text[-1] == '\n':
@@ -506,10 +506,13 @@ class AboutPype(object):
 						 relief=FLAT, image=splash, pady=10)
 			icon.pack(expand=1, fill=BOTH)
 
-			t = "pype: python physiology environment\n" + \
-				"Version %s\n" % pypeversion.PypeVersion + \
-				"Copyright (c) 1999-2010 James A. Mazer\n" + \
-				"Built: %s" % pypeversion.PypeBuildDate
+			t = "\n".join(
+                (
+                "pype: python physiology environment",
+                "Version %s" % pypeversion.PypeVersion,
+                "Copyright (c) 1999-2013 James A. Mazer",
+                "Built: %s" % pypeversion.PypeBuildDate,
+                ))
 			text = Label(AboutPype._w, text=t,fg='blue')
 			text.pack(expand=1, fill=BOTH)
 
@@ -595,9 +598,9 @@ class ProgressBar(object):
 		self.master.update_idletasks()
 		sw = self.master.winfo_screenwidth()
 		sh = self.master.winfo_screenheight()
-		self.master.geometry("+%d+%d" % \
-							 (sw/2 - (self.master.winfo_reqwidth()/2),
-							  sh/2 - (self.master.winfo_reqheight() / 2)))
+		self.master.geometry("+%d+%d" %
+                             (sw/2 - (self.master.winfo_reqwidth()/2),
+                              sh/2 - (self.master.winfo_reqheight() / 2)))
 		self.master.update_idletasks()
 
 	def __del__(self):

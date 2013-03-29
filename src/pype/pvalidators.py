@@ -241,13 +241,12 @@ def is_rgb(s, evaluate=None):
 	l = None
 	try:
 		l = eval(s)
-		if len(l) == 3 and \
-			   (l[0] >= 0 and l[0] < 256) and \
-			   (l[1] >= 0 and l[1] < 256) and \
-			   (l[2] >= 0 and l[2] < 256):
+		if (len(l) == 3 and
+                    (l[0] >= 0 and l[0] < 256) and
+                    (l[1] >= 0 and l[1] < 256) and
+                    (l[2] >= 0 and l[2] < 256)):
 			r = VALID
-		elif len(l) == 1 and \
-			 (l[0] >= 0 and l[0] < 256):
+		elif len(l) == 1 and (l[0] >= 0 and l[0] < 256):
 			r = VALID
 			l = (l[0],l[0],l[0])
 		else:
@@ -269,13 +268,13 @@ def is_rgba(s, evaluate=None):
 	l = None
 	try:
 		l = eval(s)
-		if len(l) == 3 and \
-		   (l[0] >= 0 and l[0] < 256) and (l[1] >= 0 and l[1] < 256) and \
-		   (l[2] >= 0 and l[2] < 256):
+		if (len(l) == 3 and
+            (l[0] >= 0 and l[0] < 256) and (l[1] >= 0 and l[1] < 256) and
+            (l[2] >= 0 and l[2] < 256)):
 			r = VALID
-		elif len(l) == 4 and \
-		   (l[0] >= 0 and l[0] < 256) and (l[1] >= 0 and l[1] < 256) and \
-		   (l[2] >= 0 and l[2] < 256) and (l[3] >= 0 and l[3] < 256):
+		elif (len(l) == 4 and
+              (l[0] >= 0 and l[0] < 256) and (l[1] >= 0 and l[1] < 256) and
+              (l[2] >= 0 and l[2] < 256) and (l[3] >= 0 and l[3] < 256)):
 			r = VALID
 		else:
 			r = INVALID

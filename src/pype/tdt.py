@@ -27,16 +27,16 @@ Think about something like this for the pype side. Would
 really simplify coding...
 
    >> class Foo:
-   >>     def __init__(self):
-   >>         print 'init'
+   >>	  def __init__(self):
+   >>		  print 'init'
    >>
-   >>     def callit(self, method, *args, **kw):
-   >>         print method, args, kw
+   >>	  def callit(self, method, *args, **kw):
+   >>		  print method, args, kw
    >>
-   >>     def __getattr__(self, key):
-   >>         def func(*args, **kw):
-   >>             return self.callit(key, *args, **kw)
-   >>         return func
+   >>	  def __getattr__(self, key):
+   >>		  def func(*args, **kw):
+   >>			  return self.callit(key, *args, **kw)
+   >>		  return func
    >>
    >> x = Foo()
    >> x.foobar(2, 3, 4, foo=1)
@@ -59,15 +59,15 @@ except ImportError:
 	_WINDOWS = 0
 
 _TDEVACC = 'TDevAcc'
-_TTANK   = 'TTank'
+_TTANK	 = 'TTank'
 
-_PORT    = 10000							# default inital TCP port
+_PORT	 = 10000							# default inital TCP port
 
 # OpenEx run modes:
-IDLE    = 0								# dsp completely idle
+IDLE	= 0								# dsp completely idle
 STANDBY = 1								# running, no display, no tank..
 PREVIEW = 2								# running, not saving to tank
-RECORD  = 3								# running and saving all data
+RECORD	= 3								# running and saving all data
 MODES = {
 	IDLE:'IDLE',
 	STANDBY:'STANDBY',
@@ -78,35 +78,35 @@ MODES = {
 class TDTError(Exception): pass
 
 class _Socket(object):
-    def __init__(self, clientsocket=None, host=None, port=None):
-        if (clientsocket is None) and host and port:
-            clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	def __init__(self, clientsocket=None, host=None, port=None):
+		if (clientsocket is None) and host and port:
+			clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			# set 250ms timeout on connection
 			# Mon Feb  4 13:28:52 2013 mazer -- uping timeout to 1s
 			clientsocket.settimeout(1.0)
-            clientsocket.connect((host, port))
-        self.sockfd = clientsocket
+			clientsocket.connect((host, port))
+		self.sockfd = clientsocket
 
-    def recv(self, packetsize=1024):
-        # returns None when connection is closed..
-        buf = self.sockfd.recv(struct.calcsize('!I'))
-        if len(buf) == 0:
-            return None
-        N = struct.unpack('!I', buf)[0]
-        data = ''
-        while len(data) < N:
-            packet = self.sockfd.recv(packetsize)
-            data = data + packet
-        return data
+	def recv(self, packetsize=1024):
+		# returns None when connection is closed..
+		buf = self.sockfd.recv(struct.calcsize('!I'))
+		if len(buf) == 0:
+			return None
+		N = struct.unpack('!I', buf)[0]
+		data = ''
+		while len(data) < N:
+			packet = self.sockfd.recv(packetsize)
+			data = data + packet
+		return data
 
-    def send(self, data):
-        self.sockfd.send(struct.pack('!I', len(data)))
-        return self.sockfd.sendall(data)
+	def send(self, data):
+		self.sockfd.send(struct.pack('!I', len(data)))
+		return self.sockfd.sendall(data)
 
 if _WINDOWS:
 	from threading import Thread
 
-	_DEBUG   = 1						# debug mode? (windows side only)
+	_DEBUG	 = 1						# debug mode? (windows side only)
 
 	class _Log:
 		fp = None
@@ -148,8 +148,8 @@ if _WINDOWS:
 
 		def run(self):
 			# result coding:
-			#              success: (1, ...descr...)
-			#          eval errors: (0, ...descr...)
+			#			   success: (1, ...descr...)
+			#		   eval errors: (0, ...descr...)
 			# server/client errors: (-1, ...descr...)
 			#
 
@@ -202,8 +202,8 @@ if _WINDOWS:
 								_Log(traceback.format_exc(errinfo[2]))
 								result = (0, result[errinfo:1])
 						except AttributeError:
-							result = (-1, 'invalid method: %s.%s' % \
-									  (obj, method,))
+							result = (-1, 'invalid method: %s.%s' % (obj,
+																	 method,))
 					_Log('result: %s\n' % (result,))
 					self.s.send(cPickle.dumps(result))
 
@@ -220,8 +220,8 @@ if _WINDOWS:
 				_Log('Error: %s\n' % (descr,))
 			ServersideClientHandler._ninst -= 1
 
-			_Log('Connection from %s closed (%d left)\n' % \
-				(self.src, ServersideClientHandler._ninst,))
+			_Log('Connection from %s closed (%d left)\n' %
+                 (self.src, ServersideClientHandler._ninst,))
 
 
 	def RunServer(port=_PORT):
@@ -249,7 +249,7 @@ if _WINDOWS:
 
 else: ## not _WINDOWS (ie, linux) ###########################################
 
-	_DEBUG   = 0						# debug mode? (linux side only)
+	_DEBUG	 = 0						# debug mode? (linux side only)
 
 	class TDTClient:
 		def __init__(self, server, port=_PORT):
@@ -263,12 +263,12 @@ else: ## not _WINDOWS (ie, linux) ###########################################
 			self.gotTDevAcc = cPickle.loads(self.s.recv())
 			self.gotTTank = cPickle.loads(self.s.recv())
 			if _DEBUG:
-				sys.stderr.write('tdtstatus: circuit=%d tank=%d\n' % \
+				sys.stderr.write('tdtstatus: circuit=%d tank=%d\n' %
 								 (self.gotTDevAcc, self.gotTTank, ))
 
 		def __repr__(self):
-			return '<TDTClient server=%s TDevAcc=%d TTank=%d>' % \
-				   (self.server, self.gotTDevAcc, self.gotTTank)
+			return ('<TDTClient server=%s TDevAcc=%d TTank=%d>' %
+                    (self.server, self.gotTDevAcc, self.gotTTank,))
 
 		def _sendtuple(self, cmdtuple):
 			"""Send tuple (command) from pype->TDT.
@@ -301,11 +301,9 @@ else: ## not _WINDOWS (ie, linux) ###########################################
 
 		def _invoke(self, which, method, args):
 			if which == _TDEVACC and not self.gotTDevAcc:
-				raise TDTError, \
-					  'No %s.X available; cmd=<%s>' % (which, method,)
+				raise TDTError('No %s.X available; cmd=<%s>' % (which, method,))
 			if which == _TTANK and not self.gotTTank:
-				raise TDTError, \
-					  'No %s.X available; cmd=<%s>' % (which, method,)
+				raise TDTError('No %s.X available; cmd=<%s>' % (which, method,))
 
 			if _DEBUG:
 				sys.stderr.write(repr(('exec:', which, method, args,)))
@@ -316,8 +314,8 @@ else: ## not _WINDOWS (ie, linux) ###########################################
 			if ok:
 				return result
 			else:
-				raise TDTError, \
-					  '%s.X Error; cmd=<%s>; err=<%s>' % (which, method, result)
+				raise TDTError('%s.X Error; cmd=<%s>; err=<%s>' %
+                               (which, method, result))
 
 		def tdev(self, method, *args):
 			return self._invoke(_TDEVACC, method, args)
@@ -460,9 +458,9 @@ else: ## not _WINDOWS (ie, linux) ###########################################
 					if not (newblock == oldblock) and len(newblock) > 0:
 						break
 					if nwaits == 0:
-						sys.stderr.write('newblock: oldblock=<%s> newblock=<%s>\n' %\
+						sys.stderr.write('newblock: old=<%s> new=<%s>\n' %
 										 (oldblock, newblock,))
-						sys.stderr.write('newblock: ttank.GetHotBlock blocked (2): ')
+						sys.stderr.write('newblock: GetHotBlock blkd (2): ')
 					nwaits += 1
 					sys.stderr.write('%d..' % nwaits)
 			else:
@@ -497,16 +495,14 @@ else: ## not _WINDOWS (ie, linux) ###########################################
 				params = {}
 				for n in range(1, nchans+1):
 					try:
-						params[n, 'thresh'] = \
-								  self.tdev('GetTargetVal',
-												   'Amp1.aSnip~%d' % n)
+						params[n, 'thresh'] = self.tdev('GetTargetVal',
+														'Amp1.aSnip~%d' % n)
 					except ValueError:
 						# not sure what this is --> comes back as -1.#IND..
 						params[n, 'thresh'] = 1.0
-					params[n, 'hoops'] = \
-							  self.tdev('ReadTargetV',
-											   'Amp1.cSnip~%d' % n,
-											   0, sniplen)
+					params[n, 'hoops'] = self.tdev('ReadTargetV',
+												   'Amp1.cSnip~%d' % n,
+												   0, sniplen)
 				return params
 			else:
 				for n in range(1, nchans+1):

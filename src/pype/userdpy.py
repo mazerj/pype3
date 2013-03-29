@@ -113,7 +113,7 @@ class ScaledCanvas(Canvas):
 			y1 *= self.yscale
 			y2 *= self.yscale
 			return Canvas.coords(self, item, x1, y1, x2, y2)
-		
+
 	def create_rectangle(self, x, y, w, h, **kwargs):
 		x *= self.xscale
 		w *= self.xscale
@@ -142,8 +142,8 @@ class ScaledCanvas(Canvas):
 	def create_window(self, x, y, **kwargs):
 		x *= self.xscale
 		y *= self.yscale
-		return Canvas.create_window(self, x, y, **kwargs)		
-	
+		return Canvas.create_window(self, x, y, **kwargs)
+
 
 class UserDisplay(object):
 	def __init__(self, master, fbsize, scale=1.0, pix_per_dva=1.0, app=None):
@@ -181,7 +181,7 @@ class UserDisplay(object):
 			else:
 				self.master.geometry('-0+20')
 			self.visible = 1
-			
+
 		(cwidth, cheight) = fbsize
 
 		self.background_nofocus = 'red'
@@ -189,12 +189,12 @@ class UserDisplay(object):
 
 		self.frame = Frame(self.master, relief=FLAT,
 						   bd=2, bg=self.background_nofocus)
-		
+
 		f = Frame(self.frame)
 		f.pack(expand=1, fill=X)
 		self.titlebar = Label(f, bg='black')
 		self.titlebar.pack(expand=1, fill=X, side=LEFT)
-		
+
 		self._info = Label(f, font="Courier 10")
 		self._info.pack(expand=0, side=LEFT)
 		self._mouseinfo = Label(f, font="Courier 10")
@@ -207,7 +207,7 @@ class UserDisplay(object):
 		self.gridinterval = pix_per_dva
 
 		# don't use this yet -- not quite working properly with handmap2
-		# except when scale=1.0.. 
+		# except when scale=1.0..
 		self.canvas = ScaledCanvas(self.frame,
 								   xscale=scale,
 								   yscale=scale,
@@ -215,14 +215,14 @@ class UserDisplay(object):
 								   height=round(scale*cheight))
 		self.canvas.pack()
 		self.canvas.configure(cursor='tcross', bg='grey80')
-		
+
 		self.canvas.bind("<FocusIn>",
-						 lambda ev,s=self: \
-								s.frame.configure(bg=s.background_focus))
+						 lambda ev,s=self:
+                                 s.frame.configure(bg=s.background_focus))
 		self.canvas.bind("<FocusOut>",
-						 lambda ev,s=self: \
-								s.frame.configure(bg=s.background_nofocus))
-		
+						 lambda ev,s=self:
+                                s.frame.configure(bg=s.background_nofocus))
+
 		self.frame.pack(expand=1, fill=BOTH)
 
 		self._htrace = []
@@ -235,7 +235,7 @@ class UserDisplay(object):
 			self._vtrace.append(self.canvas.create_line(x-1, 50, x, 50,
 														 fill='violet', width=3))
 		self._traceptr = 0
-		
+
 
 		self.mousex = 0
 		self.mousey = 0
@@ -477,7 +477,7 @@ class UserDisplay(object):
 
 	def can2fb(self, x, y):
 		"""Convert canvas/event coords to frame buffer coords.
-		
+
 		Canvas (ie, raw window) coords have (0,0) in upper left,
 		frame buffer has 0,0 at center and has normal Cartesian
 		directions.
@@ -516,9 +516,9 @@ class UserDisplay(object):
 				for y in range(0, int(round(self.h/2)), d):
 					for (sx, sy) in ((1,1),(-1,1),(-1,-1),(1,-1)):
 						if x == 0 or y == 0: continue
-						
-						if majorgrid and \
-							   ((round(x/d)%5) == 0 or (round(y/d)%5) == 0):
+
+						if majorgrid and ((round(x/d)%5) == 0 or
+                                          (round(y/d)%5) == 0):
 							color = 'gray50'
 						elif minorgrid:
 							color = 'gray70'
@@ -668,8 +668,8 @@ class UserDisplay(object):
 		(px, py) = (int(round(x - (self.w/2.0))), int(round((self.h/2.0) - y)))
 		d = 2; o = 6;
 		tb = self.canvas.create_oval(x-o, y-o, x+o, y+o, fill='red', width=0)
-		t = self.canvas.create_text(x, y, anchor=CENTER, justify=CENTER, \
-									 text='i', fill='white')
+		t = self.canvas.create_text(x, y, anchor=CENTER, justify=CENTER,
+                                    text='i', fill='white')
 		self.points.append((px, py, t, tb))
 
 	def deletepoint(self, x, y):
@@ -813,7 +813,7 @@ class UserDisplay(object):
 		s = "[%dppd]" % (self.gridinterval,)
 		if self.canvas.xscale != 1.0 or self.canvas.yscale != 1.0:
 			s = s + 'X[%.2f,%.2f]' % (self.canvas.xscale, self.canvas.yscale)
-			
+
 		if ev:
 			x, y = self.canvas.window2scaled(ev.x, ev.y)
 			(self.mousex, self.mousey) = self.can2fb(x, y)
@@ -866,8 +866,8 @@ class UserDisplay(object):
 						if hasattr(s, 'forcephoto'):
 							forcephoto = s.forcephoto
 
-						if forcephoto or \
-							   (self._photomode and s.w < 300 and s.h < 300):
+						if forcephoto or (self._photomode and
+                                          s.w < 300 and s.h < 300):
 							(x, y) = self.fb2can(s.x-(s.w/2), s.y+(s.h/2))
 							im = s.asPhotoImage()
 							ii.append(self.canvas.create_image(x, y, anchor=NW,
@@ -940,9 +940,9 @@ class UserDisplay(object):
 		(xs, ys, r) = self.fidinfo()
 		s = s + 'CTR=(%d,%d) R=%.1f px (%.1f deg)\n' % (xs, ys, r,
 														r/self.gridinterval)
-		s = s + 'ECC=%d px (%.1f deg)\n' % \
-			(math.sqrt((xs * xs) + (ys * ys)),
-			 math.sqrt((xs * xs) + (ys * ys)) / self.gridinterval)
+		s = s + 'ECC=%d px (%.1f deg)\n' % (math.sqrt((xs * xs) + (ys * ys)),
+                                            math.sqrt((xs * xs) + (ys * ys))
+                                            / self.gridinterval)
 
 		s = s + 'FIX=(%d, %d)\n' % (self.fix_x, self.fix_y)
 		s = s + '>>> COORDS ARE RE:FIX <<<\n'
@@ -1211,7 +1211,7 @@ class UserDisplay(object):
 			menu.add_command(label="no task-specific menu")
 		else:
 			self.taskpopup = menu
-		self.canvas.bind("<Button-2>", \
+		self.canvas.bind("<Button-2>",
 						  lambda ev,p=menu,s=self: s._dopopup(ev,p))
 
 class FID(object):

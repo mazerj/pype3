@@ -24,7 +24,7 @@ Thu Jun 16 15:20:45 2005 mazer
    bar, with the basename of each directory used as the text in
    the dropdown menu.
 
-Sat Jul  9 13:03:54 2005 mazer
+Sat Jul	 9 13:03:54 2005 mazer
 
  - moved the root take/drop stuff to a separate module & cleaned
    up the import structure for this module
@@ -47,7 +47,7 @@ Sun Jul 24 15:46:07 2005 mazer
 
  - mouse-over balloons can be added to any widget using, eg::
 
-    {app|self}.balloon.bind(widget, 'balloon message goes here...')
+	{app|self}.balloon.bind(widget, 'balloon message goes here...')
 
  - made DEBUG a Config file variable instead of an enviornment
    value (ie, use pypeconfig to add "DEBUG: 1" to enable debugging
@@ -77,12 +77,12 @@ Wed Aug 31 17:36:25 2005 mazer
 
 - changed safe_to_load() to a state var, instead of method
 
-Sat Sep  2 ??:??:?? 2005 mazer
+Sat Sep	 2 ??:??:?? 2005 mazer
 
 - removed safe_to_load and just disabled the load options in the
   main file menu..
 
-Sat Sep  3 16:59:49 2005 mazer
+Sat Sep	 3 16:59:49 2005 mazer
 
 - Changed the whole FixBreak/BarTransition interupt handling scheme
   so that the actual interrupt handler only sets a flag indicating
@@ -93,7 +93,7 @@ Sat Sep  3 16:59:49 2005 mazer
   and BarTransition exceptions from getting raised while the Tkinter
   handlers are running (which locks up parts of the pype gui).
 
-Sat Nov  5 20:01:02 2005 mazer
+Sat Nov	 5 20:01:02 2005 mazer
 
 - got rid of heatbeat code.. who uses this?? also cleaned up the
   eyelink interface a bit to make it simpler and easier to understand
@@ -122,7 +122,7 @@ Thu Mar 30 10:18:18 2006 mazer
 
 - deleted framebuffer arg to PypeApp() and added psych arg
 
-Tue Apr  4 11:47:37 2006 mazer
+Tue Apr	 4 11:47:37 2006 mazer
 
 - added arguments to eyeset() to allow tasks to muck with the
   xgain,ygain,xoffset and yoffset values
@@ -144,7 +144,7 @@ Tue Apr 25 14:13:14 2006 mazer
   ~/.pyperc config files. This is for when multiple users want to share
   a common .pyperc directory for a single animal.
 
-Mon May  1 11:10:29 2006 mazer
+Mon May	 1 11:10:29 2006 mazer
 
 - check permission on the config directory 1st thing when pype is
   fired up and exit if you don't have write access to save state.
@@ -167,22 +167,22 @@ Thu Sep 28 10:16:02 2006 mazer
   parameters:
 
   - max_trials -- maximum number of trials to run before stopping.
-    only correct and error trials count.
+	only correct and error trials count.
 
   - max_correct -- maximum number of CORRECT trials to run before stopping.
 
   - max_ui -- maximum number of SEQUENTIAL ui trials before stopping.
 
   - uimax -- still exists and all the associated code, but this is
-    really used only by the task -- user's responsible for coding
-    up the handler. the max_* parameters are handled directly by
-    pype and the run is terminated automatically when the stopping
-    conditions are met.
+	really used only by the task -- user's responsible for coding
+	up the handler. the max_* parameters are handled directly by
+	pype and the run is terminated automatically when the stopping
+	conditions are met.
 
   In all cases, setting these values to zero means they won't be used.
   Either max_trials should be set OR max_correct, but not both!
 
-Mon Dec  4 09:26:10 2006 mazer
+Mon Dec	 4 09:26:10 2006 mazer
 
 - added set_alarm() method -- this provides a mechanism to generate
   an alarm signal after a fixed # of ms. Use in conjunction with
@@ -190,9 +190,9 @@ Mon Dec  4 09:26:10 2006 mazer
   alarm goes off an 'Alarm' exception is raised the next time idlefn()
   gets called, just like Bar events::
 
-    usage: app.set_alarm(ms=##) or app.set_alarm(clear=1)
+	usage: app.set_alarm(ms=##) or app.set_alarm(clear=1)
 
-Tue Apr  3 10:41:33 2007 mazer
+Tue Apr	 3 10:41:33 2007 mazer
 
 - Added support for setting "EYETRACKERDEV: NONE" in config file to
   disable eyetracking in the comedi/das server. This is really to free
@@ -303,11 +303,11 @@ Thu Jun 25 16:01:42 2009 mazer
 
 - got rid of trial_XXX functions and trialstats{}
 
-Tue Jul  7 10:25:03 2009 mazer
+Tue Jul	 7 10:25:03 2009 mazer
 
 - got rid of BLOCKED -- automatically computed from sync info..
 
-Thu Jan  7 17:31:33 2010 mazer
+Thu Jan	 7 17:31:33 2010 mazer
 
 - added explicit typeing for c0,c1..cN numeric arrays so they
   get properly saved/pickled by labeled_load.
@@ -410,11 +410,11 @@ def _pypestdparams():
 			  'fixwin radius (pix)'),
 		pslot('win_scale', '0.0', is_float,
 			  'additive ecc. adj for win_size (rad-pixels/ecc-pixels)'),
-		pslot('vbias', 	'1.0', is_float,
+		pslot('vbias',	'1.0', is_float,
 			  'fixwin vertical elongation factor (1.0=none)'),
 
 		ptitle('Recording Info'),
-		pslot('site.well', '', 	is_any,
+		pslot('site.well', '',	is_any,
 			  'well number'),
 		pslot('site.probe', '', is_any,
 			  'probe location'),
@@ -433,7 +433,7 @@ def _pypestdparams():
 		pslot('minreward', '0', is_gteq_zero,
 			  'minimum reward duration (hard limit)'),
 
-		ptitle('Pype Blocking Params'), 	# global, but handled by pype itself
+		ptitle('Pype Blocking Params'),		# global, but handled by pype itself
 		pslot('max_trials', '0', is_int,
 			  'trials before stopping (0 for no limit)'),
 		pslot('max_correct', '0', is_int,
@@ -482,7 +482,7 @@ def _pypestdparams():
 			  'try to use real time (rt) scheduler'),
 		pslot('fb_pri', '-10', is_int,
 			  'priority of the framebuffer process pslot (<0 higher)'),
-		pslot('photo_thresh', '500', 	is_int,
+		pslot('photo_thresh', '500',	is_int,
 			  'threshold for photodiode detection'),
 		pslot('photo_polarity', '1', is_int,
 			  'sign of threshold for photodiode detection'),
@@ -566,16 +566,16 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		"""Initialize a PypeApp instance, with side effects:
 
 		- FrameBuffer instance is created, which means the hardware
-		  screen will be opened automatically.  Right now, PypeApp
+		  screen will be opened automatically.	Right now, PypeApp
 		  guesses about the size & depth of the display to simplify
-		  things for the user.  This could change.
+		  things for the user.	This could change.
 
 		- The DACQ hardware is opened, if possible.
 
 		- PypeApp gui is built and opened on screen
 
-		Don't initialize more than one instance of this class.  If you
-		do an exception will be raised.  An alternative (for later
+		Don't initialize more than one instance of this class.	If you
+		do an exception will be raised.	 An alternative (for later
 		consideration) would be to allow multiple instances which share
 		an underlying framebuffer & dacq hardware; however, this would
 		really require some sort of underlying locking method to prevent
@@ -636,9 +636,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			Logger("pype: FULLSCREEN ignored -- single display mode")
 
 		# you can set debug mode by:
-		#   - running with --debug argument
-		#   - setenv PYPEDEBUG=1
-		#   - setting DEBUG: 1 in the Config.$HOST file
+		#	- running with --debug argument
+		#	- setenv PYPEDEBUG=1
+		#	- setting DEBUG: 1 in the Config.$HOST file
 		if os.environ.has_key('PYPEDEBUG'):
 			self.config.set('DEBUG', '1', override=1)
 
@@ -691,7 +691,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.tk.resizable(0, 0)
 		self.tk.title('pype')
 		self.tk.protocol("WM_DELETE_WINDOW", self._shutdown)
-        self.setgeo(self.tk, default='+20+20', posonly=1)
+		self.setgeo(self.tk, default='+20+20', posonly=1)
 		self._stash_icons()
 
 		if self.config.iget('SPLASH'):
@@ -1070,7 +1070,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		Label(itrack1,
 			  text="Use Shift/Ctrl/Meta-Arrows in UserDisplay\n"+
-			       "window to adjust offsets in real-time",
+				   "window to adjust offsets in real-time",
 			  relief=SUNKEN).pack(expand=0, fill=X, side=TOP, pady=10)
 
 		# make sure Notebook is big enough for buttons above to show up
@@ -1126,7 +1126,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		if self.config.iget('FPS') and self.config.iget('FPS') != fps:
 			Logger('pype: error actually FPS does not match requested rate\n' +
-				   '      requested=%dhz actual=%dhz\n' %
+				   '	  requested=%dhz actual=%dhz\n' %
 				   (self.config.iget('FPS'), fps))
 			raise PypeStartupError
 		self.rig_common.set('mon_fps', '%g' % fps)
@@ -1196,12 +1196,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		# we're now ready to receive interupts, but they won't come
 		# through until you do in your task:
-		#   (app/self).interupts(enable=1, queued=0|1)
+		#	(app/self).interupts(enable=1, queued=0|1)
 
 		#
 		# External DACQ interface --
 		#  this is for multichannel recording systems:
-		#    - Plexon MAP box (via PlexNet API)
+		#	 - Plexon MAP box (via PlexNet API)
 		#	 - Tucker-Davis (via pype's tdt.py client-server module)
 		#
 		self.xdacq = None
@@ -1240,8 +1240,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				# dir must have trailing backslash
 				tankdir = tankdir + '\\'
 
-            tankname = subject()
-            tankname += '%04d%02d%02d' % time.localtime(time.time())[0:3]
+			tankname = subject()
+			tankname += '%04d%02d%02d' % time.localtime(time.time())[0:3]
 
 			try:
 				self.tdt = pype2tdt.Controller(self, tdthost)
@@ -1304,20 +1304,20 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self.idle_queue.append((dacq_ts()+inms, action,))
 
 	def _whereami(self):
-		self._console.writenl('    ver: pype %s' % (pypeversion.PypeVersion,),
-                              'blue')
-        self._console.writenl('     id: %s' % (pypeversion.PypeVersionID),
-                              'blue')
+		self._console.writenl('	   ver: pype %s' % (pypeversion.PypeVersion,),
+							  'blue')
+		self._console.writenl('		id: %s' % (pypeversion.PypeVersionID),
+							  'blue')
 		self._console.writenl('pypedir: %s' % self.pypedir, 'blue')
 		self._console.writenl(' pyperc: %s' % pyperc(), 'blue')
-		self._console.writenl('    cwd: %s' % os.getcwd(), 'blue')
+		self._console.writenl('	   cwd: %s' % os.getcwd(), 'blue')
 		self._console.writenl('_'*60)
 
 	def migrate_pypestate(self):
 		fname = subjectrc('pypestate.%s' % self._gethostname())
 		if (posixpath.exists(fname) and
-            ask('migrate_pypestate', 'Automigrate %s?' %
-                fname, ['yes', 'no']) == 0):
+			ask('migrate_pypestate', 'Automigrate %s?' %
+				fname, ['yes', 'no']) == 0):
 			try:
 				d = cPickle.load(open(fname, 'r'))
 				self.tallycount = d['tallycount']
@@ -1416,8 +1416,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					d = pt._get(evaluate=0)
 					try:
 						self.con('%s(row %d): %s=''%s''' %
-                                 (posixpath.basename(pt._file),
-                                  n, slot, d[1][slot]))
+								 (posixpath.basename(pt._file),
+								  n, slot, d[1][slot]))
 					except KeyError:
 						# skip title slots..
 						pass
@@ -1679,7 +1679,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		tasks = []
 		taskdescrs = {}
 
-        dirname = os.path.join(dirname, '')   # ensure trailing delim
+		dirname = os.path.join(dirname, '')	  # ensure trailing delim
 		filelist = glob.glob(os.path.join(dirname, '*.py'))
 
 		for fname in filelist:
@@ -1716,7 +1716,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			menubar.addmenuitem(menulabel, 'command', label=tasklabel,
 								font=('Courier', 10),
 								command=lambda s=self,t=t,d=dirname:
-                                        s.loadtask(t, d))
+										s.loadtask(t, d))
 		menubar.addmenuitem(menulabel, 'separator')
 		menubar.addmenuitem(menulabel, 'command', label='Reload current',
 							command=self.loadtask)
@@ -1742,7 +1742,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		"""(Re)load task from file.
 
 		Load a task, if taskname==None and path==None then we reload the current
-		task, if possible.  If ask is true, then pop up a dialog box to ask for
+		task, if possible.	If ask is true, then pop up a dialog box to ask for
 		a filename..
 
 		:return: None for error, task module on success
@@ -1951,7 +1951,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		if len(eyelink_opts) > 0:
 			eyelink_opts = eyelink_opts + ':'
 		eyelink_opts = eyelink_opts + ('pupil_crosstalk_fixup=%s' %
-                                       self.config.get('EYELINK_XTALK'))
+									   self.config.get('EYELINK_XTALK'))
 		eyelink_opts = eyelink_opts + ':active_eye=both'
 		eyelink_opts = eyelink_opts + ':link_sample_data=PUPIL,AREA'
 		eyelink_opts = eyelink_opts + ':heuristic_filter=0 0'
@@ -1975,12 +1975,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		self.u3 = None
 		# Tue Jan  8 15:08:12 2013 mazer
-		#   - This basically works -- the lag between the comedi
-		#     datastream and the labjack is ~0.7ms as far as I can
-		#     tell (using cross correlation against FM chirps).
-		#   - However, integration is not complete... not sure how
-		#     I want to do this -- could use it to get rid of
-		#     comedi_server completely..
+		#	- This basically works -- the lag between the comedi
+		#	  datastream and the labjack is ~0.7ms as far as I can
+		#	  tell (using cross correlation against FM chirps).
+		#	- However, integration is not complete... not sure how
+		#	  I want to do this -- could use it to get rid of
+		#	  comedi_server completely..
 		if 0:
 			try:
 				import labjack
@@ -2105,11 +2105,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		nu = self._runstats['nui']
 		nt = nc + ne
 		s = string.join((
-			' running = %d'    % (self.isrunning(),),
+			' running = %d'	   % (self.isrunning(),),
 			'----------------------------------',
-			'  nerror = %d'      % (ne,),
+			'  nerror = %d'		 % (ne,),
 			'ncorrect = %d [%d]' % (nc, self.sub_common.queryv('max_correct'),),
-			'     nui = %d [%d]' % (nu, self.sub_common.queryv('max_ui'),),
+			'	  nui = %d [%d]' % (nu, self.sub_common.queryv('max_ui'),),
 			' ntrials = %d [%d]' % (nt, self.sub_common.queryv('max_trials'),),
 			'----------------------------------'), '\n')
 		self.statsw.configure(text=s)
@@ -2126,8 +2126,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self.running = 0
 		else:
 			if (os.stat(self._task_pathname).st_mtime <> self._task_mtime and
-                ask('run task', 'Task has changed\nRun anyway?',
-                    ['yes', 'no']) == 1):
+				ask('run task', 'Task has changed\nRun anyway?',
+					['yes', 'no']) == 1):
 				return
 
 			try:
@@ -2362,7 +2362,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		- if (reset) --> set x/y offsets to (0,0)
 
-		- if (zero)  --> set x/y offset to current gaze position
+		- if (zero)	 --> set x/y offset to current gaze position
 
 		- otherwise --> shift the offsets by (x*xincr, y*yincr); use a
 		  lambda expression if you want to shift in a callback
@@ -2386,15 +2386,15 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		"""Idle function -- call when there's nothing to do to update GUI.
 
 		The idle function -- this function should be call periodically
-		by everything.  Whenever the program's looping or busy waiting
+		by everything.	Whenever the program's looping or busy waiting
 		for something (bar to go up/down, timer to expire etc), the
-		app should just call idlefn().  The optional ms arg will run
+		app should just call idlefn().	The optional ms arg will run
 		the idle function for the indicated amount of time -- this is
 		not accurate; it just uses the tk after() command, so it's
 		X11 limited and only approximate.
 
 		This function is also responsible for monitoring the GUI's
-		keyboard queue and handling key events.  Right now only some
+		keyboard queue and handling key events.	 Right now only some
 		basics are implemented -- give a drop of juice, open/close
 		solenoid, run/stop etc.. more can be implemented and eventually
 		there should be a way to set user/app specific keybindings
@@ -2535,10 +2535,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 	def _history(self, c=None, init=0):
 		"""
-		Maintains a 'history stack' ala cortex.  Cortex did do
+		Maintains a 'history stack' ala cortex.	 Cortex did do
 		somethings right.  The max size of the history stack is set by
 		LEN below; it's defined in the __init__() function above, you
-		can overright it, if you like..  Called with no arguments,
+		can overright it, if you like..	 Called with no arguments,
 		history stack will be cleared.
 
 		*NB* set_history() method uses this internally -- really should
@@ -2818,7 +2818,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		:param queue: (boolean) if true, then interupts are queued and
 				handled by idlefn(). Otherwise they are raised
-				immediately and must be caught.  Use None to
+				immediately and must be caught.	 Use None to
 				leave current setting alone
 
 		:return: tuple of current interupt status: (enable, queue)
@@ -2853,11 +2853,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.allow_ints = 0
 
 		# class/arg is:
-		#   1: DIN transition (arg is input # that changed; bar==0)
-		#       --> this is also joypad/stick button #1 presses
-		#   2: fixwin break (arg is meaningless -- always 0)
-		#   3: alarm expired (arg is meaningless -- always 0)
-		#   4: joypad/stick transition (button # > 1)
+		#	1: DIN transition (arg is input # that changed; bar==0)
+		#		--> this is also joypad/stick button #1 presses
+		#	2: fixwin break (arg is meaningless -- always 0)
+		#	3: alarm expired (arg is meaningless -- always 0)
+		#	4: joypad/stick transition (button # > 1)
 		self.lastint_ts = dacq_ts()
 
 		if iclass == 1:
@@ -2931,7 +2931,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		return (dacq_js_x(), dacq_js_y())
 
 	def setgeo(self, w=None, default=None, load=None, loadempty=None,
-               save=None, posonly=0):
+			   save=None, posonly=0):
 		"""Manage window geometry database (sticky across sessions).
 
 		:param w: (widget) widget to query -- title string is use as key!
@@ -2946,7 +2946,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		:param save: (bool) save database to ~/.pyperc/winpos
 
-        :param posonly: (bool) only use position info
+		:param posonly: (bool) only use position info
 
 		:return: nothing
 		"""
@@ -2984,9 +2984,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				geo = self._winpos[w.title()]
 				if geo[0:3] == '1x1':
 					raise KeyError
-                if posonly:
-                    geo = "".join(re.compile('[+-][0-9]+').findall(geo)[-2:])
-                w.geometry(geo)
+				if posonly:
+					geo = "".join(re.compile('[+-][0-9]+').findall(geo)[-2:])
+				w.geometry(geo)
 			except KeyError:
 				if default:
 					w.geometry(default)
@@ -3124,8 +3124,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		"""Start recording data.
 
 		Clear the per-trial recording buffer and reset the per-trial
-		timer.  This should be called at the start of every trial,
-		always at the same point in the trial.  All per-trial
+		timer.	This should be called at the start of every trial,
+		always at the same point in the trial.	All per-trial
 		timestamps (encodes and datastreams) will be timestamped
 		relative to this call (which will be t=0).
 
@@ -3144,12 +3144,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		# Thu Oct 23 15:51:34 2008 mazer
 		#
 		# - The record_state() function can now block for 250ms to
-		#   ensure that the plexon has time to register onset of new
-		#   trial, therefore, the timestamp should be recorded when
-		#   record_state() returns, not before it's called.
+		#	ensure that the plexon has time to register onset of new
+		#	trial, therefore, the timestamp should be recorded when
+		#	record_state() returns, not before it's called.
 		#
 		# - So the t=self.encode(START) has been moved from right
-		#   before the self.record_state(1) to right after
+		#	before the self.record_state(1) to right after
 
 		# tell plexon trial is BEGINNING
 		self.record_state(1)
@@ -3289,7 +3289,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				timestamp. If code is None, then it's a dummy encode
 				that can be used to retrieve the current time.
 
-	    :param ts: (int) optional time in ms for enodes -- by default
+		:param ts: (int) optional time in ms for enodes -- by default
 				the current timestamp is used, but a timestamp can
 				be provided to override (allowing multiple seqeuential
 				encodes with the same timestamp)
@@ -3357,7 +3357,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		:param stop: (ms) time/timestamp to stop looking
 
-	    :returns: (list of tuples) See pypedata.find_saccades().
+		:returns: (list of tuples) See pypedata.find_saccades().
 
 		"""
 		import pypedata
@@ -3384,9 +3384,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		"""Query current eye trace - note: was get_eyepos_now().
 
 		This function extracts the current state of the x/y eye
-		position buffers from the dacq_server NOW.  Like get_spikes()
+		position buffers from the dacq_server NOW.	Like get_spikes()
 		you can use this in mid-trial or at the end of the trial to
-		adapt the task based on his eye movements.  This should NOT be
+		adapt the task based on his eye movements.	This should NOT be
 		considered the final data, particularly if you're still in
 		record mode when you call this function
 
@@ -3451,7 +3451,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		"""
 
 		if (self.record_file == '/dev/null' and
-                    self.sub_common.queryv('fast_tmp')):
+					self.sub_common.queryv('fast_tmp')):
 			fast_tmp = 1
 		else:
 			fast_tmp = 0
@@ -3555,17 +3555,17 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					   (len(self.spike_times), len(self.photo_times), ndups,))
 
 		# Completely wipe the buffers -- don't let them accidently
-		# get read TWICE!!  They're saved as self/app.eyebuf_[xyt]
+		# get read TWICE!!	They're saved as self/app.eyebuf_[xyt]
 		# in case you wawnt them for something..
 		dacq_adbuf_clear()
 
 		# insert these into the param dictionary for later retrieval
-		params['PypeBuildDate']  = pypeversion.PypeBuildDate
+		params['PypeBuildDate']	 = pypeversion.PypeBuildDate
 		params['PypeBuildHost'] = pypeversion.PypeBuildHost
 
-        # these are git/svn info (if available)
-        params['PypeVersionInfo'] = pypeversion.PypeVersionInfo
-        params['PypeVersionID'] = pypeversion.PypeVersionID
+		# these are git/svn info (if available)
+		params['PypeVersionInfo'] = pypeversion.PypeVersionInfo
+		params['PypeVersionID'] = pypeversion.PypeVersionID
 
 		# starting with pype3 (string set in mkpypeversion.sh)
 		params['PypeVersion']  = pypeversion.PypeVersion
@@ -3601,13 +3601,13 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			#				currently implemented
 			#  rec[12]		pupil area data (if available) in same format
 			#				as the eye [xy]-position data above
-			#               (added: 08-feb-2003 JAM)
+			#				(added: 08-feb-2003 JAM)
 			#  rec[13]		on-line plexon data via PlexNet. This should be
 			#				a list of (timestamp, unit) pairs, with timestamps
 			#				in ms and unit's following the standard plexon
 			#				naming scheme (01a, 02a, 02b etc..)
-			#               (added: rec[13] 31-oct-2005 JAM)
-			#  rec[14]		eyenew data (added: Fri Apr  8 15:27:34 2011 mazer )
+			#				(added: rec[13] 31-oct-2005 JAM)
+			#  rec[14]		eyenew data (added: Fri Apr	 8 15:27:34 2011 mazer )
 
 			if self.xdacq == 'tdt':
 				# insert tdt tank info into the parameter table for this
@@ -4260,7 +4260,7 @@ def _get_plexon_events(plex, fc=40000):
 		for e in tank:
 			(Type, Channel, Unit, ts, waveform) = e
 			if (Type == PlexHeaders.Plex.PL_ExtEventType and
-                        Channel == PlexHeaders.Plex.PL_StartExtChannel):
+						Channel == PlexHeaders.Plex.PL_StartExtChannel):
 				if events is not None:
 					Logger("pype: double trigger\n")
 					return None
@@ -4268,7 +4268,7 @@ def _get_plexon_events(plex, fc=40000):
 				zero_ts = ts
 			elif events is not None:
 				if (Type == PlexHeaders.Plex.PL_ExtEventType and
-                            Channel == PlexHeaders.Plex.PL_StopExtChannel):
+							Channel == PlexHeaders.Plex.PL_StopExtChannel):
 					hit_stop = 1
 					# drain rest of tank, then return
 				else:
@@ -4279,17 +4279,17 @@ def _get_plexon_events(plex, fc=40000):
 	return events
 
 def _addpath(d, atend=None):
-    """
-    Add directory to the HEAD (or TAIL) of the python search path.
+	"""
+	Add directory to the HEAD (or TAIL) of the python search path.
 
 	**NOTE:**
 	This function also lives in pyperun.py.template.
 
-    """
-    if atend:
-        sys.path = sys.path + [d]
-    else:
-        sys.path = [d] + sys.path
+	"""
+	if atend:
+		sys.path = sys.path + [d]
+	else:
+		sys.path = [d] + sys.path
 
 def _tolist(v):
 	try:

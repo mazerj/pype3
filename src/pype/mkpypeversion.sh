@@ -26,7 +26,7 @@ if /usr/bin/svn info 1>/dev/null 2>/dev/null; then
   echo 'PypeVersionInfo = """'
   svn info
   echo '"""'
-  echo 'PypeVersionID = """svn:r'`svn info|grep ^Revision:|awk '{print $2}'`'"""'
+  echo 'PypeVersionID = """svn:r'`svnversion`'"""'
 elif git log -n1 1>/dev/null 2>/dev/null; then
   # dump git info if available
   echo 'PypeVersionInfo = """'

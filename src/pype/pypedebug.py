@@ -40,7 +40,7 @@ def remotedebug():
 		pass
 
 try:
-	import IPython
+	import IPython.Shell
 
 	def keyboard(banner='Type EOF/^D to continue (? for help)', builtin=0):
 		if builtin:

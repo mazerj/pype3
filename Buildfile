@@ -68,7 +68,10 @@ stable:
 	@if [ -e UNSTABLE ]; then svn mv UNSTABLE RELEASE; fi
 	@echo RELEASE
 
-# push repo to googlecode
-push:
+# push and sync to googlecode mirror
+gpush:
+	svnsync init --username mazerj2006 https://pype3.googlecode.com/svn
+
+gsync:
 	svnsync sync --username mazerj2006 https://pype3.googlecode.com/svn
 

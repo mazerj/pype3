@@ -68,10 +68,13 @@ stable:
 	@if [ -e UNSTABLE ]; then svn mv UNSTABLE RELEASE; fi
 	@echo RELEASE
 
-# push and sync to googlecode mirror
+# push and sync to googlecode mirror -- these don't actually
+# run the commands, but just tell you what to do..
 gpush:
-	svnsync init --username mazerj2006 https://pype3.googlecode.com/svn
+	@echo svnsync init --username mazerj2006 \
+		https://pype3.googlecode.com/svn \
+		svn+ssh://svn/auto/share/repos/pype3/
 
 gsync:
-	svnsync sync --username mazerj2006 https://pype3.googlecode.com/svn
+	@echo svnsync sync --username mazerj2006 https://pype3.googlecode.com/svn
 

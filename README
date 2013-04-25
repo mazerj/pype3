@@ -17,7 +17,3 @@ This is numpy-based pype3.
 Don't run make directly -- instead use the 'build' script in this
 directory to build/install/etc pype.
 
-----------------------------------------------------------------------
-
-Thu Apr 25 11:29:30 2013 mazer 
-- starting to mirror to googlecode

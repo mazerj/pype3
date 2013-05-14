@@ -18,13 +18,16 @@ if __name__ == '__main__':
 	except IndexError:
 		sys.stderr.write('usage: showpypefile pypefile [recno]\n')
 		sys.exit(1)
-		
+
 	if len(sys.argv) > 2:
 		n = int(sys.argv[2])
 	else:
 		n = 0
 	d = pf.nth(n)
 	pf.close()
+    if d is None:
+        sys.stderr.write('error: <%d trial(s) in file\n' % n)
+        sys.exit(1)
 	d.compute()
 
 	print 70*'-'

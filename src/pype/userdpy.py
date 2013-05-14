@@ -812,19 +812,16 @@ class UserDisplay(object):
 	def _mouse_motion(self, ev=None):
 		s = "[%dppd]" % (self.gridinterval,)
 		if self.canvas.xscale != 1.0 or self.canvas.yscale != 1.0:
-			s = s + 'X[%.2f,%.2f]' % (self.canvas.xscale, self.canvas.yscale)
-
+			s = s + '(SC)'
 		if ev:
 			x, y = self.canvas.window2scaled(ev.x, ev.y)
 			(self.mousex, self.mousey) = self.can2fb(x, y)
-		if self._mouseinfo:
-			if ev:
-				if self.fix_x or self.fix_y:
-					s = " fixrel=[%d,%d]" % (self.mousex-self.fix_x,
-											 self.mousey-self.fix_y,) + s
-					s = "abs=[%d,%d]" % (self.mousex, self.mousey,) + s
-			s = '%40s' % s
-			self._mouseinfo.configure(text=s)
+            if self.fix_x or self.fix_y:
+                s = " R=[%5d,%5d]" % (self.mousex-self.fix_x,
+                                         self.mousey-self.fix_y,) + s
+                s = "A=[%5d,%5d]" % (self.mousex, self.mousey,) + s
+		s = '%40s' % s
+		self._mouseinfo.configure(text=s)
 
 	def _mouse_enter(self, ev):
 		self.canvas.focus_set()

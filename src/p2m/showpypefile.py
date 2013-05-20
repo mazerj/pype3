@@ -25,9 +25,9 @@ if __name__ == '__main__':
 		n = 0
 	d = pf.nth(n)
 	pf.close()
-    if d is None:
-        sys.stderr.write('error: <%d trial(s) in file\n' % n)
-        sys.exit(1)
+	if d is None:
+		sys.stderr.write('error: <%d trial(s) in file\n' % n)
+		sys.exit(1)
 	d.compute()
 
 	print 70*'-'

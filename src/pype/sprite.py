@@ -11,11 +11,11 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 """Revision History
 
-Mon Jan  6 18:03:09 2003 mazer
+Mon Jan	 6 18:03:09 2003 mazer
 
 - added userdict to Image/Sprite classes
 
-Tue Jul  5 12:28:24 2005 mazer
+Tue Jul	 5 12:28:24 2005 mazer
 
 - fastblit now pays attention to the on/off flag!
 
@@ -28,14 +28,14 @@ Mon Nov 21 18:35:39 2005 mazer
 - Sprite.clone() method correctly sets the sprite name to avoid
   errors on deletion.
 
-Tue Mar  7 09:26:05 2006 mazer
+Tue Mar	 7 09:26:05 2006 mazer
 
 - Added Sprite.rotateCW(0 and Sprite.rotateCCW() methods. This is
   because the standard pygame-based rotation method actually rotates
   CW, and really we want CCW rotation. This has previously been
   corrected at the task level..
 
-Tue Mar  7 16:27:40 2006 mazer
+Tue Mar	 7 16:27:40 2006 mazer
 
 - oops - missed one thing -> barsprite
 
@@ -44,7 +44,7 @@ Fri Mar 24 11:09:23 2006 mazer
 - fixed fb.show()/hide() methods - I think these should work
   now, at least with the OPENGL driver..
 
-Mon Jan  5 14:36:35 2009 mazer
+Mon Jan	 5 14:36:35 2009 mazer
 
 - got rid of unrender() method - you can force unrendering by calling
   render with the clear=1 optional argument, but otherwise, deleting the
@@ -91,13 +91,13 @@ Fri Apr 17 10:45:46 2009 mazer
 - Tue Jul  7 10:25:19 2009 mazer
 
   - FrameBuffer.syncinfo is stashed to allow UserDisplay to automatically
-    mark the sync spot location on the screen..
+	mark the sync spot location on the screen..
 
 Wed Jan 26 14:49:42 2011 mazer
 
 - added antialiasing option to PolySprite clas
 
-Fri May  6 14:44:29 2011 mazer
+Fri May	 6 14:44:29 2011 mazer
 
 - Converted to pure OpenGL -- OpenGL is needed now. This basically
   means that everything is done using texture memory, should be
@@ -168,18 +168,18 @@ except ImportError:
 	Logger('sprite: python opengl OpenGL package required.\n')
 	sys.exit(1)
 
-GLASS   = (0,0,0,0)
-WHITE   = (255,255,255)
-BLACK   = (1,1,1)
-RED     = (255,1,1)
-GREEN   = (1,255,1)
-BLUE    = (1,1,255,1)
-YELLOW  = (255,255,1)
+GLASS	= (0,0,0,0)
+WHITE	= (255,255,255)
+BLACK	= (1,1,1)
+RED		= (255,1,1)
+GREEN	= (1,255,1)
+BLUE	= (1,1,255,1)
+YELLOW	= (255,255,1)
 MAGENTA = (255,1,255)
-CYAN    = (1,255,255)
+CYAN	= (1,255,255)
 
 class FrameBuffer(object):
-    _instance = None
+	_instance = None
 
 	def __new__(cls, *args, **kwargs):
 		"""This ensure a single instantation.
@@ -225,7 +225,7 @@ class FrameBuffer(object):
 				center, positive to left and up. *NB* this indicates
 				the position for the *center* of the sync spot, so if
 				you are at a corner, you should probably double the
-				size to get the expected value.  Default position
+				size to get the expected value.	 Default position
 				(when syncx and syncy are not specified or are None)
 				is lower right hand corner.
 
@@ -362,9 +362,9 @@ class FrameBuffer(object):
 			ogl.glOrtho(0.0, self.w, 0.0, self.h, 0.0, 1.0)
 			# in theory -- can put any static, global transformations you
 			# want here -- say to invert the stimuli or scale it, eg:
-			#    ogl.glScale(0.5, 0.5, 1.0)
+			#	 ogl.glScale(0.5, 0.5, 1.0)
 			# or
-			#    ogl.glOrtho(-self.w, 2*self.w, -self.h, 2*self.h, 0.0, 1.0)
+			#	 ogl.glOrtho(-self.w, 2*self.w, -self.h, 2*self.h, 0.0, 1.0)
 			ogl.glEnable(ogl.GL_LINE_SMOOTH)
 			ogl.glEnable(ogl.GL_BLEND)
 			ogl.glBlendFunc(ogl.GL_SRC_ALPHA, ogl.GL_ONE_MINUS_SRC_ALPHA)
@@ -716,7 +716,7 @@ class FrameBuffer(object):
 					events = pygame.event.get([KEYDOWN])
 				if len(events) > 0:
 					if events[0] == KEYUP:
-						c =  -(events[0].key)
+						c =	 -(events[0].key)
 					else:
 						c = events[0].key
 				elif not wait:
@@ -755,7 +755,7 @@ class FrameBuffer(object):
 				unspecified, then the snapshot is written at the
 				screen's true resolution.
 
-	    :return: PIL Image structure containing the snapshot (can be
+		:return: PIL Image structure containing the snapshot (can be
 				converted th PhotoImage for display in
 				Tkinter/Canvas..)
 
@@ -842,7 +842,7 @@ class FrameBuffer(object):
 				rectangle in the specified color with strokes of the
 				specified width.
 
-	    :return: nothing
+		:return: nothing
 
 		"""
 
@@ -971,7 +971,7 @@ class _SurfArrayAccess(object):
 
 	"""
 	def __init__(self, im, get, set):
-		self.im  = im
+		self.im	 = im
 		self.getfn = get
 		self.setfn = set
 
@@ -1055,7 +1055,7 @@ class Sprite(object):
 				factor. Very fast pre-blit scaling of all pixel
 				values.
 
-	    """
+		"""
 
 		self.x = x
 		self.y = y
@@ -1142,8 +1142,8 @@ class Sprite(object):
 
 	def __repr__(self):
 		return ('<Sprite "%s"@(%d,%d) %x%x depth=%d on=%d>' %
-                (self.name, self.x, self.y,
-                 self.w, self.h, self.depth, self._on,))
+				(self.name, self.x, self.y,
+				 self.w, self.h, self.depth, self._on,))
 
 	def XY(self, xy):
 		"""Correct for centerorigin flag"""
@@ -1217,7 +1217,7 @@ class Sprite(object):
 		self.pim = PIL.ImageTk.PhotoImage(pil)
 
 		# NOTE: by making .pim this a object member, it keeps a handle
-		#       on the PhotoImage to prevent GC..
+		#		on the PhotoImage to prevent GC..
 		return self.pim
 
 	def set_alpha(self, a):
@@ -1611,7 +1611,7 @@ class Sprite(object):
 		"""Threshold sprite image data
 
 		Threshold (binarize) sprite's image data
-		v =  (v > thresh) ? 255 : 1, where v is pixel value
+		v =	 (v > thresh) ? 255 : 1, where v is pixel value
 
 		:param threshval: threshold (0-255)
 
@@ -1725,7 +1725,7 @@ class Sprite(object):
 			#im = self.array[:,::-1,:]
 			#alpha = self.alpha[:][:,:,np.newaxis]
 			#rgba = np.concatenate((im, alpha), axis=2)
-			#rgba = np.transpose(rgba, axes=[1,0,2]).tostring()  <-- killer!
+			#rgba = np.transpose(rgba, axes=[1,0,2]).tostring()	 <-- killer!
 			tex = texture_create(rgba, self.w, self.h)
 			texture_blit(self.fb, tex, x, y,
 						 rotation=self.rotation,
@@ -1954,7 +1954,7 @@ class PolySprite(object):
 
 	def __repr__(self):
 		return ('<PolySprite "%s"@(%d,%d) #%d depth=%d on=%d>' %
-                (self.name, self.x0, self.y0, self._id, self.depth, self._on))
+				(self.name, self.x0, self.y0, self._id, self.depth, self._on))
 
 	def clone(self):
 		return PolySprite(
@@ -2306,7 +2306,7 @@ def C(color, gl=0):
 	length 4 tuple: (red, green, blue, alpha) where the values vary
 	[0-255], where: 0=off/transparent and 255=on/opaque.
 
-    :param gl: (boolean) if true, then values range [0-1], else [0-255]
+	:param gl: (boolean) if true, then values range [0-1], else [0-255]
 
 	"""
 	try:

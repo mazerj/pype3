@@ -214,10 +214,10 @@ class _Probe(object):
 		s = s +		"  o: offset.... %s\n" % B(self.xoff)
 		s = s +		"  u: on/off.... %s\n" % B(self.on)
 		s = s +		"  M: bar mode.. %s\n" % BARMODES[self.barmode]
-		s = s +     " []:    s-freq. %.1f\n" % self.sfreq
-		s = s +     " {}:    r-freq. %.1f\n" % self.rfreq
+		s = s +		" []:	 s-freq. %.1f\n" % self.sfreq
+		s = s +		" {}:	 r-freq. %.1f\n" % self.rfreq
 		s = s +		" 89: a......... %d/%d\n" % angle
-		s = s +     "n/m: rgb....... %s\n" % color
+		s = s +		"n/m: rgb....... %s\n" % color
 		s = s +		"1-6: color..... %s\n" % self.colorname
 		s = s +		"q/w: len....... %d\n" % self.length
 		s = s +		"e/r: wid....... %d\n" % self.width
@@ -401,7 +401,7 @@ class _Probe(object):
 		if self.drift and (self.barmode == BAR):
 			dt = t - self.drift;
 			d = (self.drift_amp * 
-                 math.sin(self.drift_freq * 2.0 * math.pi * dt / 1000.))
+				 math.sin(self.drift_freq * 2.0 * math.pi * dt / 1000.))
 			y = y + d * math.sin(math.pi * self.a / 180.)
 			x = x + d * math.cos(math.pi * self.a / 180.)
 

@@ -15,7 +15,7 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 - Thu Mar 26 15:10:32 2009 mazer
 
   - removed c-structs from documentation - see the Plexon.h file
-    in this dir for complete structure definitions.
+	in this dir for complete structure definitions.
 
 """
 

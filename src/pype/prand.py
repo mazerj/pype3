@@ -17,14 +17,14 @@ long's, while matlab's is unsigned. This means that to take the
 python state vector into matlab you need to add 2^32 to all negative
 values in the state vector before passing to the RAND function:
 
-    >> s = [state vector from puthon..]
-    >> s(s<0)=s(s<0)+(2^32); rand('twister', s);
+	>> s = [state vector from puthon..]
+	>> s(s<0)=s(s<0)+(2^32); rand('twister', s);
 
 Will put the generator at the same state the python generator was
 at when the state was saved. RAND(100) in matlab will now generate
 the same random sequence the python call:
 
-    >> PypeRandom(seed=statevector).rand(100)
+	>> PypeRandom(seed=statevector).rand(100)
 
 would. At least to about +- 1.0e-11 as far as I can tell..
 
@@ -36,137 +36,137 @@ Author -- Matt Krause (matthew.krause@yale.edu)
 """
 
 class MTRandom(object):
-    def __init__(self, seed=None, state=None):
-        """Uniform random number generator object.
+	def __init__(self, seed=None, state=None):
+		"""Uniform random number generator object.
 
-        Instantiate a uniform random number generator. This *should*
-        be the Mersenne Twister based generator that is standard in
-        Python (at least up to version 2.6).
+		Instantiate a uniform random number generator. This *should*
+		be the Mersenne Twister based generator that is standard in
+		Python (at least up to version 2.6).
 
-        Generates floating point numbers in the range [0-1].
+		Generates floating point numbers in the range [0-1].
 
-        If neither seed nor state are supplied, this will use the current
-        time to generate a seed.
+		If neither seed nor state are supplied, this will use the current
+		time to generate a seed.
 
-        *NB* To set the matlab random number generator to the same
-        known state as the python generator, you need to convert the
-        signed values of the seed into unsigned values as follows:
+		*NB* To set the matlab random number generator to the same
+		known state as the python generator, you need to convert the
+		signed values of the seed into unsigned values as follows:
 
-            >> seed = [get me from file etc..];
-            >> seed(seed < 0 ) = seed(seed < 0) + (2^32);
-            >> rand('twister', seed);
+			>> seed = [get me from file etc..];
+			>> seed(seed < 0 ) = seed(seed < 0) + (2^32);
+			>> rand('twister', seed);
 
-        :param seed: (int) single integer seed value
+		:param seed: (int) single integer seed value
 
-        :param state: (int array) length 624 SIGNED 2-byte integer
-                vector that completely captures the state of the
-                random number generator.  Note that these are SIGNED
-                values -- matlab expects UNSIGNED values; see notes
-                below. This comes from .getstate() method below
+		:param state: (int array) length 624 SIGNED 2-byte integer
+				vector that completely captures the state of the
+				random number generator.  Note that these are SIGNED
+				values -- matlab expects UNSIGNED values; see notes
+				below. This comes from .getstate() method below
 
-        """
-        import random
+		"""
+		import random
 
-        self.mt = random.Random()
-        if state and len(state) == 625:
-            self.setstate(state)
-        elif seed:
-            self.mt.seed(seed)
-        else:
-            import time
-            t = time.time()
-            seed = int(1e6*(t-int(t)))
-            self.mt.seed(seed)
+		self.mt = random.Random()
+		if state and len(state) == 625:
+			self.setstate(state)
+		elif seed:
+			self.mt.seed(seed)
+		else:
+			import time
+			t = time.time()
+			seed = int(1e6*(t-int(t)))
+			self.mt.seed(seed)
 
-    def getstate(self):
-        """Get signed/unsigned state vector for current generator state.
+	def getstate(self):
+		"""Get signed/unsigned state vector for current generator state.
 
-        :return: (array) state vector
+		:return: (array) state vector
 
-        """
-        (rtype, seed, other) = self.mt.getstate()
-        return seed
+		"""
+		(rtype, seed, other) = self.mt.getstate()
+		return seed
 
-    def setstate(self, state):
-        """Restore generator to saved state.
+	def setstate(self, state):
+		"""Restore generator to saved state.
 
-        :param state: (array) state vector from getstate()
+		:param state: (array) state vector from getstate()
 
-        :return: nothing
+		:return: nothing
 
-        """
-        self.mt.setstate((2, state, None))
+		"""
+		self.mt.setstate((2, state, None))
 
-    def rand(self, count=None):
-        """Generate random numbers.
+	def rand(self, count=None):
+		"""Generate random numbers.
 
-        With no arguments generates a single floating point random
-        number on the range [0-1]. If count is specified, then returns
-        a list of count random numbers.
+		With no arguments generates a single floating point random
+		number on the range [0-1]. If count is specified, then returns
+		a list of count random numbers.
 
-        :param count: (None or int) if not None, number of numbers to generate
+		:param count: (None or int) if not None, number of numbers to generate
 
-        :return: (float) random floats on range [0-1]
+		:return: (float) random floats on range [0-1]
 
-        """
+		"""
 
-        if count:
-            return map(lambda x,s=self: s.mt.random(), [0] * int(count))
-        else:
-            return self.mt.random()
+		if count:
+			return map(lambda x,s=self: s.mt.random(), [0] * int(count))
+		else:
+			return self.mt.random()
 
 def validate():
-    """Valid Mersenne Twister engine.
+	"""Valid Mersenne Twister engine.
 
-    Check to see if python is still using the expected Mersenne Twister
-    random number generator. This will almost certainly fail if anything
-    changes..
+	Check to see if python is still using the expected Mersenne Twister
+	random number generator. This will almost certainly fail if anything
+	changes..
 
-    """
-    r = MTRandom(seed=31415926)
-    for n in range(10000):
-        v = r.rand()
-    if abs(v-0.603852477186) < 1e-12:
-        return 1
-    else:
-        return 0
+	"""
+	r = MTRandom(seed=31415926)
+	for n in range(10000):
+		v = r.rand()
+	if abs(v-0.603852477186) < 1e-12:
+		return 1
+	else:
+		return 0
 
 if __name__ == '__main__':
-    import time, sys
+	import time, sys
 
-    if validate():
-        sys.stderr.write('Mersenne Twister: OK\n')
-    else:
-        sys.stderr.write('Mersenne Twister: INVALID!\n')
-        sys.exit(1)
+	if validate():
+		sys.stderr.write('Mersenne Twister: OK\n')
+	else:
+		sys.stderr.write('Mersenne Twister: INVALID!\n')
+		sys.exit(1)
 
-    if 0:
-        # speed test
-        n = int(1e6)
-        t1 = time.time()
-        MTRandom(seed=1).rand(n)
-        t2 = time.time()
-        print 'bulk', n/(t2-t1), "rands/sec"
+	if 0:
+		# speed test
+		n = int(1e6)
+		t1 = time.time()
+		MTRandom(seed=1).rand(n)
+		t2 = time.time()
+		print 'bulk', n/(t2-t1), "rands/sec"
 
 
-        t1 = time.time()
-        r = MTRandom(seed=1)
-        for n in range(n):
-            r.rand()
-        t2 = time.time()
-        print 'indv', n/(t2-t1), "rands/sec"
+		t1 = time.time()
+		r = MTRandom(seed=1)
+		for n in range(n):
+			r.rand()
+		t2 = time.time()
+		print 'indv', n/(t2-t1), "rands/sec"
 
-    if 0:
-        # ->matlab test
-        r = MTRandom(3141596)
-        s = r.getstate()
+	if 0:
+		# ->matlab test
+		r = MTRandom(3141596)
+		s = r.getstate()
 
-        r2 = MTRandom(state=s)
-        for n in range(len(s)):
-            print s[n], 0
+		r2 = MTRandom(state=s)
+		for n in range(len(s)):
+			print s[n], 0
 
-        d = r.rand(10000)
-        d2 = r2.rand(10000)
-        for n in range(len(d)):
-            print d[n], d2[n]
+		d = r.rand(10000)
+		d2 = r2.rand(10000)
+		for n in range(len(d)):
+			print d[n], d2[n]
 

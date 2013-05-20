@@ -70,9 +70,9 @@ class _SocketServer(_Socket):
 		self.remoteHost = self.remoteHost[0]
 
 	def __str__(self):
-        return "".join(('<_SocketServer ',
-                        str(self.host), ':', str(self.port),
-                        '>',))
+		return "".join(('<_SocketServer ',
+						str(self.host), ':', str(self.port),
+						'>',))
 
 class _SocketClient(_Socket):
 	def __init__(self):
@@ -87,9 +87,9 @@ class _SocketClient(_Socket):
 		self.conn.connect((self.remoteHost, self.remotePort))
 
 	def __str__(self):
-        return "".join(('<_SocketClient ',
-                        str(self.remoteHost), ':', str(self.remotePort),
-                        '>',))
+		return "".join(('<_SocketClient ',
+						str(self.remoteHost), ':', str(self.remotePort),
+						'>',))
 
 class TTankServer(object):
 	def __init__(self, Server='Local', tk=None):

@@ -94,13 +94,13 @@ class PlexNet(object):
 		if (NumMMFDropped - self._last_NumMMFDropped) > 0:
 			self._last_NumMMFDropped = NumMMFDropped
 			Logger("PlexNet: Warning, MMF dropout!!\n" +
-			       "         Consider power cycling MAP box...\n")
+				   "		 Consider power cycling MAP box...\n")
 			self._mmf_drops = self._mmf_drops + 1
 
 		if NumServerDropped > 0:
 			Logger("PlexNet: NumServerDropped=%d\n" % NumServerDropped +
-			       "         This should never happen. Tell Jamie,\n" +
-			       "         then quit and restart Plexon programs.\n")
+				   "		 This should never happen. Tell Jamie,\n" +
+				   "		 then quit and restart Plexon programs.\n")
 
 		pos = 16
 		events = []

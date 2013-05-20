@@ -198,7 +198,7 @@ class ParamTable(object):
 					else:
 						lockbut = Button(tmpf, text = '',
 										 command=lambda n=name:
-                                                self.lockfield(n, toggle=1))
+												self.lockfield(n, toggle=1))
 					lockbut.pack(fill=BOTH, expand=1)
 
 					if runlock == _KEEPLOCKED:
@@ -259,7 +259,7 @@ class ParamTable(object):
 	def _get(self, evaluate=1, mergewith=None, readonly=1):
 		"""Retrieve parameter table current state.
 
-	    :param evaluate: (bool) if true, then table slots are 'evaluated'
+		:param evaluate: (bool) if true, then table slots are 'evaluated'
 				before returned, otherwise the raw, unprocessed strings
 				are returned.
 
@@ -271,7 +271,7 @@ class ParamTable(object):
 
 		:returns: (2-tuple) Returned valiue is a pair (valid, dict),
 				where dict contains all the values in the parameter
-				table.  Dictionary keys are the slot names. Default is
+				table.	Dictionary keys are the slot names. Default is
 				to evaluate the parameters, which means they should
 				come back correctly) typed (ie, is_int's should come
 				back as Integers).
@@ -394,7 +394,7 @@ class ParamTable(object):
 		:param file: (string) If specified, name of output file (goes in
 				subject-specific-dir).
 
-	    :return: nothing
+		:return: nothing
 
 		"""
 		if file is None:
@@ -527,7 +527,7 @@ class ParamTable(object):
 				if default is None:
 					continue
 				if (type(validate) is types.TupleType or
-        				   type(validate) is types.DictType):
+						   type(validate) is types.DictType):
 					self._entries[name].invoke(x[name])
 				else:
 					try:
@@ -565,7 +565,7 @@ class ParamTable(object):
 				if default is None:
 					continue
 				if (type(validate) is types.TupleType or
-        				   type(validate) is types.DictType):
+						   type(validate) is types.DictType):
 					self._entries[name].invoke(x[name])
 				else:
 					try:
@@ -608,9 +608,9 @@ class ParamTable(object):
 				from the table will be merged into this existing dictionary
 				and the merged dictionary returned.
 
-	    :return: (dict) validated dictionary of all params
+		:return: (dict) validated dictionary of all params
 
-	    """
+		"""
 		while 1:
 			(ok, P) = self._get(mergewith=mergewith)
 			if self.tablename:
@@ -702,7 +702,7 @@ if __name__ == '__main__':
 
 	Button(root, text = 'info',
 		   command = lambda p=p:
-        		   sys.stdout.write('%s\n'%p.query('yn'))).pack(side='bottom')
+				   sys.stdout.write('%s\n'%p.query('yn'))).pack(side='bottom')
 
 	p.load('foobar')
 

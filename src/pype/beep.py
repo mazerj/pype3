@@ -40,7 +40,7 @@ class _Beeper(object):
 					return
 				pygame.sndarray.use_arraytype('numpy')
 			(_Beeper._dafreq,
-             _Beeper._bits, _Beeper._chans) = pygame.mixer.get_init()
+			 _Beeper._bits, _Beeper._chans) = pygame.mixer.get_init()
 			Logger('_Beeper: %d hz, %d bits, chans=%d\n' %
 				   (_Beeper._dafreq, _Beeper._bits, _Beeper._chans))
 			_Beeper.cache = {}
@@ -140,7 +140,7 @@ def warble(base, t, volume=1, fmper=25, driver=None):
 		et = et + (2 * fmper)
 
 
-if  __name__ == '__main__':
+if	__name__ == '__main__':
 	print "start"
 	beep()
 	#beep(1000, 100, 1, 1)

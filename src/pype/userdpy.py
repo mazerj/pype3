@@ -16,7 +16,7 @@ Wed Aug 14 13:09:50 2002 mazer
 
 - removed scrollbar junk: no need, never used it.
 
-Wed Mar  5 19:26:47 2003 mazer
+Wed Mar	 5 19:26:47 2003 mazer
 
 - added import points (from ascii file)
 
@@ -37,24 +37,24 @@ Fri May 22 15:58:59 2009 mazer
 
 - changed button-1 function to button-3 to avoid problems with WM..
 
-Tue Jul  7 10:25:19 2009 mazer
+Tue Jul	 7 10:25:19 2009 mazer
 
 - BLOCKED is gone -- computed automatically from syncinfo..
 
 Mon Jun 28 13:35:12 2010 mazer
 
 - Removed menubar at top in favor of dropdown menus (saves screen
-    space).  One single dropdown menu off Button-1 now (Button-2 for
-    task-specific menu, if needed).
+	space).	 One single dropdown menu off Button-1 now (Button-2 for
+	task-specific menu, if needed).
 
 - This means Pmw is no longer required here.. everything's simplified
 
 Fri Jul 16 10:58:31 2010 mazer
 
 - changed menu button to button-3 instead of button-1 to allow
-    clicking button-1 to raise the interface window!
+	clicking button-1 to raise the interface window!
 
-Tue Feb  1 12:46:07 2011 mazer
+Tue Feb	 1 12:46:07 2011 mazer
 
 - got rid of the callback/MARK function (bound to = key)
 
@@ -76,16 +76,16 @@ from pypedebug import keyboard
 
 class ScaledCanvas(Canvas):
 	def __init__(self, *args, **kwargs):
-        if kwargs.has_key('xscale'):
-            self.xscale = kwargs['xscale']
-            del(kwargs['xscale'])
-        else:
-            self.xscale = 1.0
-        if kwargs.has_key('yscale'):
-            self.yscale = kwargs['yscale']
-            del(kwargs['yscale'])
-        else:
-            self.yscale = 1.0
+		if kwargs.has_key('xscale'):
+			self.xscale = kwargs['xscale']
+			del(kwargs['xscale'])
+		else:
+			self.xscale = 1.0
+		if kwargs.has_key('yscale'):
+			self.yscale = kwargs['yscale']
+			del(kwargs['yscale'])
+		else:
+			self.yscale = 1.0
 
 		Canvas.__init__(self, *args, **kwargs)
 
@@ -218,10 +218,10 @@ class UserDisplay(object):
 
 		self.canvas.bind("<FocusIn>",
 						 lambda ev,s=self:
-                                 s.frame.configure(bg=s.background_focus))
+								 s.frame.configure(bg=s.background_focus))
 		self.canvas.bind("<FocusOut>",
 						 lambda ev,s=self:
-                                s.frame.configure(bg=s.background_nofocus))
+								s.frame.configure(bg=s.background_nofocus))
 
 		self.frame.pack(expand=1, fill=BOTH)
 
@@ -406,22 +406,22 @@ class UserDisplay(object):
 			 "Fiduciary marks (aka fidmarks)\n"+
 			 "-----------------------------------------\n"+
 			 "Arrows  Move all fidmarks left, right etc\n"+
-			 "f  Set fidmark at cursor\n"+
-			 "<  Shrink fidmarks in\n"+
-			 ">  Expand fidmarks out\n"+
+			 "f	 Set fidmark at cursor\n"+
+			 "<	 Shrink fidmarks in\n"+
+			 ">	 Expand fidmarks out\n"+
 			 "c/C  Clear nearest-one/all fidmark(s)\n"+
-			 "s  Save fidmarks to file\n"+
-			 "l  Load fidmarks from file\n"+
+			 "s	 Save fidmarks to file\n"+
+			 "l	 Load fidmarks from file\n"+
 			 "\n"+
 			 "Eyecal marks\n"+
 			 "-----------------------------------------\n"+
-			 ".  Set eyecal point (period) at cursor\n"+
-			 ",  Delete nearest eyecal point (comma)\n"+
+			 ".	 Set eyecal point (period) at cursor\n"+
+			 ",	 Delete nearest eyecal point (comma)\n"+
 			 "\n"+
 			 "Other\n"+
 			 "-----------------------------------------\n"+
-			 "/  Mark box corner (twice to set box)\n"+
-			 "x  postion message window at cursor\n"+
+			 "/	 Mark box corner (twice to set box)\n"+
+			 "x	 postion message window at cursor\n"+
 			 "R-mouse access fixation menu\n"+
 			 "M-mouse access task-specific dropdown\n",
 			 astext=1)
@@ -450,7 +450,7 @@ class UserDisplay(object):
 		rx = max(-self.w2+2, min(self.w2-2, rx))
 		ry = max(-self.h2+2, min(self.h2-2, ry))
 		(x, y) = self.fb2can(rx, ry)
-		if self._eye_lx is not None and  self._eye_ly is not None:
+		if self._eye_lx is not None and	 self._eye_ly is not None:
 			tag = self.canvas.create_line(self._eye_lx, self._eye_ly, x, y,
 										   fill="red")
 			self._eye_trace.append(tag)
@@ -518,7 +518,7 @@ class UserDisplay(object):
 						if x == 0 or y == 0: continue
 
 						if majorgrid and ((round(x/d)%5) == 0 or
-                                          (round(y/d)%5) == 0):
+										  (round(y/d)%5) == 0):
 							color = 'gray50'
 						elif minorgrid:
 							color = 'gray70'
@@ -669,7 +669,7 @@ class UserDisplay(object):
 		d = 2; o = 6;
 		tb = self.canvas.create_oval(x-o, y-o, x+o, y+o, fill='red', width=0)
 		t = self.canvas.create_text(x, y, anchor=CENTER, justify=CENTER,
-                                    text='i', fill='white')
+									text='i', fill='white')
 		self.points.append((px, py, t, tb))
 
 	def deletepoint(self, x, y):
@@ -816,9 +816,9 @@ class UserDisplay(object):
 		if not ev is None:
 			x, y = self.canvas.window2scaled(ev.x, ev.y)
 			(self.mousex, self.mousey) = self.can2fb(x, y)
-            if self.fix_x or self.fix_y:
-                s = "R[%5d,%5d] " % (self.mousex-self.fix_x,
-                                         self.mousey-self.fix_y,) + s
+			if self.fix_x or self.fix_y:
+				s = "R[%5d,%5d] " % (self.mousex-self.fix_x,
+										 self.mousey-self.fix_y,) + s
 			s = "A[%5d,%5d] " % (self.mousex, self.mousey,) + s
 		s = '%40s' % s
 		self._mouseinfo.configure(text=s)
@@ -864,7 +864,7 @@ class UserDisplay(object):
 							forcephoto = s.forcephoto
 
 						if forcephoto or (self._photomode and
-                                          s.w < 300 and s.h < 300):
+										  s.w < 300 and s.h < 300):
 							(x, y) = self.fb2can(s.x-(s.w/2), s.y+(s.h/2))
 							im = s.asPhotoImage()
 							ii.append(self.canvas.create_image(x, y, anchor=NW,
@@ -938,8 +938,8 @@ class UserDisplay(object):
 		s = s + 'CTR=(%d,%d) R=%.1f px (%.1f deg)\n' % (xs, ys, r,
 														r/self.gridinterval)
 		s = s + 'ECC=%d px (%.1f deg)\n' % (math.sqrt((xs * xs) + (ys * ys)),
-                                            math.sqrt((xs * xs) + (ys * ys))
-                                            / self.gridinterval)
+											math.sqrt((xs * xs) + (ys * ys))
+											/ self.gridinterval)
 
 		s = s + 'FIX=(%d, %d)\n' % (self.fix_x, self.fix_y)
 		s = s + '>>> COORDS ARE RE:FIX <<<\n'

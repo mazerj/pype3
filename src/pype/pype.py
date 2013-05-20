@@ -841,8 +841,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		c1pane = Frame(f, borderwidth=1, relief=RIDGE)
 		c1pane.pack(expand=0, fill=X, side=TOP)
 
-        self._task_prevtaskname = None
-        self._task_prevdir = None
+		self._task_prevtaskname = None
+		self._task_prevdir = None
 		b = Button(c1pane, text='<-(None)', command=self.prevtask)
 		b.pack(expand=0, fill=X, side=TOP)
 		self.balloon.bind(b, "load previous task")
@@ -1724,8 +1724,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 	def prevtask(self):
 		try:
-            if self._task_prevtaskname:
-                self.loadtask(self._task_prevtaskname, self._task_prevdir)
+			if self._task_prevtaskname:
+				self.loadtask(self._task_prevtaskname, self._task_prevdir)
 			return 1
 		except AttributeError:
 			return 0

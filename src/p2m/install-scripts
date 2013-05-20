@@ -21,5 +21,8 @@ for i in pype_expander.py pype_count.py matlab-nh.py \
   chmod +x $dest/$ii
 done
 
+ln -sf $dest/showpypefile.py $dest/pf
+
+
 		 
 

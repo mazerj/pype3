@@ -20,13 +20,13 @@ Tue Jan 25 15:23:19 2000 mazer
   - A simple eye trace viewer
 
   - It's multithreaded - it loads the records using a background
-    thread, so while you're browsing, it continues to load the data
-    for when you get there.
+	thread, so while you're browsing, it continues to load the data
+	for when you get there.
 
   - The load is threaded, but the numerical crunching is not. This is
-    to make it easier to skip towards the end of the file. Once the
-    file's all loaded, it goes back and starts to crunch from the
-    beginning
+	to make it easier to skip towards the end of the file. Once the
+	file's all loaded, it goes back and starts to crunch from the
+	beginning
 
 - Things to do:
 
@@ -61,19 +61,19 @@ Fri Apr 13 11:52:19 2001 mazer
 - Added support for shifting eye traces on load (for iscan lag).
   From my notes::
 
-   > Just got off phone with Rikki.  There's definitely an unaccounted
+   > Just got off phone with Rikki.	 There's definitely an unaccounted
    > for latency problem in our iscan, could be as much as 24ms at 120hz
    > (ie, 3 frames).
    >
    > Here's the deal: T
    >
-   > The camera in our system does not do progressive scan.  Instead of
+   > The camera in our system does not do progressive scan.	 Instead of
    > clocking out each scanline as it's aquired, like a normal tube
    > video camera, it acquires an entire video frame (8ms) and holds it.
    > That frame is then clocked out over the next 8ms while the next
    > frame is being acquired by the CCD.	Second, the frame grabber
    > hardware on the iscan board (inside pc) takes another 8ms to
-   > acquire each video frame.  Computation time is negliable.  These
+   > acquire each video frame.	Computation time is negliable.	These
    > 8ms values are actually frame periods (ie, at 240hz, assume 4ms etc)
    >
    > According to Tim Gawne there's one more frame in there (he got a 12ms
@@ -116,7 +116,7 @@ Sun May 21 13:30:18 2006 mazer
 
 - these changes should help speed things up
 
-Tue Jun  2 12:21:37 2009 mazer
+Tue Jun	 2 12:21:37 2009 mazer
 
 - fixed false spike_time and photo_time events -- these are now
   automatically stripped on load.. also see p2mLoad()
@@ -211,7 +211,7 @@ class PypeRecord(object):
 		#				in ms and unit's following the standard plexon
 		#				naming scheme (01a, 02a, 02b etc..)
 		#				(added: rec[13] 31-oct-2005 JAM)
-		#  rec[14]		eyenew data (added: Fri Apr  8 15:27:34 2011 mazer )
+		#  rec[14]		eyenew data (added: Fri Apr	 8 15:27:34 2011 mazer )
 
 		self.file = file
 		self.recnum = recnum
@@ -278,7 +278,7 @@ class PypeRecord(object):
 			klist.sort()
 			for k in klist:
 				file.write("params['%s']=<%s>\n	 %s\n" %
-                           (k, self.params[k], type(self.params[k])))
+						   (k, self.params[k], type(self.params[k])))
 		if rest:
 			file.write("--------------------------------\n")
 			file.write("rest=<%s>\n" % (self.rest,))
@@ -345,9 +345,9 @@ class PypeRecord(object):
 			if self.params['eyetracker'] == 'ISCAN':
 				# Tue Jun  7 15:39:09 2011 mazer : NEW
 				#  estimate eye tracker rate directly from data:
-				#   one frame for sample&hold camera, one frame for
-				#   framegrabber and one more frame because it seems
-				#   correct (check with Rikki Razdan again??)
+				#	one frame for sample&hold camera, one frame for
+				#	framegrabber and one more frame because it seems
+				#	correct (check with Rikki Razdan again??)
 				dxy=(np.diff(self.eyex)<>0)&(np.diff(self.eyey)<>0)
 				si = np.median(diff(np.array(self.realt)[dxy <> 0]))
 				si = 1000.0 / (60.0 * np.round((1000.0 / si) / 60.0))
@@ -438,9 +438,9 @@ class PypeRecord(object):
 						self.israw = 1
 					else:
 						self.eyex = ((self.eyex + self.params['@eye_xoff']) /
-                                     self.params['@eye_xgain'])
+									 self.params['@eye_xgain'])
 						self.eyey = ((self.eyey + self.params['@eye_yoff']) /
-                                     self.params['@eye_ygain'])
+									 self.params['@eye_ygain'])
 						self.israw = 1
 			else:
 				self.israw = None
@@ -595,11 +595,11 @@ class PypeFile(object):
 			elif (rec[0] == 'NOTE' and rec[1] == 'task_is'):
 				self.taskname = rec[2]
 			elif (rec[0] == 'NOTE' and rec[1] == 'pype' and
-                  rec[2] == 'run starts'):
+				  rec[2] == 'run starts'):
 				if runinfo:
 					return 1
 			elif (rec[0] == 'NOTE' and rec[1] == 'pype' and
-                  rec[2] == 'run ends'):
+				  rec[2] == 'run ends'):
 				pass
 			elif rec[0] == 'NOTE' and rec[1] == 'trialtime':
 				(n, trialtime) = rec[2]
@@ -714,17 +714,17 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 	- Two saccades within <mindur>ms are essentially considered to be
 	  one noisy saccade and the second one is discarded::
 
-		vel  /\                   /\                     /\       / ...
-		 ___/  \_________________/  \___________________/  \_____/
-		       <-------------------------------------->
-		       |                |   |                 |
-		       t0               t1  t2                t3
-		                            <-------------------------------
-		                            |                 |   |
-		                            t0                t1  t2
+		vel	 /\					  /\					 /\		  / ...
+		 ___/  \_________________/	\___________________/  \_____/
+			   <-------------------------------------->
+			   |				|	|				  |
+			   t0				t1	t2				  t3
+									<-------------------------------
+									|				  |	  |
+									t0				  t1  t2
 
 	- So, to compute a real fixation triggered PSTH, you allign allthe
-  	  rasters up on 't2' and only count spikes from t0-t3.
+	  rasters up on 't2' and only count spikes from t0-t3.
 
 	- *Mon Oct 7 10:59:13 2002 mazer*
 
@@ -765,7 +765,7 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 	   fx,fy are the mean x & y positions between t2-t3 and l_fx, l_fy
 	   are the position of the last fixation.  fv and l_fv refer to the
 	   calibration state of fx/fy and l_fx/l_fy respectively.  If fv is
-	   TRUE, then this is a 'calibrated' fixation.  Which means inside
+	   TRUE, then this is a 'calibrated' fixation.	Which means inside
 	   the calibration field, OR **NO** EYE CALIBRATION DATA WAS
 	   SUPPLIED.
 
@@ -844,10 +844,10 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 			else:
 				v = 1
 			(fx, fy, fv, lfx, lfy, lfv) = (mean(eyex[t2i:t3i]),
-                                           mean(eyey[t2i:t3i]), v, fx, fy, fv)
+										   mean(eyey[t2i:t3i]), v, fx, fy, fv)
 			if (not t0i is None) and t3-t2 > 0:
-				SacList.append((t0,  t1,  t2,  t3,
-							    t0i, t1i, t2i, t3i,
+				SacList.append((t0,	 t1,  t2,  t3,
+								t0i, t1i, t2i, t3i,
 								fx, fy, fv, lfx, lfy, lfv))
 			(t0, t1, t2, t3) = (t2, realti, None, None)
 			(t0i, t1i, t2i, t3i) = (t2i, realix, None, None)
@@ -871,7 +871,7 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 		t3 = realti
 		t3i = realix
 		if (not t0i is None) and t3-t2 > 0:
-			SacList.append((t0,  t1,  t2,  t3,
+			SacList.append((t0,	 t1,  t2,  t3,
 							t0i, t1i, t2i, t3i,
 							fx, fy, fv, lfx, lfy, lfv))
 

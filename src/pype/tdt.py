@@ -221,7 +221,7 @@ if _WINDOWS:
 			ServersideClientHandler._ninst -= 1
 
 			_Log('Connection from %s closed (%d left)\n' %
-                 (self.src, ServersideClientHandler._ninst,))
+				 (self.src, ServersideClientHandler._ninst,))
 
 
 	def RunServer(port=_PORT):
@@ -268,7 +268,7 @@ else: ## not _WINDOWS (ie, linux) ###########################################
 
 		def __repr__(self):
 			return ('<TDTClient server=%s TDevAcc=%d TTank=%d>' %
-                    (self.server, self.gotTDevAcc, self.gotTTank,))
+					(self.server, self.gotTDevAcc, self.gotTTank,))
 
 		def _sendtuple(self, cmdtuple):
 			"""Send tuple (command) from pype->TDT.
@@ -315,7 +315,7 @@ else: ## not _WINDOWS (ie, linux) ###########################################
 				return result
 			else:
 				raise TDTError('%s.X Error; cmd=<%s>; err=<%s>' %
-                               (which, method, result))
+							   (which, method, result))
 
 		def tdev(self, method, *args):
 			return self._invoke(_TDEVACC, method, args)

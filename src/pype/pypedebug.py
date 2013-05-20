@@ -8,7 +8,7 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 """Revision History
 
-Sat Feb  8 14:37:50 2003 mazer
+Sat Feb	 8 14:37:50 2003 mazer
 
 - created from scratch
 
@@ -132,7 +132,7 @@ def get_traceback(show=None):
 	for frame in stack:
 		(file, line, fn, text) = frame
 		msg.append('%2d: File "%s", line %s, in %s:\n' % (len(stack)-depth,
-                                                          file, line, fn))
+														  file, line, fn))
 		msg.append('%2d:   %s\n' % (len(stack)-depth, text))
 		depth = depth + 1
 	msg = string.join(msg)

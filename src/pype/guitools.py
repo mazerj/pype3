@@ -13,7 +13,7 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 """Revision History
 
-Wed Apr  8 21:42:18 1998 mazer
+Wed Apr	 8 21:42:18 1998 mazer
 
 - created
 
@@ -44,7 +44,7 @@ Fri Mar 27 13:39:49 2009 mazer
 
 - moved DancingBear and dance() (console versions) from pype.py to here
 
-Fri Jun  3 12:41:07 2011 mazer
+Fri Jun	 3 12:41:07 2011 mazer
 
 - got rid of Simple in SimpleDialog etc.. replaced with trailing underscores
 
@@ -128,7 +128,7 @@ class TaskNotebook(DockWindow):
 	def lift(self, name):
 		self.notebook.lift(name)
 
-class Logger(object): 					# !SINGLETON CLASS!
+class Logger(object):					# !SINGLETON CLASS!
 
 	logwindow = None
 	buffered = []
@@ -377,7 +377,7 @@ class EventQueue(object):
 	"""TkInter event queue.
 
 	Useful ev.state flags:
-	    - SHIFT = 1
+		- SHIFT = 1
 		- CTRL = 4
 	"""
 
@@ -507,12 +507,12 @@ class AboutPype(object):
 			icon.pack(expand=1, fill=BOTH)
 
 			t = "\n".join(
-                (
-                "pype: python physiology environment",
-                "Version %s" % pypeversion.PypeVersion,
-                "Copyright (c) 1999-2013 James A. Mazer",
-                "Built: %s" % pypeversion.PypeBuildDate,
-                ))
+				(
+				"pype: python physiology environment",
+				"Version %s" % pypeversion.PypeVersion,
+				"Copyright (c) 1999-2013 James A. Mazer",
+				"Built: %s" % pypeversion.PypeBuildDate,
+				))
 			text = Label(AboutPype._w, text=t,fg='blue')
 			text.pack(expand=1, fill=BOTH)
 
@@ -599,8 +599,8 @@ class ProgressBar(object):
 		sw = self.master.winfo_screenwidth()
 		sh = self.master.winfo_screenheight()
 		self.master.geometry("+%d+%d" %
-                             (sw/2 - (self.master.winfo_reqwidth()/2),
-                              sh/2 - (self.master.winfo_reqheight() / 2)))
+							 (sw/2 - (self.master.winfo_reqwidth()/2),
+							  sh/2 - (self.master.winfo_reqheight() / 2)))
 		self.master.update_idletasks()
 
 	def __del__(self):
@@ -687,23 +687,23 @@ def dance(ticker='.'):
 
 class tkSelector:
 	def __init__(self, items, title=None):
-        self.dialog = Pmw.SelectionDialog(master = None,
-                                          title = 'Select one...',
-                                          label_text = title,
-                                          buttons=('OK', 'Cancel'),
-                                          defaultbutton='OK',
-                                          scrolledlist_labelpos='n',
-                                          scrolledlist_items=items,
-                                          command=self.execute)
-        self.dialog.pack(fill='both', expand=1, padx=5, pady=5)
+		self.dialog = Pmw.SelectionDialog(master = None,
+										  title = 'Select one...',
+										  label_text = title,
+										  buttons=('OK', 'Cancel'),
+										  defaultbutton='OK',
+										  scrolledlist_labelpos='n',
+										  scrolledlist_items=items,
+										  command=self.execute)
+		self.dialog.pack(fill='both', expand=1, padx=5, pady=5)
 
 	def go(self):
-        self.dialog.activate()
+		self.dialog.activate()
 		self.dialog.destroy()
 		return self.result
 
 	def execute(self, buttonname):
-        sels = self.dialog.getcurselection()
+		sels = self.dialog.getcurselection()
 		if buttonname is None or buttonname is 'Cancel' or len(sels) == 0:
 			self.result = None
 		else:

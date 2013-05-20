@@ -8,7 +8,7 @@ Sun Feb 16 15:07:54 2003 mazer
 
   This is intented to be a generic tool that works with ANY pype task
 
-Thu Nov  3 16:59:59 2005 mazer
+Thu Nov	 3 16:59:59 2005 mazer
   added dumping of PlexNet timestamp data
 
 Sun May 21 08:22:08 2006 mazer
@@ -98,7 +98,7 @@ def matlabify(m):
 	# replace '*' with STAR(for internal)
 	m = string.join(string.split(m, '*'), 'STAR')
 
-	# This one's because Ben Hayden messed up.  Just delete
+	# This one's because Ben Hayden messed up.	Just delete
 	# colons..
 	m = string.join(string.split(m, ':'), '')
 
@@ -250,14 +250,14 @@ def expandRecord(fname, fp, n, d, xd):
 	# Thu Nov  3 16:59:55 2005 mazer 
 	# write PlexNet timestamps, if present.
 	# note: 'times' is timestamp in ms re standard pype time
-	#       'channels' is electrode #, starting with 0
-	#       'units' is sorted unit # on this electrode, starting with 0
+	#		'channels' is electrode #, starting with 0
+	#		'units' is sorted unit # on this electrode, starting with 0
 	#
 	# Fri Jan 25 13:02:10 2008 mazer 
-	#   modified to work with both plexon and tdt data
+	#	modified to work with both plexon and tdt data
 	#
 	# Wed Mar 21 17:34:25 2012 mazer
-	#   next line was: if d.plex_times: which wasn't right..
+	#	next line was: if d.plex_times: which wasn't right..
 	if (not d.plex_times is None) and len(d.plex_times) > 0:
 		writeVector(fp, objname, 'plx_times', d.plex_times, '%d')
 		writeVector(fp, objname, 'plx_channels', d.plex_channels, '%d')

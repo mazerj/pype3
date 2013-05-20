@@ -177,7 +177,7 @@ class SamplerU3(object):
 				if r is not None:
 					self.nsamps += len(r['AIN0'])
 					ts = (clockoffset +
-                          (np.array(r['AIN224'])<<16) + np.array(r['AIN200']))
+						  (np.array(r['AIN224'])<<16) + np.array(r['AIN200']))
 					self.frags.append((ts,
 									   np.array(r['AIN0']),
 									   np.array(r['AIN1']),

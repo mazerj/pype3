@@ -24,24 +24,24 @@ Tue Mar 7 09:28:03 2006 mazer
 
 - change noted above was not correct. I changed the arctan2() calls::
 
-    >> t = arctan2(s.yy, s.xx) - (pi * (90-ori_deg)) / 180.0
+	>> t = arctan2(s.yy, s.xx) - (pi * (90-ori_deg)) / 180.0
 
   to::
 
-    >> t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
+	>> t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
 
   which should give the correct orientations now. Note that the
   real problem is that these functions have been broken from the
   very beginning, but handmap.py and spotmap.py (which uses the
   sprite rotate method) have corrected for this.
 
-Tue Aug  8 14:04:36 2006 mazer
+Tue Aug	 8 14:04:36 2006 mazer
 
 - added alphabar() function - generates a bar stimulus from a sprite
   by filling the sprite with the specified color and then setting the
   alpha channel to let the specified bar stimulus show through.
 
-Wed Aug  9 13:15:34 2006 mazer
+Wed Aug	 9 13:15:34 2006 mazer
 
 - Added _unpack_rgb() to make all the stimulus generators use a common
   color specification. And documented all the grating generators.
@@ -55,7 +55,7 @@ Wed Jun 18 13:54:46 2008 mazer
 
 - removed old grating generator functions: Make_2D_XXXX()
 
-Mon Jan  5 14:49:56 2009 mazer
+Mon Jan	 5 14:49:56 2009 mazer
 
 - moved gen{axes,d,rad,theta} axes generator from sprite.py to this
   file (spritetools.py) - gend() function is now officially obsolete..
@@ -250,7 +250,7 @@ def singrat2(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 			meanlum=0.5, moddepth=1.0, ppd=None, color=None, xcache=None):
 
 	""" See singrat. This returns and caches the coordinate system, which
-	    may help speed things up.
+		may help speed things up.
 	"""
 
 	if not ppd is None:
@@ -364,7 +364,7 @@ def polargrat(s, cfreq, rfreq, phase_deg, polarity,
 
 	if logpolar:
 		z = (np.log(np.hypot(x,y)) * cfreq) + (np.arctan2(y,x) * rfreq /
-                                               (2.0 * np.pi))
+											   (2.0 * np.pi))
 	else:
 		z = (np.hypot(y,x) * cfreq) + (np.arctan2(y,x) * rfreq / (2.0 * np.pi))
 	i = moddepth * np.cos((2.0 * np.pi * z) - (np.pi * phase_deg / 180.0))

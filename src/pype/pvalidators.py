@@ -242,9 +242,9 @@ def is_rgb(s, evaluate=None):
 	try:
 		l = eval(s)
 		if (len(l) == 3 and
-                    (l[0] >= 0 and l[0] < 256) and
-                    (l[1] >= 0 and l[1] < 256) and
-                    (l[2] >= 0 and l[2] < 256)):
+					(l[0] >= 0 and l[0] < 256) and
+					(l[1] >= 0 and l[1] < 256) and
+					(l[2] >= 0 and l[2] < 256)):
 			r = VALID
 		elif len(l) == 1 and (l[0] >= 0 and l[0] < 256):
 			r = VALID
@@ -269,12 +269,12 @@ def is_rgba(s, evaluate=None):
 	try:
 		l = eval(s)
 		if (len(l) == 3 and
-            (l[0] >= 0 and l[0] < 256) and (l[1] >= 0 and l[1] < 256) and
-            (l[2] >= 0 and l[2] < 256)):
+			(l[0] >= 0 and l[0] < 256) and (l[1] >= 0 and l[1] < 256) and
+			(l[2] >= 0 and l[2] < 256)):
 			r = VALID
 		elif (len(l) == 4 and
-              (l[0] >= 0 and l[0] < 256) and (l[1] >= 0 and l[1] < 256) and
-              (l[2] >= 0 and l[2] < 256) and (l[3] >= 0 and l[3] < 256)):
+			  (l[0] >= 0 and l[0] < 256) and (l[1] >= 0 and l[1] < 256) and
+			  (l[2] >= 0 and l[2] < 256) and (l[3] >= 0 and l[3] < 256)):
 			r = VALID
 		else:
 			r = INVALID
@@ -398,7 +398,7 @@ def is_cdf(s, evaluate=None):
 	"""Must describe a cummulative distribution <-- NO REALLY, PDF...
 
 	This ensures that the specified value is an integer or a vector
-	describing a valid cummulative PDF.  If an integer, then return a
+	describing a valid cummulative PDF.	 If an integer, then return a
 	n-length cdf of uniform prob (eg, [1/n, 1/n .. 1/n]) Otherwise,
 	normalize the vector to have unity area.
 
@@ -446,7 +446,7 @@ def is_pdf(s, evaluate=None):
 	- If an integeer, then a uniform distribution of specified length
 	  is used (ie, [1/n, 1/n .. 1/n]) is generated on retrieval
 
-    - If of the form 'hazard(N)', where N is an integer
+	- If of the form 'hazard(N)', where N is an integer
 
 	"""
 	import numpy as np
@@ -489,7 +489,7 @@ def is_list(s, evaluate=None):
 
 		=start:stop:step (inclusive: both start and stop in list)
 
-		start:stop:step  (stop is not included in the list)
+		start:stop:step	 (stop is not included in the list)
 
 	"""
 

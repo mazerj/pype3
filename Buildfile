@@ -77,4 +77,5 @@ gpush:
 
 gsync:
 	@echo svnsync sync --username mazerj2006 https://pype3.googlecode.com/svn
+	svnsync sync --username mazerj2006 https://pype3.googlecode.com/svn
 

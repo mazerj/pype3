@@ -20,7 +20,7 @@ install:
 	(cd $(PYPEDIR); \
 	    $(PYTHONEXE) $(PYCOMPILE) -q pype || $(PYTHONEXE) $(PYCOMPILE) pype)
 
-justbuild:
+buildonly:
 	@for i in $(SUBDIRS); \
 		do (cd $$i ; $(MAKE) build);\
 		done
@@ -42,40 +42,19 @@ clobber:
 		do (cd $$i ; echo ...Cleaning $$i ; $(MAKE) clean);\
 		done
 
-
+# makedocs requires epydoc (should probably switch to sphinx...)
 docs:
 	@sh ./makedocs
 
 ###############################################################
+# push (initial setup only) and sync to googlecode svn mirror
+# located at https://code.google.com/p/pype3
 
-uninstall: 
-	echo  "Uninstall must be done manually!"
-
-.PHONY: install
-
-###############################################################
-
-# useful svn targets
-#
-#  these are not used, but probably should be...
-#
-
-unstable:
-	@if [ -e RELEASE ]; then svn mv RELEASE UNSTABLE; fi
-	@echo UNSTABLE
-
-stable:
-	@if [ -e UNSTABLE ]; then svn mv UNSTABLE RELEASE; fi
-	@echo RELEASE
-
-# push and sync to googlecode mirror -- these don't actually
-# run the commands, but just tell you what to do..
 gpush:
-	@echo svnsync init --username mazerj2006 \
+	svnsync init --username mazerj2006 \
 		https://pype3.googlecode.com/svn \
 		svn+ssh://svn/auto/share/repos/pype3/
 
 gsync:
-	@echo svnsync sync --username mazerj2006 https://pype3.googlecode.com/svn
 	svnsync sync --username mazerj2006 https://pype3.googlecode.com/svn
 

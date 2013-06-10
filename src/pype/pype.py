@@ -360,7 +360,8 @@ import socket, glob
 import cPickle
 import math
 from types import *
-from Tkinter import *
+#from Tkinter import *
+from mtTkinter import *
 from Pmw import *
 import numpy as np
 
@@ -695,7 +696,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._stash_icons()
 
 		if self.config.iget('SPLASH'):
-			splash(self.icons['splash'])
+			splash(self.icons['logo'])
 
 		self.conwin = ConsoleWindow()
 		self.conwin.showhide()
@@ -1288,7 +1289,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		dacq_elrestart()
 
 	def about(self):
-		AboutPype(self.icons['splash'])
+		AboutPype(self.icons['logo'])
 
 	def queue_action(self, inms=None, action=None):
 		"""Queue an action to happen about inms from now. Call with
@@ -1403,7 +1404,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			'up':		gificons.up,
 			'down':		gificons.down,
 			'stop':		gificons.stop,
-			'splash':	gificons.splash,
+			'logo':     gificons.logo,
 			}
 
 	def _findparam(self):

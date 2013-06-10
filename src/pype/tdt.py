@@ -301,9 +301,13 @@ else: ## not _WINDOWS (ie, linux) ###########################################
 
 		def _invoke(self, which, method, args):
 			if which == _TDEVACC and not self.gotTDevAcc:
-				raise TDTError('No %s.X available; cmd=<%s>' % (which, method,))
+				raise TDTError('No %s.X available; cmd=<%s>\n'
+							   'Make sure TDT circuit is open!' % \
+							   (which, method,))
 			if which == _TTANK and not self.gotTTank:
-				raise TDTError('No %s.X available; cmd=<%s>' % (which, method,))
+				raise TDTError('No %s.X available; cmd=<%s>\n'
+							   'Make sure TDT circuit is open!' % \
+							   (which, method,))					
 
 			if _DEBUG:
 				sys.stderr.write(repr(('exec:', which, method, args,)))

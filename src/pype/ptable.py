@@ -491,6 +491,9 @@ class ParamTable(object):
 				val = default
 			except ConfigParser.NoOptionError:
 				val = default
+			except:
+				sys.stderr.write('WARNING: %s is corrupt.\n' % file)
+				raise
 
 			if type(validate) is types.TupleType:
 				try: self._entries[name].invoke(val)

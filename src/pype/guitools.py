@@ -511,7 +511,7 @@ class AboutPype(object):
 				"pype: python physiology environment",
 				"Version %s" % pypeversion.PypeVersion,
 				"Copyright (c) 1999-2013 James A. Mazer",
-				"Built: %s" % pypeversion.PypeBuildDate,
+				"Build Date: %s" % pypeversion.PypeBuildDate,
 				))
 			text = Label(AboutPype._w, text=t,fg='blue')
 			text.pack(expand=1, fill=BOTH)

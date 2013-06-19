@@ -400,7 +400,8 @@ class ParamTable(object):
 		if file is None:
 			file = self._file
 
-		f = open(file, 'w')
+        tmpfile = file + '.tmp'
+		f = open(tmpfile, 'w')
 
 		(ok, x) = self._get(evaluate=0)
 
@@ -414,8 +415,8 @@ class ParamTable(object):
 					c.set('locks', k, 1)
 					lock = 1
 		c.write(f)
-
 		f.close()
+        os.rename(tmpfile, file)
 
 		if self in ParamTable._list:
 			ParamTable._list.remove(self)

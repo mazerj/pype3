@@ -143,7 +143,7 @@ class ParamTable(object):
 		for slot in self._table:
 			nrow = nrow + 1
 			(name, default, validate, descr, runlock) = _unpack_slot(slot)
-			
+
 			lf = Frame(f.interior())
 			lf.pack(expand=1, fill=X)
 			if default is None and validate is None:
@@ -416,7 +416,7 @@ class ParamTable(object):
 		c.write(f)
 
 		f.close()
-		
+
 		if self in ParamTable._list:
 			ParamTable._list.remove(self)
 
@@ -487,13 +487,10 @@ class ParamTable(object):
 				continue
 			try:
 				val = c.get('params', name)
-			except ConfigParser.NoOptionError:
+            except:
+				sys.stderr.write('WARNING: %s:params:%s missing/corrupt\n' %
+                                 (os.path.basename(file), name))
 				val = default
-			except ConfigParser.NoOptionError:
-				val = default
-			except:
-				sys.stderr.write('WARNING: %s is corrupt.\n' % file)
-				raise
 
 			if type(validate) is types.TupleType:
 				try: self._entries[name].invoke(val)

@@ -82,8 +82,7 @@ BAR=0
 CART=1
 HYPER=2
 POLAR=3
-RDP=4
-BARMODES = {BAR:'bar', CART:'cart', HYPER:'hyper', POLAR:'polar', RDP:'rdp'}
+BARMODES = {BAR:'bar', CART:'cart', HYPER:'hyper', POLAR:'polar'}
 
 class _Probe(object):
 	def __init__(self, app):
@@ -375,26 +374,9 @@ class _Probe(object):
 				polargrat(self.s, abs(self.sfreq), abs(self.rfreq), phase, pol,
 						  1.0*rc, 1.0*gc, 1.0*bc)
 				self.s.alpha_aperture(l/2)
-			elif self.barmode == RDP:
-				# rds
-				l = self.length
-				self.s = Sprite(width=l/3, height=l/3, fb=self.app.fb, depth=99)
-				if color is None:
-					c = (255,255,255)
-				else:
-					c = color
-				simple_rdp(self.s, fraction=0.10,
-						   fgcolor=c, bgcolor=(self.bg,self.bg,self.bg),
-						   rseed=SEED)
-				self.s.scale(l, l)
-				self.s.alpha_aperture(l/2)
 
 			self.lastx = None
 			self.lasty = None
-
-		if self.drift and self.barmode == RDP:
-			# advance the RDP one tick..
-			simple_rdp(self.s, self.a, self.drift_freq, rseed=SEED)
 
 		x = self.x
 		y = self.y

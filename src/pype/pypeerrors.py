@@ -32,3 +32,7 @@ class EmergencyAbort(Exception): pass
 
 # for obsolete function calls
 class Obsolete(Exception): pass
+
+
+def obsolete_fn(*args):
+    raise Obsolete

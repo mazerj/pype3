@@ -993,6 +993,38 @@ class _SurfArrayAccess(object):
 		else:
 			array[idx] = value
 
+def genaxes(w, h=None, typecode=np.float64, inverty=0):
+	"""Generate two arrays descripting sprite x- and y-coordinate axes
+	(like Matlab MESHGRID).
+
+	*NB* By default the coordinate system is matrix/matlab, which
+	means that negative values are at the top of the sprite and
+	increase going down the screen. This is fine if all you use the
+	function for is to compute eccentricity to shaping envelopes, but
+	wrong for most math. Use inverty=1 to get proper world coords..
+
+	:param w, h: scalar values indicating the width and height of the
+		sprite in needing axes in pixels
+
+	:param typecode: Numeric-style typecode for the output array
+
+	:param inverty: (boolean) if true, then axes are matlab-style with
+		0th row at the top, y increasing in the downward direction
+
+	:return: pair of vectors (xaxis, yaxis) where the dimensions of
+		each vector are (w, 1) and (1, h) respectively.
+
+	"""
+	if h is None:
+		(w, h) = w						# size supplied as pair/tuple
+	x = np.arange(0, w) - ((w - 1) / 2.0)
+	if inverty:
+		y = np.arange(h-1, 0-1, -1) - ((h - 1) / 2.0)
+	else:
+		y = np.arange(0, h) - ((h - 1) / 2.0)
+	return x.astype(typecode)[:,np.newaxis],y.astype(typecode)[np.newaxis,:]
+
+
 class Sprite(object):
 	"""Sprite object (wrapper for pygame surface class).
 

@@ -127,75 +127,25 @@ def pixelize(a, rgb=None, norm=1):
 	else:
 		return g2rgb(a)
 
-def genaxes(w, h=None, typecode=np.float64, inverty=0):
-	"""Generate two arrays descripting spirte x- and y-coordinate axes
-	(like Matlab MESHGRID).
-
-	*NB* By default the coordinate system is matrix/matlab, which
-	means that negative values are at the top of the sprite and
-	increase going down the screen. This is fine if all you use the
-	function for is to compute eccentricity to shaping envelopes, but
-	wrong for most math. Use inverty=1 to get proper world coords..
-
-	:param w, h: scalar values indicating the width and height of the
-		sprite in needing axes in pixels
-
-	:param typecode: Numeric-style typecode for the output array
-
-	:param inverty: (boolean) if true, then axes are matlab-style with
-		0th row at the top, y increasing in the downward direction
-
-	:return: pair of vectors (xaxis, yaxis) where the dimensions of
-		each vector are (w, 1) and (1, h) respectively.
-
-	"""
-	if h is None:
-		(w, h) = w						# size supplied as pair/tuple
-	x = np.arange(0, w) - ((w - 1) / 2.0)
-	if inverty:
-		y = np.arange(h-1, 0-1, -1) - ((h - 1) / 2.0)
-	else:
-		y = np.arange(0, h) - ((h - 1) / 2.0)
-	return x.astype(typecode)[:,np.newaxis],y.astype(typecode)[np.newaxis,:]
-
-def genrad(w, h=None, typecode=np.float64):
-	"""Generate numeric array of distance-from-center values (like
-	a circular MESHGRID)
+def genpolar(w, h=None, typecode=np.float64, degrees=False):
+	"""Generate polar axes (like polar meshgrid)
 
 	:param w, h: width and height of sprite (height defaults to width)
 
-	typecode: output type, defaults to Flaot65 ('d')
+	:param typecode: output type, defaults to float64 ('d')
 
-	:return: 2d matrix of dimension (w, h) containg a map of pixel
-		eccentricity values.
+    :param degrees: True/False
 
-	"""
-	x, y = genaxes(w, h)
-	return np.hypot(x,y).astype(typecode)
-
-def gentheta(w, h=None, typecode=np.float64, degrees=None):
-	"""Generate numeric array of polar angle values relative to sprite center
-	(like a circular MESHGRID)
-
-	*NB* Be careful, if you request an integer typecode and radians,
-	the values will range from -3 to 3 .. not very useful!
-
-	:param w, h: width and height of sprite (height defaults to width)
-
-	:param typecode: output type, defaults to Flaot65 ('d')
-
-	:param degrees: optionally convert to degrees (default is radians)
-
-	:return: 2d matrix of dimension (w, h) containg a map of pixel
-		theta values (polar coords). 0deg/0rad is 3:00 position,
-		increasing values CCW, decreasing values CW.
+	:return: (array) r and theta arrays
 
 	"""
 	x, y = genaxes(w, h)
-	t = np.arctan2(y, x)
+    r = np.hypot(x,y).astype(typecode)
 	if degrees:
-		t = 180.0 * t / np.pi
-	return t.astype(typecode)
+		t = (180.0 * np.arctan2(y, x) / np.pi).astype(typecode)
+    else:
+		t = np.arctan2(y, x).astype(typecode)
+	return r, t
 
 def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 			meanlum=0.5, moddepth=1.0, ppd=None, color=None):
@@ -246,46 +196,6 @@ def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 								meanlum).astype(np.uint8),
 							   axes=[1,2,0])
 
-def singrat2(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
-			meanlum=0.5, moddepth=1.0, ppd=None, color=None, xcache=None):
-
-	""" See singrat. This returns and caches the coordinate system, which
-		may help speed things up.
-	"""
-
-	if not ppd is None:
-		# c/deg -> c/sprite
-		frequency = np.mean([s.w, s.h]) / ppd * frequency
-	meanlum = 256.0 * meanlum
-	moddepth = 127.0 * moddepth
-
-	R, G, B = unpack_rgb(color, R, G, B)
-
-	# Generating the coordinate system is about 200ms/sprite. We can
-	# cache the orientation used for each one and speed things up
-	# considerably. Here's the full calculation:
-	if xcache is None or not(xcache.has_key(ori_deg)):
-		r = np.hypot(s.xx/s.w, s.yy/s.h)
-		t = np.arctan2(s.yy, s.xx)
-		t = t - (np.pi * ori_deg) / 180.
-		x = r * np.cos(t)
-		if(xcache is None):
-			xcache = dict()
-
-		xcache[ori_deg] = x
-	else: #Or, just use the orientation to decache it
-		x=xcache[ori_deg]
-
-	# This stuff still takes about 500ms/fullscreen sprite
-	i = moddepth * np.sin((2.0 * np.pi * frequency * x) -
-						  (np.pi * phase_deg / 180.0))
-	s.array[::] = np.transpose((np.array((R*i,G*i,B*i)) +
-								meanlum).astype(np.uint8),
-							   axes=[1,2,0])
-	return xcache
-
-
-
 def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 			meanlum=0.5, moddepth=1.0, ppd=None, color=None):
 	"""2D cosine grating generator (even symmetric).
@@ -319,8 +229,76 @@ def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 				   R=R, G=G, B=B, meanlum=meanlum, moddepth=moddepth,
 				   ppd=ppd, color=color)
 
+def singrat2(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
+             meanlum=0.5, moddepth=1.0, ppd=None, color=None, xcache=None):
+	"""CACHING version of singrat
+
+    This is identical to singrat(), but will cache the coordinate
+    system (based on ori_deg) in a dictionary for fast retrival. This
+    can really speed things up when generating a large number of
+    gratings that differ only in phase or sf.
+
+    If you don't need caching, don't use this!
+
+    :param xcache: (dict) the actual cache
+
+    :return: (dict) updated cache
+
+	"""
+
+	if not ppd is None:
+		# c/deg -> c/sprite
+		frequency = np.mean([s.w, s.h]) / ppd * frequency
+	meanlum = 256.0 * meanlum
+	moddepth = 127.0 * moddepth
+
+	R, G, B = unpack_rgb(color, R, G, B)
+
+	# Generating the coordinate system is about 200ms/sprite. We can
+	# cache the orientation used for each one and speed things up
+	# considerably. Here's the full calculation:
+	if xcache is None or not(xcache.has_key(ori_deg)):
+        r = np.hypot(s.xx/s.w, s.yy/s.h)
+		t = np.arctan2(s.yy, s.xx)
+		t = t - (np.pi * ori_deg) / 180.
+		x = r * np.cos(t)
+		if xcache is None:
+			xcache = dict()
+		xcache[ori_deg] = x
+	else:
+		x = xcache[ori_deg]
+
+	# This stuff still takes about 500ms/fullscreen sprite
+	i = moddepth * np.sin((2.0 * np.pi * frequency * x) -
+						  (np.pi * phase_deg / 180.0))
+	s.array[::] = np.transpose((np.array((R*i,G*i,B*i)) +
+								meanlum).astype(np.uint8),
+							   axes=[1,2,0])
+	return xcache
+
+def cosgrat2(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
+             meanlum=0.5, moddepth=1.0, ppd=None, color=None, xcache=None):
+	"""CACHING version of cosgrat
+
+    This is identical to cosgrat(), but will cache the coordinate
+    system (based on ori_deg) in a dictionary for fast retrival. This
+    can really speed things up when generating a large number of
+    gratings that differ only in phase or sf.
+
+    If you don't need caching, don't use this!
+
+    :param xcache: (dict) the actual cache
+
+    :return: (dict) updated cache
+
+	"""
+
+	return singrat2(s, frequency, phase_deg - 90.0, ori_deg,
+                    R=R, G=G, B=B, meanlum=meanlum, moddepth=moddepth,
+                    ppd=ppd, color=color)
+
 def polargrat(s, cfreq, rfreq, phase_deg, polarity,
-			  R=1.0, G=1.0, B=1.0, logpolar=0,
+			  R=1.0, G=1.0, B=1.0, logpolar=False,
 			  meanlum=0.5, moddepth=1.0, ppd=None, color=None):
 	"""2D polar (non-Cartesian) grating generator.
 
@@ -456,43 +434,6 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 	s.array[::] = np.transpose((np.array((R*i,G*i,B*i)) +
 								meanlum).astype(np.uint8), axes=[1,2,0])
 
-def simple_rdp(s, dir=None, vel=None, fraction=0.25,
-			   fgcolor=(255,255,255), bgcolor=(128,128,128), rseed=None):
-	"""Random dot pattern (RDP) generator.
-
-	This is really just used by the handmap function -- not particularly
-	robust or numerically accurate.
-
-	:return: nothing (works in place)
-
-	"""
-
-	if rseed:
-		old_seed = np.random.get_state()
-		np.random.set_state(rseed)
-
-	if dir is None:
-		for n in range(3):
-			if n == 0:
-				try:
-					m = np.random.uniform(0.0, 1.0, size=(s.w, s.h))
-				except TypeError:
-					m = np.random.uniform(0.0, 1.0, size=(s.w, s.h))
-
-			mc = np.where(np.greater(m, fraction), bgcolor[n], fgcolor[n])
-			s.array[:,:,n] = mc[::].astype(np.uint8)
-	else:
-		dx = -int(round(vel * np.cos(np.pi * dir / 180.0)))
-		dy = int(round(vel * np.sin(np.pi * dir / 180.0)))
-		a = s.array[:,:,:]
-		a = np.concatenate((a[dx:,:,:],a[:dx,:,:]), axis=0)
-		a = np.concatenate((a[:,dy:,:],a[:,:dy,:]), axis=1)
-		s.array[:,:,:] = a[::]
-
-	if rseed:
-		np.random.set_state(old_seed)
-
-
 def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
 	"""Generate a bar into existing sprite using the alpha channel.
 
@@ -511,8 +452,8 @@ def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
 
 	"""
 	R, G, B = (np.array(unpack_rgb(None, R, G, B)) * 255.0).astype(np.int)
-	r = genrad(s.w, s.h)
-	t = gentheta(s.w, s.h) + (np.pi * ori_deg / 180.0)
+	r, t = genpolar(s.w, s.h, degrees=True)
+	t += ori_deg
 	x = r * np.cos(t)
 	y = r * np.sin(t)
 	s.fill((R,G,B))
@@ -520,64 +461,41 @@ def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
 					255, 0)
 	s.alpha[::] = mask[::].astype(np.uint8)
 
-def alphaGaussian(s, sigma):
-	"""Put symmetric Gaussian envelope into sprite's alpha channel.
+def alpha_gaussian(s, xsigma, ysigma=None, ori_deg=0.0):
+	"""Generate symmetric and asymmetric Gaussian envelopes
+    into the alpha channel.
 
 	*NB* alpha's have peak value of fully visible (255), low end
 	depends on sigma
 
 	:param s: (Sprite)
 
-	:param sigma: (pixels) standard deviation
-
-	:return: nothing (works in place)
-
-	"""
-	r = np.hypot(s.xx, s.yy)
-	i = 255.0 * np.exp(-((r) ** 2) / (2 * sigma**2))
-	s.alpha[::] = i[::].astype(np.uint8)
-
-def alphaGaussian2(s, xsigma, ysigma, ori_deg):
-	"""Put non-symmetric Gaussian envelope into sprite's alpha channel.
-
-	*NB* alpha's have peak value of fully visible (255), low end
-	depends on sigma
-
-	:param s: (Sprite)
-
-	:param xsigma, ysigma: (pixels) standard dev (think of this as the
+	:param xsigma: (pixels) standard dev (think of this as the
 		Gaussian's generated with ori=0 and then rotated)
+
+	:param ysigma: (pixels) if None, then use xsigma (symmatric)
 
 	:param ori_deg: (degrees) orientation of Gaussian
 
 	:return: nothing (works in place)
 
 	"""
+    if ysigma is None:
+        ysigma = xsigma
 	r = np.hypot(s.xx, s.yy)
 	t = np.arctan2(s.yy, s.xx) - (np.pi * ori_deg) / 180.0
 	x, y = (r * np.cos(t), r * np.sin(t))
 	i = 255.0 * np.exp(-(x**2) / (2*xsigma**2)) * np.exp(-(y**2) / (2*ysigma**2))
 	s.alpha[::] = i[::].astype(np.uint8)
 
-def gaussianEnvelope(s, sigma):
-	"""Add Gaussian envelope to sprite.
-
-	Gaussian envelope is inserted into the sprite's alpha channel.
-
-	:param s: (Sprite)
-
-	:param sigma: (pixels) standard deviation.
-
-	:return: nothing (works in place)
-
-	"""
-	r = np.hypot(s.xx, s.yy)
-	g = np.exp(-((r) ** 2) / (2 * sigma**2)) / np.sqrt(2 * np.pi * sigma**2);
-
-	# note: normalize so sum(g[::]) = 1.0
-	gmax = max(np.reshape(g, [multiply.reduce(g.shape), 1]))
-	g = np.array(255.0 * g / gmax).astype(np.uint8)
-	pygame.surfarray.pixels_alpha(s.im)[::] = g
+# Thu Jun 20 13:49:46 2013 mazer -- for backward compatibility
+#  alpha_gaussian replaces all of these function with the same
+#  calling sequence...
+from pypeerrors import obsolete_fn
+alphaGaussian = alpha_gaussian
+alphaGaussian2 = obsolete_fn
+alphaGaussian2 = obsolete_fn
+gaussianEnvelope = obsolete_fn
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

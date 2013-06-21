@@ -446,7 +446,10 @@ class ParamTable(object):
 
 		while 1:
 			(file, mode) = Open(initialdir=initialdir,
-									 initialfile=self.tablename)
+								initialfile=self.tablename,
+								text='No saved parameter\n'+
+								'Select task to inherit params or\n'+
+								'Cancel to accept defaults.')
 			if file is None:
 				return
 			if self._load(file=file) == 1:

@@ -92,7 +92,7 @@ class FileDialog(object):
 
 	title = "File Selection"
 
-	def __init__(self, master=None, title=None, sortfn=None):
+	def __init__(self, master=None, title=None, text=None, sortfn=None):
 		if title is None:
 			title = self.title
 		self.master = master
@@ -106,6 +106,10 @@ class FileDialog(object):
 
 		self.botframe = Frame(self.top)
 		self.botframe.pack(side=BOTTOM, fill=X)
+
+		if text:
+			self.text = Label(self.top, text=text)
+			self.text.pack(side=TOP, pady=15, fill=X)
 
 		# this one's the actual filename box..
 		self.selection = Entry(self.top, fg='red')
@@ -352,31 +356,34 @@ class SaveFileDialog(FileDialog):
 		self.quit(file)
 
 def Open(initialdir=os.curdir, initialfile='', pattern='*',
-		 datafiles=None):
+		 datafiles=None, text=None):
 	if datafiles:
 		sortfn = _comparedatafiles
 	else:
 		sortfn = None
 
-	return LoadFileDialog(sortfn=sortfn).go(initialdir=initialdir,
-											initialfile=initialfile,
-											pattern=pattern)
+	return LoadFileDialog(sortfn=sortfn,
+						  text=text).go(initialdir=initialdir,
+										initialfile=initialfile,
+										pattern=pattern)
 
 def SaveAs(initialdir=os.curdir, initialfile='', pattern='*',
-		   append=1, datafiles=None):
+		   append=1, datafiles=None, text=None):
 	if datafiles:
 		sortfn = _comparedatafiles
 	else:
 		sortfn = None
 
 	if append:
-		return SaveFileDialog(sortfn=sortfn).go(initialdir=initialdir,
-												initialfile=initialfile,
-												pattern=pattern)
+		return SaveFileDialog(sortfn=sortfn,
+							  text=text).go(initialdir=initialdir,
+											initialfile=initialfile,
+											pattern=pattern)
 	else:
-		return SaveFileDialog_noapp(sortfn=sortfn).go(initialdir=initialdir,
-													  initialfile=initialfile,
-													  pattern=pattern)
+		return SaveFileDialog_noapp(sortfn=sortfn,
+									text=text).go(initialdir=initialdir,
+												  initialfile=initialfile,
+												  pattern=pattern)
 
 
 if __name__ == '__main__':

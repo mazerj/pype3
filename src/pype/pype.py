@@ -360,8 +360,8 @@ import socket, glob
 import cPickle
 import math
 from types import *
-#from Tkinter import *
-from mtTkinter import *
+from Tkinter import *
+#from mtTkinter import *
 from Pmw import *
 import numpy as np
 
@@ -1754,7 +1754,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		import imp, filebox
 
 		if ask:
-			(f, mode) = filebox.Open(pattern='*.py')
+			(f, mode) = filebox.Open(pattern='*.py',
+									 text='Load task from .py file')
 			if f is None:
 				return None
 			path = posixpath.dirname(f)

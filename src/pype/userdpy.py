@@ -725,7 +725,8 @@ class UserDisplay(object):
 		if filename is None:
 			from pype import subjectrc
 			(filename, mode) = filebox.SaveAs(initialdir=subjectrc(),
-											  pattern="*.pts", append=None)
+											  pattern="*.pts", append=None,
+											  text='Save points to file')
 		if filename:
 			file = open(filename, 'w')
 			cPickle.dump(self.points, file)
@@ -736,7 +737,8 @@ class UserDisplay(object):
 		if filename is None:
 			from pype import subjectrc
 			(filename, mode) = filebox.Open(initialdir=subjectrc(),
-											pattern="*.pts")
+											pattern="*.pts",
+											text='Load points from save file')
 			if filename is None:
 				return
 		try:
@@ -769,7 +771,8 @@ class UserDisplay(object):
 		if filename is None:
 			from pype import subjectrc
 			(filename, mode) = filebox.Open(initialdir=subjectrc(),
-											pattern="*.asc")
+											pattern="*.asc",
+											text='Load points from ASCII file')
 			if filename is None:
 				return
 		try:
@@ -1020,7 +1023,8 @@ class UserDisplay(object):
 	def loadfidmarks(self, file=None):
 		if file is None:
 			(file, mode) = Open(initialdir=os.getcwd(),
-								pattern='*.fid')
+								pattern='*.fid',
+								text='Load fiduciary marks')
 		if not (file is None):
 			self._clearfidmarks()
 			fp = open(file, 'r')
@@ -1061,7 +1065,8 @@ class UserDisplay(object):
 			(file, mode) = SaveAs(initialdir=os.getcwd(),
 								  pattern='*.fid',
 								  initialfile=initf,
-								  append=None)
+								  append=None,
+								  text='Save fiduciary marks to file')
 
 		if not (file is None):
 			self.fidinfo(file=file)

@@ -842,12 +842,20 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		c1pane = Frame(f, borderwidth=1, relief=RIDGE)
 		c1pane.pack(expand=0, fill=X, side=TOP)
 
+		b = Button(c1pane, text='reload',
+                   command=self.loadtask, state=DISABLED)
+		b.pack(expand=0, fill=X, side=TOP)
+		self.balloon.bind(b, "reload current task")
+		self.reloadbut = b
+
 		self._task_prevtaskname = None
 		self._task_prevdir = None
-		b = Button(c1pane, text='<-(None)', command=self.prevtask)
+		b = Button(c1pane, text='previous',
+                   command=self.prevtask, state=DISABLED)
 		b.pack(expand=0, fill=X, side=TOP)
 		self.balloon.bind(b, "load previous task")
 		self.prevtaskbut = b
+
 
 		udpy_ = Button(c1pane, text='show disp')
 		udpy_.pack(expand=0, fill=X, side=TOP)
@@ -1792,7 +1800,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		try:
 			self._task_prevtaskname = self._task_taskname
 			self._task_prevdir = self._task_dir
-			self.prevtaskbut.config(text='<-%s' % self._task_prevtaskname)
+			self.prevtaskbut.config(text='%s' % self._task_prevtaskname,
+                                    state=NORMAL)
 		except AttributeError:
 			self._task_prevtasktask = None
 			self._task_prevdir = None
@@ -1810,6 +1819,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				sys.stderr.write(err)
 				warn('pype:loadtask', err, wait=0, astext=1)
 				return None
+
+			self.reloadbut.config(text='reload', state=NORMAL)
+            
 		finally:
 			# in case loading throws an exception:
 			if file:
@@ -2136,7 +2148,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			try:
 				self._savestate()
 				self._loadmenu.disableall()
-				for w in [self._named_start, self._temp_start, self.prevtaskbut]:
+				for w in (self._named_start, self._temp_start,
+                          self.reloadbut, self.prevtaskbut,):
 					w.config(state=DISABLED)
 				self._stop.config(state=NORMAL)
 
@@ -2215,7 +2228,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				dacq_set_pri(0)
 				dacq_set_mypri(0)
 				dacq_set_rt(0)
-				for w in [self._named_start, self._temp_start, self.prevtaskbut]:
+				for w in (self._named_start, self._temp_start,
+                          self.reloadbut, self.prevtaskbut,):
 					w.config(state=NORMAL)
 				self._stop.config(state=DISABLED)
 				self.showtestpat()

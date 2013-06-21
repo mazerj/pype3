@@ -455,6 +455,8 @@ def _pypestdparams():
 			  'default screen background'),
 
 		ptitle('Timing Params'),
+		pslot('minrt', '0', is_int,
+			  'minimum allowed reaction time (ms; 0 for none)'),
 		pslot('maxrt', '600', is_int,
 			  'maximum allowed reaction time (ms)'),
 		pslot('iti', '4000+-20%', is_iparam,

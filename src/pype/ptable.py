@@ -649,6 +649,9 @@ class ParamTable(object):
 
 # helper functions for creating rows in the parameter table:
 
+def psection(name):
+    return (name, None, None)
+
 def pslot(name, default=None, val=None, info='', lockonrun=None):
 	"""Starting parameter table entry.
 
@@ -662,11 +665,11 @@ def pslot_ro(name, default=None, val=None, info=''):
 	return (name, default, val, info, _KEEPLOCKED)
 
 
-def plist(name, default=None, choices=None, info='', lockonrun=None):
+def pchoice(name, default=None, choices=None, info='', lockonrun=None):
 	"""Dropdown list.
 
 	"""
-	return (name, default, val, info, lockonrun)
+	return (name, default, choices, info, lockonrun)
 
 def pbool(name, default=1, info='', lockonrun=None):
 	"""Yes/No box that generated 0/1.
@@ -679,6 +682,25 @@ def pyesno(name, default=1, info='', lockonrun=None):
 
 	"""
 	return (name, 1-default, {'yes':1, 'no':0}, info, lockonrun)
+
+def piparam(name, default, info='', lockonrun=None):
+	return (name, default, is_iparam, info, lockonrun)
+
+def pcolor(name, default, info='', lockonrun=None):
+	return (name, default, is_color, info, lockonrun)
+
+def pint(name, default, info='', lockonrun=None):
+	return (name, default, is_int, info, lockonrun)
+
+def pfloat(name, default, info='', lockonrun=None):
+	return (name, default, is_float, info, lockonrun)
+
+def pfloat(name, default, info='', lockonrun=None):
+	return (name, default, is_float, info, lockonrun)
+
+def plist(name, default, info='', lockonrun=None):
+	return (name, default, is_list, info, lockonrun)
+
 
 def ptitle(name):
 	"""Title row.

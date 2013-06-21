@@ -456,9 +456,9 @@ def _pypestdparams():
 
 		ptitle('Timing Params'),
 		pslot('minrt', '0', is_int,
-			  'minimum allowed reaction time (ms; 0 for none)'),
+			  'minimum allowed manual RT (ms; 0 for none)'),
 		pslot('maxrt', '600', is_int,
-			  'maximum allowed reaction time (ms)'),
+			  'maximum allowed manual RT (ms)'),
 		pslot('iti', '4000+-20%', is_iparam,
 			  'inter-trial interval (ms)'),
 		pslot('timeout', '10000+-20%', is_iparam,
@@ -1823,7 +1823,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				return None
 
 			self.reloadbut.config(text='reload', state=NORMAL)
-            
+
 		finally:
 			# in case loading throws an exception:
 			if file:

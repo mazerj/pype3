@@ -364,6 +364,7 @@ from Tkinter import *
 #from mtTkinter import *
 from Pmw import *
 import numpy as np
+import pylab
 
 #####################################################################
 #  pype internal modules
@@ -858,7 +859,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.balloon.bind(b, "load previous task")
 		self.prevtaskbut = b
 
-
 		udpy_ = Button(c1pane, text='show disp')
 		udpy_.pack(expand=0, fill=X, side=TOP)
 		self.balloon.bind(udpy_, "show/hide user display window/pane")
@@ -1003,12 +1003,18 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		runlog = book.add('Pype')
 		triallog = book.add('Trial')
 		stats = book.add('Perf')
-		tally = book.add('Tally')
 		itrack1 = book.add('iTrak')
+		tally = book.add('Tally')
 
 		tallyf = Frame(tally)
 		tallyf.pack(side=BOTTOM, fill=X)
 
+		p = book.add('RTs')
+		Button(p, text='Clear RTs',
+			   command=self.update_rt).pack(side=TOP, expand=1, fill=X)
+		self.rtplot = EmbeddedFigure(p, (1,3))
+		self.update_rt()
+		
 		self._console = LogWindow(runlog)
 		self._info = LogWindow(triallog)
 
@@ -2201,6 +2207,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 				# clear/reset result stack at the start of the run..
 				self.set_result()
+
+				# reset rt histogram
+				self.update_rt()
 
 				# clear block state before starting a run
 				self._runstats_update(clear=1)
@@ -3563,6 +3572,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			ut = []
 			a0 = []
 
+		if rt and rt > 0:
+			self.update_rt(rt)
+
 		if self._show_eyetrace.get():
 			self._plotEyetraces(self.eyebuf_t,
 								self.eyebuf_x, self.eyebuf_y,
@@ -3871,13 +3883,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._show_eyetrace_stop = stop
 
 	def _plotEyetraces(self, t, x, y, p0, s0, raster):
-		try:
-			import pylab as plt
-		except ImportError:
-			sys.stderr.write('_plotEyetraces: pylab missing\n')
+		if len(t) < 1:
 			return
-
-		if len(t) < 1: return
 
 		if self._show_eyetrace_start is not None:
 			start = self._show_eyetrace_start
@@ -3892,46 +3899,60 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		t0 = t[0]
 		skip = 1
 
-		plt.ion()
-		plt.figure(99)
-		plt.clf()
+		pylab.ion()
+		pylab.figure(99)
+		pylab.clf()
 
-		plt.subplot(4, 1, 1)
-		plt.plot(t[::skip] - t0, x[::skip], 'r-',
-			   t[::skip] - t0, y[::skip], 'g-')
-		plt.xlim(start - t0, stop - t0)
-		plt.ylabel('X=RED Y=GRN')
+		pylab.subplot(4, 1, 1)
+		pylab.plot(t[::skip] - t0, x[::skip], 'r-',
+				   t[::skip] - t0, y[::skip], 'g-')
+		pylab.xlim(start - t0, stop - t0)
+		pylab.ylabel('X=RED Y=GRN')
 
 		colors = 'krgbckrgbckrgbc'
 
-		plt.subplot(4, 1, 2)
+		pylab.subplot(4, 1, 2)
 		n = 0
 		for (tt, p) in p0:
-			plt.plot(tt[::skip] - t0, p, colors[n]+'-')
-			plt.hold(True)
+			pylab.plot(tt[::skip] - t0, p, colors[n]+'-')
+			pylab.hold(True)
 			n += 1
-		plt.hold(False)
-		plt.xlim(start - t0, stop - t0)
-		plt.ylabel('photo')
+		pylab.hold(False)
+		pylab.xlim(start - t0, stop - t0)
+		pylab.ylabel('photo')
 
 
-		plt.subplot(4, 1, 3)
+		pylab.subplot(4, 1, 3)
 		n = 0
 		for (tt, s) in s0:
-			plt.plot(tt[::skip] - t0, s, colors[n]+'-')
-			plt.hold(True)
+			pylab.plot(tt[::skip] - t0, s, colors[n]+'-')
+			pylab.hold(True)
 			n += 1
-		plt.hold(False)
-		#plt.xlim(start - t0, stop - t0)
-		plt.ylabel('spikes')
+		pylab.hold(False)
+		#pylab.xlim(start - t0, stop - t0)
+		pylab.ylabel('spikes')
 
-		plt.subplot(4, 1, 4)
+		pylab.subplot(4, 1, 4)
 		raster = array(raster) - t0
-		plt.plot(raster, 0.0 * raster, 'k.')
-		plt.ylim(-1,1)
-		plt.xlim(start - t0, stop - t0)
-		plt.ylabel('raster')
-		plt.draw()
+		pylab.plot(raster, 0.0 * raster, 'k.')
+		pylab.ylim(-1,1)
+		pylab.xlim(start - t0, stop - t0)
+		pylab.ylabel('raster')
+		pylab.draw()
+
+
+	def update_rt(self, rt=None):
+		if rt is None:
+			self.rthist = []
+		else:
+			self.rthist.append(rt)
+			
+		self.rtplot.fig.clf()
+		a = self.rtplot.fig.add_subplot(111)
+		#a.hist(np.random.random(200))
+		a.set_xlabel('Reaction Time (ms)')
+		a.set_ylabel('n=%d' % len(self.rthist))
+		self.rtplot.update()
 
 	def makeFixWin(self, x, y, tweak=0):
 		"""Helper function for creating new fixation window in std way.
@@ -4324,6 +4345,22 @@ def loadwarn(*args):
 
 	"""
 	pass
+
+class EmbeddedFigure:
+	"""Create matplotlib figure embedded in tkinter parent window.
+	
+	"""
+	
+	def __init__(self, parent, *args, **kwargs):
+		from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+		self.fig = pylab.Figure(*args, **kwargs)
+		self._canvas = FigureCanvasTkAgg(self.fig, master=parent)
+		self._canvas.get_tk_widget().pack(side=TOP,
+										  fill=BOTH, expand=1, padx=0, pady=0)
+
+	def update(self):
+		self._canvas.show()
+
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

@@ -3978,8 +3978,13 @@ class PypeApp(object):					# !SINGLETON CLASS!
             g = pylab.normpdf(x, np.mean(h), np.std(h));
             g = g * np.sum(n) / np.sum(g)
             a.plot(x, g, 'r-', linewidth=2)
+            a.axvspan(self.sub_common.queryv('minrt'),
+                      self.sub_common.queryv('maxrt'), color='b', alpha=0.25)
+            a.axis([-10, 1.25*self.sub_common.queryv('maxrt'), None, None])
             a.set_xlabel('Reaction Time (ms)')
             a.set_ylabel('n=%d' % len(h))
+
+
 		self.rtplot.update()
 
 	def makeFixWin(self, x, y, tweak=0):

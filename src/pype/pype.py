@@ -3950,27 +3950,36 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self.rthist = []
 		else:
 			self.rthist.append(rt)
-        h = np.array(self.rthist)
-        
-        # for testing:
-        #h = 100+100*np.random.random(200)
 
 		self.rtplot.fig.clf()
 		a = self.rtplot.fig.add_subplot(1,1,1)
-        n, bins, patches = a.hist(h, facecolor='grey')
-        a.text(0.02, 1-0.02, '$\\mu=%.0fms$\n$\\sigma=%.0fms$\n$n=%d$' % \
-               (np.mean(h), np.std(h), len(h)),
-               color='red',
-               horizontalalignment='left',
-               verticalalignment='top',
-               transform=a.transAxes)
 
-        x = np.linspace(bins[0], bins[-1], 25)
-        g = pylab.normpdf(x, np.mean(h), np.std(h));
-        g = g * np.sum(n) / np.sum(g)
-        a.plot(x, g, 'r-', linewidth=2)
-		a.set_xlabel('Reaction Time (ms)')
-		a.set_ylabel('n=%d' % len(h))
+        if len(self.rthist) == 0:
+            a.text(0.5, 0.5, 'NO DATA',
+                   color='red',
+                   horizontalalignment='center',
+                   verticalalignment='center',
+                   transform=a.transAxes)
+        else:
+            h = np.array(self.rthist)
+
+            # for testing:
+            #h = 100+100*np.random.random(200)
+
+            n, bins, patches = a.hist(h, facecolor='grey')
+            a.text(0.02, 1-0.02, '$\\mu=%.0fms$\n$\\sigma=%.0fms$\n$n=%d$' % \
+                   (np.mean(h), np.std(h), len(h)),
+                   color='red',
+                   horizontalalignment='left',
+                   verticalalignment='top',
+                   transform=a.transAxes)
+
+            x = np.linspace(bins[0], bins[-1], 25)
+            g = pylab.normpdf(x, np.mean(h), np.std(h));
+            g = g * np.sum(n) / np.sum(g)
+            a.plot(x, g, 'r-', linewidth=2)
+            a.set_xlabel('Reaction Time (ms)')
+            a.set_ylabel('n=%d' % len(h))
 		self.rtplot.update()
 
 	def makeFixWin(self, x, y, tweak=0):

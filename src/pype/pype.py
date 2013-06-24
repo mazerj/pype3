@@ -364,7 +364,6 @@ from Tkinter import *
 #from mtTkinter import *
 from Pmw import *
 import numpy as np
-import pylab
 
 #####################################################################
 #  pype internal modules
@@ -923,6 +922,14 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.rig_common.set('mon_v_ppd', '%g' % yppd)
 		self.rig_common.set('mon_ppd', '%g' % ppd)
 
+        # reaction time plot window
+		b = Checkbutton(c1pane, text='RT hist', relief=RAISED, anchor=W)
+		b.pack(expand=0, fill=X, side=TOP, pady=2)
+		rt = DockWindow(checkbutton=b, title='Reaction Times')
+		Button(rt, text='Clear',
+			   command=self.update_rt).pack(side=TOP, expand=1, fill=X)
+		self.rtplot = EmbeddedFigure(rt)
+		self.update_rt()
 
 		et = self.config.get('EYETRACKER', 'NONE')
 		if et == 'ISCAN':
@@ -1009,12 +1016,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		tallyf = Frame(tally)
 		tallyf.pack(side=BOTTOM, fill=X)
 
-		p = book.add('RTs')
-		Button(p, text='Clear RTs',
-			   command=self.update_rt).pack(side=TOP, expand=1, fill=X)
-		self.rtplot = EmbeddedFigure(p, (1,3))
-		self.update_rt()
-		
 		self._console = LogWindow(runlog)
 		self._info = LogWindow(triallog)
 
@@ -2208,7 +2209,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				# clear/reset result stack at the start of the run..
 				self.set_result()
 
-				# reset rt histogram
+				# reset RT histogram/stats at start of run
 				self.update_rt()
 
 				# clear block state before starting a run
@@ -3883,6 +3884,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._show_eyetrace_stop = stop
 
 	def _plotEyetraces(self, t, x, y, p0, s0, raster):
+		import pylab
 		if len(t) < 1:
 			return
 
@@ -3942,16 +3944,33 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 
 	def update_rt(self, rt=None):
+        import pylab
+
 		if rt is None:
 			self.rthist = []
 		else:
 			self.rthist.append(rt)
-			
+        h = np.array(self.rthist)
+        
+        # for testing:
+        #h = 100+100*np.random.random(200)
+
 		self.rtplot.fig.clf()
-		a = self.rtplot.fig.add_subplot(111)
-		#a.hist(np.random.random(200))
+		a = self.rtplot.fig.add_subplot(1,1,1)
+        n, bins, patches = a.hist(h, facecolor='grey')
+        a.text(0.02, 1-0.02, '$\\mu=%.0fms$\n$\\sigma=%.0fms$\n$n=%d$' % \
+               (np.mean(h), np.std(h), len(h)),
+               color='red',
+               horizontalalignment='left',
+               verticalalignment='top',
+               transform=a.transAxes)
+
+        x = np.linspace(bins[0], bins[-1], 25)
+        g = pylab.normpdf(x, np.mean(h), np.std(h));
+        g = g * np.sum(n) / np.sum(g)
+        a.plot(x, g, 'r-', linewidth=2)
 		a.set_xlabel('Reaction Time (ms)')
-		a.set_ylabel('n=%d' % len(self.rthist))
+		a.set_ylabel('n=%d' % len(h))
 		self.rtplot.update()
 
 	def makeFixWin(self, x, y, tweak=0):
@@ -4348,12 +4367,14 @@ def loadwarn(*args):
 
 class EmbeddedFigure:
 	"""Create matplotlib figure embedded in tkinter parent window.
-	
+
 	"""
-	
+
 	def __init__(self, parent, *args, **kwargs):
 		from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-		self.fig = pylab.Figure(*args, **kwargs)
+		from matplotlib.figure import Figure
+
+		self.fig = Figure(*args, **kwargs)
 		self._canvas = FigureCanvasTkAgg(self.fig, master=parent)
 		self._canvas.get_tk_widget().pack(side=TOP,
 										  fill=BOTH, expand=1, padx=0, pady=0)

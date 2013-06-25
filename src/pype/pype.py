@@ -1724,7 +1724,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		_addpath(dirname, atend=1)
 
 		tasks.sort()
-		menubar.addmenu(menulabel, '', '')
+        # right prevents long menus from generating incorrect task selection!
+		menubar.addmenu(menulabel, '', '', direction=RIGHT)
 		menubar.addmenuitem(menulabel, 'command',
 							label=dirname, foreground='blue')
 		menubar.addmenuitem(menulabel, 'command', label='Reload current',
@@ -1809,7 +1810,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		try:
 			self._task_prevtaskname = self._task_taskname
 			self._task_prevdir = self._task_dir
-			self.prevtaskbut.config(text='%s' % self._task_prevtaskname,
+			self.prevtaskbut.config(text='<-%s' % self._task_prevtaskname,
                                     state=NORMAL)
 		except AttributeError:
 			self._task_prevtasktask = None
@@ -1819,8 +1820,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		try:
 			try:
-				Logger("pype: task=%s\n" % taskname)
-				Logger("pype:  src=%s\n" % pathname)
+				Logger("pype: loaded '%s' (%s)\n" % (taskname, pathname))
 				task = imp.load_module(taskname, file, pathname, descr)
 				mtime = os.stat(pathname).st_mtime
 			except:

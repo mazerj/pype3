@@ -400,7 +400,7 @@ class ParamTable(object):
 		if file is None:
 			file = self._file
 
-        tmpfile = file + '.tmp'
+		tmpfile = file + '.tmp'
 		f = open(tmpfile, 'w')
 
 		(ok, x) = self._get(evaluate=0)
@@ -416,7 +416,7 @@ class ParamTable(object):
 					lock = 1
 		c.write(f)
 		f.close()
-        os.rename(tmpfile, file)
+		os.rename(tmpfile, file)
 
 		if self in ParamTable._list:
 			ParamTable._list.remove(self)
@@ -491,9 +491,9 @@ class ParamTable(object):
 				continue
 			try:
 				val = c.get('params', name)
-            except:
+			except:
 				sys.stderr.write('WARNING: %s:params:%s missing/corrupt\n' %
-                                 (os.path.basename(file), name))
+								 (os.path.basename(file), name))
 				val = default
 
 			if type(validate) is types.TupleType:
@@ -650,7 +650,7 @@ class ParamTable(object):
 # helper functions for creating rows in the parameter table:
 
 def psection(name):
-    return (name, None, None)
+	return (name, None, None)
 
 def pslot(name, default=None, val=None, info='', lockonrun=None):
 	"""Starting parameter table entry.

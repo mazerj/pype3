@@ -612,7 +612,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		cfile = _hostconfigfile()
 		if not posixpath.exists(cfile):
 			Logger("pype: making new host config file '%s'\n" % cfile)
-            configvars.mkconfig(cfile)
+			configvars.mkconfig(cfile)
 
 		self.config = configvars.defaults(cfile)
 		Logger("pype: config loaded from '%s'\n" % cfile)
@@ -845,7 +845,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		c1pane.pack(expand=0, fill=X, side=TOP)
 
 		b = Button(c1pane, text='reload',
-                   command=self.loadtask, state=DISABLED)
+				   command=self.loadtask, state=DISABLED)
 		b.pack(expand=0, fill=X, side=TOP)
 		self.balloon.bind(b, "reload current task")
 		self.reloadbut = b
@@ -853,7 +853,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._task_prevtaskname = None
 		self._task_prevdir = None
 		b = Button(c1pane, text='previous',
-                   command=self.prevtask, state=DISABLED)
+				   command=self.prevtask, state=DISABLED)
 		b.pack(expand=0, fill=X, side=TOP)
 		self.balloon.bind(b, "load previous task")
 		self.prevtaskbut = b
@@ -922,7 +922,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.rig_common.set('mon_v_ppd', '%g' % yppd)
 		self.rig_common.set('mon_ppd', '%g' % ppd)
 
-        # reaction time plot window
+		# reaction time plot window
 		b = Checkbutton(c1pane, text='RT hist', relief=RAISED, anchor=W)
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
 		rt = DockWindow(checkbutton=b, title='Reaction Times')
@@ -1421,7 +1421,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			'up':		gificons.up,
 			'down':		gificons.down,
 			'stop':		gificons.stop,
-			'logo':     gificons.logo,
+			'logo':		gificons.logo,
 			}
 
 	def _findparam(self):
@@ -1724,7 +1724,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		_addpath(dirname, atend=1)
 
 		tasks.sort()
-        # right prevents long menus from generating incorrect task selection!
+		# right prevents long menus from generating incorrect task selection!
 		menubar.addmenu(menulabel, '', '', direction=RIGHT)
 		menubar.addmenuitem(menulabel, 'command',
 							label=dirname, foreground='blue')
@@ -1811,7 +1811,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self._task_prevtaskname = self._task_taskname
 			self._task_prevdir = self._task_dir
 			self.prevtaskbut.config(text='<-%s' % self._task_prevtaskname,
-                                    state=NORMAL)
+									state=NORMAL)
 		except AttributeError:
 			self._task_prevtasktask = None
 			self._task_prevdir = None
@@ -1997,7 +1997,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			Logger("init_dacq: try running 'pypekill' or 'pypekill -s'\n")
 			raise PypeStartupError
 
-		self.u3 = None
 		# Tue Jan  8 15:08:12 2013 mazer
 		#	- This basically works -- the lag between the comedi
 		#	  datastream and the labjack is ~0.7ms as far as I can
@@ -2005,14 +2004,13 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		#	- However, integration is not complete... not sure how
 		#	  I want to do this -- could use it to get rid of
 		#	  comedi_server completely..
-		if 0:
-			try:
-				import labjack
-				self.u3 = labjack.SamplerU3()
-				Logger("pype: found a labjack u3.\n")
-			except ImportError:
-				Logger("pype: LabJack drivers not installed.\n")
-
+        try:
+            import labjack
+            self.u3 = labjack.SamplerU3()
+            Logger("pype: found a labjack u3 -- validation mode\n")
+        except ImportError:
+            Logger("pype: LabJack drivers not installed.\n")
+            self.u3 = None
 
 	def init_framebuffer(self):
 		sx = self.config.get('SYNCX', None)
@@ -2158,7 +2156,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				self._savestate()
 				self._loadmenu.disableall()
 				for w in (self._named_start, self._temp_start,
-                          self.reloadbut, self.prevtaskbut,):
+						  self.reloadbut, self.prevtaskbut,):
 					w.config(state=DISABLED)
 				self._stop.config(state=NORMAL)
 
@@ -2241,7 +2239,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				dacq_set_mypri(0)
 				dacq_set_rt(0)
 				for w in (self._named_start, self._temp_start,
-                          self.reloadbut, self.prevtaskbut,):
+						  self.reloadbut, self.prevtaskbut,):
 					w.config(state=NORMAL)
 				self._stop.config(state=DISABLED)
 				self.showtestpat()
@@ -3944,7 +3942,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 
 	def update_rt(self, rt=None):
-        import pylab
+		import pylab
 
 		if rt is None:
 			self.rthist = []
@@ -3954,35 +3952,35 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.rtplot.fig.clf()
 		a = self.rtplot.fig.add_subplot(1,1,1)
 
-        if len(self.rthist) == 0:
-            a.text(0.5, 0.5, 'NO DATA',
-                   color='red',
-                   horizontalalignment='center',
-                   verticalalignment='center',
-                   transform=a.transAxes)
-        else:
-            h = np.array(self.rthist)
+		if len(self.rthist) == 0:
+			a.text(0.5, 0.5, 'NO DATA',
+				   color='red',
+				   horizontalalignment='center',
+				   verticalalignment='center',
+				   transform=a.transAxes)
+		else:
+			h = np.array(self.rthist)
 
-            # for testing:
-            #h = 100+100*np.random.random(200)
+			# for testing:
+			#h = 100+100*np.random.random(200)
 
-            n, bins, patches = a.hist(h, facecolor='grey')
-            a.text(0.02, 1-0.02, '$\\mu=%.0fms$\n$\\sigma=%.0fms$\n$n=%d$' % \
-                   (np.mean(h), np.std(h), len(h)),
-                   color='red',
-                   horizontalalignment='left',
-                   verticalalignment='top',
-                   transform=a.transAxes)
+			n, bins, patches = a.hist(h, facecolor='grey')
+			a.text(0.02, 1-0.02, '$\\mu=%.0fms$\n$\\sigma=%.0fms$\n$n=%d$' % \
+				   (np.mean(h), np.std(h), len(h)),
+				   color='red',
+				   horizontalalignment='left',
+				   verticalalignment='top',
+				   transform=a.transAxes)
 
-            x = np.linspace(bins[0], bins[-1], 25)
-            g = pylab.normpdf(x, np.mean(h), np.std(h));
-            g = g * np.sum(n) / np.sum(g)
-            a.plot(x, g, 'r-', linewidth=2)
-            a.axvspan(self.sub_common.queryv('minrt'),
-                      self.sub_common.queryv('maxrt'), color='b', alpha=0.25)
-            a.axis([-10, 1.25*self.sub_common.queryv('maxrt'), None, None])
-            a.set_xlabel('Reaction Time (ms)')
-            a.set_ylabel('n=%d' % len(h))
+			x = np.linspace(bins[0], bins[-1], 25)
+			g = pylab.normpdf(x, np.mean(h), np.std(h));
+			g = g * np.sum(n) / np.sum(g)
+			a.plot(x, g, 'r-', linewidth=2)
+			a.axvspan(self.sub_common.queryv('minrt'),
+					  self.sub_common.queryv('maxrt'), color='b', alpha=0.25)
+			a.axis([-10, 1.25*self.sub_common.queryv('maxrt'), None, None])
+			a.set_xlabel('Reaction Time (ms)')
+			a.set_ylabel('n=%d' % len(h))
 
 
 		self.rtplot.update()

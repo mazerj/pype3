@@ -134,16 +134,16 @@ def genpolar(w, h=None, typecode=np.float64, degrees=False):
 
 	:param typecode: output type, defaults to float64 ('d')
 
-    :param degrees: True/False
+	:param degrees: True/False
 
 	:return: (array) r and theta arrays
 
 	"""
 	x, y = genaxes(w, h)
-    r = np.hypot(x,y).astype(typecode)
+	r = np.hypot(x,y).astype(typecode)
 	if degrees:
 		t = (180.0 * np.arctan2(y, x) / np.pi).astype(typecode)
-    else:
+	else:
 		t = np.arctan2(y, x).astype(typecode)
 	return r, t
 
@@ -194,7 +194,7 @@ def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 						  (np.pi * phase_deg / 180.0))
 	s.array[::] = np.transpose((np.array((R*i,G*i,B*i)) +
 								meanlum).astype(np.uint8),
-							   axes=[1,2,0])
+                                axes=[1,2,0])
 
 def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 			meanlum=0.5, moddepth=1.0, ppd=None, color=None):
@@ -230,19 +230,19 @@ def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 				   ppd=ppd, color=color)
 
 def singrat2(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
-             meanlum=0.5, moddepth=1.0, ppd=None, color=None, xcache=None):
+			 meanlum=0.5, moddepth=1.0, ppd=None, color=None, xcache=None):
 	"""CACHING version of singrat
 
-    This is identical to singrat(), but will cache the coordinate
-    system (based on ori_deg) in a dictionary for fast retrival. This
-    can really speed things up when generating a large number of
-    gratings that differ only in phase or sf.
+	This is identical to singrat(), but will cache the coordinate
+	system (based on ori_deg) in a dictionary for fast retrival. This
+	can really speed things up when generating a large number of
+	gratings that differ only in phase or sf.
 
-    If you don't need caching, don't use this!
+	If you don't need caching, don't use this!
 
-    :param xcache: (dict) the actual cache
+	:param xcache: (dict) the actual cache
 
-    :return: (dict) updated cache
+	:return: (dict) updated cache
 
 	"""
 
@@ -258,7 +258,7 @@ def singrat2(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 	# cache the orientation used for each one and speed things up
 	# considerably. Here's the full calculation:
 	if xcache is None or not(xcache.has_key(ori_deg)):
-        r = np.hypot(s.xx/s.w, s.yy/s.h)
+		r = np.hypot(s.xx/s.w, s.yy/s.h)
 		t = np.arctan2(s.yy, s.xx)
 		t = t - (np.pi * ori_deg) / 180.
 		x = r * np.cos(t)
@@ -277,25 +277,25 @@ def singrat2(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 	return xcache
 
 def cosgrat2(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
-             meanlum=0.5, moddepth=1.0, ppd=None, color=None, xcache=None):
+			 meanlum=0.5, moddepth=1.0, ppd=None, color=None, xcache=None):
 	"""CACHING version of cosgrat
 
-    This is identical to cosgrat(), but will cache the coordinate
-    system (based on ori_deg) in a dictionary for fast retrival. This
-    can really speed things up when generating a large number of
-    gratings that differ only in phase or sf.
+	This is identical to cosgrat(), but will cache the coordinate
+	system (based on ori_deg) in a dictionary for fast retrival. This
+	can really speed things up when generating a large number of
+	gratings that differ only in phase or sf.
 
-    If you don't need caching, don't use this!
+	If you don't need caching, don't use this!
 
-    :param xcache: (dict) the actual cache
+	:param xcache: (dict) the actual cache
 
-    :return: (dict) updated cache
+	:return: (dict) updated cache
 
 	"""
 
 	return singrat2(s, frequency, phase_deg - 90.0, ori_deg,
-                    R=R, G=G, B=B, meanlum=meanlum, moddepth=moddepth,
-                    ppd=ppd, color=color)
+					R=R, G=G, B=B, meanlum=meanlum, moddepth=moddepth,
+					ppd=ppd, color=color)
 
 def polargrat(s, cfreq, rfreq, phase_deg, polarity,
 			  R=1.0, G=1.0, B=1.0, logpolar=False,
@@ -463,7 +463,7 @@ def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
 
 def alpha_gaussian(s, xsigma, ysigma=None, ori_deg=0.0):
 	"""Generate symmetric and asymmetric Gaussian envelopes
-    into the alpha channel.
+	into the alpha channel.
 
 	*NB* alpha's have peak value of fully visible (255), low end
 	depends on sigma
@@ -480,8 +480,8 @@ def alpha_gaussian(s, xsigma, ysigma=None, ori_deg=0.0):
 	:return: nothing (works in place)
 
 	"""
-    if ysigma is None:
-        ysigma = xsigma
+	if ysigma is None:
+		ysigma = xsigma
 	r = np.hypot(s.xx, s.yy)
 	t = np.arctan2(s.yy, s.xx) - (np.pi * ori_deg) / 180.0
 	x, y = (r * np.cos(t), r * np.sin(t))

@@ -32,8 +32,6 @@ import u3
 import os, time, threading, signal
 import numpy as np
 
-from pypedebug import keyboard
-
 U3CLOCK = 4000000.
 
 import ctypes, os

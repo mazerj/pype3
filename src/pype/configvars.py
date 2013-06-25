@@ -22,8 +22,24 @@ Mon Oct	 1 13:02:25 2012 mazer
 - OPENGL flag removed -- this is no longer an option..
 """
 
-import os
+import os, sys
 import config
+
+def mkconfig(file):
+    c = defaults(None)
+    try:
+        f = open(file, 'w')
+        f.write('# pype default host-specific config file\n')
+        keys = c.keys()
+        keys.sort()
+        for k in c.keys():
+            f.write("# %s\n" % (c.getdoc(k),))
+            if c.get(k):
+                f.write("%s: %s\n" % (k, c.get(k)))
+            else:
+                f.write("#%s: %s\n" % (k, '....'))
+    finally:
+        f.close()
 
 def defaults(srcfile=None):
 
@@ -42,17 +58,14 @@ def defaults(srcfile=None):
 		  doc='debug mode')
 	c.set('SPLASH', '1',
 		  doc='show splash screen on startup')
+	c.set('PSYCH', '0',
+		  doc='psychophysics mode')
 
 	#####################################################
 	# physical hardware (i/o) settings
 
-	c.set('DACQ_SERVER', 'comedi_server',
-		  doc='name of DACQ executable')
 	c.set('ARANGE',	'10.0',
 		  doc='set analog input volt. range (+-V)')
-	c.set('PPORT', '-1',
-		  doc='enable parallel port access '+
-		  'specific 1 for default or 0xNNN for non-default')
 	c.set('FLIP_BAR', '0',
 		  doc='flip response  bar input polarity')
 	c.set('FLIP_SW1', '0',
@@ -65,6 +78,8 @@ def defaults(srcfile=None):
 		  doc='beep when giving rewards?')
 	c.set('SOUND', '1',
 		  doc='access to sound card?')
+    c.set('AUDIODRIVER', '',
+          doc='name of sound card driver -- typially alsa')
 
 	c.set('USB_JS_DEV',	'',
 		  doc='enable USB joystick -- device file')
@@ -72,11 +87,11 @@ def defaults(srcfile=None):
 	#####################################################
 	# graphics display screen parameters
 
-	c.set('MONW', '-1',
+	c.set('MONW', '50',
 		  doc='physical monitor width (cm)')
-	c.set('MONH', '-1',
+	c.set('MONH', '50',
 		  doc='physical monitor height (cm)')
-	c.set('VIEWDIST', '-1',
+	c.set('VIEWDIST', '100',
 		  doc='physical viewing distance (cm)')
 	c.set('MON_ID', '',
 		  doc='ID string for data file')
@@ -90,7 +105,7 @@ def defaults(srcfile=None):
 		  doc='desired frame rate (frames/sec)')
 	c.set('GAMMA', '1.0',
 		  doc='default gamma value')
-	c.set('FULLSCREEN', '1',
+	c.set('FULLSCREEN', '0',
 		  doc='full screen mode?')
 	c.set('MOUSE', '0',
 		  doc='initialize mouse?')
@@ -143,13 +158,13 @@ def defaults(srcfile=None):
 	c.set('PLEXHOST', '',
 		  doc='PlexNet Host IP number')
 	c.set('PLEXPORT', '6000',
-		  doc='PlexNet Host Tcp Port')
+		  doc='PlexNet Host TCP Port ')
 
 	#####################################################
 	# TDT interface
 	c.set('TDTHOST', '',
 		  doc='name or IP# of window box running tdt.py')
-	
+
 	#####################################################
 	# User Display Settings
 	c.set('USERDISPLAY_HIDE', 0,
@@ -227,7 +242,7 @@ Other
 DEBUG			(0|1)	enables debug mode
 SPLASH			(0|1)	display splash screen
 PSYCH			(0|1)	psychophysics mode (also -p option on command line)
-HIDE_USERDISPLAY (0|1)	hide usder display window on startup
+USERDISPLAY_HIDE (0|1)	hide usder display window on startup
 TICKS_MAJOR		(0|1)	show major (5deg) tickmarks on userdisplay
 TICKS_MINOR		(0|1)	show minor (1deg) tickmarks on userdisplay
 

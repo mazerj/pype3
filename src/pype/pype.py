@@ -611,8 +611,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		cfile = _hostconfigfile()
 		if not posixpath.exists(cfile):
-			Logger("pype: missing host config file '%s'\n" % cfile)
-			raise PypeStartupError
+			Logger("pype: making new host config file '%s'\n" % cfile)
+            configvars.mkconfig(cfile)
 
 		self.config = configvars.defaults(cfile)
 		Logger("pype: config loaded from '%s'\n" % cfile)
@@ -660,7 +660,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self.config.set('AUDIODRIVER', 'sndmgr')
 
 		if monw < 0 or monh < 0 or viewdist < 0:
-			Logger('pype: set MONW, MONW & VIEWDIST in Config file \n')
+			Logger('pype: set MONW, MONW & VIEWDIST in %s\n' % cfile)
 			raise PypeStartupError
 
 		self.tallycount = {}

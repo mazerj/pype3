@@ -146,9 +146,6 @@ class Logger(object):					# !SINGLETON CLASS!
 		return cls._instance
 
 	def __init__(self, text=None, window=None, popup=None, once=None):
-		if not Logger._init:
-			return
-
 		# handle multi-line message recursively..
 		if text:
 			if not text[-1] == '\n':
@@ -533,7 +530,7 @@ def splash(im):
 	w.overrideredirect(1)
 	w.withdraw()
 
-	f = Frame(w, borderwidth=20, background='blue')
+	f = Frame(w, borderwidth=3, background='white')
 	f.pack(expand=1, fill=BOTH)
 	icon = Label(f, relief=FLAT, image=im)
 	icon.pack(expand=1, fill=BOTH)

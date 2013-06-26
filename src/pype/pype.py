@@ -380,7 +380,6 @@ from dacq import *
 from pypeerrors import *
 from pypedata import *
 
-
 import pypeversion
 
 import prand
@@ -3984,7 +3983,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			a.set_ylabel('n=%d' % len(h))
 
 
-		self.rtplot.update()
+		self.rtplot.drawnow()
 
 	def makeFixWin(self, x, y, tweak=0):
 		"""Helper function for creating new fixation window in std way.
@@ -4392,7 +4391,7 @@ class EmbeddedFigure:
 		self._canvas.get_tk_widget().pack(side=TOP,
 										  fill=BOTH, expand=1, padx=0, pady=0)
 
-	def update(self):
+	def drawnow(self):
 		self._canvas.show()
 
 

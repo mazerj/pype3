@@ -748,6 +748,53 @@ def createToolTip(widget, text):
 	widget.bind('<Enter>', enter)
 	widget.bind('<Leave>', leave)
 
+def SimplePlotWindow_test(app):
+    import numpy as np
+    
+    w = SimplePlotWindow('testplot', app)
+
+    w.fig.clf()
+    a = w.fig.add_subplot(1,1,1)
+    a.plot(np.random.random(200), 'ro-', linewidth=3)
+    a.set_xlabel('xlabel')
+    a.set_ylabel('ylabel')
+    a.set_title('title')
+    w.update()
+
+class SimplePlotWindow(Toplevel):
+    """Toplevel plot window for use with matplotlib.
+
+    >>> w = PlotWindow('testplot', app)
+    >>> w.fig.clf()
+    >>> a = w.fig.add_subplot(1,1,1)
+    >>> a.plot(np.random.random(200))
+    >>> a.set_xlabel('xlabel')
+    >>> a.set_ylabel('xlabel')
+    >>> w.update()
+
+    """
+
+	def __init__(self, name, app, *args, **kw):
+		from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+		from matplotlib.figure import Figure
+
+		apply(Toplevel.__init__, (self,), kw)
+
+		self.title(name)
+		self.fig = Figure()
+		self._canvas = FigureCanvasTkAgg(self.fig, master=self)
+		self._canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+        if app:
+            # note: only position is remembered, not size -- this
+            # is becaue teh FigureCanvasTkAgg has a size param we're
+            # not using here..
+            app.setgeo(self, default='+20+20')
+
+    def drawnow(self):
+        self._canvas.show()
+
+
+
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

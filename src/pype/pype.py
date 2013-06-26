@@ -378,6 +378,8 @@ from events import *
 from guitools import *
 from dacq import *
 from pypeerrors import *
+from pypedata import *
+
 
 import pypeversion
 
@@ -3387,7 +3389,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		:returns: (list of tuples) See pypedata.find_saccades().
 
 		"""
-		import pypedata
 
 		(t, x, y) = self.get_eyetrace_now()
 
@@ -3401,10 +3402,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			t = t[ix]
 			x = x[ix]
 			y = y[ix]
-		slist = pypedata.find_saccades((t, x, y, None),
-									   thresh=thresh,
-									   mindur=mindur,
-									   maxthresh=maxthresh)
+		slist = find_saccades((t, x, y, None),
+                              thresh=thresh,
+                              mindur=mindur,
+                              maxthresh=maxthresh)
 		return slist
 
 	def get_eyetrace_now(self, raw=0):

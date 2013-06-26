@@ -130,11 +130,91 @@ Mon Apr 11 11:25:11 2011 mazer
 
 import sys, types, string, os, posix
 import math, time
+import cPickle
+
 from vectorops import *
 from pype import *
 import re
 
 import numpy as np
+
+try:
+	import Numeric							# for legacy loads...
+except ImportError:
+	Numeric = None
+
+def labeled_dump(label, obj, f, bin=0):
+	"""Wrapper for cPickle.dump.
+
+	Prepends ascii tag line and then dumps a pickled
+	version of the object.
+	"""
+	f.write('<<<%s>>>\n' % label)
+	cPickle.dump(obj, f, bin)
+
+if Numeric is None:
+	def labeled_load(f):
+		"""Wrapper for cPickle.load.
+
+		Inverse of labeled_dump().
+
+		"""
+
+		while 1:
+			l = f.readline()
+			if not l:
+				return None, None
+			if l.startswith('<<<') and l.endswith('>>>\n'):
+				return l[3:-4], cPickle.load(f)
+else:
+	def labeled_load(f):
+		"""Wrapper for cPickle.load.
+
+		Inverse of labeled_dump(). This one works with old 32bit
+		Numeric-based pypefiles, but requires Numeric be installed!
+
+		"""
+
+		def local_array_constructor(shape, typecode, thestr,
+									Endian=Numeric.LittleEndian):
+
+			# try to guess the word size on the machine that
+			# pickled the data -- 'l' and 'f' are NATIVE types
+			# and native word length is not available, so we have
+			# to infer the native word length based on the actually
+			# data block size and the indicated data block size.
+			#
+			# this is FRAGILE -- could break and only handles the
+			# two cases I'm aware of -- in general, the better
+			# solution is to never create Numeric arrays without
+			# a complete type specification -- ie, use Float32
+			# instead of Float -- and always pass in a typecode.
+
+			if typecode == 'l':
+				if Numeric.cumproduct(shape) * 4 == len(thestr):
+					typecode = Numeric.Int32
+				else:
+					typecode = Numeric.Int64
+			elif typecode == 'f':
+				if Numeric.cumproduct(shape) * 4 == len(thestr):
+					typecode = Numeric.Float32
+				else:
+					typecode = Numeric.Float64
+			return ac(shape, typecode, thestr, Endian=Endian)
+
+		try:
+			ac = Numeric.array_constructor
+			Numeric.array_constructor = local_array_constructor
+			while 1:
+				l = f.readline()
+				if not l:
+					return None, None
+				if l.startswith('<<<') and l.endswith('>>>\n'):
+					return l[3:-4], cPickle.load(f)
+		finally:
+			Numeric.array_constructor = ac
+
+
 
 class PypedataTimeError(Exception):
 	"""Serious bad voodoo in the datafile!
@@ -538,6 +618,25 @@ class PypeFile(object):
 	def __repr__(self):
 		return '<PypeFile:%s (%d recs)>' % (self.fname, len(self.cache))
 
+    def _fatal_unpickle_error(self):
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        sys.stderr.write('Missing module <%s> during unpickling.\n' % exc_value)
+        sys.stderr.write("""
+    Find the original module and add it to your PYTHONPATH to access
+    datafile. This usually means the missing module imported Numeric, so
+    if you can't find the original, try making a dummmy file of the same
+    name, on your path, containing the line:
+
+    from Numeric import *
+
+    """)
+
+        sys.stderr.write('PYTHONPATH=%s\n' % os.environ['PYTHONPATH'])
+        sys.stderr.write(get_traceback())
+        sys.exit(1)
+
+    
+
 	def close(self):
 		if not self.fp is None:
 			try:
@@ -561,7 +660,7 @@ class PypeFile(object):
 			except ImportError:
 				# this is usually caused by pickling a data structure that
 				# depends on Numeric
-				fatal_unpickle_error()
+				self._fatal_unpickle_error()
 
 			if label == None:
 				self.close()
@@ -939,22 +1038,78 @@ def findfix(d, thresh=2, dur=50, anneal=10, start=None, stop=None):
 
 	return fixations
 
-def fatal_unpickle_error():
-	exc_type, exc_value, exc_traceback = sys.exc_info()
-	sys.stderr.write('Missing module <%s> during unpickling.\n' % exc_value)
-	sys.stderr.write("""
-Find the original module and add it to your PYTHONPATH to access
-datafile. This usually means the missing module imported Numeric, so
-if you can't find the original, try making a dummmy file of the same
-name, on your path, containing the line:
+def find_events(events, event):
+	"""Returns a list of event times which match pattern.
 
-from Numeric import *
+	See find_events2() to get list of the actual (time, event) pairs.
 
-""")
+	:param events: (list) list of encode pairs ((time, event),...)
 
-	sys.stderr.write('PYTHONPATH=%s\n' % os.environ['PYTHONPATH'])
-	sys.stderr.write(get_traceback())
-	sys.exit(1)
+	:param event: (string) event name to match
+
+	:return: (list) list of matching event **times**
+
+	"""
+	try:
+		# zip(*x) is 'unzip'; see python function docs..
+		return list(zip(*find_events2(events, event))[0])
+	except IndexError:
+		return []						# no matching events
+
+def find_events2(events, event):
+	"""Returns a list of actual events (pairs) which match pattern.
+
+	:param events: (list) list of encode pairs ((time, event),...)
+
+	:param event: (string) event name to match
+
+	:return: (list) list of matching event **pairs**
+
+	"""
+	if event[-1] == '*':
+		event = event[0:-1]
+		chop = len(event)
+	else:
+		chop = -1
+
+	elist = []
+	for (t, e) in events:
+		e0 = e
+		if chop > 0: e = e[:chop]
+		if e == event:
+			elist.append((t, e0))
+	return elist
+
+def align_events(events, t0):
+	"""Align an event list to a new time.
+
+	:param events: (list) list of encode pairs ((time, event),...)
+
+	:return: (list) 're-aligned' event list
+
+	"""
+
+	new_events = []
+	for (t, e) in events:
+		new_events.append(((t - t0), e))
+	return new_events
+
+def pp_encode(e):
+	"""Pretty-print an event list.
+
+	:param e: (list) list of encoded events
+
+	:return: (string) printable version of event list
+
+	"""
+	s = ''
+	for t, c in e:
+		if s is '':
+			s = '%10d %10d %s\n' % (-1, t, c)
+		else:
+			s = s + '%10d %10d %s\n' % (t-lastt, t, c)
+		lastt = t
+	return s
 
 if __name__ == '__main__':
 	v = PypeFile(sys.argv[1])

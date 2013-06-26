@@ -7,14 +7,40 @@ epydoc -v --simple-term --config=/tmp/$$.conf \
 	       --exclude=pype.stats \
 	       --exclude=pype.pstat \
 	       \
+	       --exclude=pype.dacq \
 	       --exclude=pype.candy \
 	       --exclude=pype.gificons \
+	       --exclude=pype.candy \
+	       --exclude=pype.dynconfig \
+	       --exclude=pype.userparams \
+	       --exclude=pype.config \
 	       --exclude=pype.configvars \
 	       --exclude=pype.PlexHeaders \
 	       --exclude=pype.PlexNet \
 	       --exclude=pype.pype2tdt \
 	       --exclude=pype.tdt \
 	       --exclude=pype.ttank \
+	       --exclude=pype.labjack \
+	       --exclude=pype.ttank \
+	       --exclude=pype.griddata \
+	       --exclude=pype.handmap \
+	       --exclude=pype.importer \
+	       --exclude=pype.libinfo \
+	       --exclude=pype.n2n \
+	       --exclude=pype.ikeyboard \
+	       --exclude=pype.im_stop \
+	       --exclude=pype.im_splash \
+	       --exclude=pype.im_left \
+	       --exclude=pype.im_right \
+	       --exclude=pype.im_up \
+	       --exclude=pype.im_down \
+	       --exclude=pype.pypedata \
+	       --exclude=pype.pypedata0 \
+	       --exclude=pype.rootperm \
+	       --exclude=pype.pypeversion \
+
 
 /bin/rm -f /tmp/$$.conf
+
+
 

@@ -7,7 +7,8 @@ Mon Aug 28 16:56:21 2000 mazer
 """
 
 import sys, types, string
-from Numeric import *
+#from Numeric import *
+import numpy as np
 from pype import *
 from events import *
 from pypedata import *

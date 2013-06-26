@@ -750,8 +750,8 @@ def createToolTip(widget, text):
 
 def SimplePlotWindow_test(app):
     import numpy as np
-    
-    w = SimplePlotWindow('testplot', app)
+
+    w = SimplePlotWindow('testplot', app, True)
 
     w.fig.clf()
     a = w.fig.add_subplot(1,1,1)
@@ -761,10 +761,12 @@ def SimplePlotWindow_test(app):
     a.set_title('title')
     w.drawnow()
 
+    return w
+
 class SimplePlotWindow(Toplevel):
     """Toplevel plot window for use with matplotlib.
 
-    >>> w = PlotWindow('testplot', app)
+    >>> w = SimplePlotWindow('testplot', app)
     >>> w.fig.clf()
     >>> a = w.fig.add_subplot(1,1,1)
     >>> a.plot(np.random.random(200))
@@ -773,9 +775,13 @@ class SimplePlotWindow(Toplevel):
     >>> a.set_title('title')
     >>> w.drawnow()
 
+    Note: Unless userclose is set to True, the user will not
+    be able to close the plot window and it must be closed
+    programmatically by calling widget.destroy() method..
+
     """
 
-	def __init__(self, name, app, *args, **kw):
+	def __init__(self, name, app=None, userclose=False, *args, **kw):
 		from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 		from matplotlib.figure import Figure
 
@@ -785,6 +791,9 @@ class SimplePlotWindow(Toplevel):
 		self.fig = Figure()
 		self._canvas = FigureCanvasTkAgg(self.fig, master=self)
 		self._canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+        if not userclose:
+            self.protocol("WM_DELETE_WINDOW", lambda: 1)
+
         if app:
             # note: only position is remembered, not size -- this
             # is becaue teh FigureCanvasTkAgg has a size param we're
@@ -793,7 +802,6 @@ class SimplePlotWindow(Toplevel):
 
     def drawnow(self):
         self._canvas.show()
-
 
 
 

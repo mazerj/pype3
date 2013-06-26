@@ -759,7 +759,7 @@ def SimplePlotWindow_test(app):
     a.set_xlabel('xlabel')
     a.set_ylabel('ylabel')
     a.set_title('title')
-    w.update()
+    w.drawnow()
 
 class SimplePlotWindow(Toplevel):
     """Toplevel plot window for use with matplotlib.
@@ -770,7 +770,8 @@ class SimplePlotWindow(Toplevel):
     >>> a.plot(np.random.random(200))
     >>> a.set_xlabel('xlabel')
     >>> a.set_ylabel('xlabel')
-    >>> w.update()
+    >>> a.set_title('title')
+    >>> w.drawnow()
 
     """
 

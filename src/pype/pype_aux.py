@@ -438,6 +438,9 @@ def param_expand(s, integer=None):
 				meanval, minval, maxval = v[0], 0.0, v[1]
 			else:
 				meanval, minval, maxval = v[0], v[1], v[2]
+
+            if meanval < minval or meanval > maxval:
+                return None
 			while 1:
 				# keep drawing until we get a range-valid value
 				# before 12/18/2012 draw was clipped with min/max
@@ -455,6 +458,10 @@ def param_expand(s, integer=None):
 				meanval, minval, maxval = v[0], 0.0, v[1]
 			else:
 				meanval, minval, maxval = v[0], v[1], v[2]
+
+            if meanval < minval or meanval > maxval:
+                return None
+
 			while 1:
 				# keep drawing until we get a range-valid value
 				# before 12/18/2012 draw was clipped with min/max
@@ -471,6 +478,9 @@ def param_expand(s, integer=None):
 			# edc[mu,min,max,nbins] (ACM's exponential dirac comb)
 			v = map(int, s[4:-1].split(','))
 			meanval, minval, maxval, nbins = v[0], v[1], v[2], v[3]
+
+            if meanval < minval or meanval > maxval:
+                return None
 
 			# search for a value until it falls within the specified range
 			while 1:

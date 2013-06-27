@@ -364,6 +364,7 @@ from Tkinter import *
 #from mtTkinter import *
 from Pmw import *
 import numpy as np
+import pylab
 
 #####################################################################
 #  pype internal modules
@@ -670,6 +671,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.terminate = 0
 		self.running = 0
 		self._startfn = None
+		self._updatefn = None
 		self.dropcount = 0
 		self.record_id = 1
 		self.record_buffer = []
@@ -1822,7 +1824,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		try:
 			try:
 				Logger("pype: loaded '%s' (%s)\n" % (taskname, pathname))
-				task = imp.load_module(taskname, file, pathname, descr)
+				taskmod = imp.load_module(taskname, file, pathname, descr)
 				mtime = os.stat(pathname).st_mtime
 			except:
 				err = ('Error loading ''%s'' -- \n' % taskname) + get_exception()
@@ -1840,16 +1842,26 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		if path is None:
 			path, base = os.path.split(pathname)
 
-		if task:
+		if taskmod:
 			self._task_taskname = taskname
 			self._task_dir = path
 
-			self.taskmodule = task
+			self.taskmodule = taskmod
 			self._taskname(taskname, path)
 			self._task_pathname = pathname
 			self._task_mtime = mtime
 
 			if hasattr(self.taskmodule, 'main'):
+				# module must provide a 'main' function that is:
+				#  1. a function that takes one arg (app; PypeApp handle,
+				#     ie, self).
+				#  2. When called, binds something to the start function
+				#     by  calling app.set_startfn, eg:
+				#        t = make_some_task_object_with_state()
+				#        app.set_startfn(lambda app,task=t: task.start_run(app))
+				# module MAY optionally provide a cleanup function that
+				# also takes 'app', that will be called when the task is
+				# unloaded.
 				self.taskmodule.main(self)
 			else:
 				Logger("pype: warning -- no 'main' in %s\n" % taskname)
@@ -1860,7 +1872,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		else:
 			warn('pype:loadtask', 'no start function set!')
 
-		return task
+		return taskmod
 
 	def set_canvashook(self, fn=None, data=None):
 		"""
@@ -2305,8 +2317,42 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				warn('pype:_new_cell',
 					 'cell field is non-numeric, can''t increment.')
 
-	def set_startfn(self, fn):
-		self._startfn = fn
+	def set_startfn(self, startfn, updatefn=None):
+        """Set start run function/hook.
+
+        The task_module.main() function must call this function to bind
+        the startup function for the task. The main function can optionall
+        also bind an update function that gets called after each trial. The
+        update function can be used to update task-specific plots etc.
+
+        The startfn must be a function that takes at least one argument,
+        namely the PypeApp struction that acts as a handle for everything
+        else (aka 'app'). Additional parameters can be included by using
+        a lambda expression, for example:
+
+        >>> t = Task(...)
+        >>> app.set_startfn(lambda app, mytask=t: mystart(app, mytask))
+
+        The return value from the start function is ignored.
+
+        The updatefn is similar. It should be a function takes at least
+        two parameters, first is 'app', second either None or a tuple.
+        None for a pre-run initialization stage and a tuple with
+        the info provided to record_write(), i.e.:
+
+        >>> resultcode, rt, params, taskinfo = info
+
+        You can do whatever you want, but if you are overriding the
+        built-in RT histogram stuff (in which case it might be useful
+        to know that app.rthist contains a list of all the RTs for the
+        current run) the updater shoudl return False. If it returns
+        True, the built-in histogram will get updated IN ADDITION to
+        whatever you did..
+
+        """
+
+		self._startfn = startfn
+		self._updatefn = updatefn
 
 	def _shutdown(self):
 		"""Internal shutdown function.
@@ -3571,8 +3617,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			ut = []
 			a0 = []
 
-		if rt and rt > 0:
-			self.update_rt(rt)
+		self.update_rt((resultcode, rt, params, taskinfo))
 
 		if self._show_eyetrace.get():
 			self._plotEyetraces(self.eyebuf_t,
@@ -3882,7 +3927,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._show_eyetrace_stop = stop
 
 	def _plotEyetraces(self, t, x, y, p0, s0, raster):
-		import pylab
 		if len(t) < 1:
 			return
 
@@ -3941,49 +3985,58 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		pylab.draw()
 
 
-	def update_rt(self, rt=None):
-		import pylab
-
-		if rt is None:
+	def update_rt(self, info=None):
+		if info is None:
 			self.rthist = []
 		else:
-			self.rthist.append(rt)
+			resultcode, rt, params, taskinfo = info
+			if rt > 0:
+				self.rthist.append(rt)
 
 		self.rtplot.fig.clf()
-		a = self.rtplot.fig.add_subplot(1,1,1)
 
-		if len(self.rthist) == 0:
-			a.text(0.5, 0.5, 'NO DATA',
-				   color='red',
-				   horizontalalignment='center',
-				   verticalalignment='center',
-				   transform=a.transAxes)
-		else:
-			h = np.array(self.rthist)
+		do_default = True
+		if self._updatefn:
+			# if module provides an update_rt use it. update_fn
+			# should return False to indicate it doesn't want pype
+			# to automatically update the default RT histogram.
+			do_default = self._updatefn(self, info)
 
-			# for testing:
-			#h = 100+100*np.random.random(200)
+		if do_default:
+			# otherwise, use default
+			a = self.rtplot.fig.add_subplot(1,1,1)
 
-			n, bins, patches = a.hist(h, facecolor='grey')
-			a.text(0.02, 1-0.02, '$\\mu=%.0fms$\n$\\sigma=%.0fms$\n$n=%d$' % \
-				   (np.mean(h), np.std(h), len(h)),
-				   color='red',
-				   horizontalalignment='left',
-				   verticalalignment='top',
-				   transform=a.transAxes)
+			if len(self.rthist) == 0:
+				a.text(0.5, 0.5, 'NO DATA',
+					   color='red',
+					   horizontalalignment='center',
+					   verticalalignment='center',
+					   transform=a.transAxes)
+			else:
+				h = np.array(self.rthist)
 
-			x = np.linspace(bins[0], bins[-1], 25)
-			g = pylab.normpdf(x, np.mean(h), np.std(h));
-			g = g * np.sum(n) / np.sum(g)
-			a.plot(x, g, 'r-', linewidth=2)
-			a.axvspan(self.sub_common.queryv('minrt'),
-					  self.sub_common.queryv('maxrt'), color='b', alpha=0.25)
-			a.axis([-10, 1.25*self.sub_common.queryv('maxrt'), None, None])
-			a.set_xlabel('Reaction Time (ms)')
-			a.set_ylabel('n=%d' % len(h))
+				# for testing:
+				#h = 100+100*np.random.random(200)
 
+				n, bins, patches = a.hist(h, facecolor='grey')
+				a.text(0.02, 1-0.02,
+					   '$\\mu=%.0fms$\n$\\sigma=%.0fms$\n$n=%d$' % \
+					   (np.mean(h), np.std(h), len(h)),
+					   color='red',
+					   horizontalalignment='left',
+					   verticalalignment='top',
+					   transform=a.transAxes)
 
-		self.rtplot.drawnow()
+				x = np.linspace(bins[0], bins[-1], 25)
+				g = pylab.normpdf(x, np.mean(h), np.std(h));
+				g = g * np.sum(n) / np.sum(g)
+				a.plot(x, g, 'r-', linewidth=2)
+				a.axvspan(self.sub_common.queryv('minrt'),
+						  self.sub_common.queryv('maxrt'), color='b', alpha=0.25)
+				a.axis([-10, 1.25*self.sub_common.queryv('maxrt'), None, None])
+				a.set_xlabel('Reaction Time (ms)')
+				a.set_ylabel('n=%d' % len(h))
+			self.rtplot.drawnow()
 
 	def makeFixWin(self, x, y, tweak=0):
 		"""Helper function for creating new fixation window in std way.
@@ -4398,3 +4451,4 @@ class EmbeddedFigure:
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)
 	sys.exit(1)
+

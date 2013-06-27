@@ -16,12 +16,12 @@ Fri Mar 27 13:42:32 2009 mazer
 
 """
 
-import pype, pype_aux
-from Tkinter import *
 import posixpath
-from sprite import *
+from Tkinter import *
 
-from pypedebug import keyboard
+import pype
+import pype_aux
+from sprite import *
 
 def list_():
 	return (

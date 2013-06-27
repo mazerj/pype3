@@ -354,17 +354,25 @@ Fri Aug 26 16:48:29 2011 mazer
 #####################################################################
 #  external python dependencies
 #####################################################################
-import sys, os, posixpath, posix, time, thread
-import string, re
-import socket, glob
+import sys
+import os
+import posixpath
+import posix
+import time
+import thread
+import string
+import re
+import socket
+import glob
 import cPickle
 import math
-from types import *
-from Tkinter import *
-#from mtTkinter import *
-from Pmw import *
 import numpy as np
 import pylab
+
+from types import *
+from Tkinter import *
+from Pmw import *
+
 
 #####################################################################
 #  pype internal modules

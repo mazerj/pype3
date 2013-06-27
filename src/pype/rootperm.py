@@ -14,7 +14,8 @@ pype process. Not really for general use.
  - separated from pype.py
 """
 
-import pwd, os
+import pwd
+import os
 from dacq import *
 
 def _realuid():

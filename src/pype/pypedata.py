@@ -128,8 +128,13 @@ Mon Apr 11 11:25:11 2011 mazer
 
 """
 
-import sys, types, string, os, posix
-import math, time
+import sys
+import types
+import string
+import os
+import posix
+import math
+import time
 import cPickle
 
 from vectorops import *
@@ -635,7 +640,7 @@ class PypeFile(object):
         sys.stderr.write(get_traceback())
         sys.exit(1)
 
-    
+
 
 	def close(self):
 		if not self.fp is None:

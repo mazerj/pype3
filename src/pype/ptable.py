@@ -694,8 +694,12 @@ def pyesno(name, default=1, info='', lockonrun=None):
 	"""Yes/No box that (generates bool 0/1 value); save as pbool"""
 	return (name, 1-default, {'yes':1, 'no':0}, info, lockonrun)
 
+def pparam(name, default, info='', lockonrun=None):
+	"""param slot -- see pype_aux.param_expand"""
+	return (name, default, is_iparam, info, lockonrun)
+
 def piparam(name, default, info='', lockonrun=None):
-	"""iparam slot -- see pype_aux.param_expand"""
+	"""integer param slot -- see pype_aux.param_expand"""
 	return (name, default, is_iparam, info, lockonrun)
 
 def pcolor(name, default, info='', lockonrun=None):

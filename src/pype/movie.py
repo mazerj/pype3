@@ -27,7 +27,14 @@ Mon Jul 16 12:07:03 2001 mazer
 
 """
 
-import sys, types, error, math, os, glob, string
+import sys
+import types
+import error
+import math
+import os
+import glob
+import string
+
 from sprite import *
 from guitools import *
 

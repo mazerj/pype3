@@ -133,7 +133,12 @@ Fri Jan 13 10:39:00 2012 mazer
 
 """
 
-import os, sys, time, string, types, math
+import os
+import sys
+import time
+import string
+import types
+import math
 
 try:
 	from guitools import Logger

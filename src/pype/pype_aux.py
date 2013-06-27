@@ -199,7 +199,7 @@ def urand(min=0, max=1.0, integer=None):
 	return v
 
 def nrand(mean=0, sigma=1.0, integer=None):
-	"""Generate normal/Gaussiand distributed random numbers (was normal())
+	"""Generate normally (Gaussian) distributed random numbers.
 
 	:param mean, sigma: (float) specifies normal/Gaussian dist params
 
@@ -439,8 +439,8 @@ def param_expand(s, integer=None):
 			else:
 				meanval, minval, maxval = v[0], v[1], v[2]
 
-            if meanval < minval or meanval > maxval:
-                return None
+			if meanval < minval or meanval > maxval:
+				return None
 			while 1:
 				# keep drawing until we get a range-valid value
 				# before 12/18/2012 draw was clipped with min/max
@@ -459,8 +459,8 @@ def param_expand(s, integer=None):
 			else:
 				meanval, minval, maxval = v[0], v[1], v[2]
 
-            if meanval < minval or meanval > maxval:
-                return None
+			if meanval < minval or meanval > maxval:
+				return None
 
 			while 1:
 				# keep drawing until we get a range-valid value
@@ -479,8 +479,8 @@ def param_expand(s, integer=None):
 			v = map(int, s[4:-1].split(','))
 			meanval, minval, maxval, nbins = v[0], v[1], v[2], v[3]
 
-            if meanval < minval or meanval > maxval:
-                return None
+			if meanval < minval or meanval > maxval:
+				return None
 
 			# search for a value until it falls within the specified range
 			while 1:

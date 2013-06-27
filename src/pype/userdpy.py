@@ -60,7 +60,10 @@ Tue Feb	 1 12:46:07 2011 mazer
 
 """
 
-import os, sys, time, string
+import os
+import sys
+import time
+import string
 import cPickle
 import math
 from Tkinter import *
@@ -70,7 +73,8 @@ import Pmw
 
 from pype import *
 from guitools import *
-import pype_aux, filebox
+import pype_aux
+import filebox
 
 from pypedebug import keyboard
 

@@ -11,7 +11,10 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 """Revision History
 """
 
-import os, sys, posixpath, stat
+import os
+import sys
+import posixpath
+import stat
 
 class DynamicConfig(object):
 	def __init__(self, fname):

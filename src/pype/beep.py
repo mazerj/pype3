@@ -10,7 +10,6 @@
 
 import sys
 import pygame
-from numpy import *
 import numpy as np
 
 try:
@@ -71,7 +70,7 @@ class _Beeper(object):
 			risefall = msdur / 2.0
 		env = -abs((t - (t[-1] / 2)) / (risefall/1000.0))
 		env = env - min(env)
-		env = where(less(env, 1.0), env, 1.0)
+		env = np.where(np.less(env, 1.0), env, 1.0)
 
 		bits = _Beeper._bits
 		if bits < 0:
@@ -80,7 +79,7 @@ class _Beeper(object):
 		else:
 			signed = 0
 
-		fullrange = power(2, bits-1)
+		fullrange = np.power(2, bits-1)
 
 		if freq is None:
 			y = env * vol * fullrange * np.random.random(t.shape)
@@ -89,26 +88,26 @@ class _Beeper(object):
 		y = y.astype(np.int16)
 
 		if _Beeper._chans == 2:
-			y = transpose(array([y,y]))
+			y = np.transpose(np.array([y,y]))
 		s = pygame.sndarray.make_sound(y)
 		return s
 
 def beep(freq=-1, msdur=-1, vol=0.5, risefall=20, wait=1, play=1, disable=None):
 	"""Beep the speaker using sound card.
 
-	**freq** - tone frequency in Hz or None for a white noise burst
+	:param freq: (Hz/None) tone frequency (None for noise)
 
-	**msdur** - tone duration in ms
+	:param msdur: (ms) tone duration
 
-	**vol** - tone volume (0-1)
+	:param vol: (0-1) volume
 
-	**risefall** - envelope rise and fall times (ms)
+	:param risefall: (ms) envelope rise and fall
 
-	**wait** - block until sound has been played?
+	:param wait: (bool) block until sound has been played
 
-	**play** - play now? if false, then just synthesize the tone pip and
-	cache it to play quickly at another time
+	:param play: (bool) true: play now; false: synthesize and cache for later
 
+    :return: nothing    
 	"""
 
 	if disable:
@@ -120,16 +119,20 @@ def beep(freq=-1, msdur=-1, vol=0.5, risefall=20, wait=1, play=1, disable=None):
 		_Beeper()._beep(freq, msdur, vol=vol, risefall=risefall,
 						wait=wait, play=play)
 
+
+
 def warble(base, t, volume=1, fmper=25, driver=None):
 	"""Make a nice warbling sound - cheapo FM
 
-	**base** - base frequency
+	:param base: (Hz) base frequency
 
-	**t** - duration in ms
+	:param t: (ms) duration
 
-	**volume** - floating point volume (0-1)
+	:param volume: (0-1) volume
 
-	**fmper** - period of modulation frequency in ms
+	:param fmper: (ms) period of modulation frequency
+
+    :return: nothing
 
 	"""
 

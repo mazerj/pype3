@@ -54,7 +54,6 @@ import time
 import string
 from Tkinter import *
 import Pmw
-import pypeversion
 
 _viewed_warnings = {}
 
@@ -129,7 +128,6 @@ class TaskNotebook(DockWindow):
 		self.notebook.lift(name)
 
 class Logger(object):					# !SINGLETON CLASS!
-
 	logwindow = None
 	buffered = []
 	msgs = {}
@@ -544,14 +542,10 @@ def splash(im):
 class ProgressBar(object):
 	"""Indicate progress for a long running task.
 
-	This is for when you know how long something is going to
-	take - you can specify the percentage done.
 	"""
 
-	def __init__(self, width=200, height=22,
-				 doLabel=None, labelText="",
-				 value=0, title=None, min=0, max=100):
-
+	def __init__(self, width=200, height=22, doLabel=None, labelText="",
+				 value=0, title='Working', min=0, max=100):
 		from Tkinter import _default_root
 
 		if _default_root is None:
@@ -562,33 +556,27 @@ class ProgressBar(object):
 		self.master.title('Working')
 		self.master.iconname('Working')
 		self.master.lift()
-		#self.master.overrideredirect(1)
 		self.min=min
 		self.max=max
 		self.width=width
 		self.height=height
 		self.doLabel=doLabel
 
-		fillColor="red"
-		labelColor="black"
-		background="lightgreen"
 		self.labelFormat="%d%%"
 		self.value=value
 		f = Frame(self.master, bd=3, relief=SUNKEN)
 		f.pack(expand=1, fill=BOTH)
-		if title is None:
-			title = "Working"
 		Label(f, text=title).pack(expand=1, fill=Y, side=TOP)
 		self.frame=Frame(f, relief=SUNKEN, bd=4, background='black')
 		self.frame.pack(fill=BOTH)
 		self.canvas=Canvas(self.frame, height=height, width=width, bd=0,
-						   highlightthickness=0, background=background)
+						   highlightthickness=0, background='green')
 		self.scale=self.canvas.create_polygon(0, 0, width, 0,
 											  width, height, 0, height,
-											  fill=fillColor)
+											  fill='red')
 		self.label=self.canvas.create_text(self.canvas.winfo_reqwidth() / 2,
 										   height / 2, text=labelText,
-										   anchor="c", fill=labelColor)
+										   anchor="c", fill='black')
 		self.update()
 		self.canvas.pack(side=TOP, fill=X, expand=NO)
 
@@ -638,30 +626,7 @@ class ProgressBar(object):
 				self.canvas.itemconfig(self.label, text='')
 		self.canvas.update_idletasks()
 
-class DanceBar(ProgressBar):
-	"""Indicate progress for a long running task.
-
-	This is for when you **don't** know how long it'll take, but want
-	to let the user know you're still alive & running.
-	"""
-	def set(self, newValue=None):
-		if newValue:
-			self.value = newValue
-		else:
-			self.value = (self.value + 1) % 100
-		self.update()
-
-	def update(self):
-		value = self.value % 25
-		x1 = (float(value) / 25.0 * self.width)
-		x2 = (float(value+1) / 25.0 * self.width)
-
-		self.canvas.coords(self.scale, x1, 0, x1-10, self.height,
-						   x2-10, self.height, x2, 0)
-		self.canvas.update_idletasks()
-
-
-class DancingBear(object):
+class _DancingBear(object):
 	_cursorPos = 0
 	def __init__(self, ticker='.'):
 		if ticker is None:

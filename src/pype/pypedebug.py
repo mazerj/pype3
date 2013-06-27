@@ -26,7 +26,12 @@ Fri Oct 19 10:08:12 2012 mazer
 
 """
 
-import sys, code, traceback, types, string, os
+import sys
+import code
+import traceback
+import types
+import string
+import os
 from guitools import warn
 
 def remotedebug():

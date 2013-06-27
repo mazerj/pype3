@@ -22,7 +22,9 @@ Mon Oct	 1 13:02:25 2012 mazer
 - OPENGL flag removed -- this is no longer an option..
 """
 
-import os, sys
+import sys
+import os
+
 import config
 
 def mkconfig(file):

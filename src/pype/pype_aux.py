@@ -240,7 +240,7 @@ def from_discrete_dist(v):
 			return i
 	return None
 
-def _fuzzy(mean, plus, minus=None, integer=None):
+def _fuzzynums(mean, plus, minus=None, integer=None):
 	"""Generate random number between around mean +/- plus/minus.
 
 	This means [mean-minus, mean+plus], distribution is
@@ -248,7 +248,7 @@ def _fuzzy(mean, plus, minus=None, integer=None):
 
 	"""
 	if integer:
-		return int(round(_fuzzy(mean, plus, minus, integer=None)))
+		return int(round(_fuzzynums(mean, plus, minus, integer=None)))
 	else:
 		if minus is None:
 			minus = plus
@@ -522,7 +522,7 @@ def param_expand(s, integer=None):
 			b = a * b
 		else:
 			b = float(l[1])
-		return _fuzzy(a, b)
+		return _fuzzynums(a, b)
 
 	return float(s)
 

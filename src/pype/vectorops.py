@@ -22,10 +22,12 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 """
 
-
-from griddata import griddata
 import numpy as np
 
+# take these direction from numpy!
+mean = np.mean
+std = np.std
+diff = np.diff
 
 def find(boolvec):
 	"""Find indices of all TRUE elements in boolvec.
@@ -39,23 +41,10 @@ def find(boolvec):
 	"""
 	return np.compress(boolvec, np.arange(len(boolvec)))
 
-def mean(v):
-	"""Compute mean of vector."""
-	if not type(v) == np.ndarray:
-		v = np.array(v, np.float)
-	return np.sum(v) / float(len(v))
-
-def std(v):
-	"""Compute standard deviation of vector."""
-	if len(v) > 0:
-		if not type(v) == np.ndarray:
-			v = np.array(v, np.float)
-		m = np.sum(v) / float(len(v))
-		return np.sum(((v-m)**2)/(float(len(v))-1))**0.5
-	return 0.0
-
 def sem(v, sig=None):
-	"""Compute standard error of the mean of vector."""
+	"""Compute standard error of the mean of vector.
+
+	"""
 	if len(v) > 1:
 		if sig is None:
 			sig = std(v)
@@ -64,36 +53,18 @@ def sem(v, sig=None):
 		return 0.0
 
 def zeros(v):
-	"""Count number of zero entries in vector"""
+	"""Count number of zero entries in vector.
+
+	"""
 	if not type(v) == np.ndarray:
 		v = np.array(v, np.float)
 	return len(v)-len(np.nonzero(v))
 
-def diff(v):
-	"""Compute first derivate of vector."""
-	if not type(v) == np.ndarray:
-		v = np.array(v, np.float)
-	return v[1::]-v[0:-1:]
+def smooth_boxcar(v, kn=1):
+	"""Smooth vector using a boxcar (square) filter (ie, running
+	average), where kn=1 is a 3pt average, kn=2 is a 5pt average etc..
 
-def diff2(v):
-	"""Compute first derivate of vector, but IN PLACE"""
-	for i in range(1, len(v)):
-		v[i-1] = v[i] - v[i-1]
-	return v
-
-def smooth1(yi, ksize=3):
 	"""
-	Simple smoothing function (eg, for PSTHs).
-	NOTE: Kernel length is actually (2*ksize)+1
-	"""
-	yo = np.array(yi)
-	for i in range(0, len(yi)):
-		a, b = max(0, i - ksize), min(len(yi), i + ksize)
-		yo[i] = np.sum(yo[a:b])/(b - a)
-	return yo
-
-def smooth(v, kn=1):
-	"""Smooth vector kn=1 --> 3pt average."""
 	if not type(v) == np.ndarray:
 		v = np.array(v, np.float)
 	n = len(v)
@@ -109,13 +80,18 @@ def smooth(v, kn=1):
 	return vout
 
 def decimate(v, n):
-	"""Decimate/downsample vector by n"""
+	"""Simple decimatation (ie, downsampling) vector by n. No effort
+	to be smart about this -- integer decimation only!
+
+	"""
 	if not type(v) == np.ndarray:
 		v = np.array(v, np.float)
 	return np.take(v, range(0,len(v),n))
 
 def sparseness(v):
-	"""Compute sparseness of vector."""
+	"""Compute (Tove & Rolls) sparseness of vector.
+
+	"""
 	if not type(v) == np.ndarray:
 		v = np.array(v, np.float)
 	n = float(len(v));
@@ -126,8 +102,9 @@ def sparseness(v):
 		return ((1.0 - a) / (1.0 - (1.0 / n)))
 
 def nanround(n, digits=0):
-	if n is None: return n
-	return round(n, digits)
+    if n is not None:
+        n = round(n, digits)
+    return n
 
 if __name__=='__main__' :
 	pass

@@ -1,4 +1,10 @@
 #!/bin/sh
+if [ "$*" = "rm" ]; then
+  echo "Deleting local installation..."
+  sudo rm -rf /usr/local/pype3
+  exit 0
+fi
+
 if [ "$*" = "" ]; then
   sudo env PYPEDIR=/usr/local/pype3 ./build install
 else

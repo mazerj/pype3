@@ -778,7 +778,7 @@ def fixvel(d, start=None, stop=None, kn=2):
 	dy = d.eyey[(start+1):stop] - d.eyey[start:(stop-1)]
 	dxy = (dx**2 + dy ** 2) ** .5
 	if kn:
-		return start, stop, smooth(dxy / dt, kn=kn)
+		return start, stop, smooth_boxcar(dxy / dt, kn=kn)
 	else:
 		return start, stop, dxy / dt
 
@@ -897,7 +897,7 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 	dt = t[1::] - t[0:-1:]
 
 	dxy = ((dx**2 + dy ** 2) ** .5) / dt
-	dxy = smooth(dxy, 2)
+	dxy = smooth_boxcar(dxy, 2)
 
 	# t0[i] = start of last fixation
 	# t1[i] = start of this saccade

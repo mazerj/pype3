@@ -69,6 +69,7 @@ Fri May 22 15:27:42 2009 mazer
 import numpy as np
 import pygame.surfarray
 from pygame.constants import *
+import sprite
 
 ##########################################################################
 # new, faster, clean support functions added 04-mar-2004 JAM .. stop
@@ -139,7 +140,7 @@ def genpolar(w, h=None, typecode=np.float64, degrees=False):
 	:return: (array) r and theta arrays
 
 	"""
-	x, y = genaxes(w, h)
+	x, y = sprite.genaxes(w, h)
 	r = np.hypot(x,y).astype(typecode)
 	if degrees:
 		t = (180.0 * np.arctan2(y, x) / np.pi).astype(typecode)
@@ -452,7 +453,7 @@ def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
 
 	"""
 	R, G, B = (np.array(unpack_rgb(None, R, G, B)) * 255.0).astype(np.int)
-	r, t = genpolar(s.w, s.h, degrees=True)
+	r, t = sprite.genpolar(s.w, s.h, degrees=True)
 	t += ori_deg
 	x = r * np.cos(t)
 	y = r * np.sin(t)

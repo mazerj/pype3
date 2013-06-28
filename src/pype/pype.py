@@ -988,6 +988,13 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._stop.pack(expand=0, fill=X, side=TOP, pady=2)
 		self.balloon.bind(self._stop, "stop run at end of trial")
 
+		self._stopnow = Button(startstopf, text="abort/stop",
+                                 command=self._stopabort, fg='black',
+                                 state=DISABLED)
+		self._stopnow.pack(expand=0, fill=X, side=TOP, pady=2)
+		self.balloon.bind(self._stopnow, "stop run immediately")
+        self._doabort = 0
+
 		c3pane = Frame(f, borderwidth=3, relief=RIDGE)
 		c3pane.pack(expand=0, fill=X, side=TOP)
 
@@ -2162,9 +2169,14 @@ class PypeApp(object):					# !SINGLETON CLASS!
 	def _starttmp(self):
 		self._start_helper(temp=1)
 
+    def _stopabort(self):
+        self._doabort = 1
+        self.running = 0
+
 	def _start_helper(self, temp=None):
 		if self.running:
 			self._stop.config(state=DISABLED)
+			self._stopnow.config(state=DISABLED)
 			self.running = 0
 		else:
 			if (os.stat(self._task_pathname).st_mtime <> self._task_mtime and
@@ -2179,6 +2191,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 						  self.reloadbut, self.prevtaskbut,):
 					w.config(state=DISABLED)
 				self._stop.config(state=NORMAL)
+				self._stopnow.config(state=NORMAL)
 
 				if temp:
 					if self.sub_common.queryv('save_tmp'):
@@ -2262,6 +2275,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 						  self.reloadbut, self.prevtaskbut,):
 					w.config(state=NORMAL)
 				self._stop.config(state=DISABLED)
+				self._stopnow.config(state=DISABLED)
 				self.showtestpat()
 				self._allowabort = 0
 				self._loadmenu.enableall()
@@ -2546,6 +2560,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					sys.stderr.write('JOYSTICK PARACHUTE DEPLOYED!\n')
 					sys.exit(0)
 
+            if self._doabort and self._allowabort:
+                # user hit abort/stop button -- this will abort next
+                # time task calls idlefn...
+                self._doabort = 0
+                raise UserAbort
+
 			# process keys from the TkInter GUI (user display etc)
 			(c, ev) = self.tkkeyque.pop()
 			if c:
@@ -2723,7 +2743,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		if ms is None:
 			ms = int(round(multiplier * float(self.dropsize())))
-			sigma = sqrt(self.dropvar())
+			sigma = self.dropvar()**0.5
 		else:
 			# user specified ms, no variance
 			sigma = 0
@@ -3996,7 +4016,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 	def update_rt(self, info=None):
 		import pylab
-                
+
 		if info is None:
 			self.rthist = []
 		else:

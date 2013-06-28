@@ -1,11 +1,11 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
-"""python physiology environment
+"""pype: python physiology environment
 
 This is the main module for pype.  It gets imported by both data
 collection and data analysis programs/tasks.  In general, any
 pype-related program or task should probably import this module as
-early on as possible
+early on as possible.
 
 Author -- James A. Mazer (james.mazer@yale.edu)
 
@@ -367,7 +367,6 @@ import glob
 import cPickle
 import math
 import numpy as np
-import pylab
 
 from types import *
 from Tkinter import *
@@ -3935,6 +3934,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._show_eyetrace_stop = stop
 
 	def _plotEyetraces(self, t, x, y, p0, s0, raster):
+        import pylab
+
 		if len(t) < 1:
 			return
 
@@ -4021,6 +4022,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					   verticalalignment='center',
 					   transform=a.transAxes)
 			else:
+                import pylab
+                
 				h = np.array(self.rthist)
 
 				# for testing:

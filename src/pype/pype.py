@@ -3995,6 +3995,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 
 	def update_rt(self, info=None):
+		import pylab
+                
 		if info is None:
 			self.rthist = []
 		else:
@@ -4017,13 +4019,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 			if len(self.rthist) == 0:
 				a.text(0.5, 0.5, 'NO DATA',
-					   color='red',
-					   horizontalalignment='center',
-					   verticalalignment='center',
-					   transform=a.transAxes)
+					   transform=a.transAxes, color='red',
+					   horizontalalignment='center', verticalalignment='center')
 			else:
-                import pylab
-                
 				h = np.array(self.rthist)
 
 				# for testing:

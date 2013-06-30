@@ -965,35 +965,58 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		startstopf = Frame(f, borderwidth=3, relief=RIDGE)
 		startstopf.pack(expand=0, fill=X, side=TOP)
 
-		if self.training:
-			self._named_start = Button(startstopf, text="train",
-									   command=self._start, bg='light green')
-			self.balloon.bind(self._named_start, 'start training, saving data')
-		else:
-			self._named_start = Button(startstopf, text="record",
-									   command=self._start, bg='light green')
-			self.balloon.bind(self._named_start, 'start recording, saving data')
-		self._named_start.pack(expand=0, fill=X, side=TOP, pady=2)
+        bb = Frame(startstopf)
+        bb.pack(expand=1, fill=X, side=TOP)
+
+        self._named_start = Button(bb, image=self.icons['run'],
+                                   command=self._start)
+        self.balloon.bind(self._named_start, 'start, saving data')
+		self._named_start.pack(expand=1, side=LEFT)
 		self._named_start.config(state=DISABLED)
 
-		self._temp_start = Button(startstopf, text="temp",
-								  command=self._starttmp, bg='light green')
-		self._temp_start.pack(expand=0, fill=X, side=TOP, pady=2)
+		self._temp_start = Button(bb, image=self.icons['runtemp'],
+								  command=self._starttmp)
+		self._temp_start.pack(expand=1, side=LEFT)
 		self.balloon.bind(self._temp_start, "start w/o saving data")
 		self._temp_start.config(state=DISABLED)
 
-		self._stop = Button(startstopf, text="stop",
+        bb = Frame(startstopf)
+        bb.pack(expand=1, fill=X, side=TOP)
+
+		self._stop = Button(bb, image=self.icons['Stop'],
 							command=self._start_helper, fg='black',
 							state=DISABLED)
-		self._stop.pack(expand=0, fill=X, side=TOP, pady=2)
+		self._stop.pack(expand=1, side=LEFT)
 		self.balloon.bind(self._stop, "stop run at end of trial")
 
-		self._stopnow = Button(startstopf, text="abort/stop",
+		self._stopnow = Button(bb, image=self.icons['Cancel'],
                                  command=self._stopabort, fg='black',
                                  state=DISABLED)
-		self._stopnow.pack(expand=0, fill=X, side=TOP, pady=2)
+		self._stopnow.pack(expand=1, side=LEFT)
 		self.balloon.bind(self._stopnow, "stop run immediately")
         self._doabort = 0
+
+        if not self.psych:
+            bb = Frame(startstopf)
+            bb.pack(expand=1, fill=X, side=TOP)
+
+            if not self.training:
+                b = Button(bb, text='cell', command=self._new_cell)
+                b.pack(expand=0, side=LEFT)
+                self.balloon.bind(b, "increment 'cell' counter")
+
+            if not self.psych:
+                b = Button(bb, text='$$', command=self.reward)
+                b.pack(expand=0, side=LEFT)
+                self.balloon.bind(b, "deliver a reward (also F4)")
+
+                self._candyon = 0
+                mb.addmenu('Candy', '', '')
+                for (s, fn) in candy.list_():
+                    mb.addmenuitem('Candy', 'command', label=s,
+                                   command=lambda s=self,f=fn: s._candyplay(f))
+
+        
 
 		c3pane = Frame(f, borderwidth=3, relief=RIDGE)
 		c3pane.pack(expand=0, fill=X, side=TOP)
@@ -1001,23 +1024,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		c4pane = Frame(f, borderwidth=3, relief=RIDGE)
 		c4pane.pack(expand=0, fill=X, side=TOP)
 		self._userbuttonframe = c4pane
-
-		if not self.psych and not self.training:
-			b = Button(c3pane, text="new\ncell", command=self._new_cell)
-			b.pack(expand=0, fill=X, side=TOP, pady=2)
-			self.balloon.bind(b, "increment 'cell' counter")
-
-		if not self.psych:
-			b = Button(c3pane, text="reward",
-					   command=self.reward)
-			b.pack(expand=0, fill=X, side=TOP, pady=2)
-			self.balloon.bind(b, "deliver a reward (also F4)")
-
-			self._candyon = 0
-			mb.addmenu('Candy', '', '')
-			for (s, fn) in candy.list_():
-				mb.addmenuitem('Candy', 'command', label=s,
-							   command=lambda s=self,f=fn: s._candyplay(f))
 
 		mb.addmenu('|', '', '')
 
@@ -1437,8 +1443,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			'right':	gificons.right,
 			'up':		gificons.up,
 			'down':		gificons.down,
-			'stop':		gificons.stop,
 			'logo':		gificons.logo,
+			'Stop':		gificons.Stop,
+			'Cancel':	gificons.Cancel,
+			'run':      gificons.run,
+			'runtemp':	gificons.runtemp,
+			'drop':     gificons.drop,
 			}
 
 	def _findparam(self):

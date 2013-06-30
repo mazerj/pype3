@@ -2,6 +2,8 @@
 
 sed "s^%%PYPEDIR%%^$PYPEDIR^g" <epydoc.conf >/tmp/$$.conf
 
+rm -rf $PYPEDIR/docs
+
 epydoc -v --no-private --simple-term --config=/tmp/$$.conf \
 	       --exclude=Pmw \
 	       --exclude=pype.stats \
@@ -36,6 +38,5 @@ epydoc -v --no-private --simple-term --config=/tmp/$$.conf \
 	       --exclude=pype.pypedata \
 	       --exclude=pype.rootperm \
 	       --exclude=pype.pypeversion
-
 
 /bin/rm -f /tmp/$$.conf

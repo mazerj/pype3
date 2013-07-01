@@ -398,12 +398,12 @@ if not prand.validate():
 	sys.exit(1)
 
 def trace():
-    # useful little tool: prints file & lineno
-    import inspect
-    print 'TRACE %s:%d' % (
-        inspect.getfile(inspect.currentframe().f_back),
-        inspect.currentframe().f_back.f_lineno,
-        )
+	# useful little tool: prints file & lineno
+	import inspect
+	print 'TRACE %s:%d' % (
+		inspect.getfile(inspect.currentframe().f_back),
+		inspect.currentframe().f_back.f_lineno,
+		)
 
 def _pypestdparams():
 	common = (
@@ -560,6 +560,8 @@ def _pypestdparams():
 		pslot('rot_', '0', is_float, 'degrees'),
 		)
 	return (common, rig, ical)
+
+def iButton(parent, image): pass
 
 class PypeApp(object):					# !SINGLETON CLASS!
 	"""Pype Application Class.
@@ -946,7 +948,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		rt = DockWindow(checkbutton=b, title='Reaction Times')
 		Button(rt, text='Clear',
 			   command=self.update_rt).pack(side=TOP, expand=1, fill=X)
-        self.rtplot = EmbeddedFigure(rt)
+		self.rtplot = EmbeddedFigure(rt)
 		self.update_rt()
 
 		et = self.config.get('EYETRACKER', 'NONE')
@@ -973,12 +975,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		startstopf = Frame(f, borderwidth=3, relief=RIDGE)
 		startstopf.pack(expand=0, fill=X, side=TOP)
 
-        bb = Frame(startstopf)
-        bb.pack(expand=1, fill=X, side=TOP)
+		bb = Frame(startstopf)
+		bb.pack(expand=1, fill=X, side=TOP)
 
-        self._named_start = Button(bb, image=self.icons['run'],
-                                   command=self._start)
-        self.balloon.bind(self._named_start, 'start, saving data')
+		self._named_start = Button(bb, image=self.icons['run'],
+								   command=self._start)
+		self.balloon.bind(self._named_start, 'start, saving data')
 		self._named_start.pack(expand=1, fill=X, side=LEFT)
 		self._named_start.config(state=DISABLED)
 
@@ -988,8 +990,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.balloon.bind(self._temp_start, "start w/o saving data")
 		self._temp_start.config(state=DISABLED)
 
-        bb = Frame(startstopf)
-        bb.pack(expand=1, fill=X, side=TOP)
+		bb = Frame(startstopf)
+		bb.pack(expand=1, fill=X, side=TOP)
 
 		self._stop = Button(bb, image=self.icons['Stop'],
 							command=self._start_helper, fg='black',
@@ -998,31 +1000,31 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.balloon.bind(self._stop, "stop run at end of trial")
 
 		self._stopnow = Button(bb, image=self.icons['Cancel'],
-                                 command=self._stopabort, fg='black',
-                                 state=DISABLED)
+								 command=self._stopabort, fg='black',
+								 state=DISABLED)
 		self._stopnow.pack(expand=1, fill=X, side=LEFT)
 		self.balloon.bind(self._stopnow, "stop run immediately")
-        self._doabort = 0
+		self._doabort = 0
 
-        if not self.psych:
-            bb = Frame(startstopf)
-            bb.pack(expand=1, fill=X, side=TOP)
+		if not self.psych:
+			bb = Frame(startstopf)
+			bb.pack(expand=1, fill=X, side=TOP)
 
-            if not self.training:
-                b = Button(bb, text='cell', command=self._new_cell)
-                b.pack(expand=0, side=LEFT)
-                self.balloon.bind(b, "increment 'cell' counter")
+			if not self.training:
+				b = Button(bb, text='cell', command=self._new_cell)
+				b.pack(expand=0, side=LEFT)
+				self.balloon.bind(b, "increment 'cell' counter")
 
-            if not self.psych:
-                b = Button(bb, text='$$', command=self.reward)
-                b.pack(expand=0, side=LEFT)
-                self.balloon.bind(b, "deliver a reward (also F4)")
+			if not self.psych:
+				b = Button(bb, text='$$', command=self.reward)
+				b.pack(expand=0, side=LEFT)
+				self.balloon.bind(b, "deliver a reward (also F4)")
 
-                self._candyon = 0
-                mb.addmenu('Candy', '', '')
-                for (s, fn) in candy.list_():
-                    mb.addmenuitem('Candy', 'command', label=s,
-                                   command=lambda s=self,f=fn: s._candyplay(f))
+				self._candyon = 0
+				mb.addmenu('Candy', '', '')
+				for (s, fn) in candy.list_():
+					mb.addmenuitem('Candy', 'command', label=s,
+								   command=lambda s=self,f=fn: s._candyplay(f))
 
 		c3pane = Frame(f, borderwidth=3, relief=RIDGE)
 		c3pane.pack(expand=0, fill=X, side=TOP)
@@ -1453,9 +1455,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			'logo':		gificons.logo,
 			'Stop':		gificons.Stop,
 			'Cancel':	gificons.Cancel,
-			'run':      gificons.run,
+			'run':		gificons.run,
 			'runtemp':	gificons.runtemp,
-			'drop':     gificons.drop,
+			'drop':		gificons.drop,
 			}
 
 	def _findparam(self):
@@ -1885,11 +1887,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			if hasattr(self.taskmodule, 'main'):
 				# module must provide a 'main' function that is:
 				#  1. a function that takes one arg (app; PypeApp handle,
-				#     ie, self).
+				#	  ie, self).
 				#  2. When called, binds something to the start function
-				#     by  calling app.set_startfn, eg:
-				#        t = make_some_task_object_with_state()
-				#        app.set_startfn(lambda app,task=t: task.start_run(app))
+				#	  by  calling app.set_startfn, eg:
+				#		 t = make_some_task_object_with_state()
+				#		 app.set_startfn(lambda app,task=t: task.start_run(app))
 				# module MAY optionally provide a cleanup function that
 				# also takes 'app', that will be called when the task is
 				# unloaded.
@@ -2048,13 +2050,13 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		#	- However, integration is not complete... not sure how
 		#	  I want to do this -- could use it to get rid of
 		#	  comedi_server completely..
-        try:
-            import labjack
-            self.u3 = labjack.SamplerU3()
-            Logger("pype: found a labjack u3 -- validation mode\n")
-        except ImportError:
-            Logger("pype: LabJack drivers not installed.\n")
-            self.u3 = None
+		try:
+			import labjack
+			self.u3 = labjack.SamplerU3()
+			Logger("pype: found a labjack u3 -- validation mode\n")
+		except ImportError:
+			Logger("pype: LabJack drivers not installed.\n")
+			self.u3 = None
 
 	def init_framebuffer(self):
 		sx = self.config.get('SYNCX', None)
@@ -2186,9 +2188,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 	def _starttmp(self):
 		self._start_helper(temp=1)
 
-    def _stopabort(self):
-        self._doabort = 1
-        self.running = 0
+	def _stopabort(self):
+		self._doabort = 1
+		self.running = 0
 
 	def _start_helper(self, temp=None):
 		if self.running:
@@ -2356,38 +2358,38 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					 'cell field is non-numeric, can''t increment.')
 
 	def set_startfn(self, startfn, updatefn=None):
-        """Set start run function/hook.
+		"""Set start run function/hook.
 
-        The task_module.main() function must call this function to bind
-        the startup function for the task. The main function can optionall
-        also bind an update function that gets called after each trial. The
-        update function can be used to update task-specific plots etc.
+		The task_module.main() function must call this function to bind
+		the startup function for the task. The main function can optionall
+		also bind an update function that gets called after each trial. The
+		update function can be used to update task-specific plots etc.
 
-        The startfn must be a function that takes at least one argument,
-        namely the PypeApp struction that acts as a handle for everything
-        else (aka 'app'). Additional parameters can be included by using
-        a lambda expression, for example:
+		The startfn must be a function that takes at least one argument,
+		namely the PypeApp struction that acts as a handle for everything
+		else (aka 'app'). Additional parameters can be included by using
+		a lambda expression, for example:
 
-        >>> t = Task(...)
-        >>> app.set_startfn(lambda app, mytask=t: mystart(app, mytask))
+		>>> t = Task(...)
+		>>> app.set_startfn(lambda app, mytask=t: mystart(app, mytask))
 
-        The return value from the start function is ignored.
+		The return value from the start function is ignored.
 
-        The updatefn is similar. It should be a function takes at least
-        two parameters, first is 'app', second either None or a tuple.
-        None for a pre-run initialization stage and a tuple with
-        the info provided to record_write(), i.e.:
+		The updatefn is similar. It should be a function takes at least
+		two parameters, first is 'app', second either None or a tuple.
+		None for a pre-run initialization stage and a tuple with
+		the info provided to record_write(), i.e.:
 
-        >>> resultcode, rt, params, taskinfo = info
+		>>> resultcode, rt, params, taskinfo = info
 
-        You can do whatever you want, but if you are overriding the
-        built-in RT histogram stuff (in which case it might be useful
-        to know that app.rthist contains a list of all the RTs for the
-        current run) the updater shoudl return False. If it returns
-        True, the built-in histogram will get updated IN ADDITION to
-        whatever you did..
+		You can do whatever you want, but if you are overriding the
+		built-in RT histogram stuff (in which case it might be useful
+		to know that app.rthist contains a list of all the RTs for the
+		current run) the updater shoudl return False. If it returns
+		True, the built-in histogram will get updated IN ADDITION to
+		whatever you did..
 
-        """
+		"""
 
 		self._startfn = startfn
 		self._updatefn = updatefn
@@ -2577,11 +2579,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					sys.stderr.write('JOYSTICK PARACHUTE DEPLOYED!\n')
 					sys.exit(0)
 
-            if self._doabort and self._allowabort:
-                # user hit abort/stop button -- this will abort next
-                # time task calls idlefn...
-                self._doabort = 0
-                raise UserAbort
+			if self._doabort and self._allowabort:
+				# user hit abort/stop button -- this will abort next
+				# time task calls idlefn...
+				self._doabort = 0
+				raise UserAbort
 
 			# process keys from the TkInter GUI (user display etc)
 			(c, ev) = self.tkkeyque.pop()
@@ -3492,9 +3494,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			x = x[ix]
 			y = y[ix]
 		slist = find_saccades((t, x, y, None),
-                              thresh=thresh,
-                              mindur=mindur,
-                              maxthresh=maxthresh)
+							  thresh=thresh,
+							  mindur=mindur,
+							  maxthresh=maxthresh)
 		return slist
 
 	def get_eyetrace_now(self, raw=0):
@@ -3971,7 +3973,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._show_eyetrace_stop = stop
 
 	def _plotEyetraces(self, t, x, y, p0, s0, raster):
-        import pylab
+		import pylab
 
 		if len(t) < 1:
 			return

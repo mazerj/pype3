@@ -367,6 +367,8 @@ import glob
 import cPickle
 import math
 import numpy as np
+import matplotlib
+matplotlib.use('TkAgg')
 
 from types import *
 from Tkinter import *
@@ -394,6 +396,14 @@ import prand
 if not prand.validate():
 	sys.stderr.write('prand does not implment a valid Mersenne Twister\n')
 	sys.exit(1)
+
+def trace():
+    # useful little tool: prints file & lineno
+    import inspect
+    print 'TRACE %s:%d' % (
+        inspect.getfile(inspect.currentframe().f_back),
+        inspect.currentframe().f_back.f_lineno,
+        )
 
 def _pypestdparams():
 	common = (
@@ -699,8 +709,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self.setgeo(load=1)
 
 		self.tk = Pmw.initialise(useTkOptionDb=1)
-		#self.tk.option_add("*Entry.Font", 'Courier 8')
-
 		self.tk.resizable(0, 0)
 		self.tk.title('pype')
 		self.tk.protocol("WM_DELETE_WINDOW", self._shutdown)
@@ -938,7 +946,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		rt = DockWindow(checkbutton=b, title='Reaction Times')
 		Button(rt, text='Clear',
 			   command=self.update_rt).pack(side=TOP, expand=1, fill=X)
-		self.rtplot = EmbeddedFigure(rt)
+        self.rtplot = EmbeddedFigure(rt)
 		self.update_rt()
 
 		et = self.config.get('EYETRACKER', 'NONE')
@@ -971,12 +979,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
         self._named_start = Button(bb, image=self.icons['run'],
                                    command=self._start)
         self.balloon.bind(self._named_start, 'start, saving data')
-		self._named_start.pack(expand=1, side=LEFT)
+		self._named_start.pack(expand=1, fill=X, side=LEFT)
 		self._named_start.config(state=DISABLED)
 
 		self._temp_start = Button(bb, image=self.icons['runtemp'],
 								  command=self._starttmp)
-		self._temp_start.pack(expand=1, side=LEFT)
+		self._temp_start.pack(expand=1, fill=X, side=LEFT)
 		self.balloon.bind(self._temp_start, "start w/o saving data")
 		self._temp_start.config(state=DISABLED)
 
@@ -986,13 +994,13 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._stop = Button(bb, image=self.icons['Stop'],
 							command=self._start_helper, fg='black',
 							state=DISABLED)
-		self._stop.pack(expand=1, side=LEFT)
+		self._stop.pack(expand=1, fill=X, side=LEFT)
 		self.balloon.bind(self._stop, "stop run at end of trial")
 
 		self._stopnow = Button(bb, image=self.icons['Cancel'],
                                  command=self._stopabort, fg='black',
                                  state=DISABLED)
-		self._stopnow.pack(expand=1, side=LEFT)
+		self._stopnow.pack(expand=1, fill=X, side=LEFT)
 		self.balloon.bind(self._stopnow, "stop run immediately")
         self._doabort = 0
 
@@ -1015,8 +1023,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
                 for (s, fn) in candy.list_():
                     mb.addmenuitem('Candy', 'command', label=s,
                                    command=lambda s=self,f=fn: s._candyplay(f))
-
-        
 
 		c3pane = Frame(f, borderwidth=3, relief=RIDGE)
 		c3pane.pack(expand=0, fill=X, side=TOP)
@@ -1324,6 +1330,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		if self.psych:
 			self.fb.screen_close()
+
 
 	def elrestart(self):
 		dacq_elrestart()

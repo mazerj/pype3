@@ -368,7 +368,7 @@ import cPickle
 import math
 import numpy as np
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 
 from types import *
 from Tkinter import *
@@ -610,7 +610,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		import signal
 
 		# from pype libraries:
-		import PlexNet, pype2tdt, candy, userdpy, configvars
+		import PlexNet, pype2tdt, tdt, candy, userdpy, configvars
 
 		if not PypeApp._init:
 			return
@@ -901,6 +901,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				Logger("pype: warning -- ELOG api not available.\n")
 				self.use_elog = 0
 		else:
+			Logger("pype: no ELOG setup -- using old-style cell counter.\n")
 			self.use_elog = 0
 
 		(commonp, rigp, icalp) = _pypestdparams()
@@ -1299,7 +1300,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				else:
 					Logger('pype: tdt tank = "%s"\n' % t)
 					self.xdacq = 'tdt'
-			except socket.error:
+			except (socket.error, tdt.TDTError):
 				self.tdt = None
 				Logger('pype: no connection to tdt @ %s.\n' % tdthost, popup=1)
 

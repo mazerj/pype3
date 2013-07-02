@@ -2107,7 +2107,7 @@ class DisplayList(object):
 
 	"""
 
-	def __init__(self, fb, bg=None, app=None):
+	def __init__(self, fb, bg=None, comedi=True):
 		"""Instantiation method.
 
 		:param fb: framebuffer associated with this list. This is sort
@@ -2122,13 +2122,15 @@ class DisplayList(object):
 
 		"""
 
-		from pype import Timer
+		if comedi:
+			from pype import Timer
+		else:
+			from simpletimer import Timer
 
 		self.sprites = []
 		self.fb = fb
 		self.bg = bg
-		self.app = app
-		#self.timer = Timer()
+		self.timer = Timer()
 		self.trigger = None
 		self.action = None
 
@@ -2678,19 +2680,19 @@ if __name__ == '__main__':
 	s1.fill((255,255,255))
 	s2 = Sprite(100, 100, 100, 0, fb=fb, on=0)
 	s2.fill((255,255,1))
-	dlist = DisplayList(fb, bg=128)
+	dlist = DisplayList(fb, bg=128, comedi=False)
 
 	ti = Timer(on=False)
 	fdur = int(round(1000/fb.calcfps()))
-	dlist.add(s1, ti, 100+10*fdur, 's1_on', 100+20*fdur, 's1_off')
-	dlist.add(s2, ti, 100+15*fdur, 's2_on', 100+25*fdur, 's2_off')
+	dlist.add(s1, ti, 1100, 's1_on', 1200, 's1_off')
+	dlist.add(s2, ti, 1150, 's2_on', 1250, 's2_off')
 
 	# start the timer going
 	dlist.update(flip=1)
 	ti.reset()
 	last = ti.ms()
 	print last
-	while ti.ms() < 1000:
+	while ti.ms() < 5000:
 		fb.clear()
 		elist = dlist.update(flip=1)
 		if len(elist):

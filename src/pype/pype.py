@@ -855,6 +855,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._din_stat.pack(side=RIGHT)
 		self.balloon.bind(self._din_stat, "status of digital inputs")
 
+		bb = Frame(f1b)
+		bb.pack(expand=1, side=TOP, anchor=W)
+
 		f2 = Frame(leftpane)				# entire lower section.. not visible!
 		f2.pack(expand=1)
 
@@ -975,51 +978,44 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		startstopf = Frame(f, borderwidth=3, relief=RIDGE)
 		startstopf.pack(expand=0, fill=X, side=TOP)
 
-		bb = Frame(startstopf)
-		bb.pack(expand=1, fill=X, side=TOP)
-
 		self._named_start = Button(bb, image=self.icons['run'],
 								   command=self._start)
 		self.balloon.bind(self._named_start, 'start, saving data')
-		self._named_start.pack(expand=1, fill=X, side=LEFT)
+		self._named_start.pack(expand=1, fill=Y, side=LEFT)
 		self._named_start.config(state=DISABLED)
 
 		self._temp_start = Button(bb, image=self.icons['runtemp'],
 								  command=self._starttmp)
-		self._temp_start.pack(expand=1, fill=X, side=LEFT)
+		self._temp_start.pack(expand=1, fill=Y, side=LEFT)
 		self.balloon.bind(self._temp_start, "start w/o saving data")
 		self._temp_start.config(state=DISABLED)
-
-		bb = Frame(startstopf)
-		bb.pack(expand=1, fill=X, side=TOP)
 
 		self._stop = Button(bb, image=self.icons['Stop'],
 							command=self._start_helper, fg='black',
 							state=DISABLED)
-		self._stop.pack(expand=1, fill=X, side=LEFT)
+		self._stop.pack(expand=1, fill=Y, side=LEFT)
 		self.balloon.bind(self._stop, "stop run at end of trial")
 
 		self._stopnow = Button(bb, image=self.icons['Cancel'],
 								 command=self._stopabort, fg='black',
 								 state=DISABLED)
-		self._stopnow.pack(expand=1, fill=X, side=LEFT)
+		self._stopnow.pack(expand=1, fill=Y, side=LEFT)
 		self.balloon.bind(self._stopnow, "stop run immediately")
 		self._doabort = 0
 
 		if not self.psych:
-			bb = Frame(startstopf)
-			bb.pack(expand=1, fill=X, side=TOP)
+            b = Button(bb, image=self.icons['drop'],
+                       command=self.reward)
+            b.pack(expand=1, fill=Y, side=LEFT)
+            self.balloon.bind(b, "deliver a reward (also F4)")
 
-			if not self.training:
-				b = Button(bb, text='cell', command=self._new_cell)
-				b.pack(expand=0, side=LEFT)
+            if not self.training:
+				b = Button(bb, text='cell', image=self.icons['cell'],
+                           command=self._new_cell)
+				b.pack(expand=1, fill=Y, side=LEFT)
 				self.balloon.bind(b, "increment 'cell' counter")
 
 			if not self.psych:
-				b = Button(bb, text='$$', command=self.reward)
-				b.pack(expand=0, side=LEFT)
-				self.balloon.bind(b, "deliver a reward (also F4)")
-
 				self._candyon = 0
 				mb.addmenu('Candy', '', '')
 				for (s, fn) in candy.list_():
@@ -1457,6 +1453,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			'Cancel':	gificons.Cancel,
 			'run':		gificons.run,
 			'runtemp':	gificons.runtemp,
+			'cell':		gificons.cell,
 			'drop':		gificons.drop,
 			}
 
@@ -3423,7 +3420,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		if not code is None:
 			if type(code) is TupleType:
 				for c in code:
-					self.record_buffer.append((ts, c))
+                    if len(c) > 0:
+                        # don't encode empty events
+                        self.record_buffer.append((ts, c))
 			else:
 				self.record_buffer.append((ts, code))
 		return ts
@@ -4365,8 +4364,11 @@ class FixWin(object):
 										   color=color, type=2, dash=dash)
 
 class Timer(object):
-	def __init__(self):
-		self.reset()
+	def __init__(self, on=True):
+        if on:
+            self.reset()
+        else:
+            self._start_at = None
 
 	def reset(self):
 		"""Reset timer.
@@ -4382,7 +4384,10 @@ class Timer(object):
 		:return: (ms) elapsed time
 
 		"""
-		return dacq_ts() - self._start_at
+        if self._start_at is None:
+            return 0
+        else:
+            return dacq_ts() - self._start_at
 
 class Holder(object):
 	"""Dummy class.

@@ -2107,7 +2107,7 @@ class DisplayList(object):
 
 	"""
 
-	def __init__(self, fb, bg=None):
+	def __init__(self, fb, bg=None, app=None):
 		"""Instantiation method.
 
 		:param fb: framebuffer associated with this list. This is sort
@@ -2118,6 +2118,8 @@ class DisplayList(object):
 
 		:param bg: optional background color
 
+        :param bg: optional PypeApp handle -- for auto-encoding..
+
 		"""
 
 		from pype import Timer
@@ -2125,7 +2127,8 @@ class DisplayList(object):
 		self.sprites = []
 		self.fb = fb
 		self.bg = bg
-		self.timer = Timer()
+		self.app = app
+        #self.timer = Timer()
 		self.trigger = None
 		self.action = None
 
@@ -2142,18 +2145,34 @@ class DisplayList(object):
 		for s in self.sprites:
 			del s
 
-	def add(self, s):
+	def add(self, s, timer=None,
+            on=None, onev=None, off=None, offev=None):
 		"""Add sprite to display list.
 
-		:param s: (Sprite) sprites are added in depth order
+        Each time self.update is called, the timer will be
+        checked and used to decide whether to turn this
+        sprite on or off.
+
+		:param s: (Sprite/list of Sprites) sprites are added in depth order
+		:param timer: (Timer) Timer object to use as clock
+		:param on: (ms) time to turn sprite on
+        :param onev: (str) encode to store for on event
+		:param off: (ms) time to turn sprite off
+        :param offev: (str) encode to store for off event
 
 		:return: nothing
 
 		"""
 		if is_sequence(s):
 			for i in s:
-				self.add(i)
+				self.add(i, timer=timer,
+                         on=on, onev=onev, off=off, offev=offev)
 		else:
+            s._timer = timer
+            s._ontime = on
+            s._onev = onev
+            s._offtime = off
+            s._offev = offev
 			for ix in range(0, len(self.sprites)):
 				if s.depth > self.sprites[ix].depth:
 					self.sprites.insert(ix, s)
@@ -2230,7 +2249,7 @@ class DisplayList(object):
 
 		:param preclear: (boolean) clear first?
 
-		:return: nothing
+		:return: list of encodes (from timer-triggered sprites)
 
 		"""
 
@@ -2252,12 +2271,24 @@ class DisplayList(object):
 				self.fb.clear()
 
 		# draw sprites in depth order
+        encodes = []
 		for s in self.sprites:
-			s.blit()
+            if (not s._ontime is None) and s._timer.ms() > s._ontime:
+                # turn sprite on and clear on trigger
+                s._ontime = None
+                s.on()
+                encodes.append(s._onev)
+            elif (not s._offtime is None) and s._timer.ms() > s._offtime:
+                # turn sprite off and clear off trigger
+                s._offtime = None
+                s.off()
+                encodes.append(s._offev)
+            s.blit()
 
 		# possibly flip screen..
 		if flip:
 			self.fb.flip()
+        return encodes
 
 def texture_del(texture):
 	"""INTERNAL USE ONLY
@@ -2616,8 +2647,8 @@ def tickbox(x, y, width, height, lwidth, color, fb):
 				   contig=0, width=lwidth)
 	return s
 
-
 if __name__ == '__main__':
+    from simpletimer import Timer
 
 	def drawtest2(fb):
 		s1 = Sprite(100, 100, -100, 0, fb=fb)
@@ -2638,8 +2669,32 @@ if __name__ == '__main__':
 
 	fb=quickfb(500,500)
 
-	#drawtest1(fb, None)
-	drawtest2(fb)
+    if 0:
+        drawtest2(fb)
+        sys.stdout.write('>>>'); sys.stdout.flush()
+        sys.stdin.readline()
 
-	sys.stdout.write('>>>'); sys.stdout.flush()
-	sys.stdin.readline()
+    s1 = Sprite(100, 100, -100, 0, fb=fb, on=0)
+    s1.fill((255,255,255))
+    s2 = Sprite(100, 100, 100, 0, fb=fb, on=0)
+    s2.fill((255,255,1))
+    dlist = DisplayList(fb, bg=128)
+
+    ti = Timer(on=False)
+    fdur = int(round(1000/fb.calcfps()))
+    dlist.add(s1, ti, 100+10*fdur, 's1_on', 100+20*fdur, 's1_off')
+    dlist.add(s2, ti, 100+15*fdur, 's2_on', 100+25*fdur, 's2_off')
+
+    # start the timer going
+    dlist.update(flip=1)
+    ti.reset()
+    last = ti.ms()
+    print last
+    while ti.ms() < 1000:
+        fb.clear()
+        elist = dlist.update(flip=1)
+        if len(elist):
+            x = ti.ms()
+            print x, x-last, elist
+            last = x
+

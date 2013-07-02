@@ -1010,7 +1010,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			b.pack(expand=1, fill=Y, side=LEFT)
 			self.balloon.bind(b, "deliver a reward (also F4)")
 
-			if not self.training:
+			if not self.use_elog and not self.training:
 				b = Button(bb, text='cell', image=self.icons['cell'],
 						   command=self._new_cell)
 				b.pack(expand=1, fill=Y, side=LEFT)

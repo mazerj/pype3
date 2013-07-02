@@ -1004,14 +1004,14 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._doabort = 0
 
 		if not self.psych:
-            b = Button(bb, image=self.icons['drop'],
-                       command=self.reward)
-            b.pack(expand=1, fill=Y, side=LEFT)
-            self.balloon.bind(b, "deliver a reward (also F4)")
+			b = Button(bb, image=self.icons['drop'],
+					   command=self.reward)
+			b.pack(expand=1, fill=Y, side=LEFT)
+			self.balloon.bind(b, "deliver a reward (also F4)")
 
-            if not self.training:
+			if not self.training:
 				b = Button(bb, text='cell', image=self.icons['cell'],
-                           command=self._new_cell)
+						   command=self._new_cell)
 				b.pack(expand=1, fill=Y, side=LEFT)
 				self.balloon.bind(b, "increment 'cell' counter")
 
@@ -3420,9 +3420,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		if not code is None:
 			if type(code) is TupleType:
 				for c in code:
-                    if len(c) > 0:
-                        # don't encode empty events
-                        self.record_buffer.append((ts, c))
+					if len(c) > 0:
+						# don't encode empty events
+						self.record_buffer.append((ts, c))
 			else:
 				self.record_buffer.append((ts, code))
 		return ts
@@ -4365,10 +4365,10 @@ class FixWin(object):
 
 class Timer(object):
 	def __init__(self, on=True):
-        if on:
-            self.reset()
-        else:
-            self._start_at = None
+		if on:
+			self.reset()
+		else:
+			self._start_at = None
 
 	def reset(self):
 		"""Reset timer.
@@ -4384,10 +4384,10 @@ class Timer(object):
 		:return: (ms) elapsed time
 
 		"""
-        if self._start_at is None:
-            return 0
-        else:
-            return dacq_ts() - self._start_at
+		if self._start_at is None:
+			return 0
+		else:
+			return dacq_ts() - self._start_at
 
 class Holder(object):
 	"""Dummy class.

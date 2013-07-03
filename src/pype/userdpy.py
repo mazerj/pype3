@@ -150,7 +150,8 @@ class ScaledCanvas(Canvas):
 
 
 class UserDisplay(object):
-	def __init__(self, master, fbsize, scale=1.0, pix_per_dva=1.0, app=None):
+	def __init__(self, master, fbsize, scale=1.0, pix_per_dva=1.0,
+                 app=None, eyemouse=False):
 		"""UserDisplay Class.
 
 		The UserDisplay is a pype local window on the user's computer
@@ -164,6 +165,8 @@ class UserDisplay(object):
 		**pix_per_dva** - pixels per degree visual angle
 
 		**app** - PypeApp handle
+
+        **eyemouse** - Use Button-1 as pseudo eye position signal..
 
 		**NOTE:** Just because most of these arguments are keywords
 		(and therefore optional), doesn't mean they're not
@@ -302,6 +305,8 @@ class UserDisplay(object):
 		m.add_command(label='show shortcuts', command=self.help)
 		p.add_cascade(label='Help', menu=m)
 
+        if eyemouse:
+            self.canvas.bind("<Button-1>", self._mouse1)
 		self.canvas.bind("<Button-3>", lambda ev,p=p,s=self: s._dopopup(ev,p))
 		self.canvas.bind("<Motion>", self._mouse_motion)
 		self.canvas.bind("<Enter>", self._mouse_enter)
@@ -815,6 +820,11 @@ class UserDisplay(object):
 
 	def _phototoggle(self):
 		self._photomode = self._photomode_tvar.get()
+
+	def _mouse1(self, ev=None):
+        x, y = self.canvas.window2scaled(ev.x, ev.y)
+        x, y = self.can2fb(x, y)
+        self.app.eyeshift(x=x, y=y, rel=False)
 
 	def _mouse_motion(self, ev=None):
 		s = "[%dppd]" % (self.gridinterval,)

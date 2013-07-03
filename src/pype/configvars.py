@@ -147,13 +147,16 @@ def defaults(srcfile=None):
 	c.set('SWAP_XY', '0',
 		  doc='swap X & Y on eye tracker')
 
-										# EYELINK SPECIFIC OPTIONS
+    # EYELINK SPECIFIC OPTIONS
 	c.set('EYELINK_XTALK', '0,-0.001',
 		  doc='crosstalk adj: pupil pos/size')
 	c.set('EYELINK_OPTS', '',
 		  doc='any extra options to pass to API')
 	c.set('EYELINK_CAMERA',	'1',
 		  doc='left or right camera (0, 1)')
+    
+	c.set('EYEMOUSE',	'0',
+		  doc='use mouse button-1 as substitute eye tracker')
 
 	#####################################################
 	# plexon interface

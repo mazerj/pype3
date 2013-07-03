@@ -368,7 +368,7 @@ import cPickle
 import math
 import numpy as np
 import matplotlib
-#matplotlib.use('TkAgg')
+matplotlib.use('TkAgg')
 
 from types import *
 from Tkinter import *
@@ -865,7 +865,14 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		f.grid(row=0, column=0, sticky=N+S)
 
 		c1pane = Frame(f, borderwidth=1, relief=RIDGE)
-		c1pane.pack(expand=0, fill=X, side=TOP)
+		c1pane.pack(expand=0, fill=X, side=TOP, pady=10)
+
+        c2pane = Frame(f, borderwidth=1, relief=RIDGE)
+		c2pane.pack(expand=0, fill=X, side=TOP, pady=10)
+
+		c3pane = Frame(f, borderwidth=1, relief=RIDGE)
+		c3pane.pack(expand=0, fill=X, side=TOP, pady=10)
+		self._userbuttonframe = c3pane
 
 		b = Button(c1pane, text='reload',
 				   command=self.loadtask, state=DISABLED)
@@ -886,7 +893,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.balloon.bind(udpy_, "show/hide user display window/pane")
 
 		hostname = self._gethostname()
-		b = Checkbutton(c1pane, text='subject', relief=RAISED, anchor=W)
+		b = Checkbutton(c2pane, text='subject', relief=RAISED, anchor=W)
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
 		self.balloon.bind(b, "show/hide subject worksheet")
 
@@ -912,14 +919,14 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			# 'cell' (exper in elog database) not changable in elog mode:
 			self.sub_common.lockfield('cell')
 
-		b = Checkbutton(c1pane, text='rig', relief=RAISED, anchor=W)
+		b = Checkbutton(c2pane, text='rig', relief=RAISED, anchor=W)
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
 		rig_common = DockWindow(checkbutton=b,
 								title='Rig Params (%s)' % hostname)
 		self.rig_common = ParamTable(rig_common,
 									 rigp, file='rig-%s.par' % hostname)
 
-		b = Checkbutton(c1pane, text='ical', relief=RAISED, anchor=W)
+		b = Checkbutton(c2pane, text='ical', relief=RAISED, anchor=W)
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
 		ical = DockWindow(checkbutton=b, title='ical')
 		self.ical = ParamTable(ical, icalp,
@@ -947,7 +954,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.rig_common.set('mon_ppd', '%g' % ppd)
 
 		# reaction time plot window
-		b = Checkbutton(c1pane, text='RT hist', relief=RAISED, anchor=W)
+		b = Checkbutton(c2pane, text='RT hist', relief=RAISED, anchor=W)
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
 		rt = DockWindow(checkbutton=b, title='Reaction Times')
 		Button(rt, text='Clear',
@@ -1022,13 +1029,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				for (s, fn) in candy.list_():
 					mb.addmenuitem('Candy', 'command', label=s,
 								   command=lambda s=self,f=fn: s._candyplay(f))
-
-		c3pane = Frame(f, borderwidth=3, relief=RIDGE)
-		c3pane.pack(expand=0, fill=X, side=TOP)
-
-		c4pane = Frame(f, borderwidth=3, relief=RIDGE)
-		c4pane.pack(expand=0, fill=X, side=TOP)
-		self._userbuttonframe = c4pane
 
 		mb.addmenu('|', '', '')
 
@@ -1179,13 +1179,20 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.rig_common.set('mon_fps', '%g' % fps)
 		Logger('pype: estimated fps = %g\n' % fps)
 
+        # use mouse in userdpy as substitute for eye tracker?
+        eyemouse = self.config.iget('EYEMOUSE', 0)
+        if eyemouse:
+            self.eyeset(xgain=1.0, ygain=1.0, xoff=0, yoff=0)
+
 		# userdisplay: shadow of framebuffer window
+
 		scale = self.config.fget('USERDISPLAY_SCALE')
 		self.udpy = userdpy.UserDisplay(rightpane,
 										fbsize=(self.fb.w, self.fb.h),
 										scale=scale,
 										pix_per_dva=self.pix_per_dva,
-										app=self)
+										app=self,
+                                        eyemouse=eyemouse)
 
 		udpy_.config(command=self.udpy.showhide)
 		if self.config.iget('USERDISPLAY_HIDE'):
@@ -2469,7 +2476,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._eyetarg_x = x
 		self._eyetarg_y = y
 
-	def eyeshift(self, x=0, y=0, reset=None, zero=None):
+	def eyeshift(self, x=0, y=0, reset=False, zero=False, rel=True):
 		"""Adjust X & Y offsets to set DC-offsets for eye position.
 
 		- if (reset) --> set x/y offsets to (0,0)
@@ -2485,12 +2492,17 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			x = 0
 			y = 0
 		elif zero:
-			(x, y) = (dacq_eye_read(1), dacq_eye_read(2))
-			x = float(self.ical.queryv('xoff_')) + x - self._eyetarg_x
-			y = float(self.ical.queryv('yoff_')) + y - self._eyetarg_y
-		else:
+			(x0, y0) = (dacq_eye_read(1), dacq_eye_read(2))
+			x = float(self.ical.queryv('xoff_')) + x0 - self._eyetarg_x
+			y = float(self.ical.queryv('yoff_')) + y0 - self._eyetarg_y
+		elif rel:
 			x = float(self.ical.queryv('xoff_')) + x
 			y = float(self.ical.queryv('yoff_')) + y
+        else:
+            # assume eye is looking at specified point -- for mouse clicks!
+			(x0, y0) = (dacq_eye_read(1), dacq_eye_read(2))
+			x = float(self.ical.queryv('xoff_')) + x0 - x
+			y = float(self.ical.queryv('yoff_')) + y0 - y
 		self.eyeset(xoff=x, yoff=y)
 		self.encode(EYESHIFT)
 

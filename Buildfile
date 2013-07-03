@@ -20,6 +20,12 @@ install:
 	(cd $(PYPEDIR); \
 	    $(PYTHONEXE) $(PYCOMPILE) -q pype || $(PYTHONEXE) $(PYCOMPILE) pype)
 
+
+_reinstall:
+	/bin/rm -rf $(PYPEDIR)/pype $(PYPEDIR)/lib
+
+reinstall: _reinstall install
+
 buildonly:
 	@for i in $(SUBDIRS); \
 		do (cd $$i ; $(MAKE) build);\

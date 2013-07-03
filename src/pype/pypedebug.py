@@ -146,7 +146,7 @@ def get_traceback(show=None):
 	return msg
 
 
-def reporterror(gui=1):
+def reporterror(gui=True, dbug=False):
 	"""Pretty printer for error messages.
 
 	Pretty print a timestamped error message on the console
@@ -158,6 +158,8 @@ def reporterror(gui=1):
 	sys.stderr.write(emsg)
 	if gui:
 		warn('reporterror', emsg, wait=0, astext=1)
+    if dbug:
+        keyboard()
 
 def ppDict(d):
 	"""Pretty print a dictionary

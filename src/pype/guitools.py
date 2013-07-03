@@ -413,13 +413,13 @@ def warn(title, message, wait=None, action=None,
 
 	:param once: (bool) only show this message once? (internal list kept)
 
-	:return: nothing.
+	:return: (bool) 1 if displayed, 0 if not displayed (ie, once=True)
 
 	"""
 
 	if once:
 		if _viewed_warnings.has_key(message):
-			return
+			return 0
 		else:
 			_viewed_warnings[message] = 1
 
@@ -433,6 +433,7 @@ def warn(title, message, wait=None, action=None,
 					 default=0, responses=(action,), grab=grab)
 	undermouse(dialog)
 	dialog.go(wait=wait)
+	return 1
 
 def ask(title, message, strings):
 	"""Popup a dialog box and ask the user to choose one of several
@@ -492,13 +493,19 @@ class AboutPype(object):
 
 	"""
 	_w = None
-	def __init__(self, splash):
+	def __init__(self, file):
+        from PIL import Image, ImageTk
+        import pypeversion
+
 		if AboutPype._w is None:
+            print file
+            im = ImageTk.PhotoImage(Image.open(file))
 			AboutPype._w = Toplevel()
 			AboutPype._w.title('About')
 			AboutPype._w.iconname('About')
 			icon = Label(AboutPype._w,
-						 relief=FLAT, image=splash, pady=10)
+						 relief=FLAT, image=im, pady=10)
+            icon._image = im
 			icon.pack(expand=1, fill=BOTH)
 
 			t = "\n".join(
@@ -520,10 +527,14 @@ class AboutPype(object):
 	def _withdraw(self):
 		AboutPype._w.withdraw()
 
-def splash(im):
+def splash(file):
 	"""Display a splash screen an destroy it after 10 secs.
 
 	"""
+
+    from PIL import Image, ImageTk
+
+    im = ImageTk.PhotoImage(Image.open(file))
 	w = Toplevel()
 	w.overrideredirect(1)
 	w.withdraw()
@@ -531,6 +542,7 @@ def splash(im):
 	f = Frame(w, borderwidth=3, background='white')
 	f.pack(expand=1, fill=BOTH)
 	icon = Label(f, relief=FLAT, image=im)
+    icon._image = im
 	icon.pack(expand=1, fill=BOTH)
 	w.update_idletasks()
 	screencenter(w)

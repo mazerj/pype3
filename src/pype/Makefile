@@ -1,6 +1,6 @@
 include ../../make.defs
 
-install:  mklib mkpyperun mkpypeversion mkinit preinstallclean_
+install:  mklib mkpyperun mkpypeversion mkinit 
 	@cp *.py $(PYPEDIR)/pype
 	@cp pypespike.sh $(PYPEDIR)/bin/pypespike
 	@chmod +x $(PYPEDIR)/bin/pypespike
@@ -10,7 +10,6 @@ install:  mklib mkpyperun mkpypeversion mkinit preinstallclean_
 # clean out vestigal .py files etc to make sure old stuff gets
 # deleted
 preinstallclean_:
-
 	@/bin/rm -rf $(PYPEDIR)/pype/*
 
 mkinit:

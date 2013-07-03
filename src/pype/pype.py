@@ -561,7 +561,11 @@ def _pypestdparams():
 		)
 	return (common, rig, ical)
 
-def iButton(parent, image): pass
+def addicon(app, button, file):
+    from PIL import Image, ImageTk
+    p = ImageTk.PhotoImage(Image.open(os.path.join(app.pypedir,'lib', file)))
+    button._image = p
+    button.config(image=button._image)
 
 class PypeApp(object):					# !SINGLETON CLASS!
 	"""Pype Application Class.
@@ -715,10 +719,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.tk.title('pype')
 		self.tk.protocol("WM_DELETE_WINDOW", self._shutdown)
 		self.setgeo(self.tk, default='+20+20', posonly=1)
-		self._stash_icons()
 
 		if self.config.iget('SPLASH'):
-			splash(self.icons['logo'])
+            splash(os.path.join(self.pypedir,'lib', 'logo.gif'))
 
 		self.conwin = ConsoleWindow()
 		self.conwin.showhide()
@@ -986,40 +989,39 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		startstopf = Frame(f, borderwidth=3, relief=RIDGE)
 		startstopf.pack(expand=0, fill=X, side=TOP)
 
-		self._named_start = Button(bb, image=self.icons['run'],
-								   command=self._start)
+		w = self._named_start = Button(bb, command=self._start)
+        addicon(self, w, 'run.gif')
 		self.balloon.bind(self._named_start, 'start, saving data')
 		self._named_start.pack(expand=1, fill=Y, side=LEFT)
 		self._named_start.config(state=DISABLED)
 
-		self._temp_start = Button(bb, image=self.icons['runtemp'],
-								  command=self._starttmp)
+		w = self._temp_start = Button(bb, command=self._starttmp)
+        addicon(self, w, 'runtemp.gif')
 		self._temp_start.pack(expand=1, fill=Y, side=LEFT)
 		self.balloon.bind(self._temp_start, "start w/o saving data")
 		self._temp_start.config(state=DISABLED)
 
-		self._stop = Button(bb, image=self.icons['Stop'],
-							command=self._start_helper, fg='black',
-							state=DISABLED)
+		w = self._stop = Button(bb, command=self._start_helper, state=DISABLED)
+        addicon(self, w, 'Stop.gif')
 		self._stop.pack(expand=1, fill=Y, side=LEFT)
 		self.balloon.bind(self._stop, "stop run at end of trial")
 
-		self._stopnow = Button(bb, image=self.icons['Cancel'],
-								 command=self._stopabort, fg='black',
-								 state=DISABLED)
+		w = self._stopnow = Button(bb, command=self._stopabort, state=DISABLED)
+        addicon(self, w, 'Cancel.gif')
 		self._stopnow.pack(expand=1, fill=Y, side=LEFT)
 		self.balloon.bind(self._stopnow, "stop run immediately")
 		self._doabort = 0
 
 		if not self.psych:
-			b = Button(bb, image=self.icons['drop'],
-					   command=self.reward)
+			w = b = Button(bb, command=self.reward)
+            addicon(self, w, 'drop.gif')
+
 			b.pack(expand=1, fill=Y, side=LEFT)
 			self.balloon.bind(b, "deliver a reward (also F4)")
 
 			if not self.use_elog and not self.training:
-				b = Button(bb, text='cell', image=self.icons['cell'],
-						   command=self._new_cell)
+				w = b = Button(bb, command=self._new_cell)
+                addicon(self, w, 'cell.gif')
 				b.pack(expand=1, fill=Y, side=LEFT)
 				self.balloon.bind(b, "increment 'cell' counter")
 
@@ -1097,21 +1099,20 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		fbar = Frame(f)
 		fbar.pack(expand=1, fill=X, side=TOP)
 
-		b = Button(fbar, image=self.icons['left'],
-				   command=lambda s=self: s.eyeshift(x=1, y=0))
+		w = b = Button(fbar, command=lambda s=self: s.eyeshift(x=1, y=0))
+        addicon(self, w, 'left.gif')
 		b.pack(expand=0, fill=Y, side=LEFT)
 		self.balloon.bind(b, "shift offsets left (immediate effect)")
-		b = Button(fbar, image=self.icons['right'],
-				   command=lambda s=self: s.eyeshift(x=-1, y=0))
+		w = b = Button(fbar, command=lambda s=self: s.eyeshift(x=-1, y=0))
+        addicon(self, w, 'right.gif')
 		b.pack(expand=0, fill=Y, side=LEFT)
 		self.balloon.bind(b, "shift offsets right (immediate effect)")
-		b = Button(fbar, image=self.icons['up'],
-				   command=lambda s=self: s.eyeshift(x=0, y=-1))
+		w = b = Button(fbar, command=lambda s=self: s.eyeshift(x=0, y=-1))
+        addicon(self, w, 'up.gif')
 		b.pack(expand=0, fill=Y, side=LEFT)
 		self.balloon.bind(b, "shift offsets up (immediate effect)")
-
-		b = Button(fbar, image=self.icons['down'],
-				   command=lambda s=self: s.eyeshift(x=0, y=1))
+		w = b = Button(fbar, command=lambda s=self: s.eyeshift(x=0, y=1))
+        addicon(self, w, 'down.gif')
 		b.pack(expand=0, side=LEFT)
 		self.balloon.bind(b, "shift offsets down (immediate effect)")
 
@@ -1342,7 +1343,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		dacq_elrestart()
 
 	def about(self):
-		AboutPype(self.icons['logo'])
+		AboutPype(os.path.join(self.pypedir, 'lib', 'logo.gif'))
 
 	def queue_action(self, inms=None, action=None):
 		"""Queue an action to happen about inms from now. Call with
@@ -1396,7 +1397,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				warn('migrate_pypestate',
 					 'Success; remove %s at will.' % fname2)
 			except:
-				reporterror(gui=0)
+				reporterror(gui=False, db=self.config.iget('DBERRS'))
 				warn('migrate_pypestate', 'failed!')
 
 	def con(self, msg=None, color='black', nl=1):
@@ -1448,22 +1449,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			fn(self)
 		finally:
 			self.showtestpat()
-
-	def _stash_icons(self):
-		import gificons
-		self.icons = {
-			'left':		gificons.left,
-			'right':	gificons.right,
-			'up':		gificons.up,
-			'down':		gificons.down,
-			'logo':		gificons.logo,
-			'Stop':		gificons.Stop,
-			'Cancel':	gificons.Cancel,
-			'run':		gificons.run,
-			'runtemp':	gificons.runtemp,
-			'cell':		gificons.cell,
-			'drop':		gificons.drop,
-			}
 
 	def _findparam(self):
 		s = Entry_(self.tk, 'find parameter:', '').go()
@@ -2281,7 +2266,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				self.con()				# clear console window
 				self._startfn(self)
 			except:
-				reporterror()
+				reporterror(dbug=self.config.iget('DBERRS'))
 			finally:
 				self.record_done()
 				self.set_state(running=0, paused=0, led=0)
@@ -4096,7 +4081,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				a.axis([-10, 1.25*self.sub_common.queryv('maxrt'), None, None])
 				a.set_xlabel('Reaction Time (ms)')
 				a.set_ylabel('n=%d' % len(h))
-			self.rtplot.drawnow()
+			try:
+				self.rtplot.drawnow()
+			except:
+				if warn('matlibplot error',
+						'Probably must delete ~/.matlibplot', once=True):
+					reporterror()
 
 	def makeFixWin(self, x, y, tweak=0):
 		"""Helper function for creating new fixation window in std way.

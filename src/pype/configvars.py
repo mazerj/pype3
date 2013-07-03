@@ -53,11 +53,14 @@ def defaults(srcfile=None):
 	# will only be set if not set in the config file (ie, these are
 	# the default values).
 
+
 	#####################################################
 	# general settings
 
 	c.set('DEBUG', '0',
 		  doc='debug mode')
+    c.set('DBERRS', 0,
+		  doc='drop into debugger after reporting errors')
 	c.set('SPLASH', '1',
 		  doc='show splash screen on startup')
 	c.set('PSYCH', '0',
@@ -154,7 +157,7 @@ def defaults(srcfile=None):
 		  doc='any extra options to pass to API')
 	c.set('EYELINK_CAMERA',	'1',
 		  doc='left or right camera (0, 1)')
-    
+
 	c.set('EYEMOUSE',	'0',
 		  doc='use mouse button-1 as substitute eye tracker')
 
@@ -245,11 +248,13 @@ TDTHOST			(str)	name or IP number of machine running tdt.py
 Other
 -----
 DEBUG			(0|1)	enables debug mode
+DBERRS			(0|1)	drop into debugger after an error
 SPLASH			(0|1)	display splash screen
 PSYCH			(0|1)	psychophysics mode (also -p option on command line)
 USERDISPLAY_HIDE (0|1)	hide usder display window on startup
 TICKS_MAJOR		(0|1)	show major (5deg) tickmarks on userdisplay
 TICKS_MINOR		(0|1)	show minor (1deg) tickmarks on userdisplay
+ELOG            (0|1)   link to 'elog' electronic log/notebook system
 
 Environment Vars (use setenv, not config file!)
 -----------------------------------------------

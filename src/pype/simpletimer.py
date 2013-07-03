@@ -24,10 +24,13 @@ CLOCK_MONOTONIC = 1 # see <linux/time.h>
 class Timer(object):
 	"""Like Timer class, but uses built in clock"""
 	def __init__(self, on=True):
-        if on:
-            self.reset()
-        else:
-            self._start_at = None
+		if on:
+			self.reset()
+		else:
+			self.disable()
+
+	def disable(self):
+        self._start_at = None
 
 	def reset(self):
 		"""Reset timer.

@@ -3402,7 +3402,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				it's best to use the constants defined in the
 				pype.events module or a modified version of these for
 				portability and to facilitate data analysis. If a
-				tuple of strings is provided, all events will be
+				sequence of strings is provided, all events will be
 				inserted into the timesteam with the same (current)
 				timestamp. If code is None, then it's a dummy encode
 				that can be used to retrieve the current time.
@@ -3418,7 +3418,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		if ts is None:
 			ts = dacq_ts()
-		if not code is None:
+		if not code is None and len(code) > 0:
 			if type(code) is TupleType:
 				for c in code:
 					if len(c) > 0:
@@ -4369,7 +4369,10 @@ class Timer(object):
 		if on:
 			self.reset()
 		else:
-			self._start_at = None
+			self.disable()
+
+	def disable(self):
+        self._start_at = None
 
 	def reset(self):
 		"""Reset timer.

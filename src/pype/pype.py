@@ -368,6 +368,11 @@ import cPickle
 import math
 import numpy as np
 import matplotlib
+# force matplotlib to use a version-specific config file, otherwise
+# incompatiblities between cache files (0.9.9 vs 1.1.1) will cause
+# problems (ie, different ubuntu versions)
+os.environ['MPLCONFIGDIR'] = '%s-%s' % (matplotlib.get_configdir(),
+                                        matplotlib.__version__)
 matplotlib.use('TkAgg')
 
 from types import *

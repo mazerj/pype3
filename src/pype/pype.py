@@ -367,13 +367,44 @@ import glob
 import cPickle
 import math
 import numpy as np
-import matplotlib
-# force matplotlib to use a version-specific config file, otherwise
-# incompatiblities between cache files (0.9.9 vs 1.1.1) will cause
-# problems (ie, different ubuntu versions)
-os.environ['MPLCONFIGDIR'] = '%s-%s' % (matplotlib.get_configdir(),
-                                        matplotlib.__version__)
-matplotlib.use('TkAgg')
+
+# THIS IS REALLY UGLY -- THERE ARE TWO ISSUES:
+#  matplotlib-0.9.9 uses some sort of cache file that's not compatible
+#  with later versions. Plus, the whole root thing is bad news..
+# make sure to drop root (and then reraise) while matplotlib
+# is loaded..
+euid = None
+try:
+    euid = os.geteuid()
+    if euid == 0:
+        os.seteuid(os.getuid())
+    import matplotlib
+    matplotlib.use('TkAgg')
+    # force matplotlib to use a version-specific config file, otherwise
+    # incompatiblities between cache files (0.9.9 vs 1.1.1) will cause
+    # problems (ie, different ubuntu versions)
+    os.environ['MPLCONFIGDIR'] = '%s-%s' % (matplotlib.get_configdir(),
+                                            matplotlib.__version__)
+    # make sure this dir exists (really only for 0.9.9..)
+    try:
+        os.mkdir(os.environ['MPLCONFIGDIR'])
+    except OSError:
+        pass
+    if 0:
+        try:
+            # even more cruft -- these imports can lead to error messages
+            # that choke scripts, like p2m, so we just flush them to /dev/null
+            # for now.. kind of dangerous.
+            f = sys.stderr
+            sys.stderr = open('/dev/null', 'a')
+            from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+            from matplotlib.figure import Figure
+        finally:
+            sys.stderr.close()
+            sys.stderr = f
+finally:
+    if not euid is None:
+        os.seteuid(euid)
 
 from types import *
 from Tkinter import *
@@ -4500,17 +4531,56 @@ class EmbeddedFigure:
 	"""
 
 	def __init__(self, parent, *args, **kwargs):
-		from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-		from matplotlib.figure import Figure
+        from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+        from matplotlib.figure import Figure
 
-		self.fig = Figure(*args, **kwargs)
-		self._canvas = FigureCanvasTkAgg(self.fig, master=parent)
-		self._canvas.get_tk_widget().pack(side=TOP,
-										  fill=BOTH, expand=1, padx=0, pady=0)
+        self.fig = Figure(*args, **kwargs)
+        self._canvas = FigureCanvasTkAgg(self.fig, master=parent)
+        self._canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
 
 	def drawnow(self):
-		self._canvas.show()
+		if matplotlib:
+			self._canvas.show()
 
+class SimplePlotWindow(Toplevel):
+    """Toplevel plot window for use with matplotlib.
+
+    >>> w = SimplePlotWindow('testplot', app)
+    >>> w.fig.clf()
+    >>> a = w.fig.add_subplot(1,1,1)
+    >>> a.plot(np.random.random(200))
+    >>> a.set_xlabel('xlabel')
+    >>> a.set_ylabel('xlabel')
+    >>> a.set_title('title')
+    >>> w.drawnow()
+
+    Note: Unless userclose is set to True, the user will not
+    be able to close the plot window and it must be closed
+    programmatically by calling widget.destroy() method..
+
+    """
+
+	def __init__(self, name, app=None, userclose=False, *args, **kw):
+        from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+        from matplotlib.figure import Figure
+
+		apply(Toplevel.__init__, (self,), kw)
+
+		self.title(name)
+		self.fig = Figure()
+		self._canvas = FigureCanvasTkAgg(self.fig, master=self)
+		self._canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+        if not userclose:
+            self.protocol("WM_DELETE_WINDOW", lambda: 1)
+
+        if app:
+            # note: only position is remembered, not size -- this
+            # is becaue teh FigureCanvasTkAgg has a size param we're
+            # not using here..
+            app.setgeo(self, default='+20+20')
+
+    def drawnow(self):
+        self._canvas.show()
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

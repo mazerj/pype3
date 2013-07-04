@@ -9,3 +9,6 @@ install:
 
 clobber: clean
 
+clean:
+	#nothing to clean here.. actually...
+

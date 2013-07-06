@@ -816,6 +816,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		mb.addmenuitem('File', 'command', label='Quit',
 					   command=self._shutdown)
 
+        if 0:
+            # test code:
+            mb.addmenuitem('File', 'command', label='compare timers',
+                           command=self.compare_timers)
+
 		mb.addmenu('Misc', '', '')
 		mb.addmenuitem('Misc', 'command', label='Find param',
 					   command=self._findparam)
@@ -1502,6 +1507,41 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					except KeyError:
 						# skip title slots..
 						pass
+
+	def compare_timers(self):
+        import simpletimer, pylab, time
+
+        ct = Timer()
+        st = simpletimer.Timer()
+
+        N = 100000
+        for n in [0, 1]:
+            if n == 0:
+                t = ct
+                name = 'comedi'
+            else:
+                t = st
+                name = 'simple'
+            for j in range(5):
+                t0 = simpletimer.exact_time_sec()
+                for k in range(N):
+                    x = t.ms() + 1.0
+                print name, j, float(N)/(simpletimer.exact_time_sec() - t0)/1000.
+
+        N = 10000
+        x = []
+        y = []
+        for k in range(N):
+            xs, ys = ct.ms(), st.ms()
+            x.append(xs)
+            y.append(ys)
+
+		pylab.ion()
+		pylab.figure()
+		pylab.clf()
+
+		pylab.subplot(1, 1, 1)
+		pylab.hist(np.array(x)-np.array(y))
 
 	def keyboard(self):
 		app = self
@@ -2485,7 +2525,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		(t, x, y) = self.eye_txy()
 		return (x, y)
 
-	def looking_at(self, x=0, y=0):
+	def looking_at(self, x=None, y=None):
 		"""Tell pype where the monkey's supposed to be looking.
 
 		This is crucial for the F8 key -- when you hit F8 telling
@@ -2493,7 +2533,18 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		is looking at this location (in pixels) when you strike the
 		key.
 
+        :param x: (int or FixWin) - x position (pix) or a fixwin object
+
+        :param y: (int) - y position (pix); only if x is not a fixwin!
+
+		:return: nothing
+
 		"""
+        if x is None and y is None:
+            x = y = 0
+        elif y is None:
+            # assume x is a fixwin object -- sz is ignored..
+            x, y, sz = x.get()
 		self._eyetarg_x = x
 		self._eyetarg_y = y
 
@@ -4305,6 +4356,9 @@ class FixWin(object):
 		warn('genint',
 			 'fixwin.genint() obsolete -- change to fixwin.interupts()',
 			 wait=None, action=None, once=1)
+
+	def get(self):
+        return self.x, self.y, self.size
 
 	def set(self, x=None, y=None, size=None):
 		"""Change (or set) size and position of fix window.

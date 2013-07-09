@@ -757,7 +757,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.setgeo(self.tk, default='+20+20', posonly=1)
 
 		if self.config.iget('SPLASH'):
-            splash(os.path.join(self.pypedir,'lib', 'logo.gif'))
+            self.splash(True)
 
 		self.conwin = ConsoleWindow()
 		self.conwin.showhide()
@@ -854,8 +854,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		self._loadmenu.addmenu('Help', '', side=RIGHT)
 		self._loadmenu.addmenuitem('Help', 'command',
-								   label='About Pype%s' % pypeversion.PypeVersion,
-								   command=self.about)
+								   label='About Pype',
+								   command=lambda s=self: s.splash(False))
 
 		f1b = Frame(leftpane, borderwidth=1, relief=GROOVE)
 		f1b.pack(expand=0, fill=X)
@@ -1222,19 +1222,23 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		Logger('pype: estimated fps = %g\n' % fps)
 
         # use mouse in userdpy as substitute for eye tracker?
-        eyemouse = self.config.iget('EYEMOUSE', 0)
-        if eyemouse:
+        #  - if set, then mouse button-1 clicking will simulate saccade
+        #    to indicate location
+        #  - should work in either the userdisplay or the framebuffer
+        #    window
+        self.eyemouse = self.config.iget('EYEMOUSE', 0)
+        if self.eyemouse:
             self.eyeset(xgain=1.0, ygain=1.0, xoff=0, yoff=0)
+            self.fb.cursor(on=1)
 
 		# userdisplay: shadow of framebuffer window
-
 		scale = self.config.fget('USERDISPLAY_SCALE')
 		self.udpy = userdpy.UserDisplay(rightpane,
 										fbsize=(self.fb.w, self.fb.h),
 										scale=scale,
 										pix_per_dva=self.pix_per_dva,
 										app=self,
-                                        eyemouse=eyemouse)
+                                        eyemouse=self.eyemouse)
 
 		udpy_.config(command=self.udpy.showhide)
 		if self.config.iget('USERDISPLAY_HIDE'):
@@ -1383,8 +1387,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 	def elrestart(self):
 		dacq_elrestart()
 
-	def about(self):
-		AboutPype(os.path.join(self.pypedir, 'lib', 'logo.gif'))
+	def splash(self, transient):
+        splash(os.path.join(self.pypedir,'lib', 'logo.gif'), transient)
 
 	def queue_action(self, inms=None, action=None):
 		"""Queue an action to happen about inms from now. Call with
@@ -2697,17 +2701,18 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			while 1:
 				ev = pygame.event.poll()
 				if ev.type is pygame.NOEVENT:
-					break
-				elif ev.type is pygame.KEYDOWN:
-					if (ev.key < 256) and (ev.mod & pygame.KMOD_ALT):
-						if chr(ev.key) == 's':
-							if self._allowabort:
-								self.con("stopping run", color='red')
-								self.running = 0
-								raise UserAbort
-				elif ev.type is pygame.MOUSEMOTION:
-					# for fake eye movements
-					dacq_setmouse(ev.pos[0], self.fb.h - ev.pos[1])
+                    break
+                elif ev.type is pygame.KEYDOWN:
+                    if (ev.key < 256) and (ev.mod & pygame.KMOD_ALT):
+                        if chr(ev.key) == 's':
+                            if self._allowabort:
+                                self.con("stopping run", color='red')
+                                self.running = 0
+                                raise UserAbort
+                elif self.eyemouse and \
+                  ev.type is pygame.MOUSEBUTTONDOWN and ev.button==1:
+                    self.eyeshift(x=ev.pos[0] - (self.fb.w/2),
+                                  y=(self.fb.h/2) - ev.pos[1], rel=False)
 
 			x, y = self.eyepos()
 			if (x is not None) and (y is not None):

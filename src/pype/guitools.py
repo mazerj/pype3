@@ -486,70 +486,43 @@ def screencenter(w):
 	x, y = (sw/2) - (w.winfo_reqwidth()/2), (sh/2) - (w.winfo_reqheight() / 2)
 	w.geometry("+%d+%d" % (x, y))
 
-class AboutPype(object):
-	"""Class for the About box.
-
-	Just to make sure only one box per run gets built and reused.
-
-	"""
-	_w = None
-	def __init__(self, file):
-        from PIL import Image, ImageTk
-        import pypeversion
-
-		if AboutPype._w is None:
-            print file
-            im = ImageTk.PhotoImage(Image.open(file))
-			AboutPype._w = Toplevel()
-			AboutPype._w.title('About')
-			AboutPype._w.iconname('About')
-			icon = Label(AboutPype._w,
-						 relief=FLAT, image=im, pady=10)
-            icon._image = im
-			icon.pack(expand=1, fill=BOTH)
-
-			t = "\n".join(
-				(
-				"pype: python physiology environment",
-				"Version %s" % pypeversion.PypeVersion,
-				"Copyright (c) 1999-2013 James A. Mazer",
-				"Build Date: %s" % pypeversion.PypeBuildDate,
-				))
-			text = Label(AboutPype._w, text=t,fg='blue')
-			text.pack(expand=1, fill=BOTH)
-
-			AboutPype._w.protocol("WM_DELETE_WINDOW", self._withdraw)
-			undermouse(AboutPype._w)
-		else:
-			undermouse(AboutPype._w)
-			AboutPype._w.deiconify()
-
-	def _withdraw(self):
-		AboutPype._w.withdraw()
-
-def splash(file):
-	"""Display a splash screen an destroy it after 10 secs.
+def splash(file, transient):
+	"""Display a splash screen. If transient is True, then return, but
+    use callback to clsoe it after 10 secs, otherwise user must close.
 
 	"""
 
     from PIL import Image, ImageTk
+    import pypeversion
 
     im = ImageTk.PhotoImage(Image.open(file))
 	w = Toplevel()
-	w.overrideredirect(1)
+    if transient:
+        w.overrideredirect(1)
 	w.withdraw()
 
 	f = Frame(w, borderwidth=3, background='white')
 	f.pack(expand=1, fill=BOTH)
 	icon = Label(f, relief=FLAT, image=im)
     icon._image = im
-	icon.pack(expand=1, fill=BOTH)
+	icon.pack(expand=1, fill=BOTH, side=TOP)
+
+    t = "\n".join(
+        (
+            "pype: python physiology environment",
+            "Version %s" % pypeversion.PypeVersion,
+            "Copyright (c) 1999-2013 James A. Mazer",
+            "Build Date: %s" % pypeversion.PypeBuildDate,
+            ))
+    text = Label(f, text=t)
+    text.pack(expand=1, fill=BOTH, side=BOTTOM)
+
 	w.update_idletasks()
 	screencenter(w)
 	w.deiconify()
 	w.update_idletasks()
-	w.after(3000, w.destroy)
-
+    if transient:
+        w.after(3000, w.destroy)
 
 class ProgressBar(object):
 	"""Indicate progress for a long running task.

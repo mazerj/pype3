@@ -1236,28 +1236,38 @@ class Sprite(object):
 
 		"""
 
-		import PIL.Image, PIL.ImageTk
+		import PIL.ImageTk, PIL.ImageFilter
+        pil = self.asImage(xscale=xscale, yscale=yscale)
+        if not alpha is None:
+            pil.putalpha(alpha)
+		self.pim = PIL.ImageTk.PhotoImage(pil)
 
-		if alpha:
-			im.set_alpha(alpha)
-		else:
-			im = self.im
-		#self.pil_im = PIL.Image.fromstring('RGBA', im.get_size(),
-		#								   pygame.image.tostring(im, 'RGBA'))
-		#self.pim = PIL.ImageTk.PhotoImage(self.pil_im)
-		pil = PIL.Image.fromstring('RGBA', im.get_size(),
-									pygame.image.tostring(im, 'RGBA'))
+		# NOTE: hanging pim off sprite prevents garbage collection
+		return self.pim
 
+	def asImage(self, xscale=None, yscale=None):
+		"""Convert sprite to a PIL Image.
+
+		This depends on the python imaging library (PIL)
+
+		:param xscale,yscale: (optional) x and y scale factor for
+				resizing image. If you specify one, you must specify
+				both!
+
+		:return: Image represenation of the sprite's pixels.
+
+		"""
+
+		import PIL.Image
+
+		pil = PIL.Image.fromstring('RGBA', self.im.get_size(),
+                                   pygame.image.tostring(self.im, 'RGBA'))
 		if xscale or yscale:
 			(w, h) = pil.size
 			pil = pil.resize((int(round(w*xscale)), int(round(h*yscale))))
-		self.pim = PIL.ImageTk.PhotoImage(pil)
+        return pil
 
-		# NOTE: by making .pim this a object member, it keeps a handle
-		#		on the PhotoImage to prevent GC..
-		return self.pim
-
-	def set_alpha(self, a):
+    def set_alpha(self, a):
 		"""Set global alpha value.
 
 		Set transparency of the *entire* sprite to this value.

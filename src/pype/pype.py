@@ -757,7 +757,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.setgeo(self.tk, default='+20+20', posonly=1)
 
 		if self.config.iget('SPLASH'):
-            self.splash(True)
+            self.about(1000)
 
 		self.conwin = ConsoleWindow()
 		self.conwin.showhide()
@@ -855,7 +855,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._loadmenu.addmenu('Help', '', side=RIGHT)
 		self._loadmenu.addmenuitem('Help', 'command',
 								   label='About Pype',
-								   command=lambda s=self: s.splash(False))
+								   command=self.about)
 
 		f1b = Frame(leftpane, borderwidth=1, relief=GROOVE)
 		f1b.pack(expand=0, fill=X)
@@ -1387,8 +1387,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 	def elrestart(self):
 		dacq_elrestart()
 
-	def splash(self, transient):
-        splash(os.path.join(self.pypedir,'lib', 'logo.gif'), transient)
+	def about(self, timeout=None):
+        show_about(os.path.join(self.pypedir,'lib', 'logo.gif'), timeout)
 
 	def queue_action(self, inms=None, action=None):
 		"""Queue an action to happen about inms from now. Call with
@@ -4640,6 +4640,43 @@ class SimplePlotWindow(Toplevel):
 
     def drawnow(self):
         self._canvas.show()
+
+def show_about(file, timeout=None):
+	"""Display a about/splash screen. If transient is True, then return,
+    but use callback to clsoe it after 10 secs, otherwise user must close.
+
+	"""
+
+    from PIL import Image, ImageTk
+
+    im = ImageTk.PhotoImage(Image.open(file))
+	w = Toplevel(background='white')
+    if timeout:
+        w.overrideredirect(1)
+	w.withdraw()
+
+	f = Frame(w, background='white', relief=RIDGE)
+	f.pack(expand=1, fill=BOTH)
+	icon = Label(f, relief=FLAT, image=im, background='white')
+    icon._image = im
+	icon.pack(expand=1, fill=BOTH, side=TOP)
+
+    t = "\n".join(
+        (
+            "pype: python physiology environment",
+            "Version %s" % pypeversion.PypeVersion,
+            "Copyright (c) 1999-2013 James A. Mazer",
+            "Build Date: %s" % pypeversion.PypeBuildDate,
+            ))
+    text = Label(f, text=t, background='white')
+    text.pack(expand=1, fill=BOTH, side=BOTTOM)
+
+	w.update_idletasks()
+	screencenter(w)
+	w.deiconify()
+	w.update_idletasks()
+    if timeout:
+        w.after(timeout, w.destroy)
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

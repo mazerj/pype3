@@ -1,6 +1,6 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
-"""useful GUI functions.
+"""Various useful GUI functions.
 
 Useful Tkinter and Pmw utility functions for GUI building
 nd running. Things that get repeated over and over again
@@ -485,44 +485,6 @@ def screencenter(w):
 
 	x, y = (sw/2) - (w.winfo_reqwidth()/2), (sh/2) - (w.winfo_reqheight() / 2)
 	w.geometry("+%d+%d" % (x, y))
-
-def splash(file, transient):
-	"""Display a splash screen. If transient is True, then return, but
-    use callback to clsoe it after 10 secs, otherwise user must close.
-
-	"""
-
-    from PIL import Image, ImageTk
-    import pypeversion
-
-    im = ImageTk.PhotoImage(Image.open(file))
-	w = Toplevel()
-    if transient:
-        w.overrideredirect(1)
-	w.withdraw()
-
-	f = Frame(w, borderwidth=3, background='white')
-	f.pack(expand=1, fill=BOTH)
-	icon = Label(f, relief=FLAT, image=im)
-    icon._image = im
-	icon.pack(expand=1, fill=BOTH, side=TOP)
-
-    t = "\n".join(
-        (
-            "pype: python physiology environment",
-            "Version %s" % pypeversion.PypeVersion,
-            "Copyright (c) 1999-2013 James A. Mazer",
-            "Build Date: %s" % pypeversion.PypeBuildDate,
-            ))
-    text = Label(f, text=t)
-    text.pack(expand=1, fill=BOTH, side=BOTTOM)
-
-	w.update_idletasks()
-	screencenter(w)
-	w.deiconify()
-	w.update_idletasks()
-    if transient:
-        w.after(3000, w.destroy)
 
 class ProgressBar(object):
 	"""Indicate progress for a long running task.

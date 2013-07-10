@@ -2362,7 +2362,8 @@ def texture_blit(fb, texture, x, y,
 	oc = ((cx, cy), (cx+nw, cy), (cx+nw, cy+nh), (cx, cy+nh))
 
 	ogl.glBegin(ogl.GL_QUADS)
-	ogl.glColor4f(contrast, contrast, contrast, 1.0)
+	#ogl.glColor4f(contrast, contrast, contrast, 1.0)
+	ogl.glColor4f(1.0, 1.0, 1.0, contrast)
 	for n in range(4):
 		ogl.glTexCoord2f(ic[n][0], ic[n][1])
 		ogl.glVertex(oc[n][0], oc[n][1])

@@ -430,45 +430,24 @@ def param_expand(s, integer=None):
 		except:
 			pass
 
-	if s.lower().startswith('te'):
+	if s.lower().startswith('te') or s.lower().startswith('ite'):
 		try:
-			# te[mu,max] or te[mu,min,max]
+			# ite/te[mu,max] or ite/te[mu,min,max]
 			v = map(int, s[3:-1].split(','))
 			if len(v) == 2:
 				meanval, minval, maxval = v[0], 0.0, v[1]
 			else:
 				meanval, minval, maxval = v[0], v[1], v[2]
 
-			if meanval < minval or meanval > maxval:
-				return None
 			while 1:
 				# keep drawing until we get a range-valid value
 				# before 12/18/2012 draw was clipped with min/max
 				x = np.random.exponential(meanval)
+				if s.lower()[0] == 'i':
+                    #  shift by +0.5 then -1 to to avoid problems with the
+                    #  bin from -0.5-0.5 being only half full due to exp>0
+                    x = int(round(x+0.5)-1)
 				if x >= minval and x <= maxval:
-					return x
-		except:
-			pass
-
-	if s.lower().startswith('ite'):
-		try:
-			# ite[mu,max] or ite[mu,min,max]
-			v = map(int, s[4:-1].split(','))
-			if len(v) == 2:
-				meanval, minval, maxval = v[0], 0.0, v[1]
-			else:
-				meanval, minval, maxval = v[0], v[1], v[2]
-
-			if meanval < minval or meanval > maxval:
-				return None
-
-			while 1:
-				# keep drawing until we get a range-valid value
-				# before 12/18/2012 draw was clipped with min/max
-				#  shift by +0.5 then -1 to to avoid problems with the
-				#  bin from -0.5-0.5 being only half full due to exp>0
-				x = round(np.random.exponential(meanval)+0.5)-1
-				if x >= minval and x < maxval:
 					return x
 		except:
 			pass

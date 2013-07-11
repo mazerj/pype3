@@ -3765,7 +3765,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			a0 = []
 
 		self.update_rt((resultcode, rt, params, taskinfo))
-        if resultcode[0] == CORRECT_RESPONSE:
+        if 1 or resultcode[0] == CORRECT_RESPONSE:
             self.update_psth((self.spike_times, self.record_buffer))
         if self._updatefn:
             self._updatefn((resultcode, rt, params, taskinfo),
@@ -4193,7 +4193,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
         """
 		import pylab
 
-        if self.rthist is None: return
+        if self.psth is None: return
 
 		if data is None:
 			self.psthdata = np.array([])
@@ -4201,7 +4201,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
             spike_times = np.array(data[0])
             events = data[1]
             t0 = find_events(events, trigger)
-            if t0 is []:
+            if t0 == []:
+                # no trigger event.. don't update..
                 return
             else:
                 self.psthdata = np.concatenate((self.psthdata, spike_times-t0,))
@@ -4216,7 +4217,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
             # how histogram first 2s of data in 50 ms bins; this really
             # should be settable by the task..
             a.hist(self.psthdata, facecolor='blue',
-                   nbins=40, range=(-100, 1900))
+                   bins=40, range=(-100, 1900))
         a.set_xlabel('Time (ms)')
         a.set_ylabel('nspikes')
 

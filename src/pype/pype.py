@@ -4159,7 +4159,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			a = self.rthist.fig.add_subplot(1,1,1)
 
 			if len(self.rtdata) == 0:
-				a.text(0.5, 0.5, 'NO DATA',
+				a.text(0.5, 0.5, 'NO RT DATA',
 					   transform=a.transAxes, color='red',
 					   horizontalalignment='center', verticalalignment='center')
 			else:
@@ -4186,7 +4186,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
                           color='b', alpha=0.25)
 				a.axis([-10, 1.25*self.sub_common.queryv('maxrt'), None, None])
                 a.set_ylabel('n=%d' % len(h))
-                
+
             a.set_xlabel('Reaction Time (ms)')
 
 			try:
@@ -4196,7 +4196,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 						'Probably must delete ~/.matlibplot', once=True):
 					reporterror()
 
-	def update_psth(self, data=None, trigger_event=PSTH_TRIG):
+	def update_psth(self, data=None, trigger=PSTH_TRIG):
 		import pylab
 
         if self.rthist is None: return
@@ -4206,21 +4206,22 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		else:
             spike_times = np.array(data[0])
             events = data[1]
-            # find PSTH_TRIG and align...
-            self.psthdata = np.concatenate(self.psthdata, spike_times)
+            t0 = find_events(events, trigger)
+            if t0 is []:
+                return
+            else:
+                self.psthdata = np.concatenate(self.psthdata, spike_times-t0)
 
 		self.psth.fig.clf()
-
         a = self.psth.fig.add_subplot(1,1,1)
         if len(self.psthdata) == 0:
-            a.text(0.5, 0.5, 'NO DATA',
+            a.text(0.5, 0.5, 'NO SPIKE DATA',
                    transform=a.transAxes, color='red',
                    horizontalalignment='center', verticalalignment='center')
         else:
             a.hist(self.psthdata, facecolor='blue')
         a.set_xlabel('Time (ms)')
         a.set_ylabel('nspikes')
-        print 'foo'
 
         try:
             self.psth.drawnow()

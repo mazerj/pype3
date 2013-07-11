@@ -3766,6 +3766,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		self.update_rt((resultcode, rt, params, taskinfo))
         self.update_psth((self.spike_times, self.record_buffer))
+        if self._updatefn:
+            self._updatefn((resultcode, rt, params, taskinfo),
+                           (self.spike_times, self.record_buffer))
+
 
 		if self._show_eyetrace.get():
 			self._plotEyetraces(self.eyebuf_t,
@@ -4147,47 +4151,33 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		self.rthist.fig.clf()
 
-		do_default = True
-		if self._updatefn:
-			# if module provides an update_rt use it. update_fn
-			# should return False to indicate it doesn't want pype
-			# to automatically update the default RT histogram.
-			do_default = self._updatefn(self, infotuple)
+        a = self.rthist.fig.add_subplot(1,1,1)
 
-		if do_default:
-			# otherwise, use default
-			a = self.rthist.fig.add_subplot(1,1,1)
+        if len(self.rtdata) == 0:
+            a.text(0.5, 0.5, 'NO RT DATA',
+                   transform=a.transAxes, color='red',
+                   horizontalalignment='center', verticalalignment='center')
+        else:
+            h = np.array(self.rtdata)
+            n, bins, patches = a.hist(h, facecolor='grey')
+            a.text(0.02, 1-0.02,
+                   '$\\mu=%.0fms$\n$\\sigma=%.0fms$\n$n=%d$' % \
+                   (np.mean(h), np.std(h), len(h)),
+                   color='red',
+                   horizontalalignment='left',
+                   verticalalignment='top',
+                   transform=a.transAxes)
 
-			if len(self.rtdata) == 0:
-				a.text(0.5, 0.5, 'NO RT DATA',
-					   transform=a.transAxes, color='red',
-					   horizontalalignment='center', verticalalignment='center')
-			else:
-				h = np.array(self.rtdata)
-
-				# for testing:
-				#h = 100+100*np.random.random(200)
-
-				n, bins, patches = a.hist(h, facecolor='grey')
-				a.text(0.02, 1-0.02,
-					   '$\\mu=%.0fms$\n$\\sigma=%.0fms$\n$n=%d$' % \
-					   (np.mean(h), np.std(h), len(h)),
-					   color='red',
-					   horizontalalignment='left',
-					   verticalalignment='top',
-					   transform=a.transAxes)
-
-				x = np.linspace(bins[0], bins[-1], 25)
-				g = pylab.normpdf(x, np.mean(h), np.std(h));
-				g = g * np.sum(n) / np.sum(g)
-				a.plot(x, g, 'r-', linewidth=2)
-				a.axvspan(self.sub_common.queryv('minrt'),
-						  self.sub_common.queryv('maxrt'),
-                          color='b', alpha=0.25)
-				a.axis([-10, 1.25*self.sub_common.queryv('maxrt'), None, None])
-                a.set_ylabel('n=%d' % len(h))
-
-            a.set_xlabel('Reaction Time (ms)')
+            x = np.linspace(bins[0], bins[-1], 25)
+            g = pylab.normpdf(x, np.mean(h), np.std(h));
+            g = g * np.sum(n) / np.sum(g)
+            a.plot(x, g, 'r-', linewidth=2)
+            a.axvspan(self.sub_common.queryv('minrt'),
+                      self.sub_common.queryv('maxrt'),
+                      color='b', alpha=0.25)
+            a.axis([-10, 1.25*self.sub_common.queryv('maxrt'), None, None])
+            a.set_ylabel('n=%d' % len(h))
+        a.set_xlabel('Reaction Time (ms)')
 
 			try:
 				self.rthist.drawnow()
@@ -4197,6 +4187,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					reporterror()
 
 	def update_psth(self, data=None, trigger=PSTH_TRIG):
+        """
+        Note: this only adds to the psth if the trigger event is present.
+        """
 		import pylab
 
         if self.rthist is None: return
@@ -4219,7 +4212,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
                    transform=a.transAxes, color='red',
                    horizontalalignment='center', verticalalignment='center')
         else:
-            a.hist(self.psthdata, facecolor='blue')
+            # how histogram first 2s of data in 50 ms bins; this really
+            # should be settable by the task..
+            a.hist(self.psthdata, facecolor='blue',
+                   nbins=40, range=(-100, 1900))
         a.set_xlabel('Time (ms)')
         a.set_ylabel('nspikes')
 

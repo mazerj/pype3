@@ -3765,7 +3765,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			a0 = []
 
 		self.update_rt((resultcode, rt, params, taskinfo))
-        self.update_psth((self.spike_times, self.record_buffer))
+        if resultcode[0] == CORRECT_RESPONSE:
+            self.update_psth((self.spike_times, self.record_buffer))
         if self._updatefn:
             self._updatefn((resultcode, rt, params, taskinfo),
                            (self.spike_times, self.record_buffer))
@@ -4179,12 +4180,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
             a.set_ylabel('n=%d' % len(h))
         a.set_xlabel('Reaction Time (ms)')
 
-			try:
-				self.rthist.drawnow()
-			except:
-				if warn('matlibplot error',
-						'Probably must delete ~/.matlibplot', once=True):
-					reporterror()
+        try:
+            self.rthist.drawnow()
+        except:
+            if warn('matlibplot error',
+                    'Probably must delete ~/.matlibplot', once=True):
+                reporterror()
 
 	def update_psth(self, data=None, trigger=PSTH_TRIG):
         """
@@ -4203,7 +4204,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
             if t0 is []:
                 return
             else:
-                self.psthdata = np.concatenate(self.psthdata, spike_times-t0)
+                self.psthdata = np.concatenate((self.psthdata, spike_times-t0,))
 
 		self.psth.fig.clf()
         a = self.psth.fig.add_subplot(1,1,1)

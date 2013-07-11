@@ -167,6 +167,9 @@ FLIP					= 'flip'
 # debugging mark
 MARK					= 'mark'
 
+# trigger event for automatic psth
+PSTH_TRIG				= 'psth_trig'
+
 ####################################################################
 # label tags for pickled datafiles
 ####################################################################

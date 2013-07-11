@@ -1000,11 +1000,24 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		# reaction time plot window
 		b = Checkbutton(c2pane, text='RT hist', relief=RAISED, anchor=W)
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
-		rt = DockWindow(checkbutton=b, title='Reaction Times')
-		Button(rt, text='Clear',
+		pw = DockWindow(checkbutton=b, title='Reaction Times')
+		Button(pw, text='Clear',
 			   command=self.update_rt).pack(side=TOP, expand=1, fill=X)
-		self.rtplot = EmbeddedFigure(rt)
+		self.rthist = EmbeddedFigure(pw)
 		self.update_rt()
+
+        if not self.training and not self.psych:
+            # psth plot window -- only for recording sessions
+            b = Checkbutton(c2pane, text='psth', relief=RAISED, anchor=W)
+            b.pack(expand=0, fill=X, side=TOP, pady=2)
+            pw = DockWindow(checkbutton=b, title='psth')
+            Button(pw, text='Clear',
+                   command=self.update_psth).pack(side=TOP, expand=1, fill=X)
+            self.psth = EmbeddedFigure(pw)
+            self.update_psth()
+        else:
+            self.psth = None
+
 
 		et = self.config.get('EYETRACKER', 'NONE')
 		if et == 'ISCAN':
@@ -2329,11 +2342,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				# clear/reset result stack at the start of the run..
 				self.set_result()
 
-				# reset RT histogram/stats at start of run
-				self.update_rt()
-
-				# clear block state before starting a run
-				self._runstats_update(clear=1)
+				# reset histogram/stats at start of run
+				self.update_rt()          # RT histogram
+				self.update_psth()        # PSTH (spike data)
+				self._runstats_update(clear=1) # clear block stats
 
 				# make sure graphic display is visible
 				if self.psych:
@@ -2454,7 +2466,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		You can do whatever you want, but if you are overriding the
 		built-in RT histogram stuff (in which case it might be useful
-		to know that app.rthist contains a list of all the RTs for the
+		to know that app.rtdata contains a list of all the RTs for the
 		current run) the updater shoudl return False. If it returns
 		True, the built-in histogram will get updated IN ADDITION to
 		whatever you did..
@@ -3753,6 +3765,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			a0 = []
 
 		self.update_rt((resultcode, rt, params, taskinfo))
+        self.update_psth((self.spike_times, self.record_buffer))
 
 		if self._show_eyetrace.get():
 			self._plotEyetraces(self.eyebuf_t,
@@ -4122,35 +4135,35 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		pylab.draw()
 
 
-	def update_rt(self, info=None):
+	def update_rt(self, infotuple=None):
 		import pylab
 
-		if info is None:
-			self.rthist = []
+		if infotuple is None:
+			self.rtdata = []
 		else:
-			resultcode, rt, params, taskinfo = info
+			resultcode, rt, params, taskinfo = infotuple
 			if rt > 0:
-				self.rthist.append(rt)
+				self.rtdata.append(rt)
 
-		self.rtplot.fig.clf()
+		self.rthist.fig.clf()
 
 		do_default = True
 		if self._updatefn:
 			# if module provides an update_rt use it. update_fn
 			# should return False to indicate it doesn't want pype
 			# to automatically update the default RT histogram.
-			do_default = self._updatefn(self, info)
+			do_default = self._updatefn(self, infotuple)
 
 		if do_default:
 			# otherwise, use default
-			a = self.rtplot.fig.add_subplot(1,1,1)
+			a = self.rthist.fig.add_subplot(1,1,1)
 
-			if len(self.rthist) == 0:
+			if len(self.rtdata) == 0:
 				a.text(0.5, 0.5, 'NO DATA',
 					   transform=a.transAxes, color='red',
 					   horizontalalignment='center', verticalalignment='center')
 			else:
-				h = np.array(self.rthist)
+				h = np.array(self.rtdata)
 
 				# for testing:
 				#h = 100+100*np.random.random(200)
@@ -4169,16 +4182,52 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				g = g * np.sum(n) / np.sum(g)
 				a.plot(x, g, 'r-', linewidth=2)
 				a.axvspan(self.sub_common.queryv('minrt'),
-						  self.sub_common.queryv('maxrt'), color='b', alpha=0.25)
+						  self.sub_common.queryv('maxrt'),
+                          color='b', alpha=0.25)
 				a.axis([-10, 1.25*self.sub_common.queryv('maxrt'), None, None])
-				a.set_xlabel('Reaction Time (ms)')
-				a.set_ylabel('n=%d' % len(h))
+                a.set_ylabel('n=%d' % len(h))
+                
+            a.set_xlabel('Reaction Time (ms)')
+
 			try:
-				self.rtplot.drawnow()
+				self.rthist.drawnow()
 			except:
 				if warn('matlibplot error',
 						'Probably must delete ~/.matlibplot', once=True):
 					reporterror()
+
+	def update_psth(self, data=None, trigger_event=PSTH_TRIG):
+		import pylab
+
+        if self.rthist is None: return
+
+		if data is None:
+			self.psthdata = np.array([])
+		else:
+            spike_times = np.array(data[0])
+            events = data[1]
+            # find PSTH_TRIG and align...
+            self.psthdata = np.concatenate(self.psthdata, spike_times)
+
+		self.psth.fig.clf()
+
+        a = self.psth.fig.add_subplot(1,1,1)
+        if len(self.psthdata) == 0:
+            a.text(0.5, 0.5, 'NO DATA',
+                   transform=a.transAxes, color='red',
+                   horizontalalignment='center', verticalalignment='center')
+        else:
+            a.hist(self.psthdata, facecolor='blue')
+        a.set_xlabel('Time (ms)')
+        a.set_ylabel('nspikes')
+        print 'foo'
+
+        try:
+            self.psth.drawnow()
+        except:
+            if warn('matlibplot error',
+                    'Probably must delete ~/.matlibplot', once=True):
+                reporterror()
 
 	def makeFixWin(self, x, y, tweak=0):
 		"""Helper function for creating new fixation window in std way.

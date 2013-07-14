@@ -467,6 +467,8 @@ else: ## not _WINDOWS (ie, linux) ###########################################
 						sys.stderr.write('newblock: GetHotBlock blkd (2): ')
 					nwaits += 1
 					sys.stderr.write('%d..' % nwaits)
+				if nwaits > 0:
+					sys.stderr.write('\n')
 			else:
 				self.mode(PREVIEW)
 				newblock = self.ttank('GetHotBlock')

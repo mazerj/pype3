@@ -307,6 +307,8 @@ class UserDisplay(object):
 
         if eyemouse:
             self.canvas.bind("<Button-1>", self._mouse1)
+            self.canvas.bind("<Key-space>", self._space)
+            self.canvas.bind("<KeyRelease-space>", self._space)
 		self.canvas.bind("<Button-3>", lambda ev,p=p,s=self: s._dopopup(ev,p))
 		self.canvas.bind("<Motion>", self._mouse_motion)
 		self.canvas.bind("<Enter>", self._mouse_enter)
@@ -827,21 +829,13 @@ class UserDisplay(object):
         self.app.eyeshift(x=x, y=y, rel=False)
 
 	def _space(self, ev=None):
-                    elif pev.type is pygame.KEYDOWN and chr(pev.key) == ' ':
-                        if ~self.eyebar:
-                            doint = 1
-                        self.eyebar = 1
-                    elif pev.type is pygame.KEYUP and chr(pev.key) == ' ':
-                        if self.eyebar:
-                            doint = 1
-                        self.eyebar = 0
-                    if doint:
-                        # simulated barTransition..
-                        self._int_handler(None, None, iclass=1, iarg=0)
-        
-        x, y = self.canvas.window2scaled(ev.x, ev.y)
-        x, y = self.can2fb(x, y)
-        self.app.eyeshift(x=x, y=y, rel=False)
+        if ev.type == "2":
+            # key-press
+            self.app.eyebar = 1
+        elif ev.type == "3":
+            # key-release
+            self.app.eyebar = 0
+        self.app._int_handler(None, None, iclass=1, iarg=0)
 
 	def _mouse_motion(self, ev=None):
 		s = "[%dppd]" % (self.gridinterval,)

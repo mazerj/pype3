@@ -1028,7 +1028,7 @@ void mainloop(void)
     switch (itracker)
       {
       case NONE:
-	eyenew = x = y = pa = 0;
+	// eyenew = x = y = pa = 0;
 	dacq_data->adc[0] = x;
 	dacq_data->adc[1] = y;
 	break;

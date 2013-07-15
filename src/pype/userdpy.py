@@ -826,6 +826,23 @@ class UserDisplay(object):
         x, y = self.can2fb(x, y)
         self.app.eyeshift(x=x, y=y, rel=False)
 
+	def _space(self, ev=None):
+                    elif pev.type is pygame.KEYDOWN and chr(pev.key) == ' ':
+                        if ~self.eyebar:
+                            doint = 1
+                        self.eyebar = 1
+                    elif pev.type is pygame.KEYUP and chr(pev.key) == ' ':
+                        if self.eyebar:
+                            doint = 1
+                        self.eyebar = 0
+                    if doint:
+                        # simulated barTransition..
+                        self._int_handler(None, None, iclass=1, iarg=0)
+        
+        x, y = self.canvas.window2scaled(ev.x, ev.y)
+        x, y = self.can2fb(x, y)
+        self.app.eyeshift(x=x, y=y, rel=False)
+
 	def _mouse_motion(self, ev=None):
 		s = "[%dppd]" % (self.gridinterval,)
 		if self.canvas.xscale != 1.0 or self.canvas.yscale != 1.0:

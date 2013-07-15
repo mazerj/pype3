@@ -1243,6 +1243,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
         if self.eyemouse:
             self.eyeset(xgain=1.0, ygain=1.0, xoff=0, yoff=0)
             self.fb.cursor(on=1)
+        self.eyebar = 0
 
 		# userdisplay: shadow of framebuffer window
 		scale = self.config.fget('USERDISPLAY_SCALE')
@@ -2711,20 +2712,31 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					raise UserAbort
 
 			while 1:
-				ev = pygame.event.poll()
-				if ev.type is pygame.NOEVENT:
+				pev = pygame.event.poll()
+				if pev.type is pygame.NOEVENT:
                     break
-                elif ev.type is pygame.KEYDOWN:
-                    if (ev.key < 256) and (ev.mod & pygame.KMOD_ALT):
-                        if chr(ev.key) == 's':
-                            if self._allowabort:
-                                self.con("stopping run", color='red')
-                                self.running = 0
-                                raise UserAbort
-                elif self.eyemouse and \
-                  ev.type is pygame.MOUSEBUTTONDOWN and ev.button==1:
-                    self.eyeshift(x=ev.pos[0] - (self.fb.w/2),
-                                  y=(self.fb.h/2) - ev.pos[1], rel=False)
+                elif pev.type is pygame.KEYDOWN and \
+                    (pev.key < 256) and (pev.mod & pygame.KMOD_ALT) and \
+                    chr(pev.key) == 's' and self._allowabort:
+                    self.con("stopping run", color='red')
+                    self.running = 0
+                    raise UserAbort
+                elif self.eyemouse:
+                    doint = 0
+                    if pev.type is pygame.MOUSEBUTTONDOWN and pev.button==1:
+                        self.eyeshift(x=pev.pos[0] - (self.fb.w/2),
+                                      y=(self.fb.h/2) - pev.pos[1], rel=False)
+                    elif pev.type is pygame.KEYDOWN and chr(pev.key) == ' ':
+                        if ~self.eyebar:
+                            doint = 1
+                        self.eyebar = 1
+                    elif pev.type is pygame.KEYUP and chr(pev.key) == ' ':
+                        if self.eyebar:
+                            doint = 1
+                        self.eyebar = 0
+                    if doint:
+                        # simulated barTransition..
+                        self._int_handler(None, None, iclass=1, iarg=0)
 
 			x, y = self.eyepos()
 			if (x is not None) and (y is not None):
@@ -3051,12 +3063,16 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		return (self.allow_ints, self._queue_ints)
 
-	def _int_handler(self, signal, frame):
+	def _int_handler(self, signal, frame, iclass=None, iarg=None):
 		"""This is for catching SIGUSR1's from the dacq process.
 
 		"""
-		iclass = dacq_int_class()
-		iarg = dacq_int_arg()
+
+        if iclass is None:
+            iclass = dacq_int_class()
+        if iarg is None:
+            iarg = dacq_int_arg()
+
 		if iclass == 666:
 			self.running = 0
 			warn('eyelink', 'Lost eyelink connection!', wait=0)
@@ -3116,9 +3132,15 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		"""
 		if self.flip_bar:
-			return not dacq_bar()
+            if self.eyemouse:
+                return not self.eyebar
+            else:
+                return not dacq_bar()
 		else:
-			return dacq_bar()
+            if self.eyemouse:
+                return self.eyebar
+            else:
+                return dacq_bar()
 
 	def barup(self):
 		"""Query to see if touchbar is touched (aka 'down').

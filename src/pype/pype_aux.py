@@ -433,11 +433,17 @@ def param_expand(s, integer=None):
 	if s.lower().startswith('te') or s.lower().startswith('ite'):
 		try:
 			# ite/te[mu,max] or ite/te[mu,min,max]
-			v = map(int, s[3:-1].split(','))
+			if s[0] in 'iI':
+				arg = s[3:]
+			else:
+				arg = s[2:]
+			v = eval(arg)
 			if len(v) == 2:
 				meanval, minval, maxval = v[0], 0.0, v[1]
 			else:
 				meanval, minval, maxval = v[0], v[1], v[2]
+
+			print meanval, minval, maxval
 
 			while 1:
 				# keep drawing until we get a range-valid value
@@ -455,7 +461,7 @@ def param_expand(s, integer=None):
 	if s.lower().startswith('edc'):
 		try:
 			# edc[mu,min,max,nbins] (ACM's exponential dirac comb)
-			v = map(int, s[4:-1].split(','))
+			v = eval(s[3:])
 			meanval, minval, maxval, nbins = v[0], v[1], v[2], v[3]
 
 			if meanval < minval or meanval > maxval:

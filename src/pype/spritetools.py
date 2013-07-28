@@ -148,6 +148,37 @@ def genpolar(w, h=None, typecode=np.float64, degrees=False):
 		t = np.arctan2(y, x).astype(typecode)
 	return r, t
 
+def gray2rgb8(g, inrange=(-1.0, 1.0)):
+    """Convert grayscale image array to 8bit integer array.
+
+    :param g: (numpy array) gray scale image array
+
+    :param inrange: (float pair) min/max values for input image
+
+    :return: (numpy array) uint8 RGB array
+
+    """
+
+    minval, maxval = inrange
+    a = 255.0 * (g - minval) / (maxval - minval)
+    return np.transpose(np.array((a,a,a,)).astype(np.uint8), axes=[1,2,0])
+
+def rgb2rgb8(r, g, b, inrange=(-1.0, 1.0)):
+    """Convert rgb image data to 8bit integer array.
+
+    :param r,g,b: (numpy arrays) red, green and blue image planes
+    
+    :param inrange: (float pair) min/max values for input image
+
+    :return: (numpy array) uint8 RGB array
+
+    """
+
+    minval, maxval = inrange
+    a = np.array((r, g, b,))
+    a = 255.0 * (a - minval) / (maxval - minval)
+    return np.transpose(a.astype(np.uint8), axes=[1,2,0])
+
 def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 			meanlum=0.5, moddepth=1.0, ppd=None, color=None):
 	"""2D sine grating generator (odd symmetric).

@@ -912,7 +912,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		c1pane.pack(expand=0, fill=X, side=TOP, pady=10)
 
         c2pane = Frame(f, borderwidth=1, relief=RIDGE)
-		c2pane.pack(expand=0, fill=X, side=TOP, pady=10)
+		c2pane.pack(expand=0, fill=X, side=TOP, pady=5)
 
 		c3pane = Frame(f, borderwidth=1, relief=RIDGE)
 		c3pane.pack(expand=0, fill=X, side=TOP, pady=10)
@@ -936,6 +936,29 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		udpy_.pack(expand=0, fill=X, side=TOP)
 		self.balloon.bind(udpy_, "show/hide user display window/pane")
 
+		# reaction time plot window
+		b = Checkbutton(c2pane, text='RT hist', relief=RAISED, anchor=W,
+                        background='lightblue')
+		b.pack(expand=0, fill=X, side=TOP, pady=2)
+		pw = DockWindow(checkbutton=b, title='Reaction Times')
+		Button(pw, text='Clear',
+			   command=self.update_rt).pack(side=TOP, expand=1, fill=X)
+		self.rthist = EmbeddedFigure(pw)
+		self.update_rt()
+
+        if not self.training and not self.psych:
+            # psth plot window -- only for recording sessions
+            b = Checkbutton(c2pane, text='psth', relief=RAISED, anchor=W,
+                            background='lightblue')
+            b.pack(expand=0, fill=X, side=TOP, pady=2)
+            pw = DockWindow(checkbutton=b, title='psth')
+            Button(pw, text='Clear',
+                   command=self.update_psth).pack(side=TOP, expand=1, fill=X)
+            self.psth = EmbeddedFigure(pw)
+            self.update_psth()
+        else:
+            self.psth = None
+
 		hostname = self._gethostname()
 		b = Checkbutton(c2pane, text='subject', relief=RAISED, anchor=W)
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
@@ -952,10 +975,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				Logger("pype: warning -- ELOG api not available.\n")
 				self.use_elog = 0
 		else:
-			Logger("pype: no ELOG setup -- using old-style cell counter.\n")
+			#Logger("pype: no ELOG setup -- using old-style cell counter.\n")
 			self.use_elog = 0
 
 		(commonp, rigp, icalp) = _pypestdparams()
+
 
 		sub_common = DockWindow(checkbutton=b, title='Subject Params')
 		self.sub_common = ParamTable(sub_common, commonp, file='subject.par')
@@ -996,28 +1020,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.rig_common.set('mon_h_ppd', '%g' % xppd)
 		self.rig_common.set('mon_v_ppd', '%g' % yppd)
 		self.rig_common.set('mon_ppd', '%g' % ppd)
-
-		# reaction time plot window
-		b = Checkbutton(c2pane, text='RT hist', relief=RAISED, anchor=W)
-		b.pack(expand=0, fill=X, side=TOP, pady=2)
-		pw = DockWindow(checkbutton=b, title='Reaction Times')
-		Button(pw, text='Clear',
-			   command=self.update_rt).pack(side=TOP, expand=1, fill=X)
-		self.rthist = EmbeddedFigure(pw)
-		self.update_rt()
-
-        if not self.training and not self.psych:
-            # psth plot window -- only for recording sessions
-            b = Checkbutton(c2pane, text='psth', relief=RAISED, anchor=W)
-            b.pack(expand=0, fill=X, side=TOP, pady=2)
-            pw = DockWindow(checkbutton=b, title='psth')
-            Button(pw, text='Clear',
-                   command=self.update_psth).pack(side=TOP, expand=1, fill=X)
-            self.psth = EmbeddedFigure(pw)
-            self.update_psth()
-        else:
-            self.psth = None
-
 
 		et = self.config.get('EYETRACKER', 'NONE')
 		if et == 'ISCAN':
@@ -1770,6 +1772,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 	def make_taskmenu(self, menubar):
 		# add ~/.pyperc/Tasks/*.py (in any)
+        self.tasklist = {}
+
 		self.add_tasks(menubar, '~pyperc', pyperc('Tasks'))
 
 		# add each subdir in ~/.pyperc/Tasks (unless prefixed with _)
@@ -1852,11 +1856,18 @@ class PypeApp(object):					# !SINGLETON CLASS!
 							command=self.loadtask)
 		menubar.addmenuitem(menulabel, 'separator')
 		for t in tasks:
-			tasklabel = '%-15s %s' % (t, taskdescrs[t])
-			menubar.addmenuitem(menulabel, 'command', label=tasklabel,
-								font=('Courier', 10),
-								command=lambda s=self,t=t,d=dirname:
-										s.loadtask(t, d))
+            if self.tasklist.has_key(t):
+                #sys.stderr.write('Warning: duplicate task name -- %s\n' % t)
+                c = 'blue'
+            else:
+                c = 'black'
+                self.tasklist[t] = 1
+            tasklabel = '%-15s %s' % (t, taskdescrs[t])
+            menubar.addmenuitem(menulabel, 'command', label=tasklabel,
+                                font=('Courier', 10),
+                                foreground=c,
+                                command=lambda s=self,t=t,d=dirname:
+                                s.loadtask(t, d))
 		menubar.addmenuitem(menulabel, 'separator')
 		menubar.addmenuitem(menulabel, 'command', label='Reload current',
 							command=self.loadtask)

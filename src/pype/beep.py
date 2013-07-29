@@ -40,8 +40,8 @@ class _Beeper(object):
 				pygame.sndarray.use_arraytype('numpy')
 			(_Beeper._dafreq,
 			 _Beeper._bits, _Beeper._chans) = pygame.mixer.get_init()
-			Logger('_Beeper: %d hz, %d bits, chans=%d\n' %
-				   (_Beeper._dafreq, _Beeper._bits, _Beeper._chans))
+			#Logger('_Beeper: %d hz, %d bits, chans=%d\n' %
+			#	   (_Beeper._dafreq, _Beeper._bits, _Beeper._chans))
 			_Beeper.cache = {}
 			_Beeper._doinit = 0
 

@@ -443,8 +443,6 @@ def param_expand(s, integer=None):
 			else:
 				meanval, minval, maxval = v[0], v[1], v[2]
 
-			print meanval, minval, maxval
-
 			while 1:
 				# keep drawing until we get a range-valid value
 				# before 12/18/2012 draw was clipped with min/max

@@ -420,6 +420,7 @@ from pype_aux import *
 from ptable import *
 from beep import *
 from sprite import *
+from spritetools import *
 from events import *
 from guitools import *
 from dacq import *
@@ -662,10 +663,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		# no console window to start with..
 		self.conwin = None
 
-		if os.environ.has_key('LOGNAME'):
-			self.uname = os.environ['LOGNAME']
-		else:
-			self.uname = 'XYZZY'
+        # get uid for current EFFECTIVE user id -- at this point it
+        # should be the user, not root..
+        self.uname = pwd.getpwuid(os.getuid())[0]
 
 		# Load user/host-specific config data and set appropriate
 		# defaults for missing values.
@@ -815,6 +815,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		mb.addmenuitem('File', 'separator')
 		mb.addmenuitem('File', 'command', label='Quit',
 					   command=self._shutdown)
+
+        mb.addmenuitem('File', 'command', label='benchmark',
+					   command=lambda s=self: benchmark(s.fb))
+
 
         if 0:
             # test code:

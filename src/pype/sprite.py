@@ -156,6 +156,20 @@ except ImportError:
 	sys.exit(1)
 
 try:
+    import OpenGL
+    if 0:
+        OpenGL.ERROR_CHECKING = False
+        OpenGL.ERROR_LOGGING  = False
+    else:
+        OpenGL.ERROR_ON_COPY  = True
+
+	import OpenGL.GL as ogl
+except ImportError:
+	Logger('sprite: python opengl OpenGL package required.\n')
+	sys.exit(1)
+
+
+try:
 	import pygame
 	from pygame.constants import *
 	v = map(int, pygame.version.ver[:-len('release')].split('.'))
@@ -167,11 +181,6 @@ except ImportError:
 	Logger('sprite: python pygame package required.\n' % __name__)
 	sys.exit(1)
 
-try:
-	import OpenGL.GL as ogl
-except ImportError:
-	Logger('sprite: python opengl OpenGL package required.\n')
-	sys.exit(1)
 
 # direct or indirect access (via SurfArrayAccess class)
 # to pygame surfaces (alpha and array)
@@ -353,7 +362,7 @@ class FrameBuffer(object):
 		# in theory, it works to open and close the pygame display
 		# on the fly to hide the graphics window..
 		self.screen_open(init=1)
-		Logger('framebuffer: %dx%d:%s\n' % (self.w, self.h, ppflag(self.flags)))
+		Logger('sprite: fb is %dx%d %s\n' % (self.w, self.h, ppflag(self.flags)))
 
 		# note: for historical reasons, bg is a scalar - grayscale only..
 		self.bg = bg

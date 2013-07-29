@@ -529,6 +529,50 @@ alphaGaussian2 = obsolete_fn
 alphaGaussian2 = obsolete_fn
 gaussianEnvelope = obsolete_fn
 
+
+def benchmark(fb):
+    import time
+    from sprite import Sprite
+    s = Sprite(250, 250, 0, 0, fb=fb, on=1)
+    s2 = Sprite(250, 250, 0, 0, fb=fb, on=1)
+    nmax = 100
+
+    t0 = time.time()
+    for n in range(nmax):
+        singrat(s, 10, 0.0, n, R=1.0, G=1.0, B=1.0,
+                meanlum=0.5, moddepth=1.0)
+        s.blit(flip=1)
+    time.time()
+    print 'all', float(nmax) / (time.time() - t0), 'fps'
+
+    t0 = time.time()
+    for n in range(nmax):
+        singrat(s, 10, 0.0, n, R=1.0, G=1.0, B=1.0,
+                meanlum=0.5, moddepth=1.0)
+    time.time()
+    print 'compute only', float(nmax) / (time.time() - t0), 'fps'
+
+    s2 = Sprite(250, 250, 0, 0, fb=fb, on=1)
+    singrat(s2, 10, 0.0, 0, R=1.0, G=1.0, B=1.0,
+            meanlum=0.5, moddepth=1.0)
+    foo = s2.array[::]
+    bar = s2.array[::]
+    t0 = time.time()
+    for n in range(nmax):
+        foo[::] = bar[::]
+        s.blit(flip=1)
+    time.time()
+    print 'copy+blit', float(nmax) / (time.time() - t0), 'fps'
+
+    t0 = time.time()
+    for n in range(nmax):
+        s.blit(flip=1)
+    time.time()
+    print 'blit only', float(nmax) / (time.time() - t0), 'fps'
+
+
+
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)
 	sys.exit(1)
+

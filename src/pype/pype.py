@@ -349,6 +349,10 @@ Fri Aug 26 16:48:29 2011 mazer
   the rig param table, otherwise, no additional analog data will
   get saved..
 
+Mon Jul 29 13:10:55 2013 mazer
+
+- bye-bye record_led
+
 """
 
 #####################################################################
@@ -879,14 +883,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		# and external recording system (plexon, etc)
 
 		if self.training:
-			Label(tmp, text='[TR]', relief=SUNKEN).pack(side=RIGHT)
+			Label(tmp, text='train mode', relief=SUNKEN).pack(side=RIGHT)
 		else:
-			Label(tmp, text='[REC]', relief=SUNKEN).pack(side=RIGHT)
-
-		self.record_led = Label(tmp, text="*", fg='red', relief=SUNKEN)
-		self.record_led.pack(side=RIGHT, padx=10)
-		self.balloon.bind(self.record_led,
-						  "GREEN=>recording, RED=>NOT recording")
+			Label(tmp, text='record mode', relief=SUNKEN).pack(side=RIGHT)
 
 		f = Frame(f1b, borderwidth=1, relief=GROOVE)
 		f.pack(expand=1, fill=X)
@@ -3496,10 +3495,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		# this is (was?) causing a wedge!!!
 		dacq_dig_out(2, state)
 		self._last_recstate = dacq_ts()
-		if state:
-			self.record_led.configure(fg='blue')
-		else:
-			self.record_led.configure(fg='red')
 
 	def eyetrace(self, on):
 		"""Start/stop recording eye position data.

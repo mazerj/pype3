@@ -70,8 +70,8 @@ class Config(object):
 			return None
 
 	def set(self, key, value, override=None, doc=None):
-		k = self.dict.has_key(key)
-		if (k and override) or (not k):
+		keyp = key in self.dict
+		if (keyp and override) or (not keyp):
 			self.dict[key] = value
 			self.docdict[key] = doc
 

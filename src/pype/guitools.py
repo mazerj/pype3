@@ -148,7 +148,7 @@ class Logger(object):					# !SINGLETON CLASS!
 		if text:
 			if not text[-1] == '\n':
 				text = text + '\n'
-			s = string.split(text, '\n')
+			s = text.split('\n')
 			if len(s) > 2:
 				for n in range(len(s)-1):
 					Logger(text=s[n], window=window, popup=popup, once=once)
@@ -156,7 +156,7 @@ class Logger(object):					# !SINGLETON CLASS!
 
 		# otherwise, this is single-line message, just log it..
 		if once:
-			if Logger.msgs.has_key(text):
+			if text in Logger.msgs:
 				return
 			else:
 				Logger.msgs[text] = 1
@@ -418,7 +418,7 @@ def warn(title, message, wait=None, action=None,
 	"""
 
 	if once:
-		if _viewed_warnings.has_key(message):
+		if message in _viewed_warnings:
 			return 0
 		else:
 			_viewed_warnings[message] = 1

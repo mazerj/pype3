@@ -48,7 +48,7 @@ def _comparedatafiles(a, b):
 
 	"""
 	try:
-		if int(string.split(a, '.')[2]) > int(string.split(b, '.')[2]):
+		if int(a.split('.')[2]) > int(b.split('.')[2]):
 			return -1
 		else:
 			return 1
@@ -165,7 +165,7 @@ class FileDialog(object):
 		self.top.bind('<Alt-W>', self.cancel_command)
 
 	def go(self, initialdir=os.curdir, pattern="*", initialfile="", key=None):
-		if key and dialogstates.has_key(key):
+		if key is not None and key in dialogstates:
 			self.directory, pattern = dialogstates[key]
 		else:
 			initialdir = os.path.expanduser(initialdir)

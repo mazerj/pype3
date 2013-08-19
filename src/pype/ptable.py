@@ -361,7 +361,7 @@ class ParamTable(object):
 		except AttributeError:
 			v = self._entries[qname].getvalue()
 
-		if self._entries.has_key((qname,'dict')):
+		if (qname,'dict') in self._entries:
 			return self._entries[(qname,'dict')][v]
 		else:
 			return v
@@ -427,7 +427,7 @@ class ParamTable(object):
 		c.add_section('locks')
 		for k in x.keys():
 			c.set('params', k, x[k])
-			if self._locks.has_key(k):
+			if k in self._locks:
 				if self._locks[k] == DISABLED:
 					c.set('locks', k, 1)
 					lock = 1
@@ -575,7 +575,7 @@ class ParamTable(object):
 			while 1:
 				line = f.readline()
 				if not line: break
-				source, key, lockstate, value = string.split(line, '!!')
+				source, key, lockstate, value = line.split('!!')
 				# value has trailing \n
 				x[key] = value[:-1]
 				locks[key] = lockstate
@@ -1153,13 +1153,13 @@ def is_list(s, evaluate=None):
 	"""
 
 	try:
-		v = string.split(s, ':')
+		v = s.split(':')
 		if len(v) > 1:
 			if s[0] == '=':
 				inc = 1
-				v = map(int, string.split(s[1:], ':'))
+				v = map(int, s[1:].split(':'))
 			else:
-				v = map(int, string.split(s, ':'))
+				v = map(int, s.split(':'))
 				inc = 0
 			if len(v) < 3:
 				stride = 1

@@ -413,7 +413,7 @@ class PypeRecord(object):
 		"""
 		if not self.computed:
 			# this is new 13-apr-2001:
-			if self.params.has_key('eyelag'):
+			if 'eyelag' in self.params:
 				lag = float(self.params['eyelag'])
 			else:
 				lag = 0
@@ -513,7 +513,7 @@ class PypeRecord(object):
 				self.gaps_t = None
 				self.gaps_y = None
 
-			if raw and self.params.has_key('@eye_rot'):
+			if raw and ('@eye_rot' in self.params):
 				if self.params['@eye_rot'] != 0:
 					self.israw = None
 				else:
@@ -581,7 +581,7 @@ class PypeRecord(object):
 
 class PypeFile(object):
 	def __init__(self, fname, filter=None, status=None, quiet=None):
-		flist = string.split(fname, '+')
+		flist = fname.split('+')
 		if len(flist) > 1:
 			if flist[0][-3:] == '.gz':
 				cmd = 'gunzip --quiet -c %s ' % string.join(flist,' ')

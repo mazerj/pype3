@@ -80,12 +80,12 @@ from pypedebug import keyboard
 
 class ScaledCanvas(Canvas):
 	def __init__(self, *args, **kwargs):
-		if kwargs.has_key('xscale'):
+		if 'xscale' in kwargs:
 			self.xscale = kwargs['xscale']
 			del(kwargs['xscale'])
 		else:
 			self.xscale = 1.0
-		if kwargs.has_key('yscale'):
+		if 'yscale' in kwargs:
 			self.yscale = kwargs['yscale']
 			del(kwargs['yscale'])
 		else:
@@ -557,7 +557,7 @@ class UserDisplay(object):
 					  'Enter center-x, center-y, width, height:',
 					  initialvalue='%d,%d,%d,%d' % (cx, cy, w, h))
 		try:
-			s = map(int, string.split(s,','))
+			s = map(int, s.split(','))
 		except ValueError:
 			return
 		if len(s) == 3:
@@ -799,9 +799,9 @@ class UserDisplay(object):
 			if not l:
 				break
 			if string.find(l, ',') >= 0:
-				l = string.split(l, ",")
+				l = l.split(',')
 			else:
-				l = string.split(l)
+				l = l.split()
 			px = int(l[0])
 			py = int(l[1])
 			x = int(round(px + (self.w/2.0)))
@@ -1057,13 +1057,13 @@ class UserDisplay(object):
 				l = fp.readline()
 				if not l: break
 				if l[0] == 'f':
-					(foo, x, y) = string.split(l)
+					(foo, x, y) = l.split()
 					self._fixset(x=int(x), y=int(y))
 				elif l[0] == 'p':
-					(foo, n, x, y) = string.split(l)
+					(foo, n, x, y) = l.split()
 					self._putfidmark(int(x), int(y), update=0)
 				if l[0] == 'm':
-					(foo, n, x, y) = string.split(l)
+					(foo, n, x, y) = l.split()
 					self.markstack.append((int(x), int(y)))
 					self.markstack = self.markstack[-2:]
 					self.drawbox()
@@ -1225,7 +1225,7 @@ class UserDisplay(object):
 		s = askstring('fixspot', 'new fixspot:',
 					  initialvalue='%d,%d' % (self.fix_x, self.fix_y))
 		if s:
-			s = string.split(s, ',')
+			s = s.split(',')
 			if len(s) == 2:
 				self._fixset(x=int(s[0]), y=inta(s[1]))
 
@@ -1259,15 +1259,15 @@ class FID(object):
 			if not l:
 				break
 			if l[0] == 'f':
-				(foo, x, y) = string.split(l)
+				(foo, x, y) = l.split()
 				self.fx = int(x)
 				self.fy = int(y)
 			elif l[0] == 'p':
-				(foo, n, x, y) = string.split(l)
+				(foo, n, x, y) = l.split()
 				self.x.append(int(x))
 				self.y.append(int(y))
 			elif l[0] == 'r':
-				(foo, cx, cy, r) = string.split(l)
+				(foo, cx, cy, r) = l.split()
 				self.cx = float(cx)
 				self.cy = float(cy)
 				self.r = float(r)

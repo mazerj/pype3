@@ -491,10 +491,10 @@ def param_expand(s, integer=None):
 	# 1, 3, 5, 7 or 9 with equal prob.
 	if s[0] == '=':
 		inc = 1
-		l = string.split(s[1:], ':')
+		l = s[1:].split(':')
 	else:
 		inc = 0
-		l = string.split(s, ':')
+		l = s.split(':')
 	if len(l) > 1:
 		if len(l) == 3:
 			start, stop, step = map(float, l)

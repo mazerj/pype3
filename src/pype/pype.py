@@ -707,7 +707,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		#	- running with --debug argument
 		#	- setenv PYPEDEBUG=1
 		#	- setting DEBUG: 1 in the Config.$HOST file
-		if os.environ.has_key('PYPEDEBUG'):
+		if 'PYPEDEBUG' in os.environ:
 			self.config.set('DEBUG', '1', override=1)
 
 		debug(self.config.iget('DEBUG'))
@@ -967,7 +967,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
 		self.balloon.bind(b, "show/hide subject worksheet")
 
-		if self.config.iget('ELOG', 1) and os.environ.has_key('ELOG'):
+		if self.config.iget('ELOG', 1) and ('ELOG' in os.environ):
 			# ELOG should specify path to the elog module
 			_addpath(os.environ['ELOG'])
 			try:
@@ -1707,7 +1707,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			if not len(k) == 2: continue
 
 			(task, type) = k
-			d = string.split(type)
+			d = type.split()
 			if len(d) > 1:
 				d = "%s (%s)" % (d[0], string.join(d[1:]))
 			else:
@@ -1794,7 +1794,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		taskpathlist = []
 		if self.config.get('TASKPATH', None):
 			taskpathlist.append(self.config.get('TASKPATH', None))
-		if os.environ.has_key('TASKPATH'):
+		if 'TASKPATH' in os.environ:
 			taskpathlist.append(os.environ['TASKPATH'])
 
 		for p in taskpathlist:
@@ -1813,9 +1813,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		d = {}
 		for l in lines:
 			if majik.search(l):
-				for w in string.split(l, ';')[1:]:
+				for w in l.split(';')[1:]:
 					if ':' in w:
-						(tag, val) = string.split(w, ':')
+						(tag, val) = w.split(':')
 						d[string.strip(tag)] = string.strip(val)
 					else:
 						d[string.strip(w)] = 1
@@ -1830,9 +1830,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		for fname in filelist:
 			d = self.readpypeinfo(fname)
-			if d.has_key('task'):
+			if 'task' in d:
 				tasks.append(posixpath.basename(fname)[:-3])
-				if d.has_key('descr'):
+				if 'descr' in d:
 					taskdescrs[tasks[-1]] = '%s' % d['descr']
 				else:
 					taskdescrs[tasks[-1]] = ''
@@ -1859,7 +1859,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 							command=self.loadtask)
 		menubar.addmenuitem(menulabel, 'separator')
 		for t in tasks:
-            if self.tasklist.has_key(t):
+            if t in self.tasklist:
                 #sys.stderr.write('Warning: duplicate task name -- %s\n' % t)
                 c = 'blue'
             else:
@@ -2092,7 +2092,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		# and need to be in ETUs.. so forget it for now..
 
 		try:
-			A = map(float, string.split(self.ical.query('affinem_'), ','))
+			A = map(float, self.ical.query('affinem_').split(','))
 			A = np.array(A).reshape(3,3)
 			for r in range(3):
 				for c in range(3):
@@ -2203,7 +2203,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		"""
 		try:
-			return string.split(socket.gethostname(), '.')[0]
+			return socket.gethostname().split('.')[0]
 		except:
 			return 'NOHOST'
 
@@ -3531,7 +3531,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 	def encode(self, code=None, ts=None):
 		"""Insert event code into the per-trial timestream.
 
-		:param code: (string or tuple) Any string can be used, but
+		:param code: (string or tuple/lsit) Any string can be used, but
 				it's best to use the constants defined in the
 				pype.events module or a modified version of these for
 				portability and to facilitate data analysis. If a
@@ -3551,16 +3551,17 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		if ts is None:
 			ts = dacq_ts()
-		if not code is None and len(code) > 0:
-            # Mon Aug 19 12:27:30 2013 mazer
-            # this worked only for tuples, should also work for lists now.
-			if (type(code) is TupleType) or (type(code) is ListType):
-				for c in code:
-					if len(c) > 0:
-						# don't encode empty events
-						self.record_buffer.append((ts, c))
+
+		if code is not None:
+            if (type(code) is TupleType) or (type(code) is ListType):
+                # Mon Aug 19 12:27:30 2013 mazer
+                # this worked only for tuples, should also work for lists now.
+				for acode in code:
+					if len(acode) > 0:
+                        self.record_buffer.append((ts, acode))
 			else:
-				self.record_buffer.append((ts, code))
+                if len(code): self.record_buffer.append((ts, code))
+                    
 		return ts
 
 	def get_encodes(self):
@@ -3955,7 +3956,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		next = 0
 		for f in flist:
 			try:
-				n = int(string.split(f, '.')[2])
+				n = int(f.split('.')[2])
 				if n >= next:
 					next = n + 1
 			except ValueError:
@@ -4002,7 +4003,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		next = 0
 		for f in flist:
 			try:
-				n = int(string.split(f, '.')[2])
+				n = int(f.split('.')[2])
 				if n >= next:
 					next = n + 1
 			except ValueError:
@@ -4304,7 +4305,7 @@ def _hostconfigfile():
 	:return: (string) config filename
 
 	"""
-	h = string.split(socket.gethostname(), '.')[0]
+	h = socket.gethostname().split('.')[0]
 	return pyperc('Config.%s' % h)
 
 def _find_ttl(t, x, thresh=500, polarity=1):
@@ -4388,7 +4389,7 @@ def pyperc(file=""):
 	:return: (string) name of .pyperc config directory
 
 	"""
-	if os.environ.has_key('PYPERC'):
+	if 'PYPERC' in os.environ:
 		rcdir = os.environ['PYPERC']
 	else:
 		rcdir = os.path.join(os.path.expanduser('~'), '.pyperc')

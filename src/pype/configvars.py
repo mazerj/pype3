@@ -129,7 +129,7 @@ def defaults(srcfile=None):
 	c.set('TESTPAT', None,
 		  doc='filename for test pattern')
 
-	if os.environ.has_key('DISPLAY'):	# display device for graphics
+	if 'DISPLAY' in os.environ:	# display device for graphics
 		c.set('SDLDPY', os.environ['DISPLAY'])
 	else:
 		c.set('SDLDPY', ':0.1')
@@ -137,7 +137,7 @@ def defaults(srcfile=None):
 	if not c.iget('FULLSCREEN'):
 		# if not using FULLSCREEN mode, then force the graphics to
 		# be displayed locally (in a window)
-		if os.environ.has_key('DISPLAY'):
+		if 'DISPLAY' in os.environ:
 			c.set('SDLDPY', os.environ['DISPLAY'])
 
 	#####################################################

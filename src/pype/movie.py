@@ -54,7 +54,7 @@ class Movie(object):
 			for l in lines:
 				if l[0] == '%':
 					continue
-				l = string.split(l)
+				l = l.split()
 				fname = os.path.join(idir, l[0])
 				try:
 					s = Sprite(x=x, y=y, fb=fb, depth=0, on=0, fname=fname,
@@ -141,7 +141,7 @@ def _readindex(fb, x, y, idir, index):
 	for l in lines:
 		if l[0] == '%':
 			continue
-		l = string.split(l)
+		l = l.split()
 		fname = os.path.join(idir, l[0])
 		try:
 			s = Sprite(x=x, y=y, fb=fb, depth=0, on=0,

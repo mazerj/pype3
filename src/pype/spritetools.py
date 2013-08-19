@@ -289,7 +289,7 @@ def singrat2(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 	# Generating the coordinate system is about 200ms/sprite. We can
 	# cache the orientation used for each one and speed things up
 	# considerably. Here's the full calculation:
-	if xcache is None or not(xcache.has_key(ori_deg)):
+	if (xcache is None) or (ori_deg not in xcache):
 		r = np.hypot(s.xx/s.w, s.yy/s.h)
 		t = np.arctan2(s.yy, s.xx)
 		t = t - (np.pi * ori_deg) / 180.

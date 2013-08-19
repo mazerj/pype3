@@ -3552,7 +3552,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		if ts is None:
 			ts = dacq_ts()
 		if not code is None and len(code) > 0:
-			if type(code) is TupleType:
+            # Mon Aug 19 12:27:30 2013 mazer
+            # this worked only for tuples, should also work for lists now.
+			if (type(code) is TupleType) or (type(code) is ListType):
 				for c in code:
 					if len(c) > 0:
 						# don't encode empty events

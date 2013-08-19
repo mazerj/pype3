@@ -20,7 +20,7 @@ Sun May 21 08:22:08 2006 mazer
 Sun May 21 13:44:57 2006 mazer
   Added 'startat' support so you can convert from the middle of a
   file to the end. This is for appending new data...
-  
+
 Mon Jan 26 11:00:53 2009 mazer
   Optimizing writeVector() to use matlab's load function seems to
   roughly cut conversion times in half -- but all the improvement
@@ -38,7 +38,7 @@ Tue May 10 10:23:19 2011 mazer
 
 Wed May 11 13:14:31 2011 mazer
   got rid of Numeric dependency (numpy now)
-  
+
 """
 import sys, types, string, math, os
 import numpy
@@ -55,7 +55,7 @@ def tmpvar():
 	global TMPVAR
 	TMPVAR = TMPVAR + 1
 	return 'xpx%d' % TMPVAR
-	
+
 
 def printify(fp, vname, v):
 	# convert a "value" into a matlab safe function
@@ -91,7 +91,7 @@ def matlabify(m):
 	# no leading underscores allowed
 	if m[0] == '_':
 		m = 'X' + m
-		
+
 	# replace '@' with INT (for internal)
 	m = string.join(string.split(m, '@'), 'INT')
 
@@ -112,7 +112,7 @@ def matlabify(m):
 			s.append('_')
 	m = string.join(s, '')
 	return m
-	
+
 
 def writeDict(fp, objname, name, dict):
 	for k in dict.keys():
@@ -146,7 +146,7 @@ def writeVector(fp, objname, name, v, format):
 	# Thu Jan 29 13:51:03 2009 mazer
 	#  by writing vectors out as strings, the python code becomes
 	#  significantly faster. more than factor of two I think..
-	
+
 	if v is None or len(v) == 0:
 		fp.write("%s.%s=[];" % (objname, name))
 	else:
@@ -156,14 +156,14 @@ def writeVector(fp, objname, name, v, format):
 		t.write(vs.tostring())
 		t.close()
 		os.close(fd)
-		
+
 		fp.write("fid=fopen('%s','r');\n" % tmp)
 		fp.write("%s.%s=fread(fid, 'float64');\n" % (objname, name))
 		fp.write("fclose(fid);\n")
 		if not DEBUG:
 			fp.write("delete('%s');\n" % tmp)
-		
-		
+
+
 def expandExtradata(fname, fp, extradata):
 	for n in range(len(extradata)):
 		printify(fp, "extradata{%d}.id" % (n+1),
@@ -174,7 +174,7 @@ def expandExtradata(fname, fp, extradata):
 
 def expandRecord(fname, fp, n, d, xd):
 	objname = 'rec(%d)' % (n+1)
-	d.compute()	
+	d.compute()
 
 	fp.write("%s.pype_recno=%d;\n" % (objname, n))
 	fp.write("%s.taskname='%s';\n" % (objname, d.taskname))
@@ -194,22 +194,26 @@ def expandRecord(fname, fp, n, d, xd):
 		vname = "%s.rest{%d}" % (objname, n+1)
 		printify(fp, vname, d.rest[n])
 
-	if 0:
-		n = 1
-		for (t, e) in d.events:
-			fp.write("%s.ev_t(%d)=%d;\n" % (objname, n, t))
-			fp.write("%s.ev_e{%d}='%s';\n" % (objname, n, e))
-			n = n + 1
-	else:
-		v = tmpvar()
-		fp.write("%s.ev_t=%s;\n" % (objname, map(lambda t: t[0], d.events),))
-		fp.write("%s=sprintf('%s');\n" % \
-				 (v, string.join(map(lambda t: t[1], d.events), chr(1)),))
-		fp.write("%s.ev_e=strread(%s,'%%s','delimiter',char(1));\n" % \
-				 (objname, v, ))
-		fp.write("clear %s;\n" % (v,))
-		
-	
+    # example list/tuple events into multiple events with same ts
+    times = []
+    events = []
+    for (t, e) in d.events:
+        if type(e) is types.StringType:
+            times.append(t)
+            events.append(e)
+        else:
+            for ee in e:
+                times.append(t)
+                events.append(ee)
+                
+    v = tmpvar()
+    fp.write("%s.ev_t=%s;\n" % (objname, times, ))
+    fp.write("%s=sprintf('%s');\n" % \
+             (v, string.join(events, chr(1)),))
+    fp.write("%s.ev_e=strread(%s,'%%s','delimiter',char(1));\n" % \
+             (objname, v, ))
+    fp.write("clear %s;\n" % (v,))
+
 	try:
 		v = d.spike_times
 	except AttributeError:
@@ -247,13 +251,13 @@ def expandRecord(fname, fp, n, d, xd):
 	writeVector(fp, objname, 'raw_spike', v, '%d')
 
 
-	# Thu Nov  3 16:59:55 2005 mazer 
+	# Thu Nov  3 16:59:55 2005 mazer
 	# write PlexNet timestamps, if present.
 	# note: 'times' is timestamp in ms re standard pype time
 	#		'channels' is electrode #, starting with 0
 	#		'units' is sorted unit # on this electrode, starting with 0
 	#
-	# Fri Jan 25 13:02:10 2008 mazer 
+	# Fri Jan 25 13:02:10 2008 mazer
 	#	modified to work with both plexon and tdt data
 	#
 	# Wed Mar 21 17:34:25 2012 mazer
@@ -275,7 +279,7 @@ def expandRecord(fname, fp, n, d, xd):
 			writeVector(fp, objname, 'plx_times', times, '%d')
 			writeVector(fp, objname, 'plx_channels', channels, '%d')
 			writeVector(fp, objname, 'plx_units', units, '%d')
-		
+
 
 	# handle analog data channels:
 	for chn in range(0, 7):
@@ -313,7 +317,7 @@ def expandRecord(fname, fp, n, d, xd):
 	writeVector(fp, objname, 'eyenew', v, '%d')
 
 	fp.write("fprintf(2,'+');\n")
-	
+
 
 def expandFile(fname, outfile, startat=0, maxn=None):
 	pf = PypeFile(fname, filter=None)
@@ -344,7 +348,7 @@ def expandFile(fname, outfile, startat=0, maxn=None):
 	pf.close()
 	if recno > 0:
 		sys.stderr.write('\n')
-		
+
 if __name__ == '__main__':
 	n = 0								# starting trial number (0 for first)
 	maxn = 0							# max number of trial to extract
@@ -353,7 +357,7 @@ if __name__ == '__main__':
 		sys.stderr.write("Usage: %s pypefile outfile [startat] [maxn]\n" %
 						 sys.argv[0])
 		sys.exit(1)
-		
+
 	if len(sys.argv) > 3:
 		n = int(sys.argv[3])
 	if len(sys.argv) > 4:

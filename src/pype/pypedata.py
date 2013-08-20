@@ -417,8 +417,28 @@ class PypeRecord(object):
 				lag = float(self.params['eyelag'])
 			else:
 				lag = 0
-			# all pype files (may be [] if not collected)
-			self.events = self.rec[2]
+
+			# all pype files should have these (may be [] if not collected)
+
+            #Tue Aug 20 16:08:29 2013 mazer
+            # if an event 'name' is not a string, then assume it's a list
+            # or tuple and expand on the fly into multiple events with
+            # a shared timestamp -- this was originally done in by
+            # p2m/pype_expander.py when generating matlab files, but this
+            # is actually the correct place to do it..
+            times = []
+            events = []
+            for (t, e) in self.rec[2]:
+                if type(e) is types.StringType:
+                    times.append(t)
+                    events.append(e)
+                else:
+                    for ee in e:
+                        times.append(t)
+                        events.append(ee)
+			self.events = zip(times, events)
+
+
 			self.eyet = np.array(self.rec[3], np.float) # ms
 			self.realt = np.array(self.rec[3], np.float) # ms
 			dt = diff(self.eyet)

@@ -194,19 +194,10 @@ def expandRecord(fname, fp, n, d, xd):
 		vname = "%s.rest{%d}" % (objname, n+1)
 		printify(fp, vname, d.rest[n])
 
-    # example list/tuple events into multiple events with same ts
-    times = []
-    events = []
-    for (t, e) in d.events:
-        if type(e) is types.StringType:
-            times.append(t)
-            events.append(e)
-        else:
-            for ee in e:
-                times.append(t)
-                events.append(ee)
-                
     v = tmpvar()
+    times = map(lambda e:e[0], d.events)
+    events = map(lambda e:e[1], d.events)
+    
     fp.write("%s.ev_t=%s;\n" % (objname, times, ))
     fp.write("%s=sprintf('%s');\n" % \
              (v, string.join(events, chr(1)),))

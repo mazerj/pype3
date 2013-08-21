@@ -16,15 +16,8 @@ foreach i ($*)
     echo "`basename $0`: $i does not exist."
     exit 1
   endif
-  set ec=/tmp/$$.exit
-  /bin/rm -f $ec
-  echo "p2mEyecalBatch('$i', 1, 1);" | matlab -nodisplay
-  if (-e $ec) then
-    set s = `cat $ec`
-    /bin/rm -f $ec
-  else
-    set s = 0
-  endif
+  echo "p2mEyecalBatch('$i', 1, 1); exit(0);" | matlab -nodisplay
+  s = $status
   if ("$s") then
     echo "aborting.."
     exit $s

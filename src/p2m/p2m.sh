@@ -30,16 +30,9 @@ for i in $* ; do
     exit 1
   fi
 
-  /bin/rm -f /tmp/$$.exit
   unset DISPLAY
-  echo "p2mBatch('$i', 1, 1); quit;" | matlab-nh -nodisplay -nojvm
-  if [ -f /tmp/$$.exit ]; then
-    s=`cat /tmp/$$.exit`
-    /bin/rm -f /tmp/$$.exit
-  else
-    s=0
-  fi
-  if [ $s -ne 0 ]; then
-    exit $s
+  echo "p2mBatch('$i', 1, 1); exit(0);" | matlab-nh -nodisplay -nojvm
+  if [ $? -ne 0 ]; then
+    exit 1
   fi
 done

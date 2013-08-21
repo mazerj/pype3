@@ -16,7 +16,6 @@ function p2mFindFixes(p2mfile, icalfile, inplace, exitOnError)
 %		datafiles came from.
 %    exitOnError = boolean (0/1) if 1, then any error will
 %               cause an immediate exit from the matlab kernel
-%               using p2mExit.m to generate an error status flag.
 %
 %  OUPUT
 %    none -- just writes the datafiles to disk.
@@ -59,7 +58,7 @@ try
   fprintf('%s\n+ %s\n-> %s\n', p2mfile, icalfile, newp2mfile);
 catch
   if exitOnError
-    p2mExit(1);
+    exit(1);
   else
     error(lasterr);
   end

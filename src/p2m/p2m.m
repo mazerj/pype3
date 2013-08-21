@@ -26,7 +26,6 @@
 % p2m_.m                - pypefile->p2mfile engine (don't use)
 % p2mCombine.m          - merge a bunch of p2m files into a single p2m struct
 % p2mExist.m            - check to see if file exists without following PATH
-% p2mExit.m             - exit after writing exit code to /tmp/$PPID.exit
 % p2mEyeStats.m         -
 % p2mEyecal.m           -
 % p2mEyecalApply.m      -

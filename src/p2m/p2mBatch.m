@@ -101,7 +101,7 @@ for n = 1:length(files)
   catch
     fprintf(2, 'Error converting file: %s\n', pypefile);
     if exitOnError
-      p2mExit(1);
+      exit(1);
     else
       errors{n} = lasterr;
     end

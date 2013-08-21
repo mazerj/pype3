@@ -49,7 +49,7 @@ for n = 1:length(files)
     close;
   catch
     if exitOnError
-      p2mExit(1);
+      exit(1);
     else
       error(lasterr);
     end

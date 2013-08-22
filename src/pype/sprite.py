@@ -157,12 +157,9 @@ except ImportError:
 
 try:
     import OpenGL
-    if 0:
-        OpenGL.ERROR_CHECKING = False
-        OpenGL.ERROR_LOGGING  = False
-    else:
-        OpenGL.ERROR_ON_COPY  = True
-
+    OpenGL.ERROR_CHECKING = False
+    OpenGL.ERROR_LOGGING  = False
+    OpenGL.ERROR_ON_COPY  = True
 	import OpenGL.GL as ogl
 except ImportError:
 	Logger('sprite: python opengl OpenGL package required.\n')

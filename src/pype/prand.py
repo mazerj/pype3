@@ -115,7 +115,7 @@ class MTRandom(object):
 		else:
 			return self.mt.random()
 
-def validate():
+def validate(exit=False):
 	"""Valid Mersenne Twister engine.
 
 	Check to see if python is still using the expected Mersenne Twister
@@ -123,13 +123,19 @@ def validate():
 	changes..
 
 	"""
+    import sys
+
 	r = MTRandom(seed=31415926)
 	for n in range(10000):
 		v = r.rand()
 	if abs(v-0.603852477186) < 1e-12:
-		return 1
+		return True
 	else:
-		return 0
+        if exit:
+            sys.stderr.write('error - Mersenne Twister test failed!\n')
+            sys.exit(1)
+        else:
+            return False
 
 if __name__ == '__main__':
 	import time, sys
@@ -139,34 +145,4 @@ if __name__ == '__main__':
 	else:
 		sys.stderr.write('Mersenne Twister: INVALID!\n')
 		sys.exit(1)
-
-	if 0:
-		# speed test
-		n = int(1e6)
-		t1 = time.time()
-		MTRandom(seed=1).rand(n)
-		t2 = time.time()
-		print 'bulk', n/(t2-t1), "rands/sec"
-
-
-		t1 = time.time()
-		r = MTRandom(seed=1)
-		for n in range(n):
-			r.rand()
-		t2 = time.time()
-		print 'indv', n/(t2-t1), "rands/sec"
-
-	if 0:
-		# ->matlab test
-		r = MTRandom(3141596)
-		s = r.getstate()
-
-		r2 = MTRandom(state=s)
-		for n in range(len(s)):
-			print s[n], 0
-
-		d = r.rand(10000)
-		d2 = r2.rand(10000)
-		for n in range(len(d)):
-			print d[n], d2[n]
 

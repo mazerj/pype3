@@ -34,6 +34,14 @@ import string
 import os
 from guitools import warn
 
+def trace():
+	# useful little tool: prints current file & lineno
+	import inspect
+	print 'TRACE %s:%d' % (
+		inspect.getfile(inspect.currentframe().f_back),
+		inspect.currentframe().f_back.f_lineno,
+		)
+
 def remotedebug():
 	# see: http://code.google.com/p/winpdb/
 	try:

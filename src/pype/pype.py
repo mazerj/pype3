@@ -373,10 +373,11 @@ import math
 import numpy as np
 
 # THIS IS REALLY UGLY -- THERE ARE TWO ISSUES:
-#  matplotlib-0.9.9 uses some sort of cache file that's not compatible
-#  with later versions. Plus, the whole root thing is bad news..
-# make sure to drop root (and then reraise) while matplotlib
-# is loaded..
+#  1. matplotlib-0.9.9 uses some sort of cache file that's not compatible
+#     with later versions.
+#  2. you don't want to initialize matplotlib as root -- doesn't work, so
+#     we need to drop root access and restore after init
+#
 euid = None
 try:
     euid = os.geteuid()
@@ -394,26 +395,14 @@ try:
         os.mkdir(os.environ['MPLCONFIGDIR'])
     except OSError:
         pass
-    if 0:
-        try:
-            # even more cruft -- these imports can lead to error messages
-            # that choke scripts, like p2m, so we just flush them to /dev/null
-            # for now.. kind of dangerous.
-            f = sys.stderr
-            sys.stderr = open('/dev/null', 'a')
-            from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-            from matplotlib.figure import Figure
-        finally:
-            sys.stderr.close()
-            sys.stderr = f
 finally:
     if not euid is None:
         os.seteuid(euid)
+    del euid
 
 from types import *
 from Tkinter import *
 from Pmw import *
-
 
 #####################################################################
 #  pype internal modules
@@ -434,19 +423,9 @@ from pypedata import *
 import pypeversion
 
 import prand
-if not prand.validate():
-	sys.stderr.write('prand does not implment a valid Mersenne Twister\n')
-	sys.exit(1)
+prand.validate(exit=True)
 
-def trace():
-	# useful little tool: prints file & lineno
-	import inspect
-	print 'TRACE %s:%d' % (
-		inspect.getfile(inspect.currentframe().f_back),
-		inspect.currentframe().f_back.f_lineno,
-		)
-
-def _pypestdparams():
+def _pype_std_params():
 	common = (
 		ptitle('Session Data'),
 		pyesno('warningbeeps', 0,
@@ -824,11 +803,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					   command=lambda s=self: benchmark(s.fb))
 
 
-        if 0:
-            # test code:
-            mb.addmenuitem('File', 'command', label='compare timers',
-                           command=self.compare_timers)
-
 		mb.addmenu('Misc', '', '')
 		mb.addmenuitem('Misc', 'command', label='Find param',
 					   command=self._findparam)
@@ -962,11 +936,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
         else:
             self.psth = None
 
-		hostname = self._gethostname()
-		b = Checkbutton(c2pane, text='subject', relief=RAISED, anchor=W)
-		b.pack(expand=0, fill=X, side=TOP, pady=2)
-		self.balloon.bind(b, "show/hide subject worksheet")
-
 		if self.config.iget('ELOG', 1) and ('ELOG' in os.environ):
 			# ELOG should specify path to the elog module
 			_addpath(os.environ['ELOG'])
@@ -981,8 +950,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			#Logger("pype: no ELOG setup -- using old-style cell counter.\n")
 			self.use_elog = 0
 
-		(commonp, rigp, icalp) = _pypestdparams()
+		(commonp, rigp, icalp) = _pype_std_params()
 
+		hostname = self._gethostname()
+		b = Checkbutton(c2pane, text='subject', relief=RAISED, anchor=W)
+		b.pack(expand=0, fill=X, side=TOP, pady=2)
+		self.balloon.bind(b, "subject specific parameters")
 
 		sub_common = DockWindow(checkbutton=b, title='Subject Params')
 		self.sub_common = ParamTable(sub_common, commonp, file='subject.par')
@@ -992,6 +965,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		b = Checkbutton(c2pane, text='rig', relief=RAISED, anchor=W)
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
+		self.balloon.bind(b, "rig/computer specific parameters")
 		rig_common = DockWindow(checkbutton=b,
 								title='Rig Params (%s)' % hostname)
 		self.rig_common = ParamTable(rig_common,
@@ -999,6 +973,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		b = Checkbutton(c2pane, text='ical', relief=RAISED, anchor=W)
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
+		self.balloon.bind(b, "eye calibration params")
 		ical = DockWindow(checkbutton=b, title='ical')
 		self.ical = ParamTable(ical, icalp,
 							   file='%s-%s-ical.par' % (hostname, subject(),))
@@ -1090,6 +1065,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				for (s, fn) in candy.list_():
 					mb.addmenuitem('Candy', 'command', label=s,
 								   command=lambda s=self,f=fn: s._candyplay(f))
+
+        self.make_toolbar(bb)
 
 		mb.addmenu('|', '', '')
 
@@ -1531,41 +1508,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 						# skip title slots..
 						pass
 
-	def compare_timers(self):
-        import simpletimer, pylab, time
-
-        ct = Timer()
-        st = simpletimer.Timer()
-
-        N = 100000
-        for n in [0, 1]:
-            if n == 0:
-                t = ct
-                name = 'comedi'
-            else:
-                t = st
-                name = 'simple'
-            for j in range(5):
-                t0 = simpletimer.exact_time_sec()
-                for k in range(N):
-                    x = t.ms() + 1.0
-                print name, j, float(N)/(simpletimer.exact_time_sec() - t0)/1000.
-
-        N = 10000
-        x = []
-        y = []
-        for k in range(N):
-            xs, ys = ct.ms(), st.ms()
-            x.append(xs)
-            y.append(ys)
-
-		pylab.ion()
-		pylab.figure()
-		pylab.clf()
-
-		pylab.subplot(1, 1, 1)
-		pylab.hist(np.array(x)-np.array(y))
-
 	def keyboard(self):
 		app = self
 		sys.stderr.write('Dropping into keyboard shell\n')
@@ -1794,15 +1736,13 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		taskpathlist = []
 		if self.config.get('TASKPATH', None):
 			taskpathlist.append(self.config.get('TASKPATH', None))
-		if 'TASKPATH' in os.environ:
-			taskpathlist.append(os.environ['TASKPATH'])
 
 		for p in taskpathlist:
 			for d in p.split(':'):
 				try:
 					self.add_tasks(menubar, posixpath.basename(d), d)
 				except ValueError:
-					Logger("pype: %s in $TASKPATH is a dup, skipped\n" % d)
+					Logger("pype: skipped dup %s in TASKPATH\n" % d)
 
 	def readpypeinfo(self, filename):
 		majik = re.compile('^#pypeinfo;.*')
@@ -1875,6 +1815,19 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		menubar.addmenuitem(menulabel, 'command', label='Reload current',
 							command=self.loadtask)
 
+    def make_toolbar(self, parent):
+        if self.config.get('TOOLS', None) is None:
+            return
+
+        for tool in self.config.get('TOOLS').split(';'):
+            if posixpath.exists(tool):
+                d = os.path.abspath(os.path.dirname(tool))
+                t = os.path.basename(tool).replace('.py','')
+                b = Button(parent, text=t,
+                           command=lambda s=self, t=t, d=d:s.loadtask(t,d))
+                b.pack(side=LEFT)
+                self.balloon.bind(b, 'quick load '+tool)
+
 	def prevtask(self):
 		try:
 			if self._task_prevtaskname:
@@ -1893,12 +1846,18 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		for w in [self._named_start, self._temp_start]:
 			w.config(state=DISABLED)
 
-	def loadtask(self, taskname=None, path=None, ask=None):
+	def loadtask(self, taskname=None, path=None, ask=False):
 		"""(Re)load task from file.
 
 		Load a task, if taskname==None and path==None then we reload the current
 		task, if possible.	If ask is true, then pop up a dialog box to ask for
 		a filename..
+
+        :param taskname: (string) task name without .py suffice
+
+        :param path: (string) directory where task is stored
+        
+        :param ask: (bool) query user for task to load
 
 		:return: None for error, task module on success
 
@@ -3561,7 +3520,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
                         self.record_buffer.append((ts, acode))
 			else:
                 if len(code): self.record_buffer.append((ts, code))
-                    
+
 		return ts
 
 	def get_encodes(self):

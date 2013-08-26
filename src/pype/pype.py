@@ -374,31 +374,31 @@ import numpy as np
 
 # THIS IS REALLY UGLY -- THERE ARE TWO ISSUES:
 #  1. matplotlib-0.9.9 uses some sort of cache file that's not compatible
-#     with later versions.
+#	  with later versions.
 #  2. you don't want to initialize matplotlib as root -- doesn't work, so
-#     we need to drop root access and restore after init
+#	  we need to drop root access and restore after init
 #
 euid = None
 try:
-    euid = os.geteuid()
-    if euid == 0:
-        os.seteuid(os.getuid())
-    import matplotlib
-    matplotlib.use('TkAgg')
-    # force matplotlib to use a version-specific config file, otherwise
-    # incompatiblities between cache files (0.9.9 vs 1.1.1) will cause
-    # problems (ie, different ubuntu versions)
-    os.environ['MPLCONFIGDIR'] = '%s-%s' % (matplotlib.get_configdir(),
-                                            matplotlib.__version__)
-    # make sure this dir exists (really only for 0.9.9..)
-    try:
-        os.mkdir(os.environ['MPLCONFIGDIR'])
-    except OSError:
-        pass
+	euid = os.geteuid()
+	if euid == 0:
+		os.seteuid(os.getuid())
+	import matplotlib
+	matplotlib.use('TkAgg')
+	# force matplotlib to use a version-specific config file, otherwise
+	# incompatiblities between cache files (0.9.9 vs 1.1.1) will cause
+	# problems (ie, different ubuntu versions)
+	os.environ['MPLCONFIGDIR'] = '%s-%s' % (matplotlib.get_configdir(),
+											matplotlib.__version__)
+	# make sure this dir exists (really only for 0.9.9..)
+	try:
+		os.mkdir(os.environ['MPLCONFIGDIR'])
+	except OSError:
+		pass
 finally:
-    if not euid is None:
-        os.seteuid(euid)
-    del euid
+	if not euid is None:
+		os.seteuid(euid)
+	del euid
 
 from types import *
 from Tkinter import *
@@ -582,10 +582,10 @@ def _pype_std_params():
 	return (common, rig, ical)
 
 def addicon(app, button, file):
-    from PIL import Image, ImageTk
-    p = ImageTk.PhotoImage(Image.open(os.path.join(app.pypedir,'lib', file)))
-    button._image = p
-    button.config(image=button._image)
+	from PIL import Image, ImageTk
+	p = ImageTk.PhotoImage(Image.open(os.path.join(app.pypedir,'lib', file)))
+	button._image = p
+	button.config(image=button._image)
 
 class PypeApp(object):					# !SINGLETON CLASS!
 	"""Pype Application Class.
@@ -646,9 +646,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		# no console window to start with..
 		self.conwin = None
 
-        # get uid for current EFFECTIVE user id -- at this point it
-        # should be the user, not root..
-        self.uname = pwd.getpwuid(os.getuid())[0]
+		# get uid for current EFFECTIVE user id -- at this point it
+		# should be the user, not root..
+		self.uname = pwd.getpwuid(os.getuid())[0]
 
 		# Load user/host-specific config data and set appropriate
 		# defaults for missing values.
@@ -740,7 +740,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.setgeo(self.tk, default='+20+20', posonly=1)
 
 		if self.config.iget('SPLASH'):
-            self.about(1000)
+			self.about(1000)
 
 		self.conwin = ConsoleWindow()
 		self.conwin.showhide()
@@ -799,7 +799,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		mb.addmenuitem('File', 'command', label='Quit',
 					   command=self._shutdown)
 
-        mb.addmenuitem('File', 'command', label='benchmark',
+		mb.addmenuitem('File', 'command', label='benchmark',
 					   command=lambda s=self: benchmark(s.fb))
 
 
@@ -888,7 +888,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		c1pane = Frame(f, borderwidth=1, relief=RIDGE)
 		c1pane.pack(expand=0, fill=X, side=TOP, pady=10)
 
-        c2pane = Frame(f, borderwidth=1, relief=RIDGE)
+		c2pane = Frame(f, borderwidth=1, relief=RIDGE)
 		c2pane.pack(expand=0, fill=X, side=TOP, pady=5)
 
 		c3pane = Frame(f, borderwidth=1, relief=RIDGE)
@@ -915,7 +915,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		# reaction time plot window
 		b = Checkbutton(c2pane, text='RT hist', relief=RAISED, anchor=W,
-                        background='lightblue')
+						background='lightblue')
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
 		pw = DockWindow(checkbutton=b, title='Reaction Times')
 		Button(pw, text='Clear',
@@ -923,18 +923,18 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.rthist = EmbeddedFigure(pw)
 		self.update_rt()
 
-        if not self.training and not self.psych:
-            # psth plot window -- only for recording sessions
-            b = Checkbutton(c2pane, text='psth', relief=RAISED, anchor=W,
-                            background='lightblue')
-            b.pack(expand=0, fill=X, side=TOP, pady=2)
-            pw = DockWindow(checkbutton=b, title='psth')
-            Button(pw, text='Clear',
-                   command=self.update_psth).pack(side=TOP, expand=1, fill=X)
-            self.psth = EmbeddedFigure(pw)
-            self.update_psth()
-        else:
-            self.psth = None
+		if not self.training and not self.psych:
+			# psth plot window -- only for recording sessions
+			b = Checkbutton(c2pane, text='psth', relief=RAISED, anchor=W,
+							background='lightblue')
+			b.pack(expand=0, fill=X, side=TOP, pady=2)
+			pw = DockWindow(checkbutton=b, title='psth')
+			Button(pw, text='Clear',
+				   command=self.update_psth).pack(side=TOP, expand=1, fill=X)
+			self.psth = EmbeddedFigure(pw)
+			self.update_psth()
+		else:
+			self.psth = None
 
 		if self.config.iget('ELOG', 1) and ('ELOG' in os.environ):
 			# ELOG should specify path to the elog module
@@ -1024,38 +1024,38 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		startstopf.pack(expand=0, fill=X, side=TOP)
 
 		w = self._named_start = Button(bb, command=self._start)
-        addicon(self, w, 'run.gif')
+		addicon(self, w, 'run.gif')
 		self.balloon.bind(self._named_start, 'start, saving data')
 		self._named_start.pack(expand=1, fill=Y, side=LEFT)
 		self._named_start.config(state=DISABLED)
 
 		w = self._temp_start = Button(bb, command=self._starttmp)
-        addicon(self, w, 'runtemp.gif')
+		addicon(self, w, 'runtemp.gif')
 		self._temp_start.pack(expand=1, fill=Y, side=LEFT)
 		self.balloon.bind(self._temp_start, "start w/o saving data")
 		self._temp_start.config(state=DISABLED)
 
 		w = self._stop = Button(bb, command=self._start_helper, state=DISABLED)
-        addicon(self, w, 'Stop.gif')
+		addicon(self, w, 'Stop.gif')
 		self._stop.pack(expand=1, fill=Y, side=LEFT)
 		self.balloon.bind(self._stop, "stop run at end of trial")
 
 		w = self._stopnow = Button(bb, command=self._stopabort, state=DISABLED)
-        addicon(self, w, 'Cancel.gif')
+		addicon(self, w, 'Cancel.gif')
 		self._stopnow.pack(expand=1, fill=Y, side=LEFT)
 		self.balloon.bind(self._stopnow, "stop run immediately")
 		self._doabort = 0
 
 		if not self.psych:
 			w = b = Button(bb, command=self.reward)
-            addicon(self, w, 'drop.gif')
+			addicon(self, w, 'drop.gif')
 
 			b.pack(expand=1, fill=Y, side=LEFT)
 			self.balloon.bind(b, "deliver a reward (also F4)")
 
 			if not self.use_elog and not self.training:
 				w = b = Button(bb, command=self._new_cell)
-                addicon(self, w, 'cell.gif')
+				addicon(self, w, 'cell.gif')
 				b.pack(expand=1, fill=Y, side=LEFT)
 				self.balloon.bind(b, "increment 'cell' counter")
 
@@ -1066,7 +1066,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					mb.addmenuitem('Candy', 'command', label=s,
 								   command=lambda s=self,f=fn: s._candyplay(f))
 
-        self.make_toolbar(bb)
+		self.make_toolbar(bb)
 
 		mb.addmenu('|', '', '')
 
@@ -1136,19 +1136,19 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		fbar.pack(expand=1, fill=X, side=TOP)
 
 		w = b = Button(fbar, command=lambda s=self: s.eyeshift(x=1, y=0))
-        addicon(self, w, 'left.gif')
+		addicon(self, w, 'left.gif')
 		b.pack(expand=0, fill=Y, side=LEFT)
 		self.balloon.bind(b, "shift offsets left (immediate effect)")
 		w = b = Button(fbar, command=lambda s=self: s.eyeshift(x=-1, y=0))
-        addicon(self, w, 'right.gif')
+		addicon(self, w, 'right.gif')
 		b.pack(expand=0, fill=Y, side=LEFT)
 		self.balloon.bind(b, "shift offsets right (immediate effect)")
 		w = b = Button(fbar, command=lambda s=self: s.eyeshift(x=0, y=-1))
-        addicon(self, w, 'up.gif')
+		addicon(self, w, 'up.gif')
 		b.pack(expand=0, fill=Y, side=LEFT)
 		self.balloon.bind(b, "shift offsets up (immediate effect)")
 		w = b = Button(fbar, command=lambda s=self: s.eyeshift(x=0, y=1))
-        addicon(self, w, 'down.gif')
+		addicon(self, w, 'down.gif')
 		b.pack(expand=0, side=LEFT)
 		self.balloon.bind(b, "shift offsets down (immediate effect)")
 
@@ -1216,16 +1216,16 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.rig_common.set('mon_fps', '%g' % fps)
 		Logger('pype: estimated fps = %g\n' % fps)
 
-        # use mouse in userdpy as substitute for eye tracker?
-        #  - if set, then mouse button-1 clicking will simulate saccade
-        #    to indicate location
-        #  - should work in either the userdisplay or the framebuffer
-        #    window
-        self.eyemouse = self.config.iget('EYEMOUSE', 0)
-        if self.eyemouse:
-            self.eyeset(xgain=1.0, ygain=1.0, xoff=0, yoff=0)
-            self.fb.cursor(on=1)
-        self.eyebar = 0
+		# use mouse in userdpy as substitute for eye tracker?
+		#  - if set, then mouse button-1 clicking will simulate saccade
+		#	 to indicate location
+		#  - should work in either the userdisplay or the framebuffer
+		#	 window
+		self.eyemouse = self.config.iget('EYEMOUSE', 0)
+		if self.eyemouse:
+			self.eyeset(xgain=1.0, ygain=1.0, xoff=0, yoff=0)
+			self.fb.cursor(on=1)
+		self.eyebar = 0
 
 		# userdisplay: shadow of framebuffer window
 		scale = self.config.fget('USERDISPLAY_SCALE')
@@ -1234,7 +1234,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 										scale=scale,
 										pix_per_dva=self.pix_per_dva,
 										app=self,
-                                        eyemouse=self.eyemouse)
+										eyemouse=self.eyemouse)
 
 		udpy_.config(command=self.udpy.showhide)
 		if self.config.iget('USERDISPLAY_HIDE'):
@@ -1384,7 +1384,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		dacq_elrestart()
 
 	def about(self, timeout=None):
-        show_about(os.path.join(self.pypedir,'lib', 'logo.gif'), timeout)
+		show_about(os.path.join(self.pypedir,'lib', 'logo.gif'), timeout)
 
 	def queue_action(self, inms=None, action=None):
 		"""Queue an action to happen about inms from now. Call with
@@ -1717,7 +1717,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 	def make_taskmenu(self, menubar):
 		# add ~/.pyperc/Tasks/*.py (in any)
-        self.tasklist = {}
+		self.tasklist = {}
 
 		self.add_tasks(menubar, '~pyperc', pyperc('Tasks'))
 
@@ -1799,34 +1799,34 @@ class PypeApp(object):					# !SINGLETON CLASS!
 							command=self.loadtask)
 		menubar.addmenuitem(menulabel, 'separator')
 		for t in tasks:
-            if t in self.tasklist:
-                #sys.stderr.write('Warning: duplicate task name -- %s\n' % t)
-                c = 'blue'
-            else:
-                c = 'black'
-                self.tasklist[t] = 1
-            tasklabel = '%-15s %s' % (t, taskdescrs[t])
-            menubar.addmenuitem(menulabel, 'command', label=tasklabel,
-                                font=('Courier', 10),
-                                foreground=c,
-                                command=lambda s=self,t=t,d=dirname:
-                                s.loadtask(t, d))
+			if t in self.tasklist:
+				#sys.stderr.write('Warning: duplicate task name -- %s\n' % t)
+				c = 'blue'
+			else:
+				c = 'black'
+				self.tasklist[t] = 1
+			tasklabel = '%-15s %s' % (t, taskdescrs[t])
+			menubar.addmenuitem(menulabel, 'command', label=tasklabel,
+								font=('Courier', 10),
+								foreground=c,
+								command=lambda s=self,t=t,d=dirname:
+								s.loadtask(t, d))
 		menubar.addmenuitem(menulabel, 'separator')
 		menubar.addmenuitem(menulabel, 'command', label='Reload current',
 							command=self.loadtask)
 
-    def make_toolbar(self, parent):
-        if self.config.get('TOOLS', None) is None:
-            return
+	def make_toolbar(self, parent):
+		if self.config.get('TOOLS', None) is None:
+			return
 
-        for tool in self.config.get('TOOLS').split(';'):
-            if posixpath.exists(tool):
-                d = os.path.abspath(os.path.dirname(tool))
-                t = os.path.basename(tool).replace('.py','')
-                b = Button(parent, text=t,
-                           command=lambda s=self, t=t, d=d:s.loadtask(t,d))
-                b.pack(side=LEFT)
-                self.balloon.bind(b, 'quick load '+tool)
+		for tool in self.config.get('TOOLS').split(';'):
+			if posixpath.exists(tool):
+				d = os.path.abspath(os.path.dirname(tool))
+				t = os.path.basename(tool).replace('.py','')
+				b = Button(parent, text=t,
+						   command=lambda s=self, t=t, d=d:s.loadtask(t,d))
+				b.pack(side=LEFT)
+				self.balloon.bind(b, 'quick load '+tool)
 
 	def prevtask(self):
 		try:
@@ -1853,11 +1853,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		task, if possible.	If ask is true, then pop up a dialog box to ask for
 		a filename..
 
-        :param taskname: (string) task name without .py suffice
+		:param taskname: (string) task name without .py suffice
 
-        :param path: (string) directory where task is stored
-        
-        :param ask: (bool) query user for task to load
+		:param path: (string) directory where task is stored
+		
+		:param ask: (bool) query user for task to load
 
 		:return: None for error, task module on success
 
@@ -2317,8 +2317,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				self.set_result()
 
 				# reset histogram/stats at start of run
-				self.update_rt()          # RT histogram
-				self.update_psth()        # PSTH (spike data)
+				self.update_rt()		  # RT histogram
+				self.update_psth()		  # PSTH (spike data)
 				self._runstats_update(clear=1) # clear block stats
 
 				# make sure graphic display is visible
@@ -2523,18 +2523,18 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		is looking at this location (in pixels) when you strike the
 		key.
 
-        :param x: (int or FixWin) - x position (pix) or a fixwin object
+		:param x: (int or FixWin) - x position (pix) or a fixwin object
 
-        :param y: (int) - y position (pix); only if x is not a fixwin!
+		:param y: (int) - y position (pix); only if x is not a fixwin!
 
 		:return: nothing
 
 		"""
-        if x is None and y is None:
-            x = y = 0
-        elif y is None:
-            # assume x is a fixwin object -- sz is ignored..
-            x, y, sz = x.get()
+		if x is None and y is None:
+			x = y = 0
+		elif y is None:
+			# assume x is a fixwin object -- sz is ignored..
+			x, y, sz = x.get()
 		self._eyetarg_x = x
 		self._eyetarg_y = y
 
@@ -2560,8 +2560,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		elif rel:
 			x = float(self.ical.queryv('xoff_')) + x
 			y = float(self.ical.queryv('yoff_')) + y
-        else:
-            # assume eye is looking at specified point -- for mouse clicks!
+		else:
+			# assume eye is looking at specified point -- for mouse clicks!
 			(x0, y0) = (dacq_eye_read(1), dacq_eye_read(2))
 			x = float(self.ical.queryv('xoff_')) + x0 - x
 			y = float(self.ical.queryv('yoff_')) + y0 - y
@@ -2687,29 +2687,29 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			while 1:
 				pev = pygame.event.poll()
 				if pev.type is pygame.NOEVENT:
-                    break
-                elif pev.type is pygame.KEYDOWN and \
-                    (pev.key < 256) and (pev.mod & pygame.KMOD_ALT) and \
-                    chr(pev.key) == 's' and self._allowabort:
-                    self.con("stopping run", color='red')
-                    self.running = 0
-                    raise UserAbort
-                elif self.eyemouse:
-                    doint = 0
-                    if pev.type is pygame.MOUSEBUTTONDOWN and pev.button==1:
-                        self.eyeshift(x=pev.pos[0] - (self.fb.w/2),
-                                      y=(self.fb.h/2) - pev.pos[1], rel=False)
-                    elif pev.type is pygame.KEYDOWN and chr(pev.key) == ' ':
-                        if ~self.eyebar:
-                            doint = 1
-                        self.eyebar = 1
-                    elif pev.type is pygame.KEYUP and chr(pev.key) == ' ':
-                        if self.eyebar:
-                            doint = 1
-                        self.eyebar = 0
-                    if doint:
-                        # simulated barTransition..
-                        self._int_handler(None, None, iclass=1, iarg=0)
+					break
+				elif pev.type is pygame.KEYDOWN and \
+					(pev.key < 256) and (pev.mod & pygame.KMOD_ALT) and \
+					chr(pev.key) == 's' and self._allowabort:
+					self.con("stopping run", color='red')
+					self.running = 0
+					raise UserAbort
+				elif self.eyemouse:
+					doint = 0
+					if pev.type is pygame.MOUSEBUTTONDOWN and pev.button==1:
+						self.eyeshift(x=pev.pos[0] - (self.fb.w/2),
+									  y=(self.fb.h/2) - pev.pos[1], rel=False)
+					elif pev.type is pygame.KEYDOWN and chr(pev.key) == ' ':
+						if ~self.eyebar:
+							doint = 1
+						self.eyebar = 1
+					elif pev.type is pygame.KEYUP and chr(pev.key) == ' ':
+						if self.eyebar:
+							doint = 1
+						self.eyebar = 0
+					if doint:
+						# simulated barTransition..
+						self._int_handler(None, None, iclass=1, iarg=0)
 
 			x, y = self.eyepos()
 			if (x is not None) and (y is not None):
@@ -3041,10 +3041,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		"""
 
-        if iclass is None:
-            iclass = dacq_int_class()
-        if iarg is None:
-            iarg = dacq_int_arg()
+		if iclass is None:
+			iclass = dacq_int_class()
+		if iarg is None:
+			iarg = dacq_int_arg()
 
 		if iclass == 666:
 			self.running = 0
@@ -3105,15 +3105,15 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		"""
 		if self.flip_bar:
-            if self.eyemouse:
-                return not self.eyebar
-            else:
-                return not dacq_bar()
+			if self.eyemouse:
+				return not self.eyebar
+			else:
+				return not dacq_bar()
 		else:
-            if self.eyemouse:
-                return self.eyebar
-            else:
-                return dacq_bar()
+			if self.eyemouse:
+				return self.eyebar
+			else:
+				return dacq_bar()
 
 	def barup(self):
 		"""Query to see if touchbar is touched (aka 'down').
@@ -3512,14 +3512,14 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			ts = dacq_ts()
 
 		if code is not None:
-            if (type(code) is TupleType) or (type(code) is ListType):
-                # Mon Aug 19 12:27:30 2013 mazer
-                # this worked only for tuples, should also work for lists now.
+			if (type(code) is TupleType) or (type(code) is ListType):
+				# Mon Aug 19 12:27:30 2013 mazer
+				# this worked only for tuples, should also work for lists now.
 				for acode in code:
 					if len(acode) > 0:
-                        self.record_buffer.append((ts, acode))
+						self.record_buffer.append((ts, acode))
 			else:
-                if len(code): self.record_buffer.append((ts, code))
+				if len(code): self.record_buffer.append((ts, code))
 
 		return ts
 
@@ -3759,11 +3759,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			a0 = []
 
 		self.update_rt((resultcode, rt, params, taskinfo))
-        if 1 or resultcode[0] == CORRECT_RESPONSE:
-            self.update_psth((self.spike_times, self.record_buffer))
-        if self._updatefn:
-            self._updatefn((resultcode, rt, params, taskinfo),
-                           (self.spike_times, self.record_buffer))
+		if 1 or resultcode[0] == CORRECT_RESPONSE:
+			self.update_psth((self.spike_times, self.record_buffer))
+		if self._updatefn:
+			self._updatefn((resultcode, rt, params, taskinfo),
+						   (self.spike_times, self.record_buffer))
 
 
 		if self._show_eyetrace.get():
@@ -4146,81 +4146,81 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		self.rthist.fig.clf()
 
-        a = self.rthist.fig.add_subplot(1,1,1)
+		a = self.rthist.fig.add_subplot(1,1,1)
 
-        if len(self.rtdata) == 0:
-            a.text(0.5, 0.5, 'NO RT DATA',
-                   transform=a.transAxes, color='red',
-                   horizontalalignment='center', verticalalignment='center')
-        else:
-            h = np.array(self.rtdata)
-            n, bins, patches = a.hist(h, facecolor='grey')
-            a.text(0.02, 1-0.02,
-                   '$\\mu=%.0fms$\n$\\sigma=%.0fms$\n$n=%d$' % \
-                   (np.mean(h), np.std(h), len(h)),
-                   color='red',
-                   horizontalalignment='left',
-                   verticalalignment='top',
-                   transform=a.transAxes)
+		if len(self.rtdata) == 0:
+			a.text(0.5, 0.5, 'NO RT DATA',
+				   transform=a.transAxes, color='red',
+				   horizontalalignment='center', verticalalignment='center')
+		else:
+			h = np.array(self.rtdata)
+			n, bins, patches = a.hist(h, facecolor='grey')
+			a.text(0.02, 1-0.02,
+				   '$\\mu=%.0fms$\n$\\sigma=%.0fms$\n$n=%d$' % \
+				   (np.mean(h), np.std(h), len(h)),
+				   color='red',
+				   horizontalalignment='left',
+				   verticalalignment='top',
+				   transform=a.transAxes)
 
-            x = np.linspace(bins[0], bins[-1], 25)
-            g = pylab.normpdf(x, np.mean(h), np.std(h));
-            g = g * np.sum(n) / np.sum(g)
-            a.plot(x, g, 'r-', linewidth=2)
-            a.axvspan(self.sub_common.queryv('minrt'),
-                      self.sub_common.queryv('maxrt'),
-                      color='b', alpha=0.25)
-            a.axis([-10, 1.25*self.sub_common.queryv('maxrt'), None, None])
-            a.set_ylabel('n=%d' % len(h))
-        a.set_xlabel('Reaction Time (ms)')
+			x = np.linspace(bins[0], bins[-1], 25)
+			g = pylab.normpdf(x, np.mean(h), np.std(h));
+			g = g * np.sum(n) / np.sum(g)
+			a.plot(x, g, 'r-', linewidth=2)
+			a.axvspan(self.sub_common.queryv('minrt'),
+					  self.sub_common.queryv('maxrt'),
+					  color='b', alpha=0.25)
+			a.axis([-10, 1.25*self.sub_common.queryv('maxrt'), None, None])
+			a.set_ylabel('n=%d' % len(h))
+		a.set_xlabel('Reaction Time (ms)')
 
-        try:
-            self.rthist.drawnow()
-        except:
-            if warn('matlibplot error',
-                    'Probably must delete ~/.matlibplot', once=True):
-                reporterror()
+		try:
+			self.rthist.drawnow()
+		except:
+			if warn('matlibplot error',
+					'Probably must delete ~/.matlibplot', once=True):
+				reporterror()
 
 	def update_psth(self, data=None, trigger=PSTH_TRIG):
-        """
-        Note: this only adds to the psth if the trigger event is present.
-        """
+		"""
+		Note: this only adds to the psth if the trigger event is present.
+		"""
 		import pylab
 
-        if self.psth is None: return
+		if self.psth is None: return
 
 		if data is None:
 			self.psthdata = np.array([])
 		else:
-            spike_times = np.array(data[0])
-            events = data[1]
-            t0 = find_events(events, trigger)
-            if t0 == []:
-                # no trigger event.. don't update..
-                return
-            else:
-                self.psthdata = np.concatenate((self.psthdata, spike_times-t0,))
+			spike_times = np.array(data[0])
+			events = data[1]
+			t0 = find_events(events, trigger)
+			if t0 == []:
+				# no trigger event.. don't update..
+				return
+			else:
+				self.psthdata = np.concatenate((self.psthdata, spike_times-t0,))
 
 		self.psth.fig.clf()
-        a = self.psth.fig.add_subplot(1,1,1)
-        if len(self.psthdata) == 0:
-            a.text(0.5, 0.5, 'NO SPIKE DATA',
-                   transform=a.transAxes, color='red',
-                   horizontalalignment='center', verticalalignment='center')
-        else:
-            # how histogram first 2s of data in 50 ms bins; this really
-            # should be settable by the task..
-            a.hist(self.psthdata, facecolor='blue',
-                   bins=40, range=(-100, 1900))
-        a.set_xlabel('Time (ms)')
-        a.set_ylabel('nspikes')
+		a = self.psth.fig.add_subplot(1,1,1)
+		if len(self.psthdata) == 0:
+			a.text(0.5, 0.5, 'NO SPIKE DATA',
+				   transform=a.transAxes, color='red',
+				   horizontalalignment='center', verticalalignment='center')
+		else:
+			# how histogram first 2s of data in 50 ms bins; this really
+			# should be settable by the task..
+			a.hist(self.psthdata, facecolor='blue',
+				   bins=40, range=(-100, 1900))
+		a.set_xlabel('Time (ms)')
+		a.set_ylabel('nspikes')
 
-        try:
-            self.psth.drawnow()
-        except:
-            if warn('matlibplot error',
-                    'Probably must delete ~/.matlibplot', once=True):
-                reporterror()
+		try:
+			self.psth.drawnow()
+		except:
+			if warn('matlibplot error',
+					'Probably must delete ~/.matlibplot', once=True):
+				reporterror()
 
 	def makeFixWin(self, x, y, tweak=0):
 		"""Helper function for creating new fixation window in std way.
@@ -4405,7 +4405,7 @@ class FixWin(object):
 			 wait=None, action=None, once=1)
 
 	def get(self):
-        return self.x, self.y, self.size
+		return self.x, self.y, self.size
 
 	def set(self, x=None, y=None, size=None):
 		"""Change (or set) size and position of fix window.
@@ -4511,7 +4511,7 @@ class Timer(object):
 			self.disable()
 
 	def disable(self):
-        self._start_at = None
+		self._start_at = None
 
 	def reset(self):
 		"""Reset timer.
@@ -4632,38 +4632,38 @@ class EmbeddedFigure:
 	"""
 
 	def __init__(self, parent, *args, **kwargs):
-        from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-        from matplotlib.figure import Figure
+		from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+		from matplotlib.figure import Figure
 
-        self.fig = Figure(*args, **kwargs)
-        self._canvas = FigureCanvasTkAgg(self.fig, master=parent)
-        self._canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+		self.fig = Figure(*args, **kwargs)
+		self._canvas = FigureCanvasTkAgg(self.fig, master=parent)
+		self._canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
 
 	def drawnow(self):
 		if matplotlib:
 			self._canvas.show()
 
 class SimplePlotWindow(Toplevel):
-    """Toplevel plot window for use with matplotlib.
+	"""Toplevel plot window for use with matplotlib.
 
-    >>> w = SimplePlotWindow('testplot', app)
-    >>> w.fig.clf()
-    >>> a = w.fig.add_subplot(1,1,1)
-    >>> a.plot(np.random.random(200))
-    >>> a.set_xlabel('xlabel')
-    >>> a.set_ylabel('xlabel')
-    >>> a.set_title('title')
-    >>> w.drawnow()
+	>>> w = SimplePlotWindow('testplot', app)
+	>>> w.fig.clf()
+	>>> a = w.fig.add_subplot(1,1,1)
+	>>> a.plot(np.random.random(200))
+	>>> a.set_xlabel('xlabel')
+	>>> a.set_ylabel('xlabel')
+	>>> a.set_title('title')
+	>>> w.drawnow()
 
-    Note: Unless userclose is set to True, the user will not
-    be able to close the plot window and it must be closed
-    programmatically by calling widget.destroy() method..
+	Note: Unless userclose is set to True, the user will not
+	be able to close the plot window and it must be closed
+	programmatically by calling widget.destroy() method..
 
-    """
+	"""
 
 	def __init__(self, name, app=None, userclose=False, *args, **kw):
-        from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-        from matplotlib.figure import Figure
+		from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+		from matplotlib.figure import Figure
 
 		apply(Toplevel.__init__, (self,), kw)
 
@@ -4671,54 +4671,54 @@ class SimplePlotWindow(Toplevel):
 		self.fig = Figure()
 		self._canvas = FigureCanvasTkAgg(self.fig, master=self)
 		self._canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
-        if not userclose:
-            self.protocol("WM_DELETE_WINDOW", lambda: 1)
+		if not userclose:
+			self.protocol("WM_DELETE_WINDOW", lambda: 1)
 
-        if app:
-            # note: only position is remembered, not size -- this
-            # is becaue teh FigureCanvasTkAgg has a size param we're
-            # not using here..
-            app.setgeo(self, default='+20+20')
+		if app:
+			# note: only position is remembered, not size -- this
+			# is becaue teh FigureCanvasTkAgg has a size param we're
+			# not using here..
+			app.setgeo(self, default='+20+20')
 
-    def drawnow(self):
-        self._canvas.show()
+	def drawnow(self):
+		self._canvas.show()
 
 def show_about(file, timeout=None):
 	"""Display a about/splash screen. If transient is True, then return,
-    but use callback to clsoe it after 10 secs, otherwise user must close.
+	but use callback to clsoe it after 10 secs, otherwise user must close.
 
 	"""
 
-    from PIL import Image, ImageTk
+	from PIL import Image, ImageTk
 
-    im = ImageTk.PhotoImage(Image.open(file))
+	im = ImageTk.PhotoImage(Image.open(file))
 	w = Toplevel(background='white')
-    if timeout:
-        w.overrideredirect(1)
+	if timeout:
+		w.overrideredirect(1)
 	w.withdraw()
 
 	f = Frame(w, background='white', relief=RIDGE)
 	f.pack(expand=1, fill=BOTH)
 	icon = Label(f, relief=FLAT, image=im, background='white')
-    icon._image = im
+	icon._image = im
 	icon.pack(expand=1, fill=BOTH, side=TOP)
 
-    t = "\n".join(
-        (
-            "pype: python physiology environment",
-            "Version %s" % pypeversion.PypeVersion,
-            "Copyright (c) 1999-2013 James A. Mazer",
-            "Build Date: %s" % pypeversion.PypeBuildDate,
-            ))
-    text = Label(f, text=t, background='white')
-    text.pack(expand=1, fill=BOTH, side=BOTTOM)
+	t = "\n".join(
+		(
+			"pype: python physiology environment",
+			"Version %s" % pypeversion.PypeVersion,
+			"Copyright (c) 1999-2013 James A. Mazer",
+			"Build Date: %s" % pypeversion.PypeBuildDate,
+			))
+	text = Label(f, text=t, background='white')
+	text.pack(expand=1, fill=BOTH, side=BOTTOM)
 
 	w.update_idletasks()
 	screencenter(w)
 	w.deiconify()
 	w.update_idletasks()
-    if timeout:
-        w.after(timeout, w.destroy)
+	if timeout:
+		w.after(timeout, w.destroy)
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

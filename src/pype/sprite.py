@@ -156,10 +156,10 @@ except ImportError:
 	sys.exit(1)
 
 try:
-    import OpenGL
-    OpenGL.ERROR_CHECKING = False
-    OpenGL.ERROR_LOGGING  = False
-    OpenGL.ERROR_ON_COPY  = True
+	import OpenGL
+	OpenGL.ERROR_CHECKING = False
+	OpenGL.ERROR_LOGGING  = False
+	OpenGL.ERROR_ON_COPY  = True
 	import OpenGL.GL as ogl
 except ImportError:
 	Logger('sprite: python opengl OpenGL package required.\n')
@@ -195,44 +195,44 @@ MAGENTA = (255,1,255)
 CYAN	= (1,255,255)
 
 if not SA_DIRECT:
-    class _SurfArrayAccess(object):
-        """
-        Surfarray accessor class for sprites.
-        Makes sprite.array, sprite.alpha behave almost as though they
-        were direct references to the surfarray array3d Numeric arrays.
+	class _SurfArrayAccess(object):
+		"""
+		Surfarray accessor class for sprites.
+		Makes sprite.array, sprite.alpha behave almost as though they
+		were direct references to the surfarray array3d Numeric arrays.
 
-        For example::
+		For example::
 
-          array = self.array[::]
-          array = self.array[3:,4]
-          self.array[::] = newarray
-          self.array[4,3] = 12
+		  array = self.array[::]
+		  array = self.array[3:,4]
+		  self.array[::] = newarray
+		  self.array[4,3] = 12
 
-        However, self.array is not really a Numeric array itself, so don't do::
+		However, self.array is not really a Numeric array itself, so don't do::
 
-          BAD self.array = newarray (use self.array[::] = newarray)
-          BAD sz = size(self.array) (use size(self.array[::])).
+		  BAD self.array = newarray (use self.array[::] = newarray)
+		  BAD sz = size(self.array) (use size(self.array[::])).
 
-        Similar for self.alpha.
+		Similar for self.alpha.
 
-        """
-        def __init__(self, s, get, set):
-            self.s = s
-            self.getfn = get
-            self.setfn = set
+		"""
+		def __init__(self, s, get, set):
+			self.s = s
+			self.getfn = get
+			self.setfn = set
 
-        def __getitem__(self, idx):
-            array = self.getfn(self.s.im)
-            return array[idx]
+		def __getitem__(self, idx):
+			array = self.getfn(self.s.im)
+			return array[idx]
 
-        def __setitem__(self, idx, value):
-            array = self.setfn(self.s.im)
-            if type(value) is np.ndarray:
-                array[idx] = value.astype(array.dtype.char)
-            else:
-                array[idx] = value
+		def __setitem__(self, idx, value):
+			array = self.setfn(self.s.im)
+			if type(value) is np.ndarray:
+				array[idx] = value.astype(array.dtype.char)
+			else:
+				array[idx] = value
 
-                
+				
 class FrameBuffer(object):
 	_instance = None
 
@@ -1162,24 +1162,24 @@ class Sprite(object):
 		self._id = Sprite._id
 		Sprite._id = Sprite._id + 1
 
-        if SA_DIRECT:
-            self.surfarray_refresh()
-        else:
-            self.array = _SurfArrayAccess(self,
-                                          get=pygame.surfarray.array3d,
-                                          set=pygame.surfarray.pixels3d)
-            self.alpha = _SurfArrayAccess(self,
-                                          get=pygame.surfarray.array_alpha,
-                                          set=pygame.surfarray.pixels_alpha)
+		if SA_DIRECT:
+			self.surfarray_refresh()
+		else:
+			self.array = _SurfArrayAccess(self,
+										  get=pygame.surfarray.array3d,
+										  set=pygame.surfarray.pixels3d)
+			self.alpha = _SurfArrayAccess(self,
+										  get=pygame.surfarray.array_alpha,
+										  set=pygame.surfarray.pixels_alpha)
 
 		# this is to fix a Lucid problem, not tracked down now..
 		if setalpha:
 			self.alpha[::] = 255
 
-    def surfarray_refresh(self):
-        if SA_DIRECT:
-            self.array = pygame.surfarray.pixels3d(self.im)
-            self.alpha = pygame.surfarray.pixels_alpha(self.im)
+	def surfarray_refresh(self):
+		if SA_DIRECT:
+			self.array = pygame.surfarray.pixels3d(self.im)
+			self.alpha = pygame.surfarray.pixels_alpha(self.im)
 
 	def __del__(self):
 		"""Sprite clean up.
@@ -1251,9 +1251,9 @@ class Sprite(object):
 		"""
 
 		import PIL.ImageTk, PIL.ImageFilter
-        pil = self.asImage(xscale=xscale, yscale=yscale)
-        if not alpha is None:
-            pil.putalpha(alpha)
+		pil = self.asImage(xscale=xscale, yscale=yscale)
+		if not alpha is None:
+			pil.putalpha(alpha)
 		self.pim = PIL.ImageTk.PhotoImage(pil)
 
 		# NOTE: hanging pim off sprite prevents garbage collection
@@ -1275,13 +1275,13 @@ class Sprite(object):
 		import PIL.Image
 
 		pil = PIL.Image.fromstring('RGBA', self.im.get_size(),
-                                   pygame.image.tostring(self.im, 'RGBA'))
+								   pygame.image.tostring(self.im, 'RGBA'))
 		if xscale or yscale:
 			(w, h) = pil.size
 			pil = pil.resize((int(round(w*xscale)), int(round(h*yscale))))
-        return pil
+		return pil
 
-    def set_alpha(self, a):
+	def set_alpha(self, a):
 		"""Set global alpha value.
 
 		Set transparency of the *entire* sprite to this value.
@@ -1452,8 +1452,8 @@ class Sprite(object):
 		"""
 		new = pygame.transform.flip(self.im, xaxis, yaxis)
 		self.im = new
-        if SA_DIRECT:
-            self.surfarray_refresh()
+		if SA_DIRECT:
+			self.surfarray_refresh()
 
 		self.im.set_colorkey((0,0,0,0))
 		self.w = self.im.get_width()
@@ -1500,8 +1500,8 @@ class Sprite(object):
 			y = (h/2) - (self.h/2)
 			new = new.subsurface(x, y, self.w, self.h)
 		self.im = new
-        if SA_DIRECT:
-            self.surfarray_refresh()
+		if SA_DIRECT:
+			self.surfarray_refresh()
 
 		self.im.set_colorkey((0,0,0,0))
 		self.w = self.im.get_width()
@@ -1530,8 +1530,8 @@ class Sprite(object):
 		"""
 		new = pygame.transform.scale(self.im, (new_width, new_height))
 		self.im = new
-        if SA_DIRECT:
-            self.surfarray_refresh()
+		if SA_DIRECT:
+			self.surfarray_refresh()
 
 		self.im.set_colorkey((0,0,0,0))
 		self.w = self.im.get_width()
@@ -1560,8 +1560,8 @@ class Sprite(object):
 		"""
 		new = pygame.transform.rotozoom(self.im, scale, angle)
 		self.im = new
-        if SA_DIRECT:
-            self.surfarray_refresh()
+		if SA_DIRECT:
+			self.surfarray_refresh()
 
 		self.im.set_colorkey((0,0,0,0))
 		self.w = self.im.get_width()
@@ -2701,28 +2701,28 @@ if __name__ == '__main__':
 		sys.stdout.write('>>>'); sys.stdout.flush()
 		sys.stdin.readline()
 
-    if 0:
-        s1 = Sprite(100, 100, -100, 0, fb=fb, on=0)
-        s1.fill((255,255,255))
-        s2 = Sprite(100, 100, 100, 0, fb=fb, on=0)
-        s2.fill((255,255,1))
-        dlist = DisplayList(fb, bg=128, comedi=False)
+	if 0:
+		s1 = Sprite(100, 100, -100, 0, fb=fb, on=0)
+		s1.fill((255,255,255))
+		s2 = Sprite(100, 100, 100, 0, fb=fb, on=0)
+		s2.fill((255,255,1))
+		dlist = DisplayList(fb, bg=128, comedi=False)
 
-        ti = Timer(on=False)
-        fdur = int(round(1000/fb.calcfps()))
-        dlist.add(s1, ti, 1100, 's1_on', 1200, 's1_off')
-        dlist.add(s2, ti, 1150, 's2_on', 1250, 's2_off')
+		ti = Timer(on=False)
+		fdur = int(round(1000/fb.calcfps()))
+		dlist.add(s1, ti, 1100, 's1_on', 1200, 's1_off')
+		dlist.add(s2, ti, 1150, 's2_on', 1250, 's2_off')
 
-        # start the timer going
-        dlist.update(flip=1)
-        ti.reset()
-        last = ti.ms()
-        print last
-        while ti.ms() < 5000:
-            fb.clear()
-            elist = dlist.update(flip=1)
-            if len(elist):
-                x = ti.ms()
-                print x, x-last, elist
-                last = x
+		# start the timer going
+		dlist.update(flip=1)
+		ti.reset()
+		last = ti.ms()
+		print last
+		while ti.ms() < 5000:
+			fb.clear()
+			elist = dlist.update(flip=1)
+			if len(elist):
+				x = ti.ms()
+				print x, x-last, elist
+				last = x
 

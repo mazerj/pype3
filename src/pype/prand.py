@@ -123,7 +123,7 @@ def validate(exit=False):
 	changes..
 
 	"""
-    import sys
+	import sys
 
 	r = MTRandom(seed=31415926)
 	for n in range(10000):
@@ -131,11 +131,11 @@ def validate(exit=False):
 	if abs(v-0.603852477186) < 1e-12:
 		return True
 	else:
-        if exit:
-            sys.stderr.write('error - Mersenne Twister test failed!\n')
-            sys.exit(1)
-        else:
-            return False
+		if exit:
+			sys.stderr.write('error - Mersenne Twister test failed!\n')
+			sys.exit(1)
+		else:
+			return False
 
 if __name__ == '__main__':
 	import time, sys

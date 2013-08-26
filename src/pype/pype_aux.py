@@ -448,9 +448,9 @@ def param_expand(s, integer=None):
 				# before 12/18/2012 draw was clipped with min/max
 				x = np.random.exponential(meanval)
 				if s.lower()[0] == 'i':
-                    #  shift by +0.5 then -1 to to avoid problems with the
-                    #  bin from -0.5-0.5 being only half full due to exp>0
-                    x = int(round(x+0.5)-1)
+					#  shift by +0.5 then -1 to to avoid problems with the
+					#  bin from -0.5-0.5 being only half full due to exp>0
+					x = int(round(x+0.5)-1)
 				if x >= minval and x <= maxval:
 					return x
 		except:

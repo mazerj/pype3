@@ -166,8 +166,8 @@ def reporterror(gui=True, dbug=False):
 	sys.stderr.write(emsg)
 	if gui:
 		warn('reporterror', emsg, wait=0, astext=1)
-    if dbug:
-        keyboard()
+	if dbug:
+		keyboard()
 
 def ppDict(d):
 	"""Pretty print a dictionary

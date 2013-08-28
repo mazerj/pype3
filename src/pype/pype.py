@@ -1069,6 +1069,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.make_toolbar(bb)
 
 		mb.addmenu('|', '', '')
+		
+ 		self.recent = []
 
 		book = Pmw.NoteBook(f2)
 		book.grid(row=0, column=1, sticky=N+S+E)
@@ -1761,6 +1763,19 @@ class PypeApp(object):					# !SINGLETON CLASS!
 						d[string.strip(w)] = 1
 		return d
 
+	def make_recent(self):
+		try:
+			self._loadmenu.deletemenu('Recent')
+		except KeyError:
+			pass
+		self._loadmenu.addmenu('Recent', '', '')
+		for (t, d) in self.recent:
+			self._loadmenu.addmenuitem('Recent', 'command',
+									   font=('Courier', 10),
+									   label=t,
+									   command=lambda s=self,t=t,d=d: \
+												s.loadtask(t, d))
+			
 	def add_tasks(self, menubar, menulabel, dirname):
 		tasks = []
 		taskdescrs = {}
@@ -1819,11 +1834,16 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		if self.config.get('TOOLS', None) is None:
 			return
 
+		toolbar = None
 		for tool in self.config.get('TOOLS').split(';'):
 			if posixpath.exists(tool):
 				d = os.path.abspath(os.path.dirname(tool))
 				t = os.path.basename(tool).replace('.py','')
-				b = Button(parent, text=t,
+				if toolbar is None:
+					toolbar = Frame(parent, borderwidth=1, relief=RIDGE)
+					toolbar.pack(fill=Y, padx=10)
+				b = Button(toolbar, text=t,
+						   background='orange',
 						   command=lambda s=self, t=t, d=d:s.loadtask(t,d))
 				b.pack(side=LEFT)
 				self.balloon.bind(b, 'quick load '+tool)
@@ -1898,6 +1918,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				 "Can't find task '%s' on search path.\n" % taskname +
 				 "Try specifying a full path!")
 			return None
+
+		key = (taskname, path,)
+		if key in self.recent: self.recent.remove(key)
+		self.recent = [key] + self.recent
+		self.recent = self.recent[:5]
+		self.make_recent()
 
 		# save previous task so it can be reloaded quickly...
 		try:
@@ -2690,7 +2716,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					break
 				elif pev.type is pygame.KEYDOWN and \
 					(pev.key < 256) and (pev.mod & pygame.KMOD_ALT) and \
-					chr(pev.key) == 's' and self._allowabort:
+					unichr(pev.key) == u's' and self._allowabort:
 					self.con("stopping run", color='red')
 					self.running = 0
 					raise UserAbort
@@ -2699,11 +2725,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					if pev.type is pygame.MOUSEBUTTONDOWN and pev.button==1:
 						self.eyeshift(x=pev.pos[0] - (self.fb.w/2),
 									  y=(self.fb.h/2) - pev.pos[1], rel=False)
-					elif pev.type is pygame.KEYDOWN and chr(pev.key) == ' ':
+					elif pev.type is pygame.KEYDOWN and unichr(pev.key) == u' ':
 						if ~self.eyebar:
 							doint = 1
 						self.eyebar = 1
-					elif pev.type is pygame.KEYUP and chr(pev.key) == ' ':
+					elif pev.type is pygame.KEYUP and unichr(pev.key) == u' ':
 						if self.eyebar:
 							doint = 1
 						self.eyebar = 0

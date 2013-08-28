@@ -151,7 +151,7 @@ class ScaledCanvas(Canvas):
 
 class UserDisplay(object):
 	def __init__(self, master, fbsize, scale=1.0, pix_per_dva=1.0,
-                 app=None, eyemouse=False):
+				 app=None, eyemouse=False):
 		"""UserDisplay Class.
 
 		The UserDisplay is a pype local window on the user's computer
@@ -166,7 +166,7 @@ class UserDisplay(object):
 
 		**app** - PypeApp handle
 
-        **eyemouse** - Use Button-1 as pseudo eye position signal..
+		**eyemouse** - Use Button-1 as pseudo eye position signal..
 
 		**NOTE:** Just because most of these arguments are keywords
 		(and therefore optional), doesn't mean they're not
@@ -305,10 +305,10 @@ class UserDisplay(object):
 		m.add_command(label='show shortcuts', command=self.help)
 		p.add_cascade(label='Help', menu=m)
 
-        if eyemouse:
-            self.canvas.bind("<Button-1>", self._mouse1)
-            self.canvas.bind("<Key-space>", self._space)
-            self.canvas.bind("<KeyRelease-space>", self._space)
+		if eyemouse:
+			self.canvas.bind("<Button-1>", self._mouse1)
+			self.canvas.bind("<Key-space>", self._space)
+			self.canvas.bind("<KeyRelease-space>", self._space)
 		self.canvas.bind("<Button-3>", lambda ev,p=p,s=self: s._dopopup(ev,p))
 		self.canvas.bind("<Motion>", self._mouse_motion)
 		self.canvas.bind("<Enter>", self._mouse_enter)
@@ -527,17 +527,17 @@ class UserDisplay(object):
 				for y in range(0, int(round(self.h/2)), d):
 					for (sx, sy) in ((1,1),(-1,1),(-1,-1),(1,-1)):
 						if x != 0 and y != 0:
-                            if ((round(x/d)%5) == 0 or (round(y/d)%5) == 0):
-                                color = 'gray50'
-                            else:
-                                color = 'gray70'
-                            self._axis.append(
-                                self.canvas.create_rectangle(xo+(sx*x),
-                                                             yo+(sy*y),
-                                                             xo+(sx*x),
-                                                             yo+(sy*y),
-                                                             outline=color,
-                                                             fill=color))
+							if ((round(x/d)%5) == 0 or (round(y/d)%5) == 0):
+								color = 'gray50'
+							else:
+								color = 'gray70'
+							self._axis.append(
+								self.canvas.create_rectangle(xo+(sx*x),
+															 yo+(sy*y),
+															 xo+(sx*x),
+															 yo+(sy*y),
+															 outline=color,
+															 fill=color))
 
 	def manualbox(self):
 		x1 = float(min(self.markstack[0][0], self.markstack[1][0]))
@@ -819,18 +819,18 @@ class UserDisplay(object):
 		self._photomode = self._photomode_tvar.get()
 
 	def _mouse1(self, ev=None):
-        x, y = self.canvas.window2scaled(ev.x, ev.y)
-        x, y = self.can2fb(x, y)
-        self.app.eyeshift(x=x, y=y, rel=False)
+		x, y = self.canvas.window2scaled(ev.x, ev.y)
+		x, y = self.can2fb(x, y)
+		self.app.eyeshift(x=x, y=y, rel=False)
 
 	def _space(self, ev=None):
-        if ev.type == "2":
-            # key-press
-            self.app.eyebar = 1
-        elif ev.type == "3":
-            # key-release
-            self.app.eyebar = 0
-        self.app._int_handler(None, None, iclass=1, iarg=0)
+		if ev.type == "2":
+			# key-press
+			self.app.eyebar = 1
+		elif ev.type == "3":
+			# key-release
+			self.app.eyebar = 0
+		self.app._int_handler(None, None, iclass=1, iarg=0)
 
 	def _mouse_motion(self, ev=None):
 		s = "[%dppd]" % (self.gridinterval,)

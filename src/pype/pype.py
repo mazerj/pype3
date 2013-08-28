@@ -1252,8 +1252,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.dpy_h = self.fb.h
 
 		# this must be defered until sync spot info is computed..
-		self.udpy.drawaxis(majorgrid=self.config.iget('TICKS_MAJOR'),
-						   minorgrid=self.config.iget('TICKS_MINOR'))
+		self.udpy.drawaxis()
 
 		# drop root access
 		# Tue Jul 12 10:01:53 2005 mazer --

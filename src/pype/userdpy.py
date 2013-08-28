@@ -504,7 +504,7 @@ class UserDisplay(object):
 		if y is None: (x, y) = x
 		return (self.w2 + x, self.h2 - y)
 
-	def drawaxis(self, axis=1, sync=1, majorgrid=1, minorgrid=1):
+	def drawaxis(self, axis=1, sync=1):
 		if axis:
 			# draw cardinal axis (0,0)
 			(x, y) = self.fb2can(0, 0)
@@ -526,23 +526,18 @@ class UserDisplay(object):
 			for x in range(0, int(round(self.w/2)), d):
 				for y in range(0, int(round(self.h/2)), d):
 					for (sx, sy) in ((1,1),(-1,1),(-1,-1),(1,-1)):
-						if x == 0 or y == 0: continue
-
-						if majorgrid and ((round(x/d)%5) == 0 or
-										  (round(y/d)%5) == 0):
-							color = 'gray50'
-						elif minorgrid:
-							color = 'gray70'
-						else:
-							color = None
-						if color:
-							b = self.canvas.create_rectangle(xo+(sx*x),
-															  yo+(sy*y),
-															  xo+(sx*x),
-															  yo+(sy*y),
-															  outline=color,
-															  fill=color)
-							self._axis.append(b)
+						if x != 0 and y != 0:
+                            if ((round(x/d)%5) == 0 or (round(y/d)%5) == 0):
+                                color = 'gray50'
+                            else:
+                                color = 'gray70'
+                            self._axis.append(
+                                self.canvas.create_rectangle(xo+(sx*x),
+                                                             yo+(sy*y),
+                                                             xo+(sx*x),
+                                                             yo+(sy*y),
+                                                             outline=color,
+                                                             fill=color))
 
 	def manualbox(self):
 		x1 = float(min(self.markstack[0][0], self.markstack[1][0]))

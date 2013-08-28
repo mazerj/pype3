@@ -179,10 +179,6 @@ def defaults(srcfile=None):
 		  doc='iconify udpy window on startup')
 	c.set('USERDISPLAY_SCALE', 1.0,
 		  doc='scale user display by ... for big monitors')
-	c.set('TICKS_MAJOR', 1,
-		  doc='show major (5dva) grid tickmarks?')
-	c.set('TICKS_MINOR', 1,
-		  doc='show minor (1dva) grid tickmarks?')
 	c.set('ONE_WINDOW', 0,
 		  doc='one window for GUI and UserDisplay?')
 

@@ -1069,7 +1069,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.make_toolbar(bb)
 
 		mb.addmenu('|', '', '')
-		
+
  		self.recent = []
 
 		book = Pmw.NoteBook(f2)
@@ -1774,7 +1774,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 									   label=t,
 									   command=lambda s=self,t=t,d=d: \
 												s.loadtask(t, d))
-			
+
 	def add_tasks(self, menubar, menulabel, dirname):
 		tasks = []
 		taskdescrs = {}
@@ -1875,7 +1875,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		:param taskname: (string) task name without .py suffice
 
 		:param path: (string) directory where task is stored
-		
+
 		:param ask: (bool) query user for task to load
 
 		:return: None for error, task module on success
@@ -2777,23 +2777,14 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		"""
 
-		LEN = 40
-
-		if init:
+		MAXHIST = 40
+		if c is None:
 			self._histstr = ''
 		else:
-			if c is None:
-				self._histstr = '.' * LEN
-			else:
-				if len(self._histstr) > LEN:
-					self._histstr = self._histstr[1:] + c
-				else:
-					self._histstr = self._histstr + c
+            self._histstr = (self._histstr + c)[:MAXHIST]
+            
 		if self.tk:
-			if len(self._histstr):
-				self._hist.config(text='run hist: ...' + self._histstr)
-			else:
-				self._hist.config(text='')
+            self._hist.config(text='results: ' + self._histstr)
 
 	def warn_run_start(self):
 		if self.sub_common.queryv('warningbeeps'):

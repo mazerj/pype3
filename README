@@ -1,19 +1,8 @@
-This is numpy-based pype3.
+1. If you're installing for the first time, you need to install all
+   the packages required to make pype3 build and run -- see
+   ./Notes/dep-packages.txt for an explanation and
+   ./Notes/dep-packages.sh for a script to install them all
+   automatically.
 
---> derrived from pype2 Revision 428:
-  Path: .
-  URL: svn+ssh://paprika/auto/share/repos/mlab-pype/pype2/trunk
-  Repository Root: svn+ssh://paprika/auto/share/repos/mlab-pype
-  Repository UUID: 97a921b0-85fb-0310-a969-e0731ffd8486
-  Revision: 428
-  Node Kind: directory
-  Schedule: normal
-  Last Changed Author: mazer
-  Last Changed Rev: 428
-  Last Changed Date: 2010-11-24 16:06:05 -0500 (Wed, 24 Nov 2010)
-
-----------------------------------------------------------------------
-
-Don't run make directly -- instead use the 'build' script in this
-directory to build/install/etc pype.
-
+2. Don't run make directly -- use the 'build' script in this
+   directory to build/install/etc pype.

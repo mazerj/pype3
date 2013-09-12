@@ -1,5 +1,11 @@
 #!/bin/sh
 
+grep -q 10.04.4 /etc/issue
+if [ $? -ne 0 ]; then
+ echo "Wrong arch -- use ./uinstall to install on udon!"
+ exit 1
+fi
+
 if [ "$*" = "" ]; then
   sudo env PYPEDIR=/auto/share/pype3/`uname -m` ./build clobber install docs
 else

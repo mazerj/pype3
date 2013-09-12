@@ -1173,7 +1173,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._hist = Label(f2, text="", anchor=W, borderwidth=1, relief=RIDGE)
 		self._hist.grid(row=3, column=0, columnspan=3, sticky=W+E)
 		self.balloon.bind(self._hist, "recent trial result codes")
-		self._history(init=1)
 
 		# make sure we're root, if possible
 		root_take()
@@ -1595,6 +1594,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		# combination of self.tally() and self.history()
 		if type is None:
 			self._results = []
+			self._history()
 		else:
 			self._results.append(type)
 			self._history(type[0])
@@ -2762,26 +2762,20 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			w = warn('pype:_drain', 'Juicer is open!')
 			self._juice_off()
 
-	def _history(self, c=None, init=0):
+	def _history(self, code=None):
 		"""
-		Maintains a 'history stack' ala cortex.	 Cortex did do
-		somethings right.  The max size of the history stack is set by
-		LEN below; it's defined in the __init__() function above, you
-		can overright it, if you like..	 Called with no arguments,
-		history stack will be cleared.
-
-		*NB* set_history() method uses this internally -- really should
-		never be called by user.
-
-		*users should only call set_result() method.*
+		Displays subject's recent history (based on result
+		codes). Call with no args to clear/reset, string/char
+		to push a trial onto the stack. Shouldn't be called
+		by users; users should call set_result instead.
 
 		"""
 
 		MAXHIST = 40
-		if c is None:
+		if (code is None) or (len(code) == 0):
 			self._histstr = ''
 		else:
-            self._histstr = (self._histstr + c)[:MAXHIST]
+			self._histstr = (self._histstr + code[0])[-MAXHIST:]
             
 		if self.tk:
             self._hist.config(text='results: ' + self._histstr)

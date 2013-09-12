@@ -1,8 +1,0 @@
-#!/bin/sh
-# quick lab-wide install on udon
-
-# first remove any local copy
-sudo rm -rf /usr/local/pype3
-
-# then ssh to udon and do a complete build
-ssh -t udon '(cd /auto/share/src/pype3; ./mlabinstall install)'

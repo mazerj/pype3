@@ -2,12 +2,12 @@
 
 grep -q 10.04.4 /etc/issue
 if [ $? -ne 0 ]; then
- echo "Wrong arch -- use ./uinstall to install on udon!"
- exit 1
-fi
-
-if [ "$*" = "" ]; then
-  sudo env PYPEDIR=/auto/share/pype3/`uname -m` ./build clobber install docs
+ echo "Wrong arch -- running on udon..."
+ ssh -t udon "(cd /auto/share/src/pype3; ./mlabinstall $*)"
 else
-  sudo env PYPEDIR=/auto/share/pype3/`uname -m` ./build $*
+  if [ "$*" = "" ]; then
+    sudo env PYPEDIR=/auto/share/pype3/`uname -m` ./build clobber install docs
+  else
+    sudo env PYPEDIR=/auto/share/pype3/`uname -m` ./build $*
+  fi
 fi

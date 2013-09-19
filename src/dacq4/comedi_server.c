@@ -506,6 +506,8 @@ void eyelink_halt()
   if (itracker == EYELINK) {
     stop_recording();
     set_offline_mode();
+    close_eyelink_connection();
+    fprintf(stderr, "%s: closed eyelink connection\n", progname);
     itracker = ANALOG;
   }
 }

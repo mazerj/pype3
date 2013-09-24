@@ -167,7 +167,7 @@ def rgb2rgb8(r, g, b, inrange=(-1.0, 1.0)):
     """Convert rgb image data to 8bit integer array.
 
     :param r,g,b: (numpy arrays) red, green and blue image planes
-    
+
     :param inrange: (float pair) min/max values for input image
 
     :return: (numpy array) uint8 RGB array
@@ -465,6 +465,65 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 	i = moddepth * np.cos((2.0 * np.pi * z) - (np.pi * phase_deg / 180.0))
 	s.array[::] = np.transpose((np.array((R*i,G*i,B*i)) +
 								meanlum).astype(np.uint8), axes=[1,2,0])
+
+
+def uniformnoise(s, binary=False,
+                 R=1.0, G=1.0, B=1.0, meanlum=0.5, moddepth=1.0, color=None):
+	"""Fill sprite with uniform white noise
+
+	:param s: (Sprite) target sprite
+
+    :param binary: (Boolean) binary noise? (default=False)
+
+	:param R,G,B: (either R is colortriple or R,G,B are 0-1 values)
+
+	:param meanlum: mean (DC) value of grating (0-1); default is 0.5
+
+	:param moddepth: modulation depth (0-1)
+
+    :param color: RGB triple (alternative specification of color vector)
+
+	:return: nothing (works in place)
+
+	"""
+
+
+	R, G, B = unpack_rgb(color, R, G, B)
+    i = (255.0 * np.random.uniform(meanlum-(moddepth/2.0),
+                                  meanlum+(moddepth/2.0),
+                                  size=(s.w, s.h))).astype(np.uint8)
+    if binary:
+        i = np.where(np.less(i, 128), 1, 255)
+	s.array[::] = np.transpose(np.array((R*i,G*i,B*i)), axes=[1,2,0])
+
+def gaussiannoise(s, binary=False,
+                  R=1.0, G=1.0, B=1.0, meanlum=0.5, stddev=1.0, color=None):
+	"""Fill sprite with uniform white noise
+
+	:param s: (Sprite) target sprite
+
+    :param binary: (Boolean) binary noise? (default=False)
+
+	:param R,G,B: (either R is colortriple or R,G,B are 0-1 values)
+
+	:param meanlum: mean (DC) value of grating (0-1); default is 0.5
+
+	:param stddev: std of gaussian distribution (0-1)
+
+    :param color: RGB triple (alternative specification of color vector)
+
+	:return: nothing (works in place)
+
+	"""
+
+
+	R, G, B = unpack_rgb(color, R, G, B)
+    i = (255.0 * np.random.normal(meanlum, stddev,
+                                  size=(s.w, s.h))).astype(np.uint8)
+    if binary:
+        i = np.where(np.less(i, 128), 1, 255)
+	s.array[::] = np.transpose(np.array((R*i,G*i,B*i)), axes=[1,2,0])
+
 
 def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
 	"""Generate a bar into existing sprite using the alpha channel.

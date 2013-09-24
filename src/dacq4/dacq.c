@@ -702,7 +702,9 @@ int dacq_fixwin_genint(int n, int b)
   if (n >= 0) {  
     LOCK(semid);
     i = dacq_data->fixwin[n].genint;
-    dacq_data->fixwin[n].genint = b;
+    if (b >= 0) {
+      dacq_data->fixwin[n].genint = b;
+    }
     UNLOCK(semid);
   }
   return(i);
@@ -736,7 +738,11 @@ int dacq_fixwin_state(int n)
   s = dacq_data->fixwin[n].state;
   if (s) {
     dacq_data->fixwin[n].broke = 0;
-    dacq_data->fixwin[n].genint = 0;
+    // Tue Sep 24 17:40:53 2013 mazer 
+    //   not sure why checking the fixation window was
+    //   turning off the interupt generator, but it's
+    //   almost certainly WRONG.
+    //dacq_data->fixwin[n].genint = 0;
   }
   UNLOCK(semid);
   return(s);

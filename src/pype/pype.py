@@ -2776,7 +2776,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self._histstr = ''
 		else:
 			self._histstr = (self._histstr + code[0])[-MAXHIST:]
-            
+
 		if self.tk:
             self._hist.config(text='results: ' + self._histstr)
 
@@ -3055,6 +3055,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			iclass = dacq_int_class()
 		if iarg is None:
 			iarg = dacq_int_arg()
+
+        # print 'INT', iclass, iarg
 
 		if iclass == 666:
 			self.running = 0

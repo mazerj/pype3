@@ -1282,7 +1282,7 @@ void mainloop(void)
 		dacq_data->int_arg = 0;
 		dacq_data->fixwin[i].genint = 0;
 		kill(pypepid, SIGUSR1);
-		/* fprintf(stderr,"das: sent int, disabled\n"); */
+		//fprintf(stderr,"das: sent int, disabled\n");
 	      }
 	    }
 	  }

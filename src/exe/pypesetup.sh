@@ -36,3 +36,33 @@ if [ ! -e $PYPERC/Modules ]; then
   chown $USER $PYPERC/Modules
   echo mkdir $PYPERC/Modules
 fi
+
+if [ ! -e $PYPERC/Config.$(hostname) ]; then
+  cat <<EOF >$PYPERC/Config.$(hostname)
+# sample Config file
+EYEMOUSE:1
+FRAME: 1
+MOUSE: 1
+ONE_WINDOW: 1
+USERDISPLAY_HIDE: 0
+USERDISPLAY_SCALE: 0.50
+SDLDPY: :0.0
+FULLSCREEN: 0
+EYETRACKER: ANALOG
+FLIP_BAR: 1
+USB_JS_DEV: /dev/input/js0
+DPYW: 800
+DPYH: 800
+DPYBITS: 24
+GAMMA: 2.17
+VIEWDIST: 80
+MON_ID: test display
+MONW: 36.8
+MONH: 27.9
+SYNCSIZE: 0
+SYNCX: 0
+SYNCY: 0
+AUDIODRIVER: alsa
+EOF
+fi
+

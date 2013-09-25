@@ -6,7 +6,6 @@
 ##svn checkout http://pype3.googlecode.com/svn/trunk/ pype3
 
 # install required packages
-cd pype3/Notes
 sudo sh dep-packages.sh
 
 # libezV24 is for iscan serial port comm -- for some reason it

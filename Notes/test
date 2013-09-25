@@ -1,7 +1,9 @@
 
-# need subversion to pull down snapshot
-sudo apt-get install subversion
-svn checkout http://pype3.googlecode.com/svn/trunk/ pype3
+# need subversion to pull down snapshot -- since you're
+# looking at this file, it's probably already done..
+
+##sudo apt-get install subversion
+##svn checkout http://pype3.googlecode.com/svn/trunk/ pype3
 
 # install required packages
 cd pype3/Notes
@@ -20,8 +22,8 @@ cd ..
 
 sudo ./localinstall install
 
-echo "1. Copy ../Notes/bashrc" to your .bashrc file to setup path"
-echo "2. run 'pypesetup' to setup config dir"
-echo "3. run 'pype' to try it out"
-
-
+cat <<EOF
+1. Copy ../Notes/bashrc.sample" to your .bashrc file to setup path
+2. run 'pypesetup' to setup config dir
+3. run 'pype' to try it out
+EOF

@@ -43,7 +43,7 @@ if [ ! -e $PYPERC/Config.$(hostname) ]; then
 EYEMOUSE:1
 FRAME: 1
 MOUSE: 1
-ONE_WINDOW: 1
+ONE_WINDOW: 0
 USERDISPLAY_HIDE: 0
 USERDISPLAY_SCALE: 0.50
 SDLDPY: :0.0
@@ -66,3 +66,5 @@ AUDIODRIVER: alsa
 EOF
 fi
 
+
+echo "It's ok to ignore any errors about missing files!"

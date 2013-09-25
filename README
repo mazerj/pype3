@@ -1,8 +1,4 @@
-1. If you're installing for the first time, you need to install all
-   the packages required to make pype3 build and run -- see
-   ./Notes/dep-packages.txt for an explanation and
-   ./Notes/dep-packages.sh for a script to install them all
-   automatically.
+1. If you're installing for the first time look in README.1st
 
-2. Don't run make directly -- use the 'build' script in this
+2. Never run make directly -- use the 'build' script in this
    directory to build/install/etc pype.

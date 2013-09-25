@@ -21,6 +21,9 @@ function defaults = getopts(defaults, varargin)
 %  You can also use '+foo'/'-foo' to set foo to 1/0, respectively
 %  in a single argument for ease-of-use
 %
+% NOTE: user can provide '?' as an option to get a list of all
+%       options a function takes (based on defaults).
+%
 %
 % <<part of pype/p2m toolbox>>
 %
@@ -35,11 +38,19 @@ function defaults = getopts(defaults, varargin)
 %  a struct (ie, an old option list)
 %
 
-if length(varargin) > 0 && strcmp(varargin{1}, '?help')
+if length(varargin) > 0 && varargin{1}(1) == '?'
   f = fieldnames(defaults);
+  fprintf('------------------------\n');
+  fprintf('Default Options:\n');
   for n = 1:length(f)
-    disp({f{n} getfield(defaults, f{n})});
+    v = getfield(defaults, f{n});
+    if ischar(v)
+      fprintf(' %s: ''%s''\n', f{n}, v);
+    else
+      fprintf(' %s: %g\n', f{n}, v);
+    end
   end
+  fprintf('------------------------\n');
   error('getopt: stopped after help');
 elseif length(varargin) == 1 && isstruct(varargin{1})
   opts = varargin{1};

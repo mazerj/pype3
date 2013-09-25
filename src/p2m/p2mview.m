@@ -1,5 +1,5 @@
 function pypever = p2mview(pf, n, varargin)
-%function pypever = p2mview(pf, n, varargin)
+%function pypever = p2mview(pf, n, ...options...)
 %
 %  trial viewer -- playback engine
 %
@@ -7,12 +7,12 @@ function pypever = p2mview(pf, n, varargin)
 % <<part of pype/p2m toolbox>>
 %
 
-opt.roi = 400;                          % zoom in on this region
-opt.events = 0;                        % show encodes?
-opt.start = 'FIX_ACQUIRED';
-opt.stop = 'bar_change';
+opts.roi = 400;                         % zoom in on this region
+opts.showevents = 0;                    % show encodes?
+opts.start = '';                        % start event code
+opts.stop = '';                         % stop event code
 
-opt = getopts(opt, varargin{:});
+opts = getopts(opts, varargin{:});
 
 if ~exist('n', 'var')
   n = 1;
@@ -25,10 +25,10 @@ kincr = 1;
 viewing = 1;
 while viewing
   
-  if isempty(opt.start)
+  if isempty(opts.start)
     estart = 1;
   else
-    [~, estart] = p2mFindEvents(pf, n, opt.start);
+    [~, estart] = p2mFindEvents(pf, n, opts.start);
     if isempty(estart)
       estart = length(pf.rec(n).eyet);
     else
@@ -36,10 +36,10 @@ while viewing
       estart = estart(1)
     end
   end
-  if isempty(opt.stop)
+  if isempty(opts.stop)
     stop = length(pf.rec(n).eyet);
   else
-    [~, estop] = p2mFindEvents(pf, n, opt.stop);
+    [~, estop] = p2mFindEvents(pf, n, opts.stop);
     if isempty(estop)
       estop = length(pf.rec(n).eyet);
     else
@@ -57,7 +57,7 @@ while viewing
        pf.rec(n).eyet(ix), pf.rec(n).eyey(ix), 'g-');
   hold on;
   axis tight;
-  set(gca, 'YLim', [-opt.roi opt.roi]);
+  set(gca, 'YLim', [-opts.roi opts.roi]);
   yr = get(gca, 'YLim');
   xr = get(gca, 'XLim');
   yr(2) = 2*yr(2);
@@ -66,7 +66,7 @@ while viewing
   progh = plot(0, 0, 'k^');
   set(progh, 'markerfacecolor', 'm');
 
-  if opt.events
+  if opts.events
     evtlist = [];
     for k=1:length(pf.rec(n).ev_e)
       t = pf.rec(n).ev_t(k);
@@ -104,8 +104,8 @@ while viewing
   hold on;
   solid(plot(pf.rec(n).eyex(estart), pf.rec(n).eyey(estart), 'go'));
   solid(plot(pf.rec(n).eyex(estop), pf.rec(n).eyey(estop), 'ro'));
-  set(gca, 'XLim', [-opt.roi opt.roi], ...
-           'YLim', [-opt.roi opt.roi]);
+  set(gca, 'XLim', [-opts.roi opts.roi], ...
+           'YLim', [-opts.roi opts.roi]);
   axis square;
   grid on;
   
@@ -120,7 +120,7 @@ while viewing
   eyeh = plot(0, 0, 'ko');
   set(eyeh, 'markerfacecolor', 'y');
   tagh = text(0, 0, '');
-  timeh = text(-0.90*opt.roi, 0.90*opt.roi, '');
+  timeh = text(-0.90*opts.roi, 0.90*opts.roi, '');
   set(timeh, 'FontSize', 20, 'FontName', 'Courier');
   
   title(sprintf('%s %3d {\\bf %s}', ...
@@ -153,13 +153,13 @@ while viewing
           n = max(1, n - 1);
           looping = 0; break;
         case {'+'}
-          opt.roi = max(10, opt.roi / 2);
-          set(pxy, 'XLim', [-opt.roi opt.roi], 'YLim', [-opt.roi opt.roi]);
-          set(pts, 'YLim', [-opt.roi opt.roi]);
+          opts.roi = max(10, opts.roi / 2);
+          set(pxy, 'XLim', [-opts.roi opts.roi], 'YLim', [-opts.roi opts.roi]);
+          set(pts, 'YLim', [-opts.roi opts.roi]);
         case {'-'}
-          opt.roi = opt.roi * 2;
-          set(pxy, 'XLim', [-opt.roi opt.roi], 'YLim', [-opt.roi opt.roi]);
-          set(pts, 'YLim', [-opt.roi opt.roi]);
+          opts.roi = opts.roi * 2;
+          set(pxy, 'XLim', [-opts.roi opts.roi], 'YLim', [-opts.roi opts.roi]);
+          set(pts, 'YLim', [-opts.roi opts.roi]);
       end
       
       ix = find(pf.rec(n).ev_t <= pf.rec(n).eyet(k));
@@ -170,7 +170,7 @@ while viewing
         ev = sprintf('%s...', ev(1:20));
       end
       
-      if strcmp(ev(1:3), 'INT') | strcmp(ev(1:3), 'mps')
+      if strcmp(ev(1:3), 'INT')
         ev = lastev;
       else
         lastev = ev;

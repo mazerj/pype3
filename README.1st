@@ -1,0 +1,55 @@
+1st time installation instructions
+--------------------------------------------------------
+
+1. Get a computer -- preferably a 64bit machine with an
+Nvidia graphics card. Get something supported by linux
+and reasonably fast.
+
+2. Install Ubuntu. We use 10.04 in the lab for data
+collection machines, but that's not longer supported by
+Ubuntu, so I suggest you start with 12.04 LTS, which is
+currently stable and supported (and works with pype out
+of the box).
+
+3. Once Ubuntu is up and running, login and open a terminal
+window. You first need to install subversion to pull down
+a current snapshot of pype:
+
+   % sudo apt-get -yq install subversion
+
+4. Then checkout the googlecode repository using svn:
+
+   % svn checkout http://pype3.googlecode.com/svn/trunk/ pype3
+
+5. Install packages needed by pype:
+
+   % cd pype3/Notes
+   % sudo sh fresh-install.sh
+
+This will take ~10 minutes or so. It downloads and installs all
+the packages needed to build/un pype and then actually builds and
+installs a copy of pype in /usr/local/pype3.
+
+6. Append pype3/Notes/bashrc.sample to your ~/.bashrc file to get your
+login environment setup with pype on the search path etc.
+
+7. Open a new window (or log out and log back in) to get pype
+on your path. Then do:
+
+   % pypesetup
+
+To make and initialize your ~/.pyperc dir for the first time.
+
+8. Then you can run:
+
+   % pype
+
+To startup the pype GUI interface. To get started -- run pype
+from the pype3/Notes directory. There are a couple sample tasks
+in that directory you can load using the 'cwd' menu in the GUI.
+
+9. Other useful commands are
+
+   - pypeconfig - edit your config file (host specific!)
+   - pypedocs - open a browser to the on-line docs
+

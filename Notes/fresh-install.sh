@@ -19,10 +19,5 @@ cd ..
 
 # install to /usr/local
 
-sudo ./localinstall install
+sudo ./localinstall build install docs
 
-cat <<EOF
-1. Copy ../Notes/bashrc.sample" to your .bashrc file to setup path
-2. run 'pypesetup' to setup config dir
-3. run 'pype' to try it out
-EOF

@@ -149,35 +149,35 @@ def genpolar(w, h=None, typecode=np.float64, degrees=False):
 	return r, t
 
 def gray2rgb8(g, inrange=(-1.0, 1.0)):
-    """Convert grayscale image array to 8bit integer array.
+	"""Convert grayscale image array to 8bit integer array.
 
-    :param g: (numpy array) gray scale image array
+	:param g: (numpy array) gray scale image array
 
-    :param inrange: (float pair) min/max values for input image
+	:param inrange: (float pair) min/max values for input image
 
-    :return: (numpy array) uint8 RGB array
+	:return: (numpy array) uint8 RGB array
 
-    """
+	"""
 
-    minval, maxval = inrange
-    a = 255.0 * (g - minval) / (maxval - minval)
-    return np.transpose(np.array((a,a,a,)).astype(np.uint8), axes=[1,2,0])
+	minval, maxval = inrange
+	a = 255.0 * (g - minval) / (maxval - minval)
+	return np.transpose(np.array((a,a,a,)).astype(np.uint8), axes=[1,2,0])
 
 def rgb2rgb8(r, g, b, inrange=(-1.0, 1.0)):
-    """Convert rgb image data to 8bit integer array.
+	"""Convert rgb image data to 8bit integer array.
 
-    :param r,g,b: (numpy arrays) red, green and blue image planes
+	:param r,g,b: (numpy arrays) red, green and blue image planes
 
-    :param inrange: (float pair) min/max values for input image
+	:param inrange: (float pair) min/max values for input image
 
-    :return: (numpy array) uint8 RGB array
+	:return: (numpy array) uint8 RGB array
 
-    """
+	"""
 
-    minval, maxval = inrange
-    a = np.array((r, g, b,))
-    a = 255.0 * (a - minval) / (maxval - minval)
-    return np.transpose(a.astype(np.uint8), axes=[1,2,0])
+	minval, maxval = inrange
+	a = np.array((r, g, b,))
+	a = 255.0 * (a - minval) / (maxval - minval)
+	return np.transpose(a.astype(np.uint8), axes=[1,2,0])
 
 def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 			meanlum=0.5, moddepth=1.0, ppd=None, color=None):
@@ -226,7 +226,7 @@ def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 						  (np.pi * phase_deg / 180.0))
 	s.array[::] = np.transpose((np.array((R*i,G*i,B*i)) +
 								meanlum).astype(np.uint8),
-                                axes=[1,2,0])
+								axes=[1,2,0])
 
 def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 			meanlum=0.5, moddepth=1.0, ppd=None, color=None):
@@ -468,12 +468,12 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 
 
 def uniformnoise(s, binary=False,
-                 R=1.0, G=1.0, B=1.0, meanlum=0.5, moddepth=1.0, color=None):
+				 R=1.0, G=1.0, B=1.0, meanlum=0.5, moddepth=1.0, color=None):
 	"""Fill sprite with uniform white noise
 
 	:param s: (Sprite) target sprite
 
-    :param binary: (Boolean) binary noise? (default=False)
+	:param binary: (Boolean) binary noise? (default=False)
 
 	:param R,G,B: (either R is colortriple or R,G,B are 0-1 values)
 
@@ -481,7 +481,7 @@ def uniformnoise(s, binary=False,
 
 	:param moddepth: modulation depth (0-1)
 
-    :param color: RGB triple (alternative specification of color vector)
+	:param color: RGB triple (alternative specification of color vector)
 
 	:return: nothing (works in place)
 
@@ -489,20 +489,20 @@ def uniformnoise(s, binary=False,
 
 
 	R, G, B = unpack_rgb(color, R, G, B)
-    i = (255.0 * np.random.uniform(meanlum-(moddepth/2.0),
-                                  meanlum+(moddepth/2.0),
-                                  size=(s.w, s.h))).astype(np.uint8)
-    if binary:
-        i = np.where(np.less(i, 128), 1, 255)
+	i = (255.0 * np.random.uniform(meanlum-(moddepth/2.0),
+								  meanlum+(moddepth/2.0),
+								  size=(s.w, s.h))).astype(np.uint8)
+	if binary:
+		i = np.where(np.less(i, 128), 1, 255)
 	s.array[::] = np.transpose(np.array((R*i,G*i,B*i)), axes=[1,2,0])
 
 def gaussiannoise(s, binary=False,
-                  R=1.0, G=1.0, B=1.0, meanlum=0.5, stddev=1.0, color=None):
+				  R=1.0, G=1.0, B=1.0, meanlum=0.5, stddev=1.0, color=None):
 	"""Fill sprite with uniform white noise
 
 	:param s: (Sprite) target sprite
 
-    :param binary: (Boolean) binary noise? (default=False)
+	:param binary: (Boolean) binary noise? (default=False)
 
 	:param R,G,B: (either R is colortriple or R,G,B are 0-1 values)
 
@@ -510,7 +510,7 @@ def gaussiannoise(s, binary=False,
 
 	:param stddev: std of gaussian distribution (0-1)
 
-    :param color: RGB triple (alternative specification of color vector)
+	:param color: RGB triple (alternative specification of color vector)
 
 	:return: nothing (works in place)
 
@@ -518,10 +518,10 @@ def gaussiannoise(s, binary=False,
 
 
 	R, G, B = unpack_rgb(color, R, G, B)
-    i = (255.0 * np.random.normal(meanlum, stddev,
-                                  size=(s.w, s.h))).astype(np.uint8)
-    if binary:
-        i = np.where(np.less(i, 128), 1, 255)
+	i = (255.0 * np.random.normal(meanlum, stddev,
+								  size=(s.w, s.h))).astype(np.uint8)
+	if binary:
+		i = np.where(np.less(i, 128), 1, 255)
 	s.array[::] = np.transpose(np.array((R*i,G*i,B*i)), axes=[1,2,0])
 
 
@@ -590,44 +590,44 @@ gaussianEnvelope = obsolete_fn
 
 
 def benchmark(fb):
-    import time
-    from sprite import Sprite
-    s = Sprite(250, 250, 0, 0, fb=fb, on=1)
-    s2 = Sprite(250, 250, 0, 0, fb=fb, on=1)
-    nmax = 100
+	import time
+	from sprite import Sprite
+	s = Sprite(250, 250, 0, 0, fb=fb, on=1)
+	s2 = Sprite(250, 250, 0, 0, fb=fb, on=1)
+	nmax = 100
 
-    t0 = time.time()
-    for n in range(nmax):
-        singrat(s, 10, 0.0, n, R=1.0, G=1.0, B=1.0,
-                meanlum=0.5, moddepth=1.0)
-        s.blit(flip=1)
-    time.time()
-    print 'all', float(nmax) / (time.time() - t0), 'fps'
+	t0 = time.time()
+	for n in range(nmax):
+		singrat(s, 10, 0.0, n, R=1.0, G=1.0, B=1.0,
+				meanlum=0.5, moddepth=1.0)
+		s.blit(flip=1)
+	time.time()
+	print 'all', float(nmax) / (time.time() - t0), 'fps'
 
-    t0 = time.time()
-    for n in range(nmax):
-        singrat(s, 10, 0.0, n, R=1.0, G=1.0, B=1.0,
-                meanlum=0.5, moddepth=1.0)
-    time.time()
-    print 'compute only', float(nmax) / (time.time() - t0), 'fps'
+	t0 = time.time()
+	for n in range(nmax):
+		singrat(s, 10, 0.0, n, R=1.0, G=1.0, B=1.0,
+				meanlum=0.5, moddepth=1.0)
+	time.time()
+	print 'compute only', float(nmax) / (time.time() - t0), 'fps'
 
-    s2 = Sprite(250, 250, 0, 0, fb=fb, on=1)
-    singrat(s2, 10, 0.0, 0, R=1.0, G=1.0, B=1.0,
-            meanlum=0.5, moddepth=1.0)
-    foo = s2.array[::]
-    bar = s2.array[::]
-    t0 = time.time()
-    for n in range(nmax):
-        foo[::] = bar[::]
-        s.blit(flip=1)
-    time.time()
-    print 'copy+blit', float(nmax) / (time.time() - t0), 'fps'
+	s2 = Sprite(250, 250, 0, 0, fb=fb, on=1)
+	singrat(s2, 10, 0.0, 0, R=1.0, G=1.0, B=1.0,
+			meanlum=0.5, moddepth=1.0)
+	foo = s2.array[::]
+	bar = s2.array[::]
+	t0 = time.time()
+	for n in range(nmax):
+		foo[::] = bar[::]
+		s.blit(flip=1)
+	time.time()
+	print 'copy+blit', float(nmax) / (time.time() - t0), 'fps'
 
-    t0 = time.time()
-    for n in range(nmax):
-        s.blit(flip=1)
-    time.time()
-    print 'blit only', float(nmax) / (time.time() - t0), 'fps'
+	t0 = time.time()
+	for n in range(nmax):
+		s.blit(flip=1)
+	time.time()
+	print 'blit only', float(nmax) / (time.time() - t0), 'fps'
 
 
 

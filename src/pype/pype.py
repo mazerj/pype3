@@ -1070,7 +1070,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		mb.addmenu('|', '', '')
 
- 		self.recent = []
+		self.recent = []
 
 		book = Pmw.NoteBook(f2)
 		book.grid(row=0, column=1, sticky=N+S+E)
@@ -2778,7 +2778,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self._histstr = (self._histstr + code[0])[-MAXHIST:]
 
 		if self.tk:
-            self._hist.config(text='results: ' + self._histstr)
+			self._hist.config(text='results: ' + self._histstr)
 
 	def warn_run_start(self):
 		if self.sub_common.queryv('warningbeeps'):
@@ -3056,7 +3056,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		if iarg is None:
 			iarg = dacq_int_arg()
 
-        # print 'INT', iclass, iarg
+		# print 'INT', iclass, iarg
 
 		if iclass == 666:
 			self.running = 0

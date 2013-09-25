@@ -1,0 +1,7 @@
+sudo apt-get install subversion
+svn checkout http://pype3.googlecode.com/svn/trunk/ pype3-read-only
+cd pype3-read-only/Notes
+sudo sh dep-packages.sh
+# need to build libezV24
+cd ..
+sudo ./localinstall install

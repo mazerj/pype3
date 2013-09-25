@@ -17,11 +17,8 @@ apt-get update -yq
 apt-get upgrade -yq
 
 apt-get install -yq \
-	comedi-source \
 	libcomedi-dev \
 	libcomedi0 \
-	libezV24-0 \
-	libezV24-dev \
 	libsdl-image1.2-dev \
 	libsdl-ttf2.0-dev \
 	libsmpeg-dev \
@@ -40,5 +37,15 @@ apt-get install -yq \
 	python-pmw \
 	python-pygame \
 	python-scipy \
-	python-tk 
+	python-tk \
+	swig
 
+#comedi-source \
+#	libezV24-0 \
+#	libezV24-dev \
+
+cat <<EOF
+# add to .bashrc
+export PYPEDIR=/usr/local/pype3
+PATH=$PYPEDIR/bin:$PYPEDIR/p2m:$PATH
+EOF

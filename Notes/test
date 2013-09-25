@@ -1,7 +1,27 @@
+
+# need subversion to pull down snapshot
 sudo apt-get install subversion
-svn checkout http://pype3.googlecode.com/svn/trunk/ pype3-read-only
-cd pype3-read-only/Notes
+svn checkout http://pype3.googlecode.com/svn/trunk/ pype3
+
+# install required packages
+cd pype3/Notes
 sudo sh dep-packages.sh
-# need to build libezV24
+
+# libezV24 is for iscan serial port comm -- for some reason it
+# was dropped from Ubuntu 12.04, but picked up in later versions
+# again.. It compiles out of the box, so it's no big deal..
+
+tar xfz libezV24-0.1.3.tar.gz && \
+    cd libezV24-0.1.3 && make && sudo make install && \
+    cd .. && /bin/rm -rf libezV24-0.1.3
 cd ..
+
+# install to /usr/local
+
 sudo ./localinstall install
+
+echo "1. Copy ../Notes/bashrc" to your .bashrc file to setup path"
+echo "2. run 'pypesetup' to setup config dir"
+echo "3. run 'pype' to try it out"
+
+

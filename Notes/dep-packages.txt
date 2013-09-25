@@ -6,11 +6,8 @@ needed using apt-get.
 
 PACAKGE
 -------------
-comedi-source		needed to compile the DACQ subsystem (headers)
 libcomedi-dev		needed to compile the DACQ subsystem (more headers)
 libcomedi0		libraries for DACQ subsystem
-libezV24-0		serial i/o library for ISCAN support
-libezV24-dev		serial i/o library for ISCAN support
 libsdl-image1.2-dev	allows pygame to read/write various image formats
 libsdl-ttf2.0-dev	ttf font support for pygame
 libsmpeg-dev		mpeg playback for pygame
@@ -29,4 +26,11 @@ python-pmw		extended widgets for Tkinter/pythong
 python-pygame		graphics toolkit for pythong
 python-scipy		more matlab-like tools for pythong
 python-tk		Tkinter for pythong - needed for all GUI stuff.
+swig			python-api for C library wrapper tool
 
+# no longer needed:
+comedi-source		needed to compile the DACQ subsystem (headers)
+
+# not provided by 12.04 -- need to compile from sources (included)
+libezV24-0		serial i/o library for ISCAN support
+libezV24-dev		serial i/o library for ISCAN support

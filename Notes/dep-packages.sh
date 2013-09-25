@@ -16,6 +16,11 @@ apt-get update -yq
 # make sure all installed packages are up to date
 apt-get upgrade -yq
 
+# avoid user confirmation for installation of msttcorefonts package:
+sudo sh -c "echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections"
+
+# this takes a while (5-10 mins) because python-epydoc pulls down
+# tex for formatting docs..
 apt-get install -yq \
 	libcomedi-dev \
 	libcomedi0 \
@@ -40,12 +45,3 @@ apt-get install -yq \
 	python-tk \
 	swig
 
-#comedi-source \
-#	libezV24-0 \
-#	libezV24-dev \
-
-cat <<EOF
-# add to .bashrc
-export PYPEDIR=/usr/local/pype3
-PATH=$PYPEDIR/bin:$PYPEDIR/p2m:$PATH
-EOF

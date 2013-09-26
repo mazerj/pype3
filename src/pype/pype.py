@@ -872,9 +872,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._repinfo = Label(f, text=None)
 		self._repinfo.pack(side=RIGHT)
 
-		self._din_stat = Label(f, text=None, font='Courier 10')
-		self._din_stat.pack(side=RIGHT)
-		self.balloon.bind(self._din_stat, "status of digital inputs")
+		self._stateinfo = Label(f, text=None, font='Courier 10')
+		self._stateinfo.pack(side=RIGHT)
+		self.mldown = None
+		self.balloon.bind(self._stateinfo, "state info: bar, juice etc")
 
 		bb = Frame(f1b)
 		bb.pack(expand=1, side=TOP, anchor=W)
@@ -1177,7 +1178,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		# make sure we're root, if possible
 		root_take()
 
-		#self._draw_din_stat()
 		self.dacq_going = 1
 		self.eyeset()
 
@@ -1374,7 +1374,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._testpat = None
 		self.showtestpat()
 
-		self._draw_din_stat()
+		self._show_stateinfo()
 
 		if self.psych:
 			self.fb.screen_close()
@@ -1541,7 +1541,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			except AttributeError:
 				pass
 
-	def _draw_din_stat(self):
+	def _show_stateinfo(self):
 		barstate = self.bardown()			# this will handle BAR_FLIP setting
 		if barstate:
 			t = 'BAR:DN '
@@ -1555,20 +1555,22 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				else:
 					t = t+'.'
 		try:
-			last = self._lastdin_stat
+			last = self._last_stateinfo
 		except AttributeError:
 			last = ""
 
+
+		if self.mldown is not None:
+			t = text='%dml %s' % (self.mldown, t)
+
 		if not last == t:
-			self._din_stat.configure(text=t)
+			self._stateinfo.configure(text=t)
 			try:
 				if barstate:
-					self.udpy.titlebar.config(text='bar down',
-											  fg='green')
+					self.udpy.titlebar.config(text='bar down', fg='green')
 				else:
-					self.udpy.titlebar.config(text='bar up',
-											  fg='red')
-				self._lastdin_stat = t
+					self.udpy.titlebar.config(text='bar up', fg='red')
+				self._last_stateinfo = t
 			except AttributeError:
 				pass
 
@@ -1672,7 +1674,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		s = s + '\nreward: %d drops (%d ms)' % (rn, rms,)
 		ml = self.sub_common.queryv('mldropsize')
 		if ml > 0:
-			s = s + '\nestimated: %.1f ml' % (rn * ml,)
+			self.mldown = rn * ml
+			s = s + '\nestimated: %.1f ml' % (self.mldown,)
+		else:
+			self.mldown = None
 
 		s = s + '\n'
 		s = s + '\n'
@@ -2746,7 +2751,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			if self.taskidle:
 				self.taskidle(self)
 
-			self._draw_din_stat()
+			self._show_stateinfo()
 
 		else:
 			t = Timer()
@@ -3665,15 +3670,31 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		"""
 		return self.record_buffer[::]
 
-	def record_write(self, resultcode=None, rt=None, params=None, taskinfo=None):
+	def record_write(self, resultcode=None, rt=None,
+					 params=None, taskinfo=None, returnall=False):
 		"""Write the current record to the specified datafile.
 
 		Call this at the end of each trial in your task to do
 		post-processing and flush all the recorded data to disk.
 
-		:return: (mult-val-ret) time, photodiode-waveform,
-				spike-waveform (arrays)
+		:param resultcode: (string)
+		
+		:param rt: (number) Reaction time in ns (or -1 for "not applicable")
 
+		:param params: (dict) final dictionary of all parameters (including
+				params added by the task as part of the data flow)
+
+		:param taskinfo: (tuple) anything "extra" you want saved along with
+				the rest of the trial data.
+
+		:param returnall: (bool; def=False) return a copy of the full data
+				struct written to the datafile.
+
+		:return: if returnall is False, then return values is a tuple (time,
+				photodiode-waveform, spike-waveform). Otherwise, it's simply
+				a complete copy of the object written to the datafile, which
+				includes ALL the available data.
+				
 		"""
 
 		if (self.record_file == '/dev/null' and
@@ -3891,7 +3912,32 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		self.record_id = self.record_id + 1
 
-		return (self.eyebuf_t, p0, s0)
+		if returnall:
+			p = PypeRecord(None, 0, rec)
+			p.compute()
+			return p
+		else:
+			return (self.eyebuf_t, p0, s0)
+
+	def record_split(self, rec):
+		class Record(object):
+			pass
+
+		r = Record()
+		r.resultcode = rec[1][0]
+		r.rt = rec[1][1]
+		r.params = rec[1][2]
+		r.taskinfo = rec[1][3]
+		r.evt = rec[2]
+		r.t = rec[3]
+		r.x = rec[4]
+		r.y = rec[5]
+		r.pa = rec[12]
+		r.photo_times = rec[6]
+		r.spike_times = rec[7]
+		
+		return r
+		
 
 	def record_note(self, tag, note):
 		"""Insert note into current datafile.

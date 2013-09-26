@@ -473,7 +473,7 @@ def uniformnoise(s, binary=False,
 
 	:param s: (Sprite) target sprite
 
-	:param binary: (Boolean) binary noise? (default=False)
+	:param binary: (boolean) binary noise? (default=False)
 
 	:param R,G,B: (either R is colortriple or R,G,B are 0-1 values)
 
@@ -489,20 +489,18 @@ def uniformnoise(s, binary=False,
 
 
 	R, G, B = unpack_rgb(color, R, G, B)
-	i = (255.0 * np.random.uniform(meanlum-(moddepth/2.0),
-								  meanlum+(moddepth/2.0),
-								  size=(s.w, s.h))).astype(np.uint8)
+	lmin = meanlum - (modepth/2.0)
+	lmax = meanlum + (modepth/2.0)
+	i = np.random.uniform(lmin, lmax, size=(s.w, s.h))
 	if binary:
-		i = np.where(np.less(i, 128), 1, 255)
+		i = np.where(np.less(i, meanlum), lmin, lmax)
+	i = (255.0 * i).astype(np.uint8)
 	s.array[::] = np.transpose(np.array((R*i,G*i,B*i)), axes=[1,2,0])
 
-def gaussiannoise(s, binary=False,
-				  R=1.0, G=1.0, B=1.0, meanlum=0.5, stddev=1.0, color=None):
-	"""Fill sprite with uniform white noise
+def gaussiannoise(s, R=1.0, G=1.0, B=1.0, meanlum=0.5, stddev=1.0, color=None):
+	"""Fill sprite with Gaussian white noise
 
 	:param s: (Sprite) target sprite
-
-	:param binary: (Boolean) binary noise? (default=False)
 
 	:param R,G,B: (either R is colortriple or R,G,B are 0-1 values)
 
@@ -518,10 +516,8 @@ def gaussiannoise(s, binary=False,
 
 
 	R, G, B = unpack_rgb(color, R, G, B)
-	i = (255.0 * np.random.normal(meanlum, stddev,
-								  size=(s.w, s.h))).astype(np.uint8)
-	if binary:
-		i = np.where(np.less(i, 128), 1, 255)
+	i = np.random.normal(meanlum, stddev, size=(s.w, s.h))
+	i = (255.0 * i).astype(np.uint8)
 	s.array[::] = np.transpose(np.array((R*i,G*i,B*i)), axes=[1,2,0])
 
 

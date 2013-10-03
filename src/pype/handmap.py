@@ -1,12 +1,9 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
+#pypeinfo; module; owner:mazer; for:all; descr:custom handmapping engine
 
 """Handmap engine
 
-This module was derived from hmapstim.py (10-jul-2005) and
-intended to make it easy (although less flexible) for users
-to incorporate handmap stimuli into their tasks.
-
-In your task (see http://www.mlab.yale.edu/lab/index.php/Handmap too)
+To use in your own task:
 
 - At the top of your module (taskfile.py), add::
 
@@ -45,23 +42,13 @@ In your task (see http://www.mlab.yale.edu/lab/index.php/Handmap too)
    hmap_hide(app)
    hmap_set_dlist(app, None)
 
-Sun Jul 24 16:30:25 2005 mazer
+See  http://www.mlab.yale.edu/lab/index.php/Handmap for more info.
 
-- minor changes in cleanup code trying to figure out why Jon's tasks
-  are leaving text and markers behind..
-
-Fri May 29 14:51:00 2009 mazer
-
-- got rid of color-bink..
-
-"""
-
-"""Revision History
 """
 
 import sys
 import math
-import cPickle
+#import cPickle
 
 from pype import *
 from Tkinter import *
@@ -73,21 +60,38 @@ SEED=numpy.random.get_state()
 
 import pype_aux
 
-def B(x):
+def B(x, on='ON ', off='OFF'):
 	"""convert boolean value to human-readable string"""
-	if x: return 'ON'
-	else: return 'OFF'
+	if x: return on
+	else: return off
 
-BAR=0
-CART=1
-HYPER=2
-POLAR=3
-BARMODES = {BAR:'bar', CART:'cart', HYPER:'hyper', POLAR:'polar'}
+BLINK_STATES = ['OFF', 'ON', 'BLINK']
+BTAG = ['X', '', '']
+
+_n = 0
+BAR=_n ; _n += 1
+RECT=_n ; _n += 1
+CART=_n ; _n += 1
+HYPER=_n ; _n += 1
+POLAR=_n ; _n += 1
+DISK=_n ; _n += 1
+CIRCLE=_n ; _n += 1
+
+BARMODES = {
+    BAR:'bar',
+    CART:'cart',
+    HYPER:'hyper',
+    POLAR:'polar',
+    RECT:'rect',
+    CIRCLE:'circle',
+    DISK:'disk',
+    }
 
 class _Probe(object):
 	def __init__(self, app):
+		self.ppd = float(app.rig_common.queryv('mon_ppd'))
+
 		self.lock = 0
-		self.on = 1
 		self.app = app
 		self.s = None
 		self.length = 100
@@ -102,12 +106,11 @@ class _Probe(object):
 		self.jitter = 0
 		self.xoff = 0
 		self.yoff = 0
-		self.blinktime = app.ts()
 		self.app.udpy.xoffset = self.xoff
 		self.app.udpy.yoffset = self.yoff
 		self.live = 0
-		self.blink = 0
 		self.blink_freq = 1.0
+		self.blink_state = 0
 		self.inten = 100
 		self.colorstr = None
 		self.barmode = BAR
@@ -115,9 +118,11 @@ class _Probe(object):
 		self.rfreq = 0.0
 		self.major_ax = None
 		self.minor_ax = None
+		self.onoff = None
 		self.bg = 128.0
 		self.showinfo = 1
 		self.probeid = None
+		self.lw = 10
 
 		try:
 			self.load()
@@ -132,10 +137,10 @@ class _Probe(object):
 		self.clear()
 
 	def save(self):
+        import cPickle
 		x = Holder()
 
 		x.lock = self.lock
-		x.on = self.on
 		x.length = self.length
 		x.width = self.width
 		x.a = self.a
@@ -147,18 +152,20 @@ class _Probe(object):
 		x.xoff = self.xoff
 		x.yoff = self.yoff
 		x.live = self.live
-		x.blink = self.blink
 		x.blink_freq = self.blink_freq
+		x.blink_state = self.blink_state
 		x.inten = self.inten
 		x.barmode = self.barmode
 		x.sfreq = self.sfreq
 		x.rfreq = self.rfreq
+		x.lw = self.lw
 
 		file = open(pyperc('hmapstim'), 'w')
 		cPickle.dump(x, file)
 		file.close()
 
 	def load(self):
+        import cPickle
 		try:
 			file = open(pyperc('hmapstim'), 'r')
 			x = cPickle.load(file)
@@ -168,7 +175,6 @@ class _Probe(object):
 
 		try:
 			self.lock = x.lock
-			self.on = x.on
 			self.length = x.length
 			self.width = x.width
 			self.a = x.a
@@ -182,12 +188,13 @@ class _Probe(object):
 			self.app.udpy.xoffset = self.xoff
 			self.app.udpy.yoffset = self.yoff
 			self.live = x.live
-			self.blink = x.blink
 			self.blink_freq = x.blink_freq
+			self.blink_state = x.blink_state
 			self.inten = x.inten
 			self.barmode = x.barmode
 			self.sfreq = x.sfreq
 			self.rfreq = x.rfreq
+			self.lw = x.lw
 		except AttributeError:
 			sys.stderr.write('** loaded modified probe **\n');
 
@@ -204,33 +211,42 @@ class _Probe(object):
 
 		angle = ((self.a % 180), (self.a % 180)+180)
 		try:
-			color = '#'+string.join(map(lambda x:"%02x"%x, self.colorshow),'')
+			color = string.join(map(lambda x:"%d"%x, self.colorshow),',')
 		except TypeError:
 			color = 'noise'
 
-		s = ""
-		s = s +		"  z: lock...... %s\n" % B(self.lock)
-		s = s +		"  o: offset.... %s\n" % B(self.xoff)
-		s = s +		"  u: on/off.... %s\n" % B(self.on)
-		s = s +		"  M: bar mode.. %s\n" % BARMODES[self.barmode]
-		s = s +		" []:	 s-freq. %.1f\n" % self.sfreq
-		s = s +		" {}:	 r-freq. %.1f\n" % self.rfreq
-		s = s +		" 89: a......... %d/%d\n" % angle
-		s = s +		"n/m: rgb....... %s\n" % color
-		s = s +		"1-6: color..... %s\n" % self.colorname
-		s = s +		"q/w: len....... %d\n" % self.length
-		s = s +		"e/r: wid....... %d\n" % self.width
-		s = s +		"  j: jitter.... %s\n" % B(self.jitter)
-		s = s +		"  d: drft...... %s\n" % B(self.drift)
-		s = s +		"t/T: drft amp.. %dpix\n" % self.drift_amp
-		s = s +		"y/Y: drft frq.. %.1fHz\n" % self.drift_freq
-		s = s +		"  b: blink..... %s\n" % B(self.blink)
-		s = s +		"p/P: blnk frq.. %.1fHz\n" % self.blink_freq
-		s = s +		"i/I: inten..... %d\n" % self.inten
-		s = s +		"\n"
-		s = s +		"  h: hide/show info\n"
+		z = self.sfreq/self.length
 
-		return s[:-1]
+		s = ""
+		s = s + "  z:%s " % B(self.lock, 'LOCK', 'FREE')
+		s = s + "  o:%s " % B(self.xoff, 'OFFST', 'MOUSE')
+		s = s + "\n"
+		s = s + "  j:%s " % B(self.jitter, 'ON  ', 'OFF ')
+		s = s + "  d:%s " % B(self.drift, 'ON  ', 'OFF ')
+		s = s + "  b:%s " % BLINK_STATES[self.blink_state]
+		s = s + "\n"
+		s = s +	"  h:hide info       p:post info\n"
+		s = s + "\n"
+		s = s +		"  m  stim type  %s\n" % BARMODES[self.barmode]
+		s = s +		" 89  dir/ori    %d:%d deg\n" % angle
+		s = s +     " nN  rgb        %s\n" % color
+		s = s +		"1-6  color      %s\n" % self.colorname
+		s = s +		" iI  inten      %d\n" % self.inten
+		s = s +		" qw  length     %d\n" % self.length
+		s = s +		" er  width      %d\n" % self.width
+		s = s +		" -=  linewidth  %d\n" % self.lw
+		s = s +		" tT  drift amp  %d px\n" % self.drift_amp
+		s = s +		" yY  drift freq %.1f Hz\n" % self.drift_freq
+		s = s +		" kK  blink freq %.1f Hz\n" % self.blink_freq
+		s = s + "\n"
+		s = s +     " []  sp-freq    %.1f c/rf\n" % self.sfreq
+		s = s +     "                %.4f c/deg\n" % z
+		s = s +     "                %.4f c/pix\n" % (z * self.ppd)
+		s = s +     " {}  rad-freq   %.1f c/rf\n" % self.rfreq
+
+		if s[:-1] == '\n':
+			s = s[:-1]
+		return s
 
 	def clear(self):
 		if self.major_ax:
@@ -239,7 +255,9 @@ class _Probe(object):
 		if self.minor_ax:
 			self.app.udpy.canvas.delete(self.minor_ax)
 			self.minor_ax = None
-		self.app.udpy_note('')
+		if self.onoff:
+			self.app.udpy.canvas.delete(self.onoff)
+			self.onoff = None
 
 	def force_redraw(self):
 		"""force sprite to be redraw next cycle"""
@@ -293,11 +311,12 @@ class _Probe(object):
 		self.colorn = (self.colorn + incr) % 9
 
 	def showprobe(self, x=0, y=0, redraw=1):
-		if self.probeid and not self.s.on:
-			self.app.udpy.canvas.delete(self.probeid)
-			self.probeid = None
-		elif self.probeid is None or redraw:
-			self.photoim = self.s.asPhotoImage()
+        import PIL.ImageTk
+
+		if self.probeid is None or redraw:
+            self.im = self.s.asImage(xscale=self.app.udpy.canvas.xscale,
+                                     yscale=self.app.udpy.canvas.yscale)
+            self.photoim = PIL.ImageTk.PhotoImage(self.im)
 			self.probeid = self.app.udpy.canvas.create_image(x, y, anchor=NW,
 															 image=self.photoim)
 			self.app.udpy.canvas.lower(self.probeid)
@@ -309,10 +328,13 @@ class _Probe(object):
 	def draw(self):
 		t = self.app.ts()
 
-		ms_bperiod = 1000.0 / self.blink_freq
-		if (self.blink > 0) and (t - self.blinktime) > (ms_bperiod/2):
-			self.on = not self.on
-			self.blinktime = t
+		if self.blink_state == 0:
+			self.contrast = 0.0
+		if self.blink_state == 1:
+            self.contrast = 1.0
+        else:
+			self.contrast = float(math.sin(self.blink_freq * 2.0 * \
+										   math.pi * t / 1000.) > 0)
 
 		(color, name) = self.color()
 		if color:
@@ -327,19 +349,75 @@ class _Probe(object):
 		self.colorname = name
 		olds = self.s
 		if (self.s is None) or self.drift:
-			if self.drift and not (self.barmode == BAR):
+            if not self.drift or self.barmode in [BAR, RECT, CIRCLE, DISK]:
+                phase = 0.0
+            elif self.drift:
 				phase = (t/1000.0) * self.drift_freq * 360.0
-			else:
-				phase = 0.0;
 
 			if self.barmode == BAR:
-				self.s = Sprite(width=self.width, height=self.length,
-								fb=self.app.fb, depth=99)
 				if color is None:
-					self.s.noise(0.5)
+                    self.s = Sprite(width=max(1,self.width/self.lw),
+                                    height=max(1,self.length/self.lw),
+                                    fb=self.app.fb, depth=99)
+                    #self.s.noise(0.5)
+                    #uniformnoise(self.s, binary=True)
+                    gaussiannoise(self.s)
+                    self.s.scale(self.width, self.length)
 				else:
+                    self.s = Sprite(width=self.width,
+                                    height=self.length,
+                                    fb=self.app.fb, depth=99)
 					self.s.fill(color)
 				self.s.rotateCCW(self.a, 0, 1)
+			elif self.barmode == RECT:
+				if color is None:
+                    self.s = Sprite(width=max(1,(self.width+2*self.lw)/self.lw),
+                                    height=max(1,
+                                               (self.length+2*self.lw)/self.lw),
+                                               fb=self.app.fb, depth=99)
+					#self.s.noise(0.5)
+                    #uniformnoise(self.s, binary=True)
+                    gaussiannoise(self.s)
+                    self.s.scale(self.width+2*self.lw, self.length+2*self.lw)
+				else:
+                    self.s = Sprite(width=self.width+2*self.lw,
+                                    height=self.length+2*self.lw,
+                                    fb=self.app.fb, depth=99)
+					self.s.fill(color)
+                self.s.rect(0, 0, self.width, self.length, (0,0,0,0))
+				self.s.rotateCCW(self.a, 0, 1)
+			elif self.barmode == DISK:
+				if color is None:
+                    self.s = Sprite(width=max(1,self.length/self.lw),
+                                    height=max(1,self.length/self.lw),
+                                    fb=self.app.fb, depth=99)
+					#self.s.noise(0.5)
+                    #uniformnoise(self.s, binary=True)
+                    gaussiannoise(self.s)
+                    self.s.scale(self.length, self.length)
+				else:
+					self.s = Sprite(width=self.length, height=self.length,
+                                    fb=self.app.fb, depth=99)
+                    self.s.fill(color)
+                self.s.circmask(0, 0, self.length/2)
+			elif self.barmode == CIRCLE:
+                l = self.length
+				if color is None:
+                    self.s = Sprite(width=max(1,(l+2*self.lw)/self.lw),
+                                    height=max(1, (l+2*self.lw)/self.lw),
+                                    fb=self.app.fb, depth=99)
+					#self.s.noise(0.5)
+                    #uniformnoise(self.s, binary=True)
+                    gaussiannoise(self.s)
+                    self.s.scale(l+2*self.lw, l+2*self.lw)
+				else:
+                    self.s = Sprite(width=l+2*self.lw,
+                                    height=l+2*self.lw,
+                                    fb=self.app.fb, depth=99)
+					self.s.fill(color)
+                r = l/2
+                self.s.circmask(0, 0, l/2+self.lw)
+                self.s.circlefill((0,0,0,0), l/2)
 			elif self.barmode == CART:
 				l = self.length
 				self.s = Sprite(width=l, height=l,
@@ -380,10 +458,10 @@ class _Probe(object):
 
 		x = self.x
 		y = self.y
-		if self.drift and (self.barmode == BAR):
+		if self.drift and self.barmode in [BAR, RECT, CIRCLE, DISK]:
 			dt = t - self.drift;
-			d = (self.drift_amp * 
-				 math.sin(self.drift_freq * 2.0 * math.pi * dt / 1000.))
+			d = self.drift_amp * \
+				math.sin(self.drift_freq * 2.0 * math.pi * dt / 1000.)
 			y = y + d * math.sin(math.pi * self.a / 180.)
 			x = x + d * math.cos(math.pi * self.a / 180.)
 
@@ -392,11 +470,12 @@ class _Probe(object):
 			y = y + (2 * pype_aux.urand(-3, 3, integer=1))
 
 
-		if self.on and self.live:
+		if self.live and self.blink_state > 0:
 			if self.lastx != x or self.lasty != y:
 				# only actually blit if new sprite or it moved
 				self.s.on()
 				self.s.moveto(x, y)
+                self.s.contrast = self.contrast
 				self.s.blit()
 				self.lastx = x
 				self.lastx = y
@@ -405,19 +484,19 @@ class _Probe(object):
 
 		(x, y) = self.app.udpy.fb2can(x, y)
 
-		# compute line for long axis (orientation indicator)
-		hh = max(10, self.length / 2.0)
-		hh = 15
-		_tsin = hh * math.sin(math.pi * (270.0 - self.a) / 180.0)
-		_tcos = hh * math.cos(math.pi * (270.0 - self.a) / 180.0)
+		# compute sizes for indicator axes/arrow
+		ih = max(10, 0.25 * self.length)
+		iw = max(5, ih/2)
+
+		# major axis:
+		_tsin = ih * math.sin(math.pi * (270.0 - self.a) / 180.0)
+		_tcos = ih * math.cos(math.pi * (270.0 - self.a) / 180.0)
 		(x1, y1) = (x + _tcos, y + _tsin)
 		(x2, y2) = (x - _tcos, y - _tsin)
 
-		# compute line for short axis (direction indicator)
-		hw = max(10, self.width / 2.0)
-		hw = 15
-		dx = hw * math.cos(math.pi * -self.a / 180.0)
-		dy = hw * math.sin(math.pi * -self.a / 180.0)
+		# minor axis:
+		dx = iw * math.cos(math.pi * -self.a / 180.0)
+		dy = iw * math.sin(math.pi * -self.a / 180.0)
 
 		# compute photoimage position in canvas coords
 		cx = x - (self.s.w / 2.0)
@@ -432,87 +511,103 @@ class _Probe(object):
 		if self.major_ax:
 			self.app.udpy.canvas.coords(self.major_ax, x1, y1, x2, y2)
 			self.app.udpy.canvas.coords(self.minor_ax, x, y, x+dx, y+dy)
+			self.app.udpy.canvas.coords(self.onoff, x, y)
+			self.app.udpy.canvas.itemconfig(self.onoff,
+											text=BTAG[self.blink_state])
 		else:
 			self.major_ax = self.app.udpy.canvas.create_line(x1, y1, x2, y2,
 															 width=4)
 			self.minor_ax = self.app.udpy.canvas.create_line(x, y, x+dx, y+dy,
 															 fill='blue',
 															 arrow=LAST,
-															  width=4)
+															 width=4)
+			self.onoff = self.app.udpy.canvas.create_text(x, y,
+														  text=BTAG[self.blink_state],
+														  font="Courier 100",
+														  anchor=CENTER,
+														  fill='red')
 			for l in (self.minor_ax, self.major_ax):
 				self.app.udpy.canvas.lower(l)
-
-		if self.on and self.app.hmapstate.probe.live:
-			self.app.udpy.canvas.itemconfigure(self.major_ax, fill='green')
+				
+		if self.app.hmapstate.probe.live:
+			if self.contrast > 0:
+				self.app.udpy.canvas.itemconfigure(self.major_ax,
+												   fill='green')
+			else:
+				self.app.udpy.canvas.itemconfigure(self.major_ax,
+												   fill='lightgreen')
 		else:
-			self.app.udpy.canvas.itemconfigure(self.major_ax, fill='red')
+			if self.contrast > 0:
+				self.app.udpy.canvas.itemconfigure(self.major_ax,
+												   fill='red')
+			else:
+				self.app.udpy.canvas.itemconfigure(self.major_ax,
+												   fill='pink')
 
 		if self.showinfo:
-			self.app.udpy_note(self.pp())
+			s = self.pp()
 		else:
-			self.app.udpy_note("  h: hide/show info")
-
+			s = "  h: show info"
+		self.app.udpy.canvas.itemconfig(self.text1, text=s)
+		self.app.udpy.canvas.itemconfig(self.text2, text=s)
 
 def step(val, by=1, minval=None, maxval=None):
 	val = val + by
-	if minval and val < minval:
-		val = minval
-	elif maxval and val > maxval:
-		val = maxval
+	if not minval is None: val = max(val,minval)
+	if not maxval is None: val = min(val, maxval)
 	return val
-
 
 def _key_handler(app, c, ev):
 	p = app.hmapstate.probe
 
-	if c == 'z':
+	if c == 'p':
+		warn('handmap2 state', p.pp(), grab=0, astext=1)
+	elif c == 'z':
 		p.lock = not p.lock
 	elif c == 'h':
 		p.showinfo = not p.showinfo
-	elif c == 'M':
+	elif c == 'm' or c == 'M':
 		p.barmode = (p.barmode + 1) % len(BARMODES.keys())
 		app.udpy.canvas.delete(p.major_ax)
 		app.udpy.canvas.delete(p.minor_ax)
+		app.udpy.canvas.delete(p.onoff)
 		p.major_ax = None
 		p.minor_ax = None
+		p.onoff = None
 		p.force_redraw()
 	elif c == 'bracketleft':
-		p.sfreq = step(p.sfreq, by=-0.2)
+		p.sfreq = max(1.0, p.sfreq - 1.0)
 		p.force_redraw()
 	elif c == 'bracketright':
-		p.sfreq = step(p.sfreq, by=0.2)
+		p.sfreq = p.sfreq + 1.0
 		p.force_redraw()
 	elif c == 'braceleft':
-		p.rfreq = round(step(p.rfreq, by=-1.0))
+		p.rfreq = max(1.0, p.rfreq - 1.0)
 		p.force_redraw()
 	elif c == 'braceright':
-		p.rfreq = round(step(p.rfreq, by=1.0))
+		p.rfreq = p.rfreq + 1.0
 		p.force_redraw()
-	elif c == 'b':
-		p.blink = step(p.blink, by=1)
-		if p.blink >= 2: p.blink = 0
-		p.blinktime = app.ts()
-		if not p.blink:
-			p.on = 1
 	elif c == 'i':
 		p.inten = step(p.inten, by=-1, minval=1, maxval=100)
 		p.force_redraw()
 	elif c == 'I':
 		p.inten = step(p.inten, by=1, minval=1, maxval=100)
 		p.force_redraw()
-	elif c == 'p':
-		p.blink_freq = step(p.blink_freq, by=-0.1, minval=0.1)
-	elif c == 'P':
-		p.blink_freq = step(p.blink_freq, by=0.1, minval=0.1)
-	elif c == 'u':
-		p.on = not p.on
+	elif c == 'b':
+		p.blink_state = int((p.blink_state+1)%len(BLINK_STATES))
+	elif c == 'k':
+		p.blink_freq = step(p.blink_freq, by=-0.1, minval=0.0)
+	elif c == 'K':
+		p.blink_freq = step(p.blink_freq, by=0.1)
+	elif c == 'V':
+		p.verbose = not p.verbose
 	elif c in '123456':
 		p.colorn = ord(c) - ord('1')
 		p.force_redraw()
 	elif c == 'n':
 		p.nextcolor(-1)
 		p.force_redraw()
-	elif c == 'm':
+	elif c == 'N':
 		p.nextcolor(1)
 		p.force_redraw()
 	elif c == '8':
@@ -521,53 +616,59 @@ def _key_handler(app, c, ev):
 	elif c == '9':
 		p.a = (p.a - 15) % 360
 		p.force_redraw()
-	elif c == 'q':
+	elif c == 'Q':
 		p.length = step(p.length, by=1, minval=1)
 		p.force_redraw()
-	elif c == 'Q':
+	elif c == 'q':
 		p.length = step(p.length, by=10, minval=1)
 		p.force_redraw()
-	elif c == 'w':
+	elif c == 'W':
 		p.length = step(p.length, by=-1, minval=2)
 		if p.width > p.length:
 			p.width = p.length-1
 		p.force_redraw()
-	elif c == 'W':
+	elif c == 'w':
 		p.length = step(p.length, by=-10, minval=2)
 		if p.width > p.length:
 			p.width = p.length-1
 		p.force_redraw()
-	elif c == 'e':
+	elif c == 'E':
 		p.width = step(p.width, by=1, minval=1)
 		if p.width > p.length:
 			p.length = p.width+1
 		p.force_redraw()
-	elif c == 'E':
+	elif c == 'e':
 		p.width = step(p.width, by=10, minval=1)
 		if p.width > p.length:
 			p.length = p.width+1
 		p.force_redraw()
-	elif c == 'r':
+	elif c == 'R':
 		p.width = step(p.width, by=-1, minval=1)
 		p.force_redraw()
-	elif c == 'R':
+	elif c == 'r':
 		p.width = step(p.width, by=-10, minval=1)
+		p.force_redraw()
+	elif c == 'minus':
+        p.lw = max(1, p.lw - 1)
+		p.force_redraw()
+	elif c == 'equal':
+        p.lw = min(20, p.lw + 1)
 		p.force_redraw()
 	elif c == 'd':
 		if p.drift:
 			p.drift = 0
 		else:
 			p.drift = p.app.ts()
+	elif c == 'y':
+		p.drift_freq = step(p.drift_freq, by=-0.1, minval=0.1)
+	elif c == 'Y':
+		p.drift_freq = step(p.drift_freq, by=0.1, minval=0.1)
 	elif c == 'j':
-		p.jitter = not p.jitter
+		p.jitter = int(not p.jitter)
 	elif c == 'T':
 		p.drift_amp = step(p.drift_amp, by=10, minval=0)
 	elif c == 't':
 		p.drift_amp = step(p.drift_amp, by=-10, minval=0)
-	elif c == 'Y':
-		p.drift_freq = step(p.drift_freq, by=0.1, minval=0.1)
-	elif c == 'y':
-		p.drift_freq = step(p.drift_freq, by=-0.1, minval=0.1)
 	elif c == 'o':
 		if app.hmapstate.probe.xoff:
 			app.hmapstate.probe.xoff = 0
@@ -616,6 +717,17 @@ def hmap_install(app):
 	app.hmapstate.probe = _Probe(app)
 	app.hmapstate.hookdata = app.set_canvashook(_key_handler, app)
 	app.taskidle = _hmap_idlefn
+	app.hmapstate.probe.text1 = app.udpy.canvas.create_text(11, 36,
+															font="Courier 10",
+															anchor=NW,
+															justify=LEFT,
+															fill='black')
+	app.hmapstate.probe.text2 = app.udpy.canvas.create_text(10, 37,
+															font="Courier 10",
+															anchor=NW,
+															justify=LEFT,
+															fill='red')
+
 
 def hmap_uninstall(app):
 	app.udpy.xoffset = 0
@@ -624,7 +736,11 @@ def hmap_uninstall(app):
 	app.hmapstate.probe.save()
 	app.hmapstate.probe.clear()
 	app.set_canvashook(app.hmapstate.hookdata[0], app.hmapstate.hookdata[1])
+	app.udpy.canvas.delete(app.hmapstate.probe.text1)
+	app.udpy.canvas.delete(app.hmapstate.probe.text2)
+
 	del app.hmapstate
+
 
 if __name__ == '__main__':
 	pass

@@ -263,7 +263,7 @@ class PypeRecord(object):
 	_reportchannel = 1
 	def __init__(self, file, recnum, rec, taskname=None,
 				 trialtime=None, parsed_trialtime=None,
-				 userparams=None,
+				 userparams={},
 				 tracker_guess=('iscan', 120, 24)):
 		#
 		# Wed Sep 11 14:36:42 2002 mazer

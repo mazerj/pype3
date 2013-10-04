@@ -714,6 +714,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.running = 0
 		self._startfn = None
 		self._updatefn = None
+		self._validatefn = None
 		self.dropcount = 0
 		self.record_id = 1
 		self.record_buffer = []
@@ -2197,14 +2198,29 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			return 'NOHOST'
 
 	def _tallyfile(self, save=1):
+		"""load/save tallyfile
+
+		:return: age of last tallyfile in days
+
+		"""
+
 		fname = subjectrc('tally.%s.%s' % (subject(), self._gethostname(),))
+		try:
+			age = (time.time()-os.path.getmtime(fname)) / (60.*60.*24.)
+		except OSError:
+			age = -1
 		try:
 			if save:
 				cPickle.dump(self.tallycount, open(fname, 'w'))
 			else:
-				self.tallycount = cPickle.load(open(fname, 'r'))
+                if age > 0.5 and ask('loadstate',
+                                     'Tally data > 12h old; load anyway?',
+                                     ['yes', 'no']) == 0:
+                    self.tallycount = cPickle.load(open(fname, 'r'))
 		except IOError:
 			Logger("Can't read/write tally file.\n")
+
+		return age
 
 	def _savestate(self):
 		self.setgeo(save=1)
@@ -2289,6 +2305,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				ask('run task', 'Task has changed\nRun anyway?',
 					['yes', 'no']) == 1):
 				return
+
+			if self._validatefn:
+				# abort if validatefn returns False
+				if not self._validatefn(self):
+					return
 
 			try:
 				self._savestate()
@@ -2443,7 +2464,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				warn('pype:_new_cell',
 					 'cell field is non-numeric, can''t increment.')
 
-	def set_startfn(self, startfn, updatefn=None):
+	def set_startfn(self, startfn, updatefn=None, validatefn=None):
 		"""Set start run function/hook.
 
 		The task_module.main() function must call this function to bind
@@ -2475,10 +2496,16 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		True, the built-in histogram will get updated IN ADDITION to
 		whatever you did..
 
+		validatefn (new 10/4/2013) is called before the run actually
+		starts to give task chance to validate parameters, cache stimuli
+		etc. Should return 'True' if pype should continue on and start
+		task, 'False' to abort run.
+
 		"""
 
 		self._startfn = startfn
 		self._updatefn = updatefn
+		self._validatefn = validatefn	# called before start to validate params
 
 	def _shutdown(self):
 		"""Internal shutdown function.
@@ -3678,7 +3705,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		post-processing and flush all the recorded data to disk.
 
 		:param resultcode: (string)
-		
+
 		:param rt: (number) Reaction time in ns (or -1 for "not applicable")
 
 		:param params: (dict) final dictionary of all parameters (including
@@ -3694,7 +3721,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				photodiode-waveform, spike-waveform). Otherwise, it's simply
 				a complete copy of the object written to the datafile, which
 				includes ALL the available data.
-				
+
 		"""
 
 		if (self.record_file == '/dev/null' and
@@ -3935,9 +3962,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		r.pa = rec[12]
 		r.photo_times = rec[6]
 		r.spike_times = rec[7]
-		
+
 		return r
-		
+
 
 	def record_note(self, tag, note):
 		"""Insert note into current datafile.
@@ -4184,7 +4211,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		pylab.ylabel('spikes')
 
 		pylab.subplot(4, 1, 4)
-		raster = array(raster) - t0
+		raster = np.array(raster) - t0
 		pylab.plot(raster, 0.0 * raster, 'k.')
 		pylab.ylim(-1,1)
 		pylab.xlim(start - t0, stop - t0)

@@ -66,7 +66,7 @@ def B(x, on='ON ', off='OFF'):
 	else: return off
 
 BLINK_STATES = ['OFF', 'ON', 'BLINK']
-BTAG = ['X', '', '']
+BTAG = ['X', '+', 'B']
 
 _n = 0
 BAR=_n ; _n += 1
@@ -485,8 +485,8 @@ class _Probe(object):
 		(x, y) = self.app.udpy.fb2can(x, y)
 
 		# compute sizes for indicator axes/arrow
-		ih = max(10, 0.25 * self.length)
-		iw = max(5, ih/2)
+		ih = min(60, max(40, 0.25 * self.length))
+		iw = min(30, max(20, ih/2))
 
 		# major axis:
 		_tsin = ih * math.sin(math.pi * (270.0 - self.a) / 180.0)
@@ -511,38 +511,36 @@ class _Probe(object):
 		if self.major_ax:
 			self.app.udpy.canvas.coords(self.major_ax, x1, y1, x2, y2)
 			self.app.udpy.canvas.coords(self.minor_ax, x, y, x+dx, y+dy)
-			self.app.udpy.canvas.coords(self.onoff, x, y)
+			self.app.udpy.canvas.coords(self.onoff, x-dx, y-dy)
 			self.app.udpy.canvas.itemconfig(self.onoff,
 											text=BTAG[self.blink_state])
 		else:
 			self.major_ax = self.app.udpy.canvas.create_line(x1, y1, x2, y2,
+                                                             fill='gold',
 															 width=4)
 			self.minor_ax = self.app.udpy.canvas.create_line(x, y, x+dx, y+dy,
-															 fill='blue',
 															 arrow=LAST,
+                                                             fill='lightsalmon',
 															 width=4)
-			self.onoff = self.app.udpy.canvas.create_text(x, y,
+			self.onoff = self.app.udpy.canvas.create_text(x+10, y+10,
 														  text=BTAG[self.blink_state],
-														  font="Courier 100",
 														  anchor=CENTER,
-														  fill='red')
+                                                          font='Courier 30',
+														  fill='wheat')
 			for l in (self.minor_ax, self.major_ax):
 				self.app.udpy.canvas.lower(l)
-				
+
 		if self.app.hmapstate.probe.live:
-			if self.contrast > 0:
-				self.app.udpy.canvas.itemconfigure(self.major_ax,
-												   fill='green')
-			else:
-				self.app.udpy.canvas.itemconfigure(self.major_ax,
-												   fill='lightgreen')
-		else:
-			if self.contrast > 0:
-				self.app.udpy.canvas.itemconfigure(self.major_ax,
-												   fill='red')
-			else:
-				self.app.udpy.canvas.itemconfigure(self.major_ax,
-												   fill='pink')
+            self.app.udpy.canvas.itemconfigure(self.major_ax, dash=(100,1))
+        else:
+            self.app.udpy.canvas.itemconfigure(self.major_ax, dash=(4,2))
+
+        if self.blink_state > 0:
+            c = self.contrast > 0
+        else:
+            c = 0
+        self.app.udpy.canvas.itemconfigure(self.onoff, font='Courier 30',
+                                           fill=['wheat', 'orange'][c])
 
 		if self.showinfo:
 			s = self.pp()

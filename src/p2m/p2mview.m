@@ -37,7 +37,7 @@ while viewing
     end
   end
   if isempty(opts.stop)
-    stop = length(pf.rec(n).eyet);
+    estop = length(pf.rec(n).eyet);
   else
     [~, estop] = p2mFindEvents(pf, n, opts.stop);
     if isempty(estop)
@@ -66,7 +66,7 @@ while viewing
   progh = plot(0, 0, 'k^');
   set(progh, 'markerfacecolor', 'm');
 
-  if opts.events
+  if opts.showevents
     evtlist = [];
     for k=1:length(pf.rec(n).ev_e)
       t = pf.rec(n).ev_t(k);

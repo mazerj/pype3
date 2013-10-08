@@ -873,7 +873,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._repinfo = Label(f, text=None)
 		self._repinfo.pack(side=RIGHT)
 
-		self._stateinfo = Label(f, text=None, font='Courier 10')
+		self._stateinfo = Label(f, text=None, font=('Courier', 10))
 		self._stateinfo.pack(side=RIGHT)
 		self.mldown = None
 		self.balloon.bind(self._stateinfo, "state info: bar, juice etc")
@@ -1093,7 +1093,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		self.statsw = Label(stats, text='',
 							anchor=W, justify=LEFT,
-							font="Courier 10")
+							font=('Courier', 10))
 		self.statsw.pack(expand=0, fill=BOTH, side=TOP)
 
 
@@ -1632,7 +1632,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			except KeyError:
 				self.tallycount[ctask,type] = 1
 			try:
-				del self.tally_recent[0]; self.tally_recent.append(type)
+				del self.tally_recent[0]
+				self.tally_recent.append(type)
 			except AttributeError:
 				self.tally_recent = [''] * 5
 		elif not reward is None:
@@ -1751,10 +1752,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				except ValueError:
 					Logger("pype: skipped dup %s in TASKPATH\n" % d)
 
-	def readpypeinfo(self, filename):
+	def _get_taskheader(self, filename):
+		# read up to ~50 lines of text from specified file looking
+		# for a task header line (starts with '#pypeinfo;')
+
 		majik = re.compile('^#pypeinfo;.*')
 		f = open(filename, 'r')
-		# read up to about 50 lines from the file
 		lines = f.readlines(80*50)
 		f.close()
 		d = {}
@@ -1789,7 +1792,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		filelist = glob.glob(os.path.join(dirname, '*.py'))
 
 		for fname in filelist:
-			d = self.readpypeinfo(fname)
+			d = self._get_taskheader(fname)
 			if 'task' in d:
 				tasks.append(posixpath.basename(fname)[:-3])
 				if 'descr' in d:
@@ -2209,14 +2212,14 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			age = (time.time()-os.path.getmtime(fname)) / (60.*60.*24.)
 		except OSError:
 			age = -1
+		print age
 		try:
 			if save:
 				cPickle.dump(self.tallycount, open(fname, 'w'))
 			else:
-                if age > 0.5 and ask('loadstate',
-                                     'Tally data > 12h old; load anyway?',
-                                     ['yes', 'no']) == 0:
-                    self.tallycount = cPickle.load(open(fname, 'r'))
+				if age < 0.5 or ask('loadstate', 'Clear old tally data?',
+									['yes', 'no']) == 1:
+					self.tallycount = cPickle.load(open(fname, 'r'))
 		except IOError:
 			Logger("Can't read/write tally file.\n")
 

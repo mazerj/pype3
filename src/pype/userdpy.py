@@ -199,8 +199,8 @@ class UserDisplay(object):
 
 		f = Frame(self.frame)
 		f.pack(expand=1, fill=X)
-		self.titlebar = Label(f, bg='black')
-		self.titlebar.pack(expand=1, fill=X, side=LEFT)
+		self.titlebar = Label(f, bg='white')
+		self.titlebar.pack(expand=0, side=LEFT)
 
 		self._info = Label(f, font="Courier 10")
 		self._info.pack(expand=0, side=LEFT)

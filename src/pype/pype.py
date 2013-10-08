@@ -1568,9 +1568,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self._stateinfo.configure(text=t)
 			try:
 				if barstate:
-					self.udpy.titlebar.config(text='bar down', fg='green')
+					self.udpy.titlebar.config(text='    BAR DOWN    ',
+											  fg='green')
 				else:
-					self.udpy.titlebar.config(text='bar up', fg='red')
+					self.udpy.titlebar.config(text='XXXX BAR UP XXXX',
+											  fg='red')
 				self._last_stateinfo = t
 			except AttributeError:
 				pass
@@ -2212,7 +2214,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			age = (time.time()-os.path.getmtime(fname)) / (60.*60.*24.)
 		except OSError:
 			age = -1
-		print age
 		try:
 			if save:
 				cPickle.dump(self.tallycount, open(fname, 'w'))

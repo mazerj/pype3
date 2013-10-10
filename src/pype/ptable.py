@@ -166,7 +166,7 @@ class ParamTable(object):
 			if default is None and validate is None:
 				e = Label(lf, text=name, bg='yellow', anchor=W)
 				e.pack(expand=1, fill=X)
-			elif type(validate) is types.TupleType:
+			elif isinstance(validate, types.TupleType):
 				tmpf = Frame(lf, height=12, width=12)
 				tmpf.pack(side=LEFT)
 				e = Pmw.RadioSelect(lf,
@@ -180,7 +180,7 @@ class ParamTable(object):
 				e.invoke(default)
 				self._entries[name] = e
 				entries.append(e)
-			elif type(validate) is types.DictType:
+			elif isinstance(validate, types.DictType):
 				tmpf = Frame(lf, height=12, width=12)
 				tmpf.pack(side=LEFT)
 				e = Pmw.RadioSelect(lf,
@@ -311,8 +311,8 @@ class ParamTable(object):
 				# to the evaluated version for future reference..  only do
 				# this if evaluating
 				d[name+'_raw_'] = v
-				if not (type(validate) is types.TupleType or
-						type(validate) is types.DictType) and validate:
+				if validate and not (isinstance(validate, types.TupleType) or
+                                     isinstance(validate, types.DictType)):
 					(r, v) = apply(validate, (v,), {"evaluate": 1})
 					if (runlock == _KEEPLOCKED) and not readonly:
 						continue
@@ -381,8 +381,8 @@ class ParamTable(object):
 				continue
 			if name is qname:
 				v = self.query(name)
-				if not (type(validate) is types.TupleType or
-						type(validate) is types.DictType) and validate:
+				if validate and not (isinstance(validate, types.TupleType) or
+                                     isinstance(validate, types.DictType)):
 					(r, v) = apply(validate, (v,), {"evaluate": 1})
 					if r != VALID:
 						(r, v) = apply(validate, (default,), {"evaluate": 1})
@@ -513,10 +513,10 @@ class ParamTable(object):
 								 (os.path.basename(file), name))
 				val = default
 
-			if type(validate) is types.TupleType:
+			if isinstance(validate, types.TupleType):
 				try: self._entries[name].invoke(val)
 				except ValueError: pass
-			elif type(validate) is types.DictType:
+			elif isinstance(validate, types.DictType):
 				for k in validate.keys():
 					if '%s'%validate[k] == val:
 						try: self._entries[name].invoke(k)
@@ -547,8 +547,8 @@ class ParamTable(object):
 				(name, default, validate, descr, runlock) = _unpack_slot(slot)
 				if default is None:
 					continue
-				if (type(validate) is types.TupleType or
-						   type(validate) is types.DictType):
+				if (isinstance(validate, types.TupleType) or
+                    isinstance(validate, types.DictType)):
 					self._entries[name].invoke(x[name])
 				else:
 					try:
@@ -585,8 +585,8 @@ class ParamTable(object):
 				(name, default, validate, descr, runlock) = _unpack_slot(slot)
 				if default is None:
 					continue
-				if (type(validate) is types.TupleType or
-						   type(validate) is types.DictType):
+				if (isinstance(validate, types.TupleType) or
+                    isinstance(validate, types.DictType)):
 					self._entries[name].invoke(x[name])
 				else:
 					try:
@@ -1078,7 +1078,7 @@ def is_cdf(s, evaluate=None):
 		try:
 			i = eval(s)
 			val = []
-			if type(i) is types.ListType:
+			if isinstance(i, types.ListType):
 				sum = 0.0
 				for f in i:
 					sum = sum + float(f)
@@ -1127,7 +1127,7 @@ def is_pdf(s, evaluate=None):
 			try:
 				i = eval(s)
 				val = []
-				if type(i) is types.ListType:
+				if isinstance(i, types.ListType):
 					sum = 0.0
 					for f in i:
 						sum = sum + float(f)
@@ -1178,7 +1178,7 @@ def is_list(s, evaluate=None):
 
 	try:
 		val = eval(s)
-		if type(val) == types.ListType:
+		if isinstance(val, types.ListType):
 			r = VALID
 		else:
 			r = INVALID

@@ -56,7 +56,7 @@ def zeros(v):
 	"""Count number of zero entries in vector.
 
 	"""
-	if not type(v) == np.ndarray:
+	if not isinstance(v, np.ndarray):
 		v = np.array(v, np.float)
 	return len(v)-len(np.nonzero(v))
 
@@ -65,7 +65,7 @@ def smooth_boxcar(v, kn=1):
 	average), where kn=1 is a 3pt average, kn=2 is a 5pt average etc..
 
 	"""
-	if not type(v) == np.ndarray:
+	if not isinstance(v, np.ndarray):
 		v = np.array(v, np.float)
 	n = len(v)
 	vout = np.zeros(v.shape)
@@ -84,7 +84,7 @@ def decimate(v, n):
 	to be smart about this -- integer decimation only!
 
 	"""
-	if not type(v) == np.ndarray:
+	if not isinstance(v, np.ndarray):
 		v = np.array(v, np.float)
 	return np.take(v, range(0,len(v),n))
 
@@ -92,7 +92,7 @@ def sparseness(v):
 	"""Compute (Tove & Rolls) sparseness of vector.
 
 	"""
-	if not type(v) == np.ndarray:
+	if not isinstance(v, np.ndarray):
 		v = np.array(v, np.float)
 	n = float(len(v));
 	if np.sum(v) == 0:

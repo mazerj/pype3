@@ -559,7 +559,7 @@ def _key_handler(app, c, ev):
 	p = app.hmapstate.probe
 
 	if c == 'p':
-		warn('handmap2 state', p.pp(), grab=0, astext=1)
+		warn('handmap', p.pp(), grab=0, astext=1)
 	elif c == 'z':
 		p.lock = not p.lock
 	elif c == 'h':

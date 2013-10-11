@@ -425,13 +425,23 @@ import pypeversion
 import prand
 prand.validate(exit=True)
 
-def _pype_std_params():
+def MYNAME(level=0):
+	"""Get name of calling function (or, if level=1: caller of caller, etc.
+
+	"""
+	
+	import traceback
+	stack = traceback.extract_stack()
+	filename, codeline, funcName, text = stack[-2-level]
+	return funcName
+
+def _base_ptables():
 	common = (
 		ptitle('Session Data'),
 		pyesno('warningbeeps', 0,
-			   'use auditory cues for start/stop run?'),
+			   'use sounds to cue beginning and end of runs'),
 		pslot('subject', '', is_any,
-			  'subject id (prefix/partial)'),
+			  'subject id for filenames (ie, nickname)'),
 		pslot('full_subject', '', is_any,
 			  'full (unique) subject name'),
 		pslot('owner', '', is_any,
@@ -443,11 +453,11 @@ def _pype_std_params():
 		pyesno('save_tmp', 1,
 			  '0 to write to /dev/null'),
 		pyesno('fast_tmp', 1,
-			  'super fast tmp mode'),
+			  'super fast tmp mode -- write to /dev/null'),
 
 		ptitle('Fixation Window Params'),	# global, but handled by task
 		pslot('win_size', '50', is_int,
-			  'fixwin radius (pix)'),
+			  'fixation window radius (pix)'),
 		pslot('win_scale', '0.0', is_float,
 			  'additive ecc. adj for win_size (rad-pixels/ecc-pixels)'),
 		pslot('vbias',	'1.0', is_float,
@@ -878,6 +888,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.mldown = None
 		self.balloon.bind(self._stateinfo, "state info: bar, juice etc")
 
+		self.disable_on_start = []
+		self.enable_on_start = []
+
 		bb = Frame(f1b)
 		bb.pack(expand=1, side=TOP, anchor=W)
 
@@ -897,19 +910,15 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		c3pane.pack(expand=0, fill=X, side=TOP, pady=10)
 		self._userbuttonframe = c3pane
 
-		b = Button(c1pane, text='reload',
-				   command=self.loadtask, state=DISABLED)
+		b = Button(c1pane, text='reload', command=self.loadtask)
 		b.pack(expand=0, fill=X, side=TOP)
 		self.balloon.bind(b, "reload current task")
-		self.reloadbut = b
+		self.disable_on_start.append(b)
 
-		self._task_prevtaskname = None
-		self._task_prevdir = None
-		b = Button(c1pane, text='previous',
-				   command=self.prevtask, state=DISABLED)
+		b = Button(c1pane, text='<<<', command=self.prevtask)
 		b.pack(expand=0, fill=X, side=TOP)
 		self.balloon.bind(b, "load previous task")
-		self.prevtaskbut = b
+		self.disable_on_start.append(b)
 
 		udpy_ = Button(c1pane, text='show disp')
 		udpy_.pack(expand=0, fill=X, side=TOP)
@@ -952,7 +961,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			#Logger("pype: no ELOG setup -- using old-style cell counter.\n")
 			self.use_elog = 0
 
-		(commonp, rigp, icalp) = _pype_std_params()
+		(commonp, rigp, icalp) = _base_ptables()
 
 		hostname = self._gethostname()
 		b = Checkbutton(c2pane, text='subject', relief=RAISED, anchor=W)
@@ -1025,27 +1034,37 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		startstopf = Frame(f, borderwidth=3, relief=RIDGE)
 		startstopf.pack(expand=0, fill=X, side=TOP)
 
-		w = self._named_start = Button(bb, command=self._start)
+		w = Button(bb, command=self._start, state=DISABLED)
 		addicon(self, w, 'run.gif')
-		self.balloon.bind(self._named_start, 'start, saving data')
-		self._named_start.pack(expand=1, fill=Y, side=LEFT)
-		self._named_start.config(state=DISABLED)
+		self.balloon.bind(w, 'start, saving data')
+		w.pack(expand=1, fill=Y, side=LEFT)
+		self.disable_on_start.append(w)
 
-		w = self._temp_start = Button(bb, command=self._starttmp)
+		w = Button(bb, command=self._starttmp, state=DISABLED)
 		addicon(self, w, 'runtemp.gif')
-		self._temp_start.pack(expand=1, fill=Y, side=LEFT)
-		self.balloon.bind(self._temp_start, "start w/o saving data")
-		self._temp_start.config(state=DISABLED)
+		self.balloon.bind(w, "start w/o saving data")
+		w.pack(expand=1, fill=Y, side=LEFT)
+		self.disable_on_start.append(w)
 
-		w = self._stop = Button(bb, command=self._start_helper, state=DISABLED)
+		w  = Button(bb, command=lambda s=self: s.pause(state=True),
+					state=DISABLED)
+		addicon(self, w, 'pause.gif')
+		self.balloon.bind(w, 'pause run')
+		w.pack(expand=1, fill=Y, side=LEFT)
+		self.enable_on_start.append(w)
+		self.pause(state=False)
+
+		w = Button(bb, command=self._start_helper, state=DISABLED)
 		addicon(self, w, 'Stop.gif')
-		self._stop.pack(expand=1, fill=Y, side=LEFT)
-		self.balloon.bind(self._stop, "stop run at end of trial")
+		w.pack(expand=1, fill=Y, side=LEFT)
+		self.balloon.bind(w, "stop run at end of trial")
+		self.enable_on_start.append(w)
 
-		w = self._stopnow = Button(bb, command=self._stopabort, state=DISABLED)
+		w = Button(bb, command=self._stopabort, state=DISABLED)
 		addicon(self, w, 'Cancel.gif')
-		self._stopnow.pack(expand=1, fill=Y, side=LEFT)
-		self.balloon.bind(self._stopnow, "stop run immediately")
+		w.pack(expand=1, fill=Y, side=LEFT)
+		self.balloon.bind(w, "stop run immediately")
+		self.enable_on_start.append(w)
 		self._doabort = 0
 
 		if not self.psych:
@@ -1072,7 +1091,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		mb.addmenu('|', '', '')
 
-		self.recent = []
+		self.recent = []				# list of recently used tasks
 
 		book = Pmw.NoteBook(f2)
 		book.grid(row=0, column=1, sticky=N+S+E)
@@ -1436,11 +1455,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				fname2 = fname+'.obsolete'
 				os.rename(fname, fname2)
 
-				warn('migrate_pypestate',
-					 'Success; remove %s at will.' % fname2)
+				warn(MYNAME(), 'Success; remove %s at will.' % fname2)
 			except:
 				reporterror(gui=False, db=self.config.iget('DBERRS'))
-				warn('migrate_pypestate', 'failed!')
+				warn(MYNAME(), 'failed!')
 
 	def con(self, msg=None, color='black', nl=1):
 		"""Write message to *console* window.
@@ -1515,20 +1533,27 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		sys.stderr.write('"app" should be defined!\n')
 		keyboard()
 
-	def ispaused(self):
-		""" this is a NOP now.. pause is gone.. """
-		return 0
+	def pause(self, state=None):
+		"""Call this to automatically pause task if user has requested pause.
+		
+		"""
+		if state is None:
+			if self._paused:
+				self._paused = False
+				warn(MYNAME(), 'Task paused; close to continue', wait=1)
+		else:
+			self._paused = state
+			if state:
+				self.con("[pause @ trial end]", color='red')
 
-	def set_state(self, running=-1, led=None, paused=None):
+	def set_state(self, running=-1):
 		"""Setting running state flags.
 
 		Use this instead of tweaking internal vars in the app object!
 
-		3/22/2011 mazer: paused is no longer used.
-		3/23/2011 mazer: led no longer used.
-
 		"""
-		if not (running is -1):	self.running = running
+		if not (running is -1):
+			self.running = running
 
 		if self.running:
 			try:
@@ -1859,12 +1884,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				self.balloon.bind(b, 'quick load '+tool)
 
 	def prevtask(self):
-		try:
-			if self._task_prevtaskname:
-				self.loadtask(self._task_prevtaskname, self._task_prevdir)
-			return 1
-		except AttributeError:
-			return 0
+		if len(self.recent) > 1:
+			(name, dir) = self.recent[1]
+			self.loadtask(name, dir)
 
 	def unloadtask(self):
 		if self.taskmodule:
@@ -1873,36 +1895,23 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				self.taskmodule.cleanup(self)
 			del self.taskmodule
 			self.taskmodule = None
-		for w in [self._named_start, self._temp_start]:
+		for w in self.disable_on_start:
 			w.config(state=DISABLED)
 
-	def loadtask(self, taskname=None, path=None, ask=False):
+	def loadtask(self, taskname=None, path=None):
 		"""(Re)load task from file.
 
-		Load a task, if taskname==None and path==None then we reload the current
-		task, if possible.	If ask is true, then pop up a dialog box to ask for
-		a filename..
+		Load a task, if no task is specified, try to reload
+		current task.
 
 		:param taskname: (string) task name without .py suffice
 
 		:param path: (string) directory where task is stored
 
-		:param ask: (bool) query user for task to load
-
 		:return: None for error, task module on success
 
 		"""
-		import imp, filebox
-
-		if ask:
-			(f, mode) = filebox.Open(pattern='*.py',
-									 text='Load task from .py file')
-			if f is None:
-				return None
-			path = posixpath.dirname(f)
-			taskname = posixpath.basename(f)
-			if taskname[-3:] == '.py':
-				taskname = taskname[:-3]
+		import imp
 
 		if taskname is None:
 			if self.task_name is None:
@@ -1924,27 +1933,17 @@ class PypeApp(object):					# !SINGLETON CLASS!
 						taskname = taskname[:-3]
 					(file, pathname, descr) = imp.find_module(taskname, [path])
 		except ImportError:
-			warn('pype:loadtask',
-				 "Can't find task '%s' on search path.\n" % taskname +
-				 "Try specifying a full path!")
+			warn(MYNAME(),
+				 "Can't find task '%s' on search path.\n" % \
+				 taskname + "Try specifying a full path!")
 			return None
 
 		key = (taskname, path,)
-		if key in self.recent: self.recent.remove(key)
+		if key in self.recent:
+			self.recent.remove(key)
 		self.recent = [key] + self.recent
 		self.recent = self.recent[:5]
 		self.make_recent()
-
-		# save previous task so it can be reloaded quickly...
-		try:
-			self._task_prevtaskname = self._task_taskname
-			self._task_prevdir = self._task_dir
-			self.prevtaskbut.config(text='<-%s' % self._task_prevtaskname,
-									state=NORMAL)
-		except AttributeError:
-			self._task_prevtasktask = None
-			self._task_prevdir = None
-
 		self.unloadtask()				# unload current, if it exists..
 
 		try:
@@ -1955,10 +1954,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			except:
 				err = ('Error loading ''%s'' -- \n' % taskname) + get_exception()
 				sys.stderr.write(err)
-				warn('pype:loadtask', err, wait=0, astext=1)
+				warn(MYNAME(), err, wait=0, astext=1)
 				return None
-
-			self.reloadbut.config(text='reload', state=NORMAL)
 
 		finally:
 			# in case loading throws an exception:
@@ -1993,10 +1990,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				Logger("pype: warning -- no 'main' in %s\n" % taskname)
 
 		if self._startfn:
-			for w in [self._named_start, self._temp_start]:
+			for w in self.disable_on_start:
 				w.config(state=NORMAL)
 		else:
-			warn('pype:loadtask', 'no start function set!')
+			warn(MYNAME(), 'no start function set!')
 
 		return taskmod
 
@@ -2093,7 +2090,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				for c in range(3):
 					dacq_eye_setaffine_coef(r, c, A[r,c])
 		except:
-			warn('ical::affine', 'affine matrix should be 9-element vector')
+			warn(MYNAME(), 'affine matrix should be 9-element vector')
 
 	def init_dacq(self):
 
@@ -2258,21 +2255,21 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			n = self._runstats['ncorrect'] + self._runstats['nerror']
 			if (nmax > 0) and n > nmax:
 				self.set_state(running=0)
-				warn('pype:_runstats_update',
+				warn(MYNAME(),
 					 '%d total trials reached -- stopping.' % n, wait=0)
 
 			nmax = self.sub_common.queryv('max_correct')
 			n = self._runstats['ncorrect']
 			if (nmax > 0) and n > nmax:
 				self.set_state(running=0)
-				warn('pype:_runstats_update',
+				warn(MYNAME(),
 					 '%d correct trials reached -- stopping.' % n, wait=0)
 
 			nmax = self.sub_common.queryv('max_ui')
 			n = self._runstats['nui']
 			if (nmax > 0) and n > nmax:
 				self.set_state(running=0)
-				warn('pype:_runstats_update',
+				warn(MYNAME(),
 					 '%d sequential UI trials -- stopping.' % n, wait=0)
 
 		ne = self._runstats['nerror']
@@ -2301,8 +2298,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 	def _start_helper(self, temp=None):
 		if self.running:
-			self._stop.config(state=DISABLED)
-			self._stopnow.config(state=DISABLED)
+			for w in self.enable_on_start:
+				w.config(state=DISABLED)
 			self.running = 0
 		else:
 			if (os.stat(self._task_pathname).st_mtime <> self._task_mtime and
@@ -2318,11 +2315,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			try:
 				self._savestate()
 				self._loadmenu.disableall()
-				for w in (self._named_start, self._temp_start,
-						  self.reloadbut, self.prevtaskbut,):
+				for w in self.disable_on_start:
 					w.config(state=DISABLED)
-				self._stop.config(state=NORMAL)
-				self._stopnow.config(state=NORMAL)
+				for w in self.enable_on_start:
+					w.config(state=NORMAL)
 
 				if temp:
 					if self.sub_common.queryv('save_tmp'):
@@ -2352,7 +2348,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 						self.task_name,
 						force=1)
 					if not ok:
-						warn('pype:_start_helper:elog', ecode)
+						warn(MYNAME(), ecode)
 					#del self._exper
 
 				if self.xdacq == 'plexon':
@@ -2382,7 +2378,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 
 				# call task-specific start function.
-				self.set_state(running=1, paused=0, led=1)
+				self.set_state(running=1)
 				self.warn_run_start()
 				self.con()				# clear console window
 				self._startfn(self)
@@ -2390,7 +2386,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				reporterror(dbug=self.config.iget('DBERRS'))
 			finally:
 				self.record_done()
-				self.set_state(running=0, paused=0, led=0)
+				self.set_state(running=0)
 				self.warn_run_stop()
 				if self.psych:
 					self.fb.screen_close()
@@ -2401,17 +2397,16 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				dacq_set_pri(0)
 				dacq_set_mypri(0)
 				dacq_set_rt(0)
-				for w in (self._named_start, self._temp_start,
-						  self.reloadbut, self.prevtaskbut,):
+				for w in self.disable_on_start:
 					w.config(state=NORMAL)
-				self._stop.config(state=DISABLED)
-				self._stopnow.config(state=DISABLED)
+				for w in self.enable_on_start:
+					w.config(state=DISABLED)
 				self.showtestpat()
 				self._allowabort = 0
 				self._loadmenu.enableall()
 
 			if self.xdacq == 'plexon':
-				warn('pype:_start_helper:xdacq',
+				warn(MYNAME(),
 					 'Stop plexon now', wait=0)
 			elif self.xdacq == 'tdt':
 				# recording's done -- direct output back to TempBlk
@@ -2457,7 +2452,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 	def _new_cell(self):
 		if self.use_elog:
-			warn('pype:_new_cell',
+			warn(MYNAME(),
 				 'Use elog "Edit>New Experiment" and then File>Save.')
 		else:
 			try:
@@ -2465,7 +2460,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				n = n + 1
 				self.sub_common.set('cell', "%d" % n)
 			except ValueError:
-				warn('pype:_new_cell',
+				warn(MYNAME(),
 					 'cell field is non-numeric, can''t increment.')
 
 	def set_startfn(self, startfn, updatefn=None, validatefn=None):
@@ -2795,7 +2790,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		"""
 		if not self.running:
 			self._juice_on()
-			w = warn('pype:_drain', 'Juicer is open!')
+			w = warn(MYNAME(), 'Juicer is open!')
 			self._juice_off()
 
 	def _history(self, code=None):
@@ -3096,7 +3091,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		if iclass == 666:
 			self.running = 0
-			warn('eyelink', 'Lost eyelink connection!', wait=0)
+			warn(MYNAME(), 'Lost eyelink connection!', wait=0)
 			return
 
 		# for INT_FATAL interupts -- handle regardless of allow_ints
@@ -3532,7 +3527,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			if dacq_adbuf_toggle(0):
 				self.encode(EYE_OVERFLOW)
 				Logger('pype: warning -- eyetrace overflowed\n')
-				warn('pype:eyetrace', 'eye trace overflow')
+				warn(MYNAME(), 'eye trace overflow')
 			self._eyetrace = 0
 
 	def encode(self, code=None, ts=None):
@@ -4027,7 +4022,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		full_animal = self.sub_common.queryv('full_subject')
 
 		if len(animal) == 0 or len(full_animal) == 0:
-			warn('pype:_guess_elog',
+			warn(MYNAME(),
 				 "Set 'subject' and 'full_subject' parameters.")
 			return None
 
@@ -4266,7 +4261,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		try:
 			self.rthist.drawnow()
 		except:
-			if warn('matlibplot error',
+			if warn(MYNAME(),
 					'Probably must delete ~/.matlibplot', once=True):
 				reporterror()
 

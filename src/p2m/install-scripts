@@ -22,7 +22,6 @@ for i in pype_expander.py pype_count.py matlab-nh.py \
 done
 
 ln -sf $dest/showpypefile.py $dest/pf
-ln -sf $dest/showparams.py $dest/pf
 
 
 		 

@@ -39,8 +39,8 @@ if __name__ == '__main__':
             try:
                 raw = d.params[k+'_raw_']
                 if raw == val:
-                    print '%20s: %s' % (k, pval)
+                    print '%-15s %s' % (k, pval)
                 else:
-                    print '%20s: %s    {%s}' % (k, pval, raw)
+                    print '%-15s %s    {%s}' % (k, pval, raw)
             except KeyError:
-                print '%20s: %s' % (k, pval)
+                print '%-15s %s' % (k, pval)

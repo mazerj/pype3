@@ -961,6 +961,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			#Logger("pype: no ELOG setup -- using old-style cell counter.\n")
 			self.use_elog = 0
 
+		if self.use_elog:
+			mb.addmenuitem('File', 'command', label='elog',
+						   command=lambda s=self: s.open_elog())
+			
+
 		(commonp, rigp, icalp) = _base_ptables()
 
 		hostname = self._gethostname()
@@ -1399,6 +1404,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		if self.psych:
 			self.fb.screen_close()
 
+	def open_elog(self):
+		animal = self.sub_common.queryv('full_subject')
+		os.system('elog -animal=%s -today &' % (animal,))
 
 	def elrestart(self):
 		dacq_elrestart()

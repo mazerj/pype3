@@ -32,7 +32,7 @@ def list_():
 
 def _startstop(app, start):
 	if start:
-		for w in [app._named_start, app._temp_start]:
+		for w in app.disable_on_start:
 			w.config(state=DISABLED)
 		if app.psych:
 			app.fb.screen_open()
@@ -45,7 +45,7 @@ def _startstop(app, start):
 		app.info(' Select again to stop! ', color='black')
 	else:
         if app.taskmodule:
-            for w in [app._named_start, app._temp_start]:
+            for w in app.disable_on_start:
                 w.config(state=NORMAL)
 		app.info()
 		if app.psych:

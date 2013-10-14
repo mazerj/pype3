@@ -1601,10 +1601,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self._stateinfo.configure(text=t)
 			try:
 				if barstate:
-					self.udpy.titlebar.config(text='    BAR DOWN    ',
+					self.udpy.titlebar.config(text=' BAR DOWN ',
+											  font=('Courier', 10),
 											  fg='green')
 				else:
-					self.udpy.titlebar.config(text='XXXX BAR UP XXXX',
+					self.udpy.titlebar.config(text=' BAR UP   ',
+											  font=('Courier', 10),
 											  fg='red')
 				self._last_stateinfo = t
 			except AttributeError:

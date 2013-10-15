@@ -334,12 +334,14 @@ class UserDisplay(object):
 
 		self._axis = []
 
-		self._eye_trace = []
-		self._eye_trace_maxlen = 50
+		self.eye = []                     # current eye position
+		self._eye_trace = []              # eye trace sample points
+		self._eye_trace_lines = []        # eye trace lines
+		self._eye_trace_maxlen = 25       # make length of eyetrace train
+		self._eye_lx = None               # last x position
 
 		self.fix_x = 0
 		self.fix_y = 0
-		self.eye = None
 
 		self.userhook = None
 		self.userhook_data = None
@@ -441,7 +443,9 @@ class UserDisplay(object):
 
 	def eye_clear(self):
 		self._eye_trace = self.deltags(self._eye_trace)
+		self._eye_trace_lines = self.deltags(self._eye_trace_lines)
 		self._eye_trace = []
+		self._eye_trace_lines = []
 
 	def eye_at(self, rx, ry, xt=False):
 		tnow = time.time()
@@ -450,26 +454,39 @@ class UserDisplay(object):
 			return
 		self._lastEyeUpdate = tnow
 
-		# update 2D X-Y display
-		SPOTSIZE = 3
 		# clip at display edges
-		rx = max(-self.w2+2, min(self.w2-2, rx))
-		ry = max(-self.h2+2, min(self.h2-2, ry))
+		rx = max(-self.w2+25, min(self.w2-25, rx))
+		ry = max(-self.h2+25, min(self.h2-25, ry))
 		(x, y) = self.fb2can(rx, ry)
+
+		if self._eye_lx is not None:
+            self._eye_trace_lines.append(self.canvas.create_line(self._eye_lx,
+																 self._eye_ly,
+																 x, y,
+																 fill="red"))
+			if len(self._eye_trace_lines) > self._eye_trace_maxlen:
+				self.canvas.delete(self._eye_trace_lines[0])
+				del self._eye_trace_lines[0]
+        self._eye_lx = x
+        self._eye_ly = y
+
 		tag = self.canvas.create_text(x, y, text='+',
-									  font=('Courier', 5),
-									  fill='pink', justify=CENTER)
+									  font=('Courier', 10, 'bold'),
+									  fill='red', justify=CENTER)
 		self._eye_trace.append(tag)
-		if len(self._eye_trace) > self._eye_trace_maxlen:
-			del self._eye_trace[0]
+        if len(self._eye_trace) > self._eye_trace_maxlen:
 			self.canvas.delete(self._eye_trace[0])
-			
-		if self.eye:
-			del self.eye
-		self.eye = self.canvas.create_text(x, y, text='O',
-										   font=('Courier', 13),
-										   fill='orange', justify=CENTER)
-		
+			del self._eye_trace[0]
+
+		for i in self.eye:
+			self.canvas.delete(i)
+		self.eye = (self.canvas.create_text(x, y, text='o',
+											font=('Courier', 18, 'bold'),
+											fill='white', justify=CENTER),
+					self.canvas.create_text(x, y, text='o',
+											font=('Courier', 14, 'bold'),
+											fill='black', justify=CENTER))
+
 		if xt:
 			# update X-T display
 			n = self._traceptr

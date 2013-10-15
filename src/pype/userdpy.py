@@ -336,13 +336,10 @@ class UserDisplay(object):
 
 		self._eye_trace = []
 		self._eye_trace_maxlen = 50
-		self._eye_lx = None
-		self._eye_ly = None
 
 		self.fix_x = 0
 		self.fix_y = 0
-		self.eye = self.canvas.create_rectangle(0, 0, 0, 0,
-												 fill="black", outline="")
+		self.eye = None
 
 		self.userhook = None
 		self.userhook_data = None
@@ -445,10 +442,48 @@ class UserDisplay(object):
 	def eye_clear(self):
 		self._eye_trace = self.deltags(self._eye_trace)
 		self._eye_trace = []
-		self._eye_lx = None
-		self._eye_ly = None
 
 	def eye_at(self, rx, ry, xt=False):
+		tnow = time.time()
+		# throttle updating to max of 60hz
+		if (tnow - self._lastEyeUpdate) < 0.008:
+			return
+		self._lastEyeUpdate = tnow
+
+		# update 2D X-Y display
+		SPOTSIZE = 3
+		# clip at display edges
+		rx = max(-self.w2+2, min(self.w2-2, rx))
+		ry = max(-self.h2+2, min(self.h2-2, ry))
+		(x, y) = self.fb2can(rx, ry)
+		tag = self.canvas.create_text(x, y, text='+',
+									  font=('Courier', 5),
+									  fill='pink', justify=CENTER)
+		self._eye_trace.append(tag)
+		if len(self._eye_trace) > self._eye_trace_maxlen:
+			del self._eye_trace[0]
+			self.canvas.delete(self._eye_trace[0])
+			
+		if self.eye:
+			del self.eye
+		self.eye = self.canvas.create_text(x, y, text='O',
+										   font=('Courier', 13),
+										   fill='orange', justify=CENTER)
+		
+		if xt:
+			# update X-T display
+			n = self._traceptr
+			h = self._htrace[n]
+			v = self._vtrace[n]
+			self._traceptr = (self._traceptr + 1) % len(self._htrace)
+			n = self._traceptr
+			h = self._htrace[n]
+			v = self._vtrace[n]
+			self.canvas.coords(h, n, 50 + rx/10.0, n+1, 50 + rx/10.0)
+			self.canvas.coords(v, n, 50 + ry/10.0, n+1, 50 + ry/10.0)
+			self.canvas.coords(self._tracecursor, n, 50-20, n, 50+20)
+
+	def line_eye_at(self, rx, ry, xt=False):
 		tnow = time.time()
 		# throttle updating to max of 60hz
 		if (tnow - self._lastEyeUpdate) < 0.008:

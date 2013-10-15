@@ -429,7 +429,7 @@ def MYNAME(level=0):
 	"""Get name of calling function (or, if level=1: caller of caller, etc.
 
 	"""
-	
+
 	import traceback
 	stack = traceback.extract_stack()
 	filename, codeline, funcName, text = stack[-2-level]
@@ -964,7 +964,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		if self.use_elog:
 			mb.addmenuitem('File', 'command', label='elog',
 						   command=lambda s=self: s.open_elog())
-			
+
 
 		(commonp, rigp, icalp) = _base_ptables()
 
@@ -1543,7 +1543,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 	def pause(self, state=None):
 		"""Call this to automatically pause task if user has requested pause.
-		
+
 		"""
 		if state is None:
 			if self._paused:
@@ -1601,11 +1601,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self._stateinfo.configure(text=t)
 			try:
 				if barstate:
-					self.udpy.titlebar.config(text=' BAR DOWN ',
+					self.udpy.titlebar.config(text='BAR DOWN',
 											  font=('Courier', 10),
 											  fg='green')
 				else:
-					self.udpy.titlebar.config(text=' BAR UP   ',
+					self.udpy.titlebar.config(text='BAR  UP ',
 											  font=('Courier', 10),
 											  fg='red')
 				self._last_stateinfo = t
@@ -3864,6 +3864,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		# pype internal ('pi') -- user tagged this trial (f7)?
 		params['piTrialTag'] = tag
 
+        rec = None
+        
 		if not fast_tmp and self.record_file:
 			# dump the event stream
 			info = (resultcode, rt, params) + taskinfo

@@ -66,7 +66,7 @@ def B(x, on='ON ', off='OFF'):
 	else: return off
 
 BLINK_STATES = ['OFF', 'ON', 'BLINK']
-BTAG = ['X', '+', 'B']
+BTAG = ['OFF', '', '']
 
 _n = 0
 BAR=_n ; _n += 1
@@ -218,8 +218,8 @@ class _Probe(object):
 		z = self.sfreq/self.length
 
 		s = ""
-		s = s + "  z:%s " % B(self.lock, 'LOCK', 'FREE')
 		s = s + "  o:%s " % B(self.xoff, 'OFFST', 'MOUSE')
+		s = s + "  z:%s (mb2) " % B(self.lock, 'LOCK', 'FREE')
 		s = s + "\n"
 		s = s + "  j:%s " % B(self.jitter, 'ON  ', 'OFF ')
 		s = s + "  d:%s " % B(self.drift, 'ON  ', 'OFF ')
@@ -227,13 +227,14 @@ class _Probe(object):
 		s = s + "\n"
 		s = s +	"  h:hide info       p:post info\n"
 		s = s + "\n"
-		s = s +		"  m  stim type  %s\n" % BARMODES[self.barmode]
+		s = s +		" qw  length     %d\n" % self.length
+		s = s +		" er  width      %d\n" % self.width
 		s = s +		" 89  dir/ori    %d:%d deg\n" % angle
+		s = s + "\n"
+		s = s +		"  m  stim type  %s\n" % BARMODES[self.barmode]
 		s = s +     " nN  rgb        %s\n" % color
 		s = s +		"1-6  color      %s\n" % self.colorname
 		s = s +		" iI  inten      %d\n" % self.inten
-		s = s +		" qw  length     %d\n" % self.length
-		s = s +		" er  width      %d\n" % self.width
 		s = s +		" -=  linewidth  %d\n" % self.lw
 		s = s +		" tT  drift amp  %d px\n" % self.drift_amp
 		s = s +		" yY  drift freq %.1f Hz\n" % self.drift_freq
@@ -511,43 +512,48 @@ class _Probe(object):
 		if self.major_ax:
 			self.app.udpy.canvas.coords(self.major_ax, x1, y1, x2, y2)
 			self.app.udpy.canvas.coords(self.minor_ax, x, y, x+dx, y+dy)
-			self.app.udpy.canvas.coords(self.onoff, x-dx, y-dy)
+			self.app.udpy.canvas.coords(self.onoff, x, y)
 			self.app.udpy.canvas.itemconfig(self.onoff,
 											text=BTAG[self.blink_state])
 		else:
-			self.major_ax = self.app.udpy.canvas.create_line(x1, y1, x2, y2,
-                                                             fill='gold',
-															 width=4)
-			self.minor_ax = self.app.udpy.canvas.create_line(x, y, x+dx, y+dy,
-															 arrow=LAST,
-                                                             fill='lightsalmon',
-															 width=4)
-			self.onoff = self.app.udpy.canvas.create_text(x+10, y+10,
-														  text=BTAG[self.blink_state],
-														  anchor=CENTER,
-                                                          font='Courier 30',
-														  fill='wheat')
+			self.major_ax = \
+              self.app.udpy.canvas.create_line(x1, y1, x2, y2,
+                                               fill='magenta',
+                                               width=4)
+			self.minor_ax = \
+              self.app.udpy.canvas.create_line(x, y, x+dx, y+dy,
+                                               arrow=LAST,
+                                               fill='magenta',
+                                               width=4)
+			self.onoff = \
+              self.app.udpy.canvas.create_text(x, y,
+                                               text=BTAG[self.blink_state],
+                                               anchor=CENTER,
+                                               font=('Courier', 30),
+                                               fill='cyan')
 			for l in (self.minor_ax, self.major_ax):
 				self.app.udpy.canvas.lower(l)
-
-		if self.app.hmapstate.probe.live:
-            self.app.udpy.canvas.itemconfigure(self.major_ax, dash=(100,1))
-        else:
-            self.app.udpy.canvas.itemconfigure(self.major_ax, dash=(4,2))
 
         if self.blink_state > 0:
             c = self.contrast > 0
         else:
             c = 0
-        self.app.udpy.canvas.itemconfigure(self.onoff, font='Courier 30',
-                                           fill=['wheat', 'orange'][c])
+
+		if self.app.hmapstate.probe.live:
+            for i in (self.major_ax, self.minor_ax):
+                self.app.udpy.canvas.itemconfigure(i, dash=(100,1),
+                                                   width=4+(2*c))
+        else:
+            for i in (self.major_ax, self.minor_ax):
+                self.app.udpy.canvas.itemconfigure(i, dash=(4,2),
+                                                   width=4+(2*c))
 
 		if self.showinfo:
 			s = self.pp()
 		else:
 			s = "  h: show info"
-		self.app.udpy.canvas.itemconfig(self.text1, text=s)
-		self.app.udpy.canvas.itemconfig(self.text2, text=s)
+        for i in self.text:
+            self.app.udpy.canvas.itemconfig(i, text=s)
 
 def step(val, by=1, minval=None, maxval=None):
 	val = val + by
@@ -715,16 +721,16 @@ def hmap_install(app):
 	app.hmapstate.probe = _Probe(app)
 	app.hmapstate.hookdata = app.set_canvashook(_key_handler, app)
 	app.taskidle = _hmap_idlefn
-	app.hmapstate.probe.text1 = app.udpy.canvas.create_text(11, 36,
-															font="Courier 10",
-															anchor=NW,
-															justify=LEFT,
-															fill='black')
-	app.hmapstate.probe.text2 = app.udpy.canvas.create_text(10, 37,
-															font="Courier 10",
-															anchor=NW,
-															justify=LEFT,
-															fill='red')
+    app.hmapstate.probe.text = []
+    for n in [0, 1]:
+        app.hmapstate.probe.text.append(
+            app.udpy.canvas.create_text(11, 36+n,
+                                        font=('Courier', 8),
+                                        anchor=NW,
+                                        justify=LEFT,
+                                        fill=['black', 'red'][n])
+                                        )
+    app.udpy.set_taskcallback(lambda ev, app=app: _key_handler(app, 'z', ev))
 
 
 def hmap_uninstall(app):
@@ -734,8 +740,9 @@ def hmap_uninstall(app):
 	app.hmapstate.probe.save()
 	app.hmapstate.probe.clear()
 	app.set_canvashook(app.hmapstate.hookdata[0], app.hmapstate.hookdata[1])
-	app.udpy.canvas.delete(app.hmapstate.probe.text1)
-	app.udpy.canvas.delete(app.hmapstate.probe.text2)
+    for i in app.hmapstate.probe.text:
+        app.udpy.canvas.delete(i)
+    app.udpy.set_taskcallback(None)
 
 	del app.hmapstate
 

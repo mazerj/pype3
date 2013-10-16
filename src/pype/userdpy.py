@@ -258,9 +258,9 @@ class UserDisplay(object):
 					  command=self._fixset)
 		m.add_command(label="Set fixspot to (0,0)",
 					  command=self._fixzero)
-		m.add_command(label="Set fixspot (0,here) - on X axis",
+		m.add_command(label="Project fixspot up/down to X-AXIS",
 					  command=lambda:self._fixset(y=0))
-		m.add_command(label="Set fixspot (here,0) - on Y axis",
+		m.add_command(label="Project fixspot left/right to Y-AXIS",
 					  command=lambda:self._fixset(x=0))
 		m.add_command(label="Enter fixspot coords", command=self._fixxy)
 		p.add_cascade(label='Fixspot', menu=m)
@@ -297,8 +297,6 @@ class UserDisplay(object):
 		m = Menu(p, tearoff=0)
 		m.add_checkbutton(label='Photo mode', command=self._phototoggle,
 						  variable=self._photomode_tvar)
-		m.add_checkbutton(label='clear trace',
-						  command=lambda s=self: s.eye_clear())
 		p.add_cascade(label='Display Options', menu=m)
 
 		m = Menu(p, tearoff=0)
@@ -344,7 +342,7 @@ class UserDisplay(object):
 		self._eye_at = None            # current eye position marker
 		self._eye_trace = []           # trace history sample markers
 		self._eye_trace_lines = []     # trace history lines
-		self._eye_trace_maxlen = 25    # length of history buffer
+		self._eye_trace_maxlen = 20    # length of history buffer
 		self._eye_lxy = None           # last x,y eye position
 
 		self.fix_x = 0
@@ -354,7 +352,6 @@ class UserDisplay(object):
 		self.userhook_data = None
 
 		self._lastEyeUpdate = time.time()
-		self.eye_clear()
 		self.eye_at(0,0)
 
 		self.points = []
@@ -362,11 +359,22 @@ class UserDisplay(object):
 		self.msg_label = None
 		self.msg_win = None
 
-		self.set_taskpopup()
+        if 0:
+            self.set_taskpopup()
+        else:
+            self.canvas.bind("<Button-2>",
+                             lambda ev,s=self: s._taskcallbackfn(ev))
 
 		self.visible = 1
 
 		self.canvas.config(scrollregion=self.canvas.bbox(ALL))
+
+    def set_taskcallback(self, callbackfn=None):
+        if callbackfn:
+            self._taskcallbackfn = callbackfn
+        else:
+            self._taskcallbackfn = lambda ev: None
+
 
 	def showhide(self):
 		if self.visible:
@@ -448,12 +456,6 @@ class UserDisplay(object):
 				self.canvas.delete(tag)
 		return []
 
-	def eye_clear(self):
-		self._eye_trace = self.deltags(self._eye_trace)
-		self._eye_trace_lines = self.deltags(self._eye_trace_lines)
-		self._eye_trace = []
-		self._eye_trace_lines = []
-
 	def eye_at(self, rx, ry, xt=False):
 		tnow = time.time()
 		# throttle updating to max of 60hz
@@ -508,59 +510,24 @@ class UserDisplay(object):
 			self.canvas.coords(v, n, 50 + ry/10.0, n+1, 50 + ry/10.0)
 			self.canvas.coords(self._tracecursor, n, 50-20, n, 50+20)
 
-	def line_eye_at(self, rx, ry, xt=False):
-		tnow = time.time()
-		# throttle updating to max of 60hz
-		if (tnow - self._lastEyeUpdate) < 0.008:
-			return
-		self._lastEyeUpdate = tnow
-
-		# update 2D X-Y display
-		SPOTSIZE = 3
-		# clip at display edges
-		rx = max(-self.hw+2, min(self.hw-2, rx))
-		ry = max(-self.hh+2, min(self.hh-2, ry))
-		(x, y) = self.fb2can(rx, ry)
-		if self._eye_lx is not None and	 self._eye_ly is not None:
-			tag = self.canvas.create_line(self._eye_lx, self._eye_ly, x, y,
-										   fill="red")
-			self._eye_trace.append(tag)
-			if len(self._eye_trace) > self._eye_trace_maxlen:
-				self.canvas.delete(self._eye_trace[0])
-				del self._eye_trace[0]
-		self.canvas.coords(self.eye,
-							x-SPOTSIZE, y-SPOTSIZE, x+SPOTSIZE, y+SPOTSIZE)
-		self._eye_lx = x
-		self._eye_ly = y
-
-		if xt:
-			# update X-T display
-			n = self._traceptr
-			h = self._htrace[n]
-			v = self._vtrace[n]
-			self._traceptr = (self._traceptr + 1) % len(self._htrace)
-			n = self._traceptr
-			h = self._htrace[n]
-			v = self._vtrace[n]
-			self.canvas.coords(h, n, 50 + rx/10.0, n+1, 50 + rx/10.0)
-			self.canvas.coords(v, n, 50 + ry/10.0, n+1, 50 + ry/10.0)
-			self.canvas.coords(self._tracecursor, n, 50-20, n, 50+20)
-
 	def can2fb(self, x, y=None):
-		"""Convert canvas/event coords to frame buffer coords.
+		"""Convert canvas (including event position) coords to
+        frame buffer coords.
 
-		Tkinter canvas coords have (0,0) in upper left,
-		frame buffer has 0,0 at center and has normal
-		Cartesian directions.
+        Inverse of fb2can() method.
+
+		Tkinter canvas coords have (0,0) in upper left, frame buffer
+		has 0,0 at center and has normal Cartesian directions.
+
 		"""
 		if y is None:
 			(x, y) = x
 		return (x - (self.hw), (self.h - y) - self.hh)
 
 	def fb2can(self, x, y=None):
-		"""Convert (Cartesian) frame buffer coords to canvas coords
+		"""Convert frame buffer coords to canvas coords
 
-		Inverse of can2fb().
+		Inverse of can2fb() method.
 		"""
 		if y is None:
             (x, y) = x
@@ -895,19 +862,15 @@ class UserDisplay(object):
 		self.app._int_handler(None, None, iclass=1, iarg=0)
 
 	def _mouse_motion(self, ev=None):
-		s = "[%dppd]" % (self.gridinterval,)
+		s = '[%dppd]' % (self.gridinterval,)
 		if self.canvas.xscale != 1.0 or self.canvas.yscale != 1.0:
 			s = s + '[%.1fx%.1f]' % (self.canvas.xscale,self.canvas.yscale)
 		if not ev is None:
 			x, y = self.canvas.window2scaled(ev.x, ev.y)
 			(self.mousex, self.mousey) = self.can2fb(x, y)
-			#print (ev.x,ev.y), (x,y), (self.mousex, self.mousey)
-			s = s + "xy=[%05d,%05d] " % (x, y)
-            xx,yy = self.fb2can(x,y)
-			s = s + "fb=[%05d,%05d] " % (xx, yy)
-			s = s + "R=[%05d,%05d] " % (self.mousex-self.fix_x,
+			s = s + ' REL=[%05d,%05d]' % (self.mousex-self.fix_x,
                                         self.mousey-self.fix_y,)
-			s = s + "A=[%05d,%05d] " % (self.mousex, self.mousey,)
+			s = s + ' ABS=[%05d,%05d]' % (self.mousex, self.mousey,)
 		s = '%40s' % s
 		self._mouseinfo.configure(text=s)
 

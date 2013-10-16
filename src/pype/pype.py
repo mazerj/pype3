@@ -2761,6 +2761,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					self.running = 0
 					raise UserAbort
 				elif self.eyemouse:
+                    # UserDisplay object handles eyemouse events in the
+                    # UserDisplay; here we handle eyemouse events in the
+                    # FrameBuffer:
 					doint = 0
 					if pev.type is pygame.MOUSEBUTTONDOWN and pev.button==1:
 						self.eyeshift(x=pev.pos[0] - (self.fb.w/2),
@@ -3430,9 +3433,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		self.recording = 1
 
-		# start with fresh eye trace..
-		self.udpy.eye_clear()
-
 		# save recording start time -- this is used to ensure
 		# 250ms between start/stop events for proper plexon sync
 
@@ -3447,8 +3447,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		# see note about re self.encode(START) -- this has been moved
 		# to right AFTER the self.record_state(0) call to avoid
 		# problems with plexon sync..
-
-		self.udpy.eye_clear()
 
 		# tell plexon trial is OVER
 		self.recording = 0
@@ -3865,7 +3863,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		params['piTrialTag'] = tag
 
         rec = None
-        
+
 		if not fast_tmp and self.record_file:
 			# dump the event stream
 			info = (resultcode, rt, params) + taskinfo

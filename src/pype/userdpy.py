@@ -325,20 +325,27 @@ class UserDisplay(object):
 		self.markstack = []
 		self.markbox = None
 
-		#self.w = int(self.canvas.configure("width")[4])
-		#self.h = int(self.canvas.configure("height")[4])
-		self.w = cwidth
-		self.h = cheight
-		self.w2 = int(round(self.w / 2.0))
-		self.h2 = int(round(self.h / 2.0))
+		self.w = cwidth                      # full width
+		self.h = cheight                     # full height
+		self.hw = int(round(self.w / 2.0))   # half width
+		self.hh = int(round(self.h / 2.0))   # half height
 
 		self._axis = []
 
-		self.eye = []                     # current eye position
-		self._eye_trace = []              # eye trace sample points
-		self._eye_trace_lines = []        # eye trace lines
-		self._eye_trace_maxlen = 25       # make length of eyetrace train
-		self._eye_lx = None               # last x position
+        # Wed Oct 16 17:01:56 2013 mazer
+        # big mystery: if you do this coords are correct, otherwise,
+        # the y values are off. I think it has something to do with
+        # forcing the canvas widget to update its width and height
+        # parameters in a funny, buggy way.. just leave it for now.
+        bug = self.canvas.create_rectangle(0, 0, 0, 0,
+                                           fill="black", outline="")
+        del bug
+
+		self._eye_at = None            # current eye position marker
+		self._eye_trace = []           # trace history sample markers
+		self._eye_trace_lines = []     # trace history lines
+		self._eye_trace_maxlen = 25    # length of history buffer
+		self._eye_lxy = None           # last x,y eye position
 
 		self.fix_x = 0
 		self.fix_y = 0
@@ -455,20 +462,18 @@ class UserDisplay(object):
 		self._lastEyeUpdate = tnow
 
 		# clip at display edges
-		rx = max(-self.w2+25, min(self.w2-25, rx))
-		ry = max(-self.h2+25, min(self.h2-25, ry))
+		rx = max(-self.hw+5, min(self.hw-5, rx))
+		ry = max(-self.hh+5, min(self.hh-5, ry))
 		(x, y) = self.fb2can(rx, ry)
 
-		if self._eye_lx is not None:
-            self._eye_trace_lines.append(self.canvas.create_line(self._eye_lx,
-																 self._eye_ly,
-																 x, y,
-																 fill="red"))
+		if self._eye_lxy is not None:
+            l = self.canvas.create_line(self._eye_lxy[0], self._eye_lxy[1],
+                                        x, y, fill="red")
+            self._eye_trace_lines.append(l)
 			if len(self._eye_trace_lines) > self._eye_trace_maxlen:
 				self.canvas.delete(self._eye_trace_lines[0])
-				del self._eye_trace_lines[0]
-        self._eye_lx = x
-        self._eye_ly = y
+				self._eye_trace_lines.pop(0)
+        self._eye_lxy = (x, y)
 
 		tag = self.canvas.create_text(x, y, text='+',
 									  font=('Courier', 10, 'bold'),
@@ -478,14 +483,17 @@ class UserDisplay(object):
 			self.canvas.delete(self._eye_trace[0])
 			del self._eye_trace[0]
 
-		for i in self.eye:
-			self.canvas.delete(i)
-		self.eye = (self.canvas.create_text(x, y, text='o',
-											font=('Courier', 18, 'bold'),
-											fill='white', justify=CENTER),
-					self.canvas.create_text(x, y, text='o',
-											font=('Courier', 14, 'bold'),
-											fill='black', justify=CENTER))
+        if self._eye_at is None:
+            self._eye_at = (
+                self.canvas.create_text(x, y, text='O',
+                                        font=('Courier', 16, 'bold'),
+                                        fill='white', justify=CENTER),
+                self.canvas.create_text(x, y, text='O',
+                                        font=('Courier', 14),
+                                        fill='black', justify=CENTER)
+                                        )
+        for i in self._eye_at:
+            self.canvas.coords(i, x, y)
 
 		if xt:
 			# update X-T display
@@ -510,8 +518,8 @@ class UserDisplay(object):
 		# update 2D X-Y display
 		SPOTSIZE = 3
 		# clip at display edges
-		rx = max(-self.w2+2, min(self.w2-2, rx))
-		ry = max(-self.h2+2, min(self.h2-2, ry))
+		rx = max(-self.hw+2, min(self.hw-2, rx))
+		ry = max(-self.hh+2, min(self.hh-2, ry))
 		(x, y) = self.fb2can(rx, ry)
 		if self._eye_lx is not None and	 self._eye_ly is not None:
 			tag = self.canvas.create_line(self._eye_lx, self._eye_ly, x, y,
@@ -538,23 +546,25 @@ class UserDisplay(object):
 			self.canvas.coords(v, n, 50 + ry/10.0, n+1, 50 + ry/10.0)
 			self.canvas.coords(self._tracecursor, n, 50-20, n, 50+20)
 
-	def can2fb(self, x, y):
+	def can2fb(self, x, y=None):
 		"""Convert canvas/event coords to frame buffer coords.
 
-		Canvas (ie, raw window) coords have (0,0) in upper left,
-		frame buffer has 0,0 at center and has normal Cartesian
-		directions.
+		Tkinter canvas coords have (0,0) in upper left,
+		frame buffer has 0,0 at center and has normal
+		Cartesian directions.
 		"""
-		if y is None: (x, y) = x
-		return (x - (self.w2), (self.h - y) - self.h2)
+		if y is None:
+			(x, y) = x
+		return (x - (self.hw), (self.h - y) - self.hh)
 
 	def fb2can(self, x, y=None):
 		"""Convert (Cartesian) frame buffer coords to canvas coords
 
 		Inverse of can2fb().
 		"""
-		if y is None: (x, y) = x
-		return (self.w2 + x, self.h2 - y)
+		if y is None:
+            (x, y) = x
+		return (self.hw + x, self.hh - y)
 
 	def drawaxis(self, axis=1, sync=1):
 		if axis:
@@ -891,10 +901,13 @@ class UserDisplay(object):
 		if not ev is None:
 			x, y = self.canvas.window2scaled(ev.x, ev.y)
 			(self.mousex, self.mousey) = self.can2fb(x, y)
-			if self.fix_x or self.fix_y:
-				s = "R[%5d,%5d] " % (self.mousex-self.fix_x,
-										 self.mousey-self.fix_y,) + s
-			s = "A[%5d,%5d] " % (self.mousex, self.mousey,) + s
+			#print (ev.x,ev.y), (x,y), (self.mousex, self.mousey)
+			s = s + "xy=[%05d,%05d] " % (x, y)
+            xx,yy = self.fb2can(x,y)
+			s = s + "fb=[%05d,%05d] " % (xx, yy)
+			s = s + "R=[%05d,%05d] " % (self.mousex-self.fix_x,
+                                        self.mousey-self.fix_y,)
+			s = s + "A=[%05d,%05d] " % (self.mousex, self.mousey,)
 		s = '%40s' % s
 		self._mouseinfo.configure(text=s)
 

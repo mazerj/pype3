@@ -552,6 +552,95 @@ def dir2ori(dir):
 		ori = ori + 360.
 	return ori
 
+class ConditionBucket(object):
+    def __init__(self, conditions, randomize=True, freeze=False):
+        """Bucket to hold a set of conditions or stimulus parameters,.
+
+        Initialize with a list of conditions -- can be any type of
+        sequence object (list, tuple etc) to be provided to the
+        task on-demand.
+
+        :params conditions: (list) list of condition descriptions/parameters
+
+        :params randomize: (bool) automatically randomize order?
+
+        :params freeze: (bool) randomize once and freeze sequence?
+
+        :return nothing:
+
+        """
+        self.conditions = conditions
+        self.randomize = randomize
+        self.block = 0
+        self.frozen_seq = None
+        self.reset()
+        if freeze:
+            self.frozen_seq = self.sequence[:]
+
+    def reset(self):
+        """Reset the bucket -- usually task shouldn't need to call this.
+
+        This resets the bucket back to the starting point, potentially
+        re-randomizing the order. This is automatically called when the
+        bucket on initialization and when the bucket goes empty, so the
+        user should need need to call this directly.
+
+        :return nothing:
+
+        """
+
+        self.sequence = range(len(self.conditions))
+        if self.randomize:
+            if self.frozen_seq is None:
+                self.sequence = permute(self.sequence)
+            else:
+                self.sequence = self.frozen_seq[:]
+
+    def pop(self):
+        """Get next condition from the bucket.
+
+        Automatically refills bucket when it's empty. The index number
+        returned here is what needs to be passed to pop when putting
+        things back in the bucket.
+
+        :return tuple: (index number of condition, condition,
+          current block/repeat)
+
+        """
+
+        if len(self.sequence) < 1:
+            self.reset()
+            self.block += 1
+
+        n = self.sequence[0]
+        self.sequence.pop(0)
+        return n, self.conditions[n], self.block
+
+    def push(self, n):
+        """Put condition back in the bucket (if there's an error)
+
+        Automatically refills bucket when it's empty
+
+        :return nothing:
+
+        """
+        if self.randomize and self.frozen_seq is None:
+            self.sequence.append(n)
+        else:
+            self.sequence.insert(0,n)
+
+
+
 if __name__ == '__main__':
+    """
+    bucket = ConditionBucket('a,b,c,d'.split(','),
+                             randomize=True, freeze=True)
+    for k in range(10):
+        n, cond, block = bucket.pop()
+        print k, block, cond
+        if k == 5:
+            bucket.push(n)
+    """
+    
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)
 	sys.exit(1)

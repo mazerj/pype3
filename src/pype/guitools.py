@@ -173,10 +173,10 @@ class Logger(object):					# !SINGLETON CLASS!
 				Logger.logwindow.write(s)
 			Logger.buffered = []
 		else:
-			if Logger.logwindow:
-				Logger.logwindow.write(text)
-			else:
-				Logger.buffered.append(text)
+            if Logger.logwindow:
+                Logger.logwindow.write(text)
+            else:
+                Logger.buffered.append(text)
 			sys.stderr.write(text)
 			sys.stderr.flush()
 

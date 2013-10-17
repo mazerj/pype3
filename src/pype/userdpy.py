@@ -457,45 +457,48 @@ class UserDisplay(object):
 		return []
 
 	def eye_at(self, rx, ry, xt=False):
-		tnow = time.time()
-		# throttle updating to max of 60hz
-		if (tnow - self._lastEyeUpdate) < 0.008:
+		# throttle eye trace update to 60hz max:
+		now = time.time()
+		if (now - self._lastEyeUpdate) < 0.008:
 			return
-		self._lastEyeUpdate = tnow
+		self._lastEyeUpdate = now
 
 		# clip at display edges
 		rx = max(-self.hw+5, min(self.hw-5, rx))
 		ry = max(-self.hh+5, min(self.hh-5, ry))
-		(x, y) = self.fb2can(rx, ry)
+		(x, y) = self.cart2canv(rx, ry)
 
+		C = self.canvas
 		if self._eye_lxy is not None:
-            l = self.canvas.create_line(self._eye_lxy[0], self._eye_lxy[1],
-                                        x, y, fill="red")
+            l = C.create_line(self._eye_lxy[0], self._eye_lxy[1], x, y,
+							  fill="red")
+			C.tag_lower(l)
             self._eye_trace_lines.append(l)
 			if len(self._eye_trace_lines) > self._eye_trace_maxlen:
-				self.canvas.delete(self._eye_trace_lines[0])
+				C.delete(self._eye_trace_lines[0])
 				self._eye_trace_lines.pop(0)
         self._eye_lxy = (x, y)
 
-		tag = self.canvas.create_text(x, y, text='+',
-									  font=('Courier', 10, 'bold'),
-									  fill='red', justify=CENTER)
+		tag = C.create_text(x, y, text='+',
+							font=('Courier', 10),
+							fill='red', justify=CENTER)
+		C.tag_lower(tag)
+
 		self._eye_trace.append(tag)
         if len(self._eye_trace) > self._eye_trace_maxlen:
-			self.canvas.delete(self._eye_trace[0])
+			C.delete(self._eye_trace[0])
 			del self._eye_trace[0]
 
         if self._eye_at is None:
-            self._eye_at = (
-                self.canvas.create_text(x, y, text='O',
-                                        font=('Courier', 16, 'bold'),
-                                        fill='white', justify=CENTER),
-                self.canvas.create_text(x, y, text='O',
-                                        font=('Courier', 14),
-                                        fill='black', justify=CENTER)
-                                        )
+            self._eye_at = (C.create_text(x+1, y+1, text='o',
+                                          font=('Courier', 10),
+                                          fill='white', justify=CENTER),
+                            C.create_text(x, y, text='o',
+                                          font=('Courier', 10),
+                                          fill='black', justify=CENTER))
         for i in self._eye_at:
-            self.canvas.coords(i, x, y)
+            C.coords(i, x, y)
+			C.tag_raise(i)
 
 		if xt:
 			# update X-T display
@@ -506,15 +509,15 @@ class UserDisplay(object):
 			n = self._traceptr
 			h = self._htrace[n]
 			v = self._vtrace[n]
-			self.canvas.coords(h, n, 50 + rx/10.0, n+1, 50 + rx/10.0)
-			self.canvas.coords(v, n, 50 + ry/10.0, n+1, 50 + ry/10.0)
-			self.canvas.coords(self._tracecursor, n, 50-20, n, 50+20)
+			C.coords(h, n, 50 + rx/10.0, n+1, 50 + rx/10.0)
+			C.coords(v, n, 50 + ry/10.0, n+1, 50 + ry/10.0)
+			C.coords(self._tracecursor, n, 50-20, n, 50+20)
 
-	def can2fb(self, x, y=None):
+	def canv2cart(self, x, y=None):
 		"""Convert canvas (including event position) coords to
         frame buffer coords.
 
-        Inverse of fb2can() method.
+        Inverse of cart2canv() method.
 
 		Tkinter canvas coords have (0,0) in upper left, frame buffer
 		has 0,0 at center and has normal Cartesian directions.
@@ -524,10 +527,10 @@ class UserDisplay(object):
 			(x, y) = x
 		return (x - (self.hw), (self.h - y) - self.hh)
 
-	def fb2can(self, x, y=None):
+	def cart2canv(self, x, y=None):
 		"""Convert frame buffer coords to canvas coords
 
-		Inverse of can2fb() method.
+		Inverse of canv2cart() method.
 		"""
 		if y is None:
             (x, y) = x
@@ -536,7 +539,7 @@ class UserDisplay(object):
 	def drawaxis(self, axis=1, sync=1):
 		if axis:
 			# draw cardinal axis (0,0)
-			(x, y) = self.fb2can(0, 0)
+			(x, y) = self.cart2canv(0, 0)
 			self.canvas.create_line(x, 0, x, self.h, width=1,
 									 fill='black', dash=(7,2))
 			self.canvas.create_line(0, y, self.w, y, width=1,
@@ -544,14 +547,14 @@ class UserDisplay(object):
 
 		if sync and self.app.fb.syncinfo:
 			(sx, sy, ss) = self.app.fb.syncinfo
-			(a, b) = self.fb2can(sx - ss/2, sy - ss/2)
-			(c, d) = self.fb2can(sx + ss/2, sy + ss/2)
+			(a, b) = self.cart2canv(sx - ss/2, sy - ss/2)
+			(c, d) = self.cart2canv(sx + ss/2, sy + ss/2)
 			self.canvas.create_rectangle(a, b, c, d, fill='black')
 
 		# gridinterval is pix/deg
 		d = int(round(self.gridinterval))
 		if d > 0:
-			(xo, yo) = self.fb2can(0,0)
+			(xo, yo) = self.cart2canv(0,0)
 			for x in range(0, int(round(self.w/2)), d):
 				for y in range(0, int(round(self.h/2)), d):
 					for (sx, sy) in ((1,1),(-1,1),(-1,-1),(1,-1)):
@@ -619,7 +622,7 @@ class UserDisplay(object):
 			x1, y1 = self.markstack[0][0], self.markstack[0][1]
 			x1 = self.fix_x + x1
 			y1 = self.fix_y + y1
-			x1,y1 = self.fb2can(x1, y1)
+			x1,y1 = self.cart2canv(x1, y1)
 			self.markbox = self.canvas.create_rectangle(x1-1,y1-1,x1+1,y1+1,
 														 fill='black',
 														 outline="black")
@@ -627,12 +630,12 @@ class UserDisplay(object):
 			x1, y1 = self.markstack[0][0], self.markstack[0][1]
 			x1 = self.fix_x + x1
 			y1 = self.fix_y + y1
-			x1,y1 = self.fb2can(x1, y1)
+			x1,y1 = self.cart2canv(x1, y1)
 
 			x2, y2 = self.markstack[1][0], self.markstack[1][1]
 			x2 = self.fix_x + x2
 			y2 = self.fix_y + y2
-			x2,y2 = self.fb2can(x2, y2)
+			x2,y2 = self.cart2canv(x2, y2)
 
 			self.markbox = self.canvas.create_rectangle(x1,y1,x2,y2,
 														 fill=None,
@@ -849,7 +852,7 @@ class UserDisplay(object):
 
 	def _mouse1(self, ev=None):
 		x, y = self.canvas.window2scaled(ev.x, ev.y)
-		x, y = self.can2fb(x, y)
+		x, y = self.canv2cart(x, y)
 		self.app.eyeshift(x=x, y=y, rel=False)
 
 	def _space(self, ev=None):
@@ -867,7 +870,7 @@ class UserDisplay(object):
 			s = s + '[%.1fx%.1f]' % (self.canvas.xscale,self.canvas.yscale)
 		if not ev is None:
 			x, y = self.canvas.window2scaled(ev.x, ev.y)
-			(self.mousex, self.mousey) = self.can2fb(x, y)
+			(self.mousex, self.mousey) = self.canv2cart(x, y)
 			s = s + ' REL=[%05d,%05d]' % (self.mousex-self.fix_x,
                                         self.mousey-self.fix_y,)
 			s = s + ' ABS=[%05d,%05d]' % (self.mousex, self.mousey,)
@@ -904,8 +907,8 @@ class UserDisplay(object):
 					if hasattr(s, 'points'):
 						xy = s.points	# PolySprite
 						for n in range(1,len(xy)):
-							(x0, y0) = self.fb2can(xy[n-1])
-							(x1, y1) = self.fb2can(xy[n])
+							(x0, y0) = self.cart2canv(xy[n-1])
+							(x1, y1) = self.cart2canv(xy[n])
 							ii.append(self.canvas.create_line(x0, y0, x1, y1,
 															   width=s.width,
 															   fill='black'))
@@ -916,7 +919,7 @@ class UserDisplay(object):
 
 						if forcephoto or (self._photomode and
 										  s.w < 300 and s.h < 300):
-							(x, y) = self.fb2can(s.x-(s.w/2), s.y+(s.h/2))
+							(x, y) = self.cart2canv(s.x-(s.w/2), s.y+(s.h/2))
 							im = s.asPhotoImage()
 							ii.append(self.canvas.create_image(x, y, anchor=NW,
 																image=im))
@@ -936,7 +939,7 @@ class UserDisplay(object):
 			self.canvas.delete(x)
 		else:
 			# create an icon
-			(x, y) = self.fb2can(x, y)
+			(x, y) = self.cart2canv(x, y)
 
 			w = w / 2
 			h = h / 2
@@ -970,7 +973,7 @@ class UserDisplay(object):
 			self.canvas.delete(x)
 		else:
 			# create an icon
-			(x, y) = self.fb2can(x, y)
+			(x, y) = self.cart2canv(x, y)
 			tag = self.canvas.create_text(x, y, text=text, fill=color)
 			self._iconlist.append(tag)
 			return tag
@@ -1028,7 +1031,7 @@ class UserDisplay(object):
 		if n > 1:
 			_xs = self.fix_x + xs
 			_ys = self.fix_y + ys
-			(cx, cy) = self.fb2can(_xs, _ys)
+			(cx, cy) = self.cart2canv(_xs, _ys)
 			self._fidstuff = (
 				self.canvas.create_text(cx, cy, anchor=CENTER, justify=CENTER,
 										 fill='blue', text='o'),
@@ -1137,7 +1140,7 @@ class UserDisplay(object):
 		# draw mark at absolute screen coords:
 		ax = mx + self.fix_x
 		ay = my + self.fix_y
-		(cx, cy) = self.fb2can(ax, ay)
+		(cx, cy) = self.cart2canv(ax, ay)
 
 		o = 6
 		tagb = self.canvas.create_oval(cx-o, cy-o, cx+o, cy+o,
@@ -1229,7 +1232,7 @@ class UserDisplay(object):
 		self.fix_x = x
 		self.fix_y = y
 		if (not x is None) and (not y is None):
-			(x, y) = self.fb2can(x, y)
+			(x, y) = self.cart2canv(x, y)
 			self._fixtag = self.canvas.create_rectangle(x-5, y-5, x+5, y+5,
 														 fill='',
 														 outline='blue')

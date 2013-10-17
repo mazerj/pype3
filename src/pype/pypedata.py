@@ -300,7 +300,7 @@ class PypeRecord(object):
 
 		self.file = file
 		self.recnum = recnum
-		self.rec = rec
+        self.rec = rec
 		self.taskname = taskname
 		self.trialtime = trialtime
 		self.parsed_trialtime = parsed_trialtime
@@ -310,6 +310,7 @@ class PypeRecord(object):
 		# these things are fast, the rest of the recording will
 		# be filled in by the compute() method..
 		# task specific data
+
 		self.info = self.rec[1]
 
 		# these should be standard..

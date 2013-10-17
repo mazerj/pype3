@@ -367,6 +367,8 @@ import thread
 import string
 import re
 import socket
+import asyncore
+import threading
 import glob
 import cPickle
 import math
@@ -1403,6 +1405,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		if self.psych:
 			self.fb.screen_close()
+
+
+        self.server = PypeServer('', 5666)
+        self.server_thread = threading.Thread(target=asyncore.loop)
+        self.server_thread.daemon = True
+        self.server_thread.start()
 
 	def open_elog(self):
 		animal = self.sub_common.queryv('full_subject')
@@ -3953,9 +3961,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.record_id = self.record_id + 1
 
 		if returnall:
-			p = PypeRecord(None, 0, rec)
-			p.compute()
-			return p
+            if rec is not None:
+                p = PypeRecord(None, 0, rec)
+                p.compute()
+                return p
+            else:
+                return None
 		else:
 			return (self.eyebuf_t, p0, s0)
 
@@ -4817,6 +4828,35 @@ def show_about(file, timeout=None):
 	w.update_idletasks()
 	if timeout:
 		w.after(timeout, w.destroy)
+
+class PypeServer(asyncore.dispatcher):
+	def __init__(self, host, port):
+        import socket
+
+		asyncore.dispatcher.__init__(self)
+		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		self.bind(('', port))
+		self.listen(1)
+		Logger('pype: listening for connections on port %d\n' % port)
+
+	def handle_accept(self):
+		# when we get a client connection start a dispatcher for that
+		# client
+		socket, address = self.accept()
+		sys.stderr.write('pype: connection from %s\n' % repr(address))
+		PypeHandler(socket)
+
+class PypeHandler(asyncore.dispatcher_with_send):
+	def handle_read(self):
+        data = self.recv(1024)
+        if data.lower().startswith('quit'):
+            self.send('BYE\n');
+            self.close()
+        elif data.lower().startswith('info'):
+            self.send('running=%d\n' % (PypeApp().running,))
+        else:
+            self.send('? unknown command\n');
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

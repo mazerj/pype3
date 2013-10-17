@@ -483,7 +483,7 @@ class _Probe(object):
 		else:
 			self.s.off()
 
-		(x, y) = self.app.udpy.fb2can(x, y)
+		(x, y) = self.app.udpy.cart2canv(x, y)
 
 		# compute sizes for indicator axes/arrow
 		ih = min(60, max(40, 0.25 * self.length))

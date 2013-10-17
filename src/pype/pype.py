@@ -2216,11 +2216,14 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		"""
 
-		fname = subjectrc('tally.%s.%s' % (subject(), self._gethostname(),))
-		try:
-			age = (time.time()-os.path.getmtime(fname)) / (60.*60.*24.)
-		except OSError:
-			age = -1
+        if self.config.iget('acute'):
+            age = -1
+        else:
+            fname = subjectrc('tally.%s.%s' % (subject(), self._gethostname(),))
+            try:
+                age = (time.time()-os.path.getmtime(fname)) / (60.*60.*24.)
+            except OSError:
+                age = -1
 		try:
 			if save:
 				cPickle.dump(self.tallycount, open(fname, 'w'))
@@ -2241,6 +2244,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._tallyfile(save=1)
 
 	def _loadstate(self):
+        # rig,sub,ical etc are automatically loaded by the ptable object..
 		self._tallyfile(save=0)
 
 	def _runstats_update(self, clear=None, resultcode=None):

@@ -541,12 +541,12 @@ class _Probe(object):
 
 		if self.app.hmapstate.probe.live:
             for i in (self.major_ax, self.minor_ax):
-                self.app.udpy.canvas.itemconfigure(i, dash=(100,1),
-                                                   width=4+(2*c))
+                self.app.udpy.canvas.itemconfigure(i, dash=(200,1),
+                                                   width=1+(4*c))
         else:
             for i in (self.major_ax, self.minor_ax):
-                self.app.udpy.canvas.itemconfigure(i, dash=(4,2),
-                                                   width=4+(2*c))
+                self.app.udpy.canvas.itemconfigure(i, dash=(4,4),
+                                                   width=1+(4*c))
 
 		if self.showinfo:
 			s = self.pp()

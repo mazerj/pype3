@@ -232,7 +232,7 @@ if not SA_DIRECT:
 			else:
 				array[idx] = value
 
-				
+
 class FrameBuffer(object):
 	_instance = None
 
@@ -310,7 +310,6 @@ class FrameBuffer(object):
 		self.eyefn = eyefn
 
 		self.record = 0
-		self.record_t0 = time.time()
 		self._keystack = []
 		self._font = None
 		if not width or not height:
@@ -675,17 +674,19 @@ class FrameBuffer(object):
 			self.fliptimer = t
 
 		if self.record:
-			f = '/tmp/pype%015d.jpg' % int(0.5+ 1000.0 *
-										 (time.time() - self.record_t0))
+			f = '/tmp/pype%020d.jpg' % int(round(1000.0*(time.time())))
 			self.snapshot(f)
 
-	def recordtog(self):
-		self.record = not self.record
+	def recordtog(self, state=None):
+        if state is None:
+            self.record = not self.record
+        else:
+            self.record = state
 		if self.record:
 			os.system('/bin/rm -f /tmp/pype*.jpg')
-			sys.stderr.write('[Start Recording]')
+			sys.stderr.write('[Recording is ON]\n')
 		else:
-			sys.stderr.write('[Stop Recording]')
+			sys.stderr.write('[Recording is OFF]\n')
 
 	def checklshift(self):
 		"""LEFT Shift key down?"""

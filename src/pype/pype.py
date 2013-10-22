@@ -3874,6 +3874,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		# pype internal ('pi') -- user tagged this trial (f7)?
 		params['piTrialTag'] = tag
 
+        # save record_id in parameter table for easy access
+        params['record_id'] = tag
+
         rec = None
 
 		if not fast_tmp and self.record_file:

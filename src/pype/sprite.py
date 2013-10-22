@@ -674,8 +674,17 @@ class FrameBuffer(object):
 			self.fliptimer = t
 
 		if self.record:
-			f = '/tmp/pype%020d.jpg' % int(round(1000.0*(time.time())))
+            from pype import PypeApp
+            recno = PypeApp().record_id
+            fname = PypeApp().record_file
+            if fname is None:
+                return
+            if fname.startswith('/dev/null'):
+                fname = 'null'
+            ms = int(round(1000.0*(time.time())))
+			f = '%s_%04d_%020d.jpg' % (fname, recno, ms)
 			self.snapshot(f)
+            PypeApp().encode('SNAPSHOT ' + f)
 
 	def recordtog(self, state=None):
         if state is None:

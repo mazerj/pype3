@@ -5,6 +5,7 @@ all: clean install
 install: exe
 	@sh ./install-scripts $(PYPEDIR) *.sh
 	@sudo cp -f pype pypenv $(PYPEDIR)/bin
+	@sudo cp -f qpype.py $(PYPEDIR)/bin/qpype
 	@echo "Using sudo to chmod/chown pype"
 	@sudo chown root $(PYPEDIR)/bin/pype
 	@sudo chmod 4111 $(PYPEDIR)/bin/pype

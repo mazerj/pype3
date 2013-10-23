@@ -719,8 +719,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			Logger('pype: set MONW, MONW & VIEWDIST in %s\n' % cfile)
 			raise PypeStartupError
 
-		self.tallycount = {}
-		state = self._loadstate()
+		#self.tallycount = {}
+		#state = self._loadstate()
 
 		self.terminate = 0
 		self.running = 0
@@ -995,6 +995,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		ical = DockWindow(checkbutton=b, title='ical')
 		self.ical = ParamTable(ical, icalp,
 							   file='%s-%s-ical.par' % (hostname, subject(),))
+
+        self.tallycount = {}
+		state = self._loadstate()
+
+
 
 		# JAM 07-feb-2003: Compute ppd values based on current setup.
 		# Then place these in the rig menu automatically.
@@ -2224,10 +2229,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		"""
 
-        if self.config.iget('acute'):
+        fname = subjectrc('tally.%s.%s' % (subject(), self._gethostname(),))
+        if int(self.sub_common.query('acute')):
             age = -1
         else:
-            fname = subjectrc('tally.%s.%s' % (subject(), self._gethostname(),))
             try:
                 age = (time.time()-os.path.getmtime(fname)) / (60.*60.*24.)
             except OSError:
@@ -2542,7 +2547,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			if self.tk:
 				self.tk.bell()
 		else:
-			self._savestate()			# Do this NOW!
+			Logger('pype: terminal save state.\n')
+			self._savestate()			# Do this NOW in case of lockup on exit
 			Logger('pype: user shutdown/close -- terminating.\n')
 			self.terminate = 1
 
@@ -4852,11 +4858,12 @@ class PypeServer(asyncore.dispatcher):
 
 class PypeHandler(asyncore.dispatcher_with_send):
 	def handle_read(self):
-        data = self.recv(1024)
-        if data.lower().startswith('quit'):
-            self.send('BYE\n');
+        packet = self.recv(1024)
+        cmd = packet.upper()
+        if cmd.startswith('STATUS'):
+            self.send('ALIVE\n');
             self.close()
-        elif data.lower().startswith('info'):
+        elif cmd.startswith('INFO'):
             self.send('running=%d\n' % (PypeApp().running,))
         else:
             self.send('? unknown command\n');

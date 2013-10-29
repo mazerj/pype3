@@ -996,7 +996,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.ical = ParamTable(ical, icalp,
 							   file='%s-%s-ical.par' % (hostname, subject(),))
 
-        self.tallycount = {}
+		self.tallycount = {}
 		state = self._loadstate()
 
 
@@ -1380,6 +1380,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					self.tdt = None
 				else:
 					Logger('pype: tdt tank = "%s"\n' % t)
+					self.con('tdt tank = "%s"\n' % t)
 					self.xdacq = 'tdt'
 			except (socket.error, tdt.TDTError):
 				self.tdt = None
@@ -1412,10 +1413,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self.fb.screen_close()
 
 
-        self.server = PypeServer('', 5666)
-        self.server_thread = threading.Thread(target=asyncore.loop)
-        self.server_thread.daemon = True
-        self.server_thread.start()
+		self.server = PypeServer('', 5666)
+		self.server_thread = threading.Thread(target=asyncore.loop)
+		self.server_thread.daemon = True
+		self.server_thread.start()
 
 	def open_elog(self):
 		animal = self.sub_common.queryv('full_subject')
@@ -1618,7 +1619,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 											  font=('Courier', 10),
 											  fg='green')
 				else:
-					self.udpy.titlebar.config(text='BAR  UP ',
+					self.udpy.titlebar.config(text='BAR	 UP ',
 											  font=('Courier', 10),
 											  fg='red')
 				self._last_stateinfo = t
@@ -2229,14 +2230,14 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		"""
 
-        fname = subjectrc('tally.%s.%s' % (subject(), self._gethostname(),))
-        if int(self.sub_common.query('acute')):
-            age = -1
-        else:
-            try:
-                age = (time.time()-os.path.getmtime(fname)) / (60.*60.*24.)
-            except OSError:
-                age = -1
+		fname = subjectrc('tally.%s.%s' % (subject(), self._gethostname(),))
+		if int(self.sub_common.query('acute')):
+			age = -1
+		else:
+			try:
+				age = (time.time()-os.path.getmtime(fname)) / (60.*60.*24.)
+			except OSError:
+				age = -1
 		try:
 			if save:
 				cPickle.dump(self.tallycount, open(fname, 'w'))
@@ -2257,7 +2258,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self._tallyfile(save=1)
 
 	def _loadstate(self):
-        # rig,sub,ical etc are automatically loaded by the ptable object..
+		# rig,sub,ical etc are automatically loaded by the ptable object..
 		self._tallyfile(save=0)
 
 	def _runstats_update(self, clear=None, resultcode=None):
@@ -2378,6 +2379,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 						warn(MYNAME(), ecode)
 					#del self._exper
 
+				self.con()
+                
 				if self.xdacq == 'plexon':
 					warn('pype:_start_helper:xdacq',
 						 'Start plexon now', wait=1)
@@ -2386,10 +2389,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					# trial counter..
 					(server, tank, block) = self.tdt.newblock(record=1)
 					Logger('pype: tdt data = %s %s\n' % (tank, block))
+					self.con('tdt data = %s %s\n' % (tank, block))
 
 				self._allowabort = 1
-
-				self.con()
 
 				# clear/reset result stack at the start of the run..
 				self.set_result()
@@ -2407,7 +2409,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				# call task-specific start function.
 				self.set_state(running=1)
 				self.warn_run_start()
-				self.con()				# clear console window
 				self._startfn(self)
 			except:
 				reporterror(dbug=self.config.iget('DBERRS'))
@@ -2779,9 +2780,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					self.running = 0
 					raise UserAbort
 				elif self.eyemouse:
-                    # UserDisplay object handles eyemouse events in the
-                    # UserDisplay; here we handle eyemouse events in the
-                    # FrameBuffer:
+					# UserDisplay object handles eyemouse events in the
+					# UserDisplay; here we handle eyemouse events in the
+					# FrameBuffer:
 					doint = 0
 					if pev.type is pygame.MOUSEBUTTONDOWN and pev.button==1:
 						self.eyeshift(x=pev.pos[0] - (self.fb.w/2),
@@ -3858,7 +3859,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 								((self.eyebuf_t, s0), (ut, a0), ),
 								self.spike_times)
 
-		self.udpy.info("[%dspk %dsync %ddups]" %
+		self.udpy.info("[%4dspk %4dsync %4ddups]" %
 					   (len(self.spike_times), len(self.photo_times), ndups,))
 
 		# Completely wipe the buffers -- don't let them accidently
@@ -3880,10 +3881,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		# pype internal ('pi') -- user tagged this trial (f7)?
 		params['piTrialTag'] = tag
 
-        # save record_id in parameter table for easy access
-        params['record_id'] = tag
+		# save record_id in parameter table for easy access
+		params['record_id'] = tag
 
-        rec = None
+		rec = None
 
 		if not fast_tmp and self.record_file:
 			# dump the event stream
@@ -3970,12 +3971,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.record_id = self.record_id + 1
 
 		if returnall:
-            if rec is not None:
-                p = PypeRecord(None, 0, rec)
-                p.compute()
-                return p
-            else:
-                return None
+			if rec is not None:
+				p = PypeRecord(None, 0, rec)
+				p.compute()
+				return p
+			else:
+				return None
 		else:
 			return (self.eyebuf_t, p0, s0)
 
@@ -4840,7 +4841,7 @@ def show_about(file, timeout=None):
 
 class PypeServer(asyncore.dispatcher):
 	def __init__(self, host, port):
-        import socket
+		import socket
 
 		asyncore.dispatcher.__init__(self)
 		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -4858,15 +4859,15 @@ class PypeServer(asyncore.dispatcher):
 
 class PypeHandler(asyncore.dispatcher_with_send):
 	def handle_read(self):
-        packet = self.recv(1024)
-        cmd = packet.upper()
-        if cmd.startswith('STATUS'):
-            self.send('ALIVE\n');
-            self.close()
-        elif cmd.startswith('INFO'):
-            self.send('running=%d\n' % (PypeApp().running,))
-        else:
-            self.send('? unknown command\n');
+		packet = self.recv(1024)
+		cmd = packet.upper()
+		if cmd.startswith('STATUS'):
+			self.send('ALIVE\n');
+			self.close()
+		elif cmd.startswith('INFO'):
+			self.send('running=%d\n' % (PypeApp().running,))
+		else:
+			self.send('? unknown command\n');
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

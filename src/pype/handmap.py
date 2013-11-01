@@ -119,7 +119,7 @@ class _Probe(object):
 		self.major_ax = None
 		self.minor_ax = None
 		self.onoff = None
-		self.bg = 128.0
+		self.bg = sum(app.fb.bg) / len(app.fb.bg)
 		self.showinfo = 1
 		self.probeid = None
 		self.lw = 10
@@ -555,7 +555,7 @@ class _Probe(object):
         for i in self.text:
             self.app.udpy.canvas.itemconfig(i, text=s)
 
-def step(val, by=1, minval=None, maxval=None):
+def _step(val, by=1, minval=None, maxval=None):
 	val = val + by
 	if not minval is None: val = max(val,minval)
 	if not maxval is None: val = min(val, maxval)
@@ -592,17 +592,17 @@ def _key_handler(app, c, ev):
 		p.rfreq = p.rfreq + 1.0
 		p.force_redraw()
 	elif c == 'i':
-		p.inten = step(p.inten, by=-1, minval=1, maxval=100)
+		p.inten = _step(p.inten, by=-1, minval=1, maxval=100)
 		p.force_redraw()
 	elif c == 'I':
-		p.inten = step(p.inten, by=1, minval=1, maxval=100)
+		p.inten = _step(p.inten, by=1, minval=1, maxval=100)
 		p.force_redraw()
 	elif c == 'b':
 		p.blink_state = int((p.blink_state+1)%len(BLINK_STATES))
 	elif c == 'k':
-		p.blink_freq = step(p.blink_freq, by=-0.1, minval=0.0)
+		p.blink_freq = _step(p.blink_freq, by=-0.1, minval=0.0)
 	elif c == 'K':
-		p.blink_freq = step(p.blink_freq, by=0.1)
+		p.blink_freq = _step(p.blink_freq, by=0.1)
 	elif c == 'V':
 		p.verbose = not p.verbose
 	elif c in '123456':
@@ -621,36 +621,36 @@ def _key_handler(app, c, ev):
 		p.a = (p.a - 15) % 360
 		p.force_redraw()
 	elif c == 'Q':
-		p.length = step(p.length, by=1, minval=1)
+		p.length = _step(p.length, by=1, minval=1)
 		p.force_redraw()
 	elif c == 'q':
-		p.length = step(p.length, by=10, minval=1)
+		p.length = _step(p.length, by=10, minval=1)
 		p.force_redraw()
 	elif c == 'W':
-		p.length = step(p.length, by=-1, minval=2)
+		p.length = _step(p.length, by=-1, minval=2)
 		if p.width > p.length:
 			p.width = p.length-1
 		p.force_redraw()
 	elif c == 'w':
-		p.length = step(p.length, by=-10, minval=2)
+		p.length = _step(p.length, by=-10, minval=2)
 		if p.width > p.length:
 			p.width = p.length-1
 		p.force_redraw()
 	elif c == 'E':
-		p.width = step(p.width, by=1, minval=1)
+		p.width = _step(p.width, by=1, minval=1)
 		if p.width > p.length:
 			p.length = p.width+1
 		p.force_redraw()
 	elif c == 'e':
-		p.width = step(p.width, by=10, minval=1)
+		p.width = _step(p.width, by=10, minval=1)
 		if p.width > p.length:
 			p.length = p.width+1
 		p.force_redraw()
 	elif c == 'R':
-		p.width = step(p.width, by=-1, minval=1)
+		p.width = _step(p.width, by=-1, minval=1)
 		p.force_redraw()
 	elif c == 'r':
-		p.width = step(p.width, by=-10, minval=1)
+		p.width = _step(p.width, by=-10, minval=1)
 		p.force_redraw()
 	elif c == 'minus':
         p.lw = max(1, p.lw - 1)
@@ -664,15 +664,15 @@ def _key_handler(app, c, ev):
 		else:
 			p.drift = p.app.ts()
 	elif c == 'y':
-		p.drift_freq = step(p.drift_freq, by=-0.1, minval=0.1)
+		p.drift_freq = _step(p.drift_freq, by=-0.1, minval=0.1)
 	elif c == 'Y':
-		p.drift_freq = step(p.drift_freq, by=0.1, minval=0.1)
+		p.drift_freq = _step(p.drift_freq, by=0.1, minval=0.1)
 	elif c == 'j':
 		p.jitter = int(not p.jitter)
 	elif c == 'T':
-		p.drift_amp = step(p.drift_amp, by=10, minval=0)
+		p.drift_amp = _step(p.drift_amp, by=10, minval=0)
 	elif c == 't':
-		p.drift_amp = step(p.drift_amp, by=-10, minval=0)
+		p.drift_amp = _step(p.drift_amp, by=-10, minval=0)
 	elif c == 'o':
 		if app.hmapstate.probe.xoff:
 			app.hmapstate.probe.xoff = 0
@@ -714,6 +714,17 @@ def hmap_hide(app, update=None):
 	app.hmapstate.probe.live = 0
 	if update:
 		_hmap_idlefn(app)
+
+def hmap_state(app, enable=None):
+    if enable is None:
+        return (app.taskidle is _hmap_idlefn)
+    elif enable:
+        app.taskidle = _hmap_idlefn
+    else:
+        app.taskidle = None
+
+def hmap_enable(app):
+    app.taskidle = _hmap_idlefn
 
 def hmap_install(app):
 	app.hmapstate = Holder()

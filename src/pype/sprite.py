@@ -360,7 +360,6 @@ class FrameBuffer(object):
 		self.screen_open(init=1)
 		Logger('sprite: fb is %dx%d %s\n' % (self.w, self.h, ppflag(self.flags)))
 
-		# note: for historical reasons, bg is a scalar - grayscale only..
 		self.bg = bg
 
 		# disable the sync pulse in config with 'SYNCSIZE: -1'
@@ -2141,7 +2140,7 @@ class DisplayList(object):
 
 	"""
 
-	def __init__(self, fb, bg=None, comedi=True):
+	def __init__(self, fb, comedi=True):
 		"""Instantiation method.
 
 		:param fb: framebuffer associated with this list. This is sort
@@ -2149,10 +2148,6 @@ class DisplayList(object):
 				framebuffer it lives on too. It's currently only used
 				for clearing and flipping the framebuffer after
 				updates.
-
-		:param bg: optional background color
-
-		:param bg: optional PypeApp handle -- for auto-encoding..
 
 		"""
 
@@ -2163,7 +2158,7 @@ class DisplayList(object):
 
 		self.sprites = []
 		self.fb = fb
-		self.bg = bg
+		self.bg = fb.bg
 		self.timer = Timer()
 		self.trigger = None
 		self.action = None
@@ -2716,7 +2711,7 @@ if __name__ == '__main__':
 		s1.fill((255,255,255))
 		s2 = Sprite(100, 100, 100, 0, fb=fb, on=0)
 		s2.fill((255,255,1))
-		dlist = DisplayList(fb, bg=128, comedi=False)
+		dlist = DisplayList(fb, comedi=False)
 
 		ti = Timer(on=False)
 		fdur = int(round(1000/fb.calcfps()))

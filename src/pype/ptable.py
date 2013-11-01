@@ -962,6 +962,26 @@ def is_gray(s, evaluate=None):
 		return (r, i)
 	return r
 
+def is_rgba2(s, evaluate=None, meanlum=(128,128,128)):
+	"""RGBA triple where values are 0-1
+
+	"""
+    l, r = None, INVALID
+	try:
+		l = tuple(eval(s))
+        if all(map(lambda x: x>=0 and x<=1, l)):
+            r = VALID
+            if len(l) == 3:
+                l = l + (1.0,)
+	except SyntaxError:
+        pass
+
+    l = map(lambda x: int(x[0] + (255 * (x[1] - 0.5))),
+            zip(meanlum, x)) + (l[3],)
+	if evaluate:
+		return (r, l)
+	return r
+
 def is_float(s, evaluate=None):
 	"""Must be a valid floating point number
 

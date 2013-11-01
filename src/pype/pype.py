@@ -502,8 +502,6 @@ def _base_ptables():
 			  'default X pos of fixspot (pix)'),
 		pslot('fix_y', '0', is_int,
 			  'default Y pos of fixspot (pix)'),
-		pslot('bg', '(128,128,128)', is_color,
-			  'default screen background'),
 
 		ptitle('Timing Params'),
 		pslot('minrt', '0', is_int,
@@ -1443,13 +1441,13 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self.idle_queue.append((dacq_ts()+inms, action,))
 
 	def _whereami(self):
-		self._console.writenl('	   ver: pype %s' % (pypeversion.PypeVersion,),
+		self._console.writenl('ver: pype %s' % (pypeversion.PypeVersion,),
 							  'blue')
-		self._console.writenl('		id: %s' % (pypeversion.PypeVersionID),
+		self._console.writenl('id: %s' % (pypeversion.PypeVersionID),
 							  'blue')
-		self._console.writenl('pypedir: %s' % self.pypedir, 'blue')
-		self._console.writenl(' pyperc: %s' % pyperc(), 'blue')
-		self._console.writenl('	   cwd: %s' % os.getcwd(), 'blue')
+		self._console.writenl('pypedir=%s' % self.pypedir, 'blue')
+		self._console.writenl('pyperc=%s' % pyperc(), 'blue')
+		self._console.writenl('cwd=%s' % os.getcwd(), 'blue')
 		self._console.writenl('_'*60)
 
 	def migrate_pypestate(self):

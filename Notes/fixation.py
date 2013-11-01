@@ -23,7 +23,7 @@ except NameError:
 try:
 	hmap = reload(hmap)
 except NameError:
-	import handmap2 as hmap
+	import handmap as hmap
 
 class Task(fixmaster.Task):
 

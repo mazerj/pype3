@@ -483,7 +483,6 @@ class Task:
 
 		app.udpy.display(None)
 		app.looking_at(x=P['fx'], y=P['fy'])
-		self.dlist.bg = P['bg']
 
 		if P['acute']:
 			spotfb = None
@@ -699,7 +698,6 @@ class Task:
 
 			app.looking_at()
 			app.eyetrace(0)
-			self.dlist.bg = P['bg']
 			self.dlist.delete_all()
 			app.fb.sync(0)
 			self.dlist.update(flip=1)
@@ -735,12 +733,12 @@ class Task:
 				beep(500, 500, vol=0.5, wait=0)
 			spot.off()
 			self.dlist.clear()
-			bg = self.dlist.bg
-			self.dlist.bg = P['errcolor']
-			self.dlist.update(flip=1)
-			app.idlefn(ms=250)
-			self.dlist.bg = bg
-			self.dlist.update(flip=1)
+			self.dlist.update()
+            try:
+                app.fb.clear(P['errcolor'], flip=1)
+                app.idlefn(ms=250)
+            finally:
+                app.fb.clear(flip=1)
 			app.udpy.display(self.dlist)
 		except UserAbort:
 			print "caught abort in errorsig"

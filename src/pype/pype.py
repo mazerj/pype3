@@ -1410,11 +1410,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		if self.psych:
 			self.fb.screen_close()
 
-
-		self.server = PypeServer('', 5666)
-		self.server_thread = threading.Thread(target=asyncore.loop)
-		self.server_thread.daemon = True
-		self.server_thread.start()
+        if 0:
+            self.server = PypeServer('', 5666)
+            self.server_thread = threading.Thread(target=asyncore.loop)
+            self.server_thread.daemon = True
+            self.server_thread.start()
 
 	def open_elog(self):
 		animal = self.sub_common.queryv('full_subject')

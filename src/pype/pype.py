@@ -2378,7 +2378,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					#del self._exper
 
 				self.con()
-                
+
 				if self.xdacq == 'plexon':
 					warn('pype:_start_helper:xdacq',
 						 'Start plexon now', wait=1)
@@ -2746,6 +2746,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				c = string.lower(c)
 				if c == 'escape':
 					if self._allowabort:
+						self.encode(ABORT)
 						self.con("[esc]", color='red')
 						raise UserAbort
 				elif c == 'f4':
@@ -2762,6 +2763,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				while not self.fb.checkkeys() == []: pass
 			elif 'escape' in self.fb.checkkeys():
 				if self._allowabort:
+                    self.encode(ABORT)
 					self.con('framebuffer:esc')
 					while not self.fb.checkkeys() == []: pass
 					self.con("[esc]", color='red')

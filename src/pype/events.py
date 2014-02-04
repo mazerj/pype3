@@ -82,6 +82,7 @@ def isearly_release(code):
 # internal use only by pype
 
 EYESHIFT = 'eyeshift'					# F8 key (or something similar)
+ABORT = 'abort'                         # user hit ESC key
 
 # semi internal -- generated automatically by pype, but ok to count on..
 

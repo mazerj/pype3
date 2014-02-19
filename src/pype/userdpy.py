@@ -151,7 +151,7 @@ class ScaledCanvas(Canvas):
 
 class UserDisplay(object):
 	def __init__(self, master, fbsize, scale=1.0, pix_per_dva=1.0,
-				 app=None, eyemouse=False):
+                 xscale=1.0, yscale=1.0, app=None, eyemouse=False):
 		"""UserDisplay Class.
 
 		The UserDisplay is a pype local window on the user's computer
@@ -216,10 +216,10 @@ class UserDisplay(object):
 		# don't use this yet -- not quite working properly with handmap2
 		# except when scale=1.0..
 		self.canvas = ScaledCanvas(self.frame,
-								   xscale=scale,
-								   yscale=scale,
-								   width=round(scale*cwidth),
-								   height=round(scale*cheight))
+								   xscale=xscale,
+								   yscale=xscale,
+								   width=round(xscale*cwidth),
+								   height=round(yscale*cheight))
 		self.canvas.pack()
 		self.canvas.configure(cursor='tcross', bg='grey80')
 

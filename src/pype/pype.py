@@ -555,9 +555,13 @@ def _base_ptables():
 		pslot_ro('mon_height', '0', is_float,
 				 'monitor height (cm)'),
 		pslot_ro('mon_dpyw', '0', is_int,
-				 'monitor width (pix)'),
+				 'monitor virtual width (pix)'),
 		pslot_ro('mon_dpyh', '0', is_int,
-				 'monitor height (pix)'),
+				 'monitor virtual height (pix)'),
+		pslot_ro('mon_realdpyw', '0', is_int,
+				 'monitor physical width (pix)'),
+		pslot_ro('mon_realdpyh', '0', is_int,
+				 'monitor physical height (pix)'),
 		pslot_ro('mon_h_ppd', '0', is_float,
 				 'horizontal pixels_per_deg'),
 		pslot_ro('mon_v_ppd', '0', is_float,
@@ -997,16 +1001,16 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.tallycount = {}
 		state = self._loadstate()
 
-
-
 		# JAM 07-feb-2003: Compute ppd values based on current setup.
 		# Then place these in the rig menu automatically.
 
+		fps = self.init_framebuffer()
+
 		s = 180.0 * 2.0 * math.atan2(monw/2, viewdist) / np.pi
-		xppd = self.config.fget("DPYW") / s;
+		xppd = self.fb.w / s;
 
 		s = 180.0 * 2.0 * math.atan2(monh/2, viewdist) / np.pi
-		yppd = self.config.fget("DPYH") / s;
+		yppd = self.fb.h / s;
 
 		ppd = (xppd + yppd) / 2.0
 
@@ -1014,8 +1018,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.rig_common.set('viewdist', '%g' % viewdist)
 		self.rig_common.set('mon_width', '%g' % monw)
 		self.rig_common.set('mon_height', '%g' % monh)
-		self.rig_common.set('mon_dpyw', self.config.iget('DPYW'))
-		self.rig_common.set('mon_dpyh', self.config.iget('DPYH'))
+		self.rig_common.set('mon_dpyw', self.fb.w)
+		self.rig_common.set('mon_dpyh', self.fb.h)
+		self.rig_common.set('mon_realdpyw', self.fb.realw)
+		self.rig_common.set('mon_realdpyh', self.fb.realh)
 		self.rig_common.set('mon_h_ppd', '%g' % xppd)
 		self.rig_common.set('mon_v_ppd', '%g' % yppd)
 		self.rig_common.set('mon_ppd', '%g' % ppd)
@@ -1237,7 +1243,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		# added automatic detection of framerate (13-jan-2004 JAM):
 		# Wed Apr 27 17:37:26 2011 mazer moved it into init_framebuffer
-		fps = self.init_framebuffer()
+		#fps = self.init_framebuffer()
 
 		if self.config.iget('FPS') and self.config.iget('FPS') != fps:
 			Logger('pype: error actually FPS does not match requested rate\n' +
@@ -1259,13 +1265,13 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.eyebar = 0
 
 		# userdisplay: shadow of framebuffer window
-		scale = self.config.fget('USERDISPLAY_SCALE')
+        # xscale=1./self.config.fget('XSCALE'),
+        # yscale=1./self.config.fget('YSCALE'),
 		self.udpy = userdpy.UserDisplay(rightpane,
 										fbsize=(self.fb.w, self.fb.h),
-										scale=scale,
 										pix_per_dva=self.pix_per_dva,
-										app=self,
-										eyemouse=self.eyemouse)
+										eyemouse=self.eyemouse,
+										app=self)
 
 		udpy_.config(command=self.udpy.showhide)
 		if self.config.iget('USERDISPLAY_HIDE'):
@@ -2187,6 +2193,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 							  synclevel=self.config.iget('SYNCLEVEL'),
 							  mouse=self.config.iget('MOUSE'),
 							  frame = self.config.iget('FRAME'),
+							  xscale=self.config.fget('XSCALE'),
+							  yscale=self.config.fget('YSCALE'),
 							  app=self)
 
 		fps = self.fb.calcfps(duration=250)

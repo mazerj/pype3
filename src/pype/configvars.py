@@ -104,6 +104,10 @@ def defaults(srcfile=None):
 		  doc='display width (pix)')
 	c.set('DPYH', '768',
 		  doc='display height (pix)')
+	c.set('XSCALE', '1.0',
+		  doc='x-scale factor for framebuffer (fraction)')
+	c.set('YSCALE', '1.0',
+		  doc='y-scale factor for framebuffer (fraction)')
 	c.set('DPYBITS', '32',
 		  doc='bit-depth for display')
 	c.set('FPS', '0',
@@ -177,8 +181,6 @@ def defaults(srcfile=None):
 	# User Display Settings
 	c.set('USERDISPLAY_HIDE', 0,
 		  doc='iconify udpy window on startup')
-	c.set('USERDISPLAY_SCALE', 1.0,
-		  doc='scale user display by ... for big monitors')
 	c.set('ONE_WINDOW', 0,
 		  doc='one window for GUI and UserDisplay?')
 

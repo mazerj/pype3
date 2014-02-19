@@ -249,7 +249,8 @@ class FrameBuffer(object):
 	def __init__(self, dpy, width, height, fullscreen,
 				 bg=(128, 128, 128),
 				 sync=1, syncsize=50, syncx=None, syncy=None, synclevel=255,
-				 mouse=0, frame=0, app=None, eyefn=None):
+				 mouse=0, frame=0, app=None, eyefn=None,
+                 xscale=1.0, yscale=1.0):
 		"""pygame+GL-based framebuffer class for pype.
 
 		Wrapper for the pygame platform-independent interface to the
@@ -312,13 +313,17 @@ class FrameBuffer(object):
 		self.record = 0
 		self._keystack = []
 		self._font = None
+        self.xscale = xscale
+        self.yscale = yscale
 		if not width or not height:
 			Logger('sprite: must specify display width and height\n')
 		else:
-			self.w = width
-			self.h = height
-			self.hw = width / 2
-			self.hh = height / 2
+			self.realw = width
+			self.realh = height
+			self.w = int(0.5 + width * self.xscale)
+			self.h = int(0.5 + height * self.yscale)
+			self.hw = self.w / 2
+			self.hh = self.h / 2
 
 		self.flags = OPENGL | DOUBLEBUF
 		if fullscreen:
@@ -343,12 +348,12 @@ class FrameBuffer(object):
 
 		# position display window at upper right corner based on screen size
 		(dpyw, dpyh) = pygame.display.list_modes()[0]
-		os.environ['SDL_VIDEO_WINDOW_POS'] = '%d,%d' % (dpyw - self.w, 0,)
+		os.environ['SDL_VIDEO_WINDOW_POS'] = '%d,%d' % (dpyw - self.realw, 0,)
 
 		try:
-			if pygame.display.mode_ok((self.w, self.h), self.flags) == 0:
+			if pygame.display.mode_ok((self.realw, self.realh), self.flags) == 0:
 				Logger('sprite: mode %dx%d:%s not available.\n' %
-					   (self.w, self.h, ppflag(self.flags)))
+					   (self.realw, self.realh, ppflag(self.flags)))
 				Logger('sprite: available modes are %s\n' % modes)
 				sys.exit(1)
 		except pygame.error:
@@ -358,7 +363,10 @@ class FrameBuffer(object):
 		# in theory, it works to open and close the pygame display
 		# on the fly to hide the graphics window..
 		self.screen_open(init=1)
-		Logger('sprite: fb is %dx%d %s\n' % (self.w, self.h, ppflag(self.flags)))
+		Logger('sprite: display is %dx%d %s\n' % \
+               (self.realw, self.realh, ppflag(self.flags)))
+		Logger('sprite: fb is %dx%d %s\n' % \
+               (self.w, self.h, ppflag(self.flags)))
 
 		self.bg = bg
 
@@ -407,15 +415,17 @@ class FrameBuffer(object):
 		self.fullscreen =  self.flags & FULLSCREEN
 
 	def screen_open(self, init=0):
-		self.screen = pygame.display.set_mode((self.w, self.h), self.flags)
+		self.screen = pygame.display.set_mode((self.realw, self.realh),
+                                              self.flags)
 		pygame.display.set_caption('framebuf')
 
 		if init:
 			# initialize OpenGL subsystem
-			ogl.glOrtho(0.0, self.w, 0.0, self.h, 0.0, 1.0)
+			ogl.glOrtho(0.0, self.realw, 0.0, self.realh, 0.0, 1.0)
+			ogl.glScale(1. / self.xscale, 1. / self.yscale, 1.0)
 			# in theory -- can put any static, global transformations you
 			# want here -- say to invert the stimuli or scale it, eg:
-			#	 ogl.glScale(0.5, 0.5, 1.0)
+			#    ogl.glScale(0.5, 0.5, 1.0)
 			# or
 			#	 ogl.glOrtho(-self.w, 2*self.w, -self.h, 2*self.h, 0.0, 1.0)
 			ogl.glEnable(ogl.GL_LINE_SMOOTH)

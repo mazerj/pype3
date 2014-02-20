@@ -232,7 +232,6 @@ if not SA_DIRECT:
 			else:
 				array[idx] = value
 
-
 class FrameBuffer(object):
 	_instance = None
 
@@ -318,8 +317,8 @@ class FrameBuffer(object):
 		if not width or not height:
 			Logger('sprite: must specify display width and height\n')
 		else:
-			self.realw = width
-			self.realh = height
+			self.physicalw = width
+			self.physicalh = height
 			self.w = int(0.5 + width * self.xscale)
 			self.h = int(0.5 + height * self.yscale)
 			self.hw = self.w / 2
@@ -347,13 +346,20 @@ class FrameBuffer(object):
 			os.environ['DISPLAY'] = self.gui_dpy
 
 		# position display window at upper right corner based on screen size
+        modes = pygame.display.list_modes()
+        if not (self.physicalw, self.physicalh) in modes:
+            Logger('sprite: warning %dx%d not an avialable resolution\n' % \
+                   (self.physicalw, self.physicalh))
+            
+
+		print pygame.display.list_modes()
 		(dpyw, dpyh) = pygame.display.list_modes()[0]
-		os.environ['SDL_VIDEO_WINDOW_POS'] = '%d,%d' % (dpyw - self.realw, 0,)
+		os.environ['SDL_VIDEO_WINDOW_POS'] = '%d,%d' % (dpyw - self.physicalw, 0,)
 
 		try:
-			if pygame.display.mode_ok((self.realw, self.realh), self.flags) == 0:
+			if pygame.display.mode_ok((self.physicalw, self.physicalh), self.flags) == 0:
 				Logger('sprite: mode %dx%d:%s not available.\n' %
-					   (self.realw, self.realh, ppflag(self.flags)))
+					   (self.physicalw, self.physicalh, ppflag(self.flags)))
 				Logger('sprite: available modes are %s\n' % modes)
 				sys.exit(1)
 		except pygame.error:
@@ -364,7 +370,7 @@ class FrameBuffer(object):
 		# on the fly to hide the graphics window..
 		self.screen_open(init=1)
 		Logger('sprite: display is %dx%d %s\n' % \
-               (self.realw, self.realh, ppflag(self.flags)))
+               (self.physicalw, self.physicalh, ppflag(self.flags)))
 		Logger('sprite: fb is %dx%d %s\n' % \
                (self.w, self.h, ppflag(self.flags)))
 
@@ -415,13 +421,13 @@ class FrameBuffer(object):
 		self.fullscreen =  self.flags & FULLSCREEN
 
 	def screen_open(self, init=0):
-		self.screen = pygame.display.set_mode((self.realw, self.realh),
+		self.screen = pygame.display.set_mode((self.physicalw, self.physicalh),
                                               self.flags)
 		pygame.display.set_caption('framebuf')
 
 		if init:
 			# initialize OpenGL subsystem
-			ogl.glOrtho(0.0, self.realw, 0.0, self.realh, 0.0, 1.0)
+			ogl.glOrtho(0.0, self.physicalw, 0.0, self.physicalh, 0.0, 1.0)
 			ogl.glScale(1. / self.xscale, 1. / self.yscale, 1.0)
 			# in theory -- can put any static, global transformations you
 			# want here -- say to invert the stimuli or scale it, eg:

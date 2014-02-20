@@ -558,9 +558,9 @@ def _base_ptables():
 				 'monitor virtual width (pix)'),
 		pslot_ro('mon_dpyh', '0', is_int,
 				 'monitor virtual height (pix)'),
-		pslot_ro('mon_realdpyw', '0', is_int,
+		pslot_ro('mon_phys_dpyw', '0', is_int,
 				 'monitor physical width (pix)'),
-		pslot_ro('mon_realdpyh', '0', is_int,
+		pslot_ro('mon_phys_dpyh', '0', is_int,
 				 'monitor physical height (pix)'),
 		pslot_ro('mon_h_ppd', '0', is_float,
 				 'horizontal pixels_per_deg'),
@@ -1020,8 +1020,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.rig_common.set('mon_height', '%g' % monh)
 		self.rig_common.set('mon_dpyw', self.fb.w)
 		self.rig_common.set('mon_dpyh', self.fb.h)
-		self.rig_common.set('mon_realdpyw', self.fb.realw)
-		self.rig_common.set('mon_realdpyh', self.fb.realh)
+		self.rig_common.set('mon_phys_dpyw', self.fb.physicalw)
+		self.rig_common.set('mon_phys_dpyh', self.fb.physicalh)
 		self.rig_common.set('mon_h_ppd', '%g' % xppd)
 		self.rig_common.set('mon_v_ppd', '%g' % yppd)
 		self.rig_common.set('mon_ppd', '%g' % ppd)

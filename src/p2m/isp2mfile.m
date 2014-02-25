@@ -9,7 +9,7 @@ function b = isp2mfile(obj)
 %Mon Jun  1 13:27:54 2009 mazer 
 
 if ischar(obj)
-  b = regexp(obj, '.*p2m$');
+  b = ~isempty(regexp(obj, '.*p2m$'));
 else
   b = 0;
 end

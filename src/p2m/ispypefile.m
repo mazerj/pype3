@@ -9,7 +9,8 @@ function b = ispypefile(obj)
 %Mon Jun  1 13:27:54 2009 mazer 
 
 if ischar(obj)
-  b = regexp(obj, '[a-zA-Z].*[0-9][0-9][0-9][0-9]\..*\.[0-9][0-9][0-9]$');
+  b = ~isempty(regexp(obj, ...
+                      '[a-zA-Z].*[0-9][0-9][0-9][0-9]\..*\.[0-9][0-9][0-9]$'));
 else
   b = 0;
 end

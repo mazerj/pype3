@@ -352,12 +352,14 @@ class FrameBuffer(object):
                    (self.physicalw, self.physicalh))
             
 
-		print pygame.display.list_modes()
+		Logger('sprite: available modes are %s\n' % pygame.display.list_modes())
+        
 		(dpyw, dpyh) = pygame.display.list_modes()[0]
 		os.environ['SDL_VIDEO_WINDOW_POS'] = '%d,%d' % (dpyw - self.physicalw, 0,)
 
 		try:
-			if pygame.display.mode_ok((self.physicalw, self.physicalh), self.flags) == 0:
+			if pygame.display.mode_ok((self.physicalw, self.physicalh),
+                                      self.flags) == 0:
 				Logger('sprite: mode %dx%d:%s not available.\n' %
 					   (self.physicalw, self.physicalh, ppflag(self.flags)))
 				Logger('sprite: available modes are %s\n' % modes)

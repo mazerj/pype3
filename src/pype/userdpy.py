@@ -199,13 +199,18 @@ class UserDisplay(object):
 
 		f = Frame(self.frame)
 		f.pack(expand=1, fill=X)
-		self.titlebar = Label(f)
-		self.titlebar.pack(expand=0, side=LEFT)
+		self._info = Label(f, font="Courier 10", relief=SUNKEN)
+		self._info.pack(expand=1, fill=X, side=LEFT)
 
-		self._info = Label(f, font="Courier 10")
-		self._info.pack(expand=0, side=LEFT)
-		self._mouseinfo = Label(f, font="Courier 10")
-		self._mouseinfo.pack(expand=0, side=LEFT)
+		self.barstate = Label(f, relief=RAISED)
+		self.barstate.pack(expand=0, side=RIGHT)
+        Label(f, font="Courier 10", \
+              text='%dppd' % (pix_per_dva,), \
+              relief=SUNKEN).pack(expand=0, side=RIGHT)
+		if xscale != 1.0 or yscale != 1.0:
+            Label(f, font="Courier 10", \
+                  text='%.1fx%.1f' % (xscale, yscale), \
+                  relief=SUNKEN).pack(expand=0, side=RIGHT)
 
         self._mouseinfo_x = Label(f, font="Courier 10",
                                   fg='red', bg='white', relief=SUNKEN)
@@ -872,16 +877,12 @@ class UserDisplay(object):
 		self.app._int_handler(None, None, iclass=1, iarg=0)
 
 	def _mouse_motion(self, ev=None):
-		s = '[%dppd]' % (self.gridinterval,)
-		if self.canvas.xscale != 1.0 or self.canvas.yscale != 1.0:
-			s = s + '[%.1fx%.1f]' % (self.canvas.xscale,self.canvas.yscale)
 		if not ev is None:
 			x, y = self.canvas.window2scaled(ev.x, ev.y)
 			(self.mousex, self.mousey) = self.canv2cart(x, y)
             rx, ry = (self.mousex-self.fix_x, self.mousey-self.fix_y,)
         else:
             rx, ry = 0, 0
-		self._mouseinfo.configure(text=s)
         self._mouseinfo_x.configure(text='X:%5d' % rx)
         self._mouseinfo_y.configure(text='Y:%5d' % ry)
 

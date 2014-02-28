@@ -1619,11 +1619,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self._stateinfo.configure(text=t)
 			try:
 				if barstate:
-					self.udpy.titlebar.config(text='DOWN',
+					self.udpy.barstate.config(text='DOWN',
 											  font=('Courier', 10),
 											  fg='blue')
 				else:
-					self.udpy.titlebar.config(text=' UP ',
+					self.udpy.barstate.config(text=' UP ',
 											  font=('Courier', 10),
 											  fg='red')
 				self._last_stateinfo = t
@@ -3867,8 +3867,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 								((self.eyebuf_t, s0), (ut, a0), ),
 								self.spike_times)
 
-		self.udpy.info("[%4dspk %4dsync %4ddups]" %
-					   (len(self.spike_times), len(self.photo_times), ndups,))
+		self.udpy.info("%3dspk | %3dsync | %3ddup" %
+					   (len(self.spike_times),
+                        len(self.photo_times),
+                        ndups,))
 
 		# Completely wipe the buffers -- don't let them accidently
 		# get read TWICE!!	They're saved as self/app.eyebuf_[xyt]

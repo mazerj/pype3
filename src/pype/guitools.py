@@ -330,6 +330,29 @@ class Dialog_(Toplevel):
 			self._choice = self.default
 			self.destroy()
 
+class TextWin(Toplevel):
+	def __init__(self, title=None, iconname=None, **kw):
+		apply(Toplevel.__init__, (self,), {})
+		if title:
+			self.title(title)
+		if iconname:
+			self.iconname(iconname)
+		self.parent = self._nametowidget(self.winfo_parent())
+		self.transient(self.parent)
+        self.m = Text(self, font="Courier 10")
+		self.m.pack(expand=0)
+		apply(self.m.configure, (self.m,), kw)
+        self.lastmsg_ = None
+        
+		self.protocol("WM_DELETE_WINDOW", lambda s=self: s.withdraw())
+        
+    def set(self, msg):
+        if self.lastmsg_ != msg:
+            self.m.delete("1.0", END)
+            self.m.insert(END, msg)
+            self.deiconify()
+            self.lastmsg_ = msg
+
 class LogWindow(object):
 	def __init__(self, parent, height=20, width=70, bg='white',
 				 font='Courier 8'):

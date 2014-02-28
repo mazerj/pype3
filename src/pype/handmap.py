@@ -218,14 +218,14 @@ class _Probe(object):
 		z = self.sfreq/self.length
 
 		s = ""
+		s = s +	"  p:post info\n"
 		s = s + "  o:%s " % B(self.xoff, 'OFFST', 'MOUSE')
 		s = s + "  z:%s (mb2) " % B(self.lock, 'LOCK', 'FREE')
 		s = s + "\n"
 		s = s + "  j:%s " % B(self.jitter, 'ON  ', 'OFF ')
-		s = s + "  d:%s " % B(self.drift, 'ON  ', 'OFF ')
+		s = s + "   d:%s " % B(self.drift, 'ON  ', 'OFF ')
 		s = s + "  b:%s " % BLINK_STATES[self.blink_state]
 		s = s + "\n"
-		s = s +	"  h:hide info       p:post info\n"
 		s = s + "\n"
 		s = s +		" qw  length     %d\n" % self.length
 		s = s +		" er  width      %d\n" % self.width
@@ -552,8 +552,11 @@ class _Probe(object):
 			s = self.pp()
 		else:
 			s = "  h: show info"
-        for i in self.text:
-            self.app.udpy.canvas.itemconfig(i, text=s)
+        if 1:
+            self.app.hmapstate.infobox.set(s)
+        else:
+            for i in self.text:
+                self.app.udpy.canvas.itemconfig(i, text=s)
 
 def _step(val, by=1, minval=None, maxval=None):
 	val = val + by
@@ -743,6 +746,12 @@ def hmap_install(app):
                                         )
     app.udpy.set_taskcallback(lambda ev, app=app: _key_handler(app, 'z', ev))
 
+    app.hmapstate.infobox = TextWin('handmap', fg='blue', font='Courier 8')
+    app.setgeo(app.hmapstate.infobox, default='-0-0')
+    
+    app.hmapstate.infobox.set('a\n\b\n\c')
+    
+
 
 def hmap_uninstall(app):
 	app.udpy.xoffset = 0
@@ -755,6 +764,7 @@ def hmap_uninstall(app):
         app.udpy.canvas.delete(i)
     app.udpy.set_taskcallback(None)
 
+    app.hmapstate.infobox.destroy()
 	del app.hmapstate
 
 

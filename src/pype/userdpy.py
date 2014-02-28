@@ -199,13 +199,20 @@ class UserDisplay(object):
 
 		f = Frame(self.frame)
 		f.pack(expand=1, fill=X)
-		self.titlebar = Label(f, bg='white')
+		self.titlebar = Label(f)
 		self.titlebar.pack(expand=0, side=LEFT)
 
 		self._info = Label(f, font="Courier 10")
 		self._info.pack(expand=0, side=LEFT)
 		self._mouseinfo = Label(f, font="Courier 10")
 		self._mouseinfo.pack(expand=0, side=LEFT)
+
+        self._mouseinfo_x = Label(f, font="Courier 10",
+                                  fg='red', bg='white', relief=SUNKEN)
+        self._mouseinfo_y = Label(f, font="Courier 10",
+                                  fg='red', bg='white', relief=SUNKEN)
+        self._mouseinfo_x.pack(expand=0, side=RIGHT)
+		self._mouseinfo_y.pack(expand=0, side=RIGHT)
 
 		# tkinter vars for linking GUI to python vars:
 		self._photomode_tvar = IntVar()
@@ -871,11 +878,12 @@ class UserDisplay(object):
 		if not ev is None:
 			x, y = self.canvas.window2scaled(ev.x, ev.y)
 			(self.mousex, self.mousey) = self.canv2cart(x, y)
-			s = s + ' REL=[%05d,%05d]' % (self.mousex-self.fix_x,
-                                        self.mousey-self.fix_y,)
-			s = s + ' ABS=[%05d,%05d]' % (self.mousex, self.mousey,)
-		s = '%40s' % s
+            rx, ry = (self.mousex-self.fix_x, self.mousey-self.fix_y,)
+        else:
+            rx, ry = 0, 0
 		self._mouseinfo.configure(text=s)
+        self._mouseinfo_x.configure(text='X:%5d' % rx)
+        self._mouseinfo_y.configure(text='Y:%5d' % ry)
 
 	def _mouse_enter(self, ev):
 		self.canvas.focus_set()

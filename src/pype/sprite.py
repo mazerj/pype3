@@ -179,11 +179,6 @@ except ImportError:
 	sys.exit(1)
 
 
-# direct or indirect access (via SurfArrayAccess class)
-# to pygame surfaces (alpha and array)
-SA_DIRECT = True
-
-
 GLASS	= (0,0,0,0)
 WHITE	= (255,255,255)
 BLACK	= (1,1,1)
@@ -193,6 +188,21 @@ BLUE	= (1,1,255,1)
 YELLOW	= (255,255,1)
 MAGENTA = (255,1,255)
 CYAN	= (1,255,255)
+
+
+# Direct or indirect access to SurfArray data?
+#
+# direct or indirect access (via SurfArrayAccess class) to pygame
+# surfaces (alpha and array). If SA_DIRECT is true, then alpha and
+# array are direct links to the pygame sprite data and must be
+# refreshed every time ScaledSprite.im is changed to point to a new
+# pygame surface by calling the ScaledSprite.refresh_surfarray()
+# method. This is the preferred approach, the SurfArrayAccess
+# wrapper below is an old hack to make things work ~python2.4 on
+# the mac..
+
+SA_DIRECT = True
+#SA_DIRECT = False
 
 if not SA_DIRECT:
 	class _SurfArrayAccess(object):
@@ -249,7 +259,7 @@ class FrameBuffer(object):
 				 bg=(128, 128, 128),
 				 sync=1, syncsize=50, syncx=None, syncy=None, synclevel=255,
 				 mouse=0, frame=0, app=None, eyefn=None,
-                 xscale=1.0, yscale=1.0):
+				 xscale=1.0, yscale=1.0):
 		"""pygame+GL-based framebuffer class for pype.
 
 		Wrapper for the pygame platform-independent interface to the
@@ -312,8 +322,8 @@ class FrameBuffer(object):
 		self.record = 0
 		self._keystack = []
 		self._font = None
-        self.xscale = xscale
-        self.yscale = yscale
+		self.xscale = xscale
+		self.yscale = yscale
 		if not width or not height:
 			Logger('sprite: must specify display width and height\n')
 		else:
@@ -346,20 +356,20 @@ class FrameBuffer(object):
 			os.environ['DISPLAY'] = self.gui_dpy
 
 		# position display window at upper right corner based on screen size
-        modes = pygame.display.list_modes()
-        if not (self.physicalw, self.physicalh) in modes:
-            Logger('sprite: warning %dx%d not an avialable resolution\n' % \
+		modes = pygame.display.list_modes()
+		if not (self.physicalw, self.physicalh) in modes:
+			Logger('sprite: warning %dx%d not an avialable resolution\n' %
                    (self.physicalw, self.physicalh))
-            
+			
 
 		Logger('sprite: available modes are %s\n' % pygame.display.list_modes())
-        
+		
 		(dpyw, dpyh) = pygame.display.list_modes()[0]
 		os.environ['SDL_VIDEO_WINDOW_POS'] = '%d,%d' % (dpyw - self.physicalw, 0,)
 
 		try:
 			if pygame.display.mode_ok((self.physicalw, self.physicalh),
-                                      self.flags) == 0:
+									  self.flags) == 0:
 				Logger('sprite: mode %dx%d:%s not available.\n' %
 					   (self.physicalw, self.physicalh, ppflag(self.flags)))
 				Logger('sprite: available modes are %s\n' % modes)
@@ -372,9 +382,9 @@ class FrameBuffer(object):
 		# on the fly to hide the graphics window..
 		self.screen_open(init=1)
 		Logger('sprite: display is %dx%d %s\n' % \
-               (self.physicalw, self.physicalh, ppflag(self.flags)))
+			   (self.physicalw, self.physicalh, ppflag(self.flags)))
 		Logger('sprite: fb is %dx%d %s\n' % \
-               (self.w, self.h, ppflag(self.flags)))
+			   (self.w, self.h, ppflag(self.flags)))
 
 		self.bg = bg
 
@@ -424,7 +434,7 @@ class FrameBuffer(object):
 
 	def screen_open(self, init=0):
 		self.screen = pygame.display.set_mode((self.physicalw, self.physicalh),
-                                              self.flags)
+											  self.flags)
 		pygame.display.set_caption('framebuf')
 
 		if init:
@@ -433,7 +443,7 @@ class FrameBuffer(object):
 			ogl.glScale(1. / self.xscale, 1. / self.yscale, 1.0)
 			# in theory -- can put any static, global transformations you
 			# want here -- say to invert the stimuli or scale it, eg:
-			#    ogl.glScale(0.5, 0.5, 1.0)
+			#	 ogl.glScale(0.5, 0.5, 1.0)
 			# or
 			#	 ogl.glOrtho(-self.w, 2*self.w, -self.h, 2*self.h, 0.0, 1.0)
 			ogl.glEnable(ogl.GL_LINE_SMOOTH)
@@ -691,23 +701,23 @@ class FrameBuffer(object):
 			self.fliptimer = t
 
 		if self.record:
-            from pype import PypeApp
-            recno = PypeApp().record_id
-            fname = PypeApp().record_file
-            if fname is None:
-                return
-            if fname.startswith('/dev/null'):
-                fname = 'null'
-            ms = int(round(1000.0*(time.time())))
+			from pype import PypeApp
+			recno = PypeApp().record_id
+			fname = PypeApp().record_file
+			if fname is None:
+				return
+			if fname.startswith('/dev/null'):
+				fname = 'null'
+			ms = int(round(1000.0*(time.time())))
 			f = '%s_%04d_%020d.jpg' % (fname, recno, ms)
 			self.snapshot(f)
-            PypeApp().encode('SNAPSHOT ' + f)
+			PypeApp().encode('SNAPSHOT ' + f)
 
 	def recordtog(self, state=None):
-        if state is None:
-            self.record = not self.record
-        else:
-            self.record = state
+		if state is None:
+			self.record = not self.record
+		else:
+			self.record = state
 		if self.record:
 			os.system('/bin/rm -f /tmp/pype*.jpg')
 			sys.stderr.write('[Recording is ON]\n')
@@ -1031,7 +1041,7 @@ class FrameBuffer(object):
 		y = r * np.sin(t) + cy
 		self.lines(zip(x,y), color, width=width, closed=1, flip=flip)
 
-def genaxes(w, h=None, typecode=np.float64, inverty=0):
+def genaxes(w, h=None, typecode=np.float64, inverty=0, xscale=1.0, yscale=1.0):
 	"""Generate two arrays descripting sprite x- and y-coordinate axes
 	(like Matlab MESHGRID).
 
@@ -1052,47 +1062,51 @@ def genaxes(w, h=None, typecode=np.float64, inverty=0):
 	:return: pair of vectors (xaxis, yaxis) where the dimensions of
 		each vector are (w, 1) and (1, h) respectively.
 
+	Mon Mar	 3 13:24:10 2014 mazer
+	NOTE: there was a small fencpost error here (I think) -- linspace
+	is right, arange is likely wrong:
+			x = np.arange(0, w) - ((w - 1) / 2.0)
+			y = np.arange(0, h) - ((h - 1) / 2.0)
+
 	"""
 	if h is None:
 		(w, h) = w						# size supplied as pair/tuple
-	x = np.arange(0, w) - ((w - 1) / 2.0)
+	x = np.linspace(-w/2., w/2., w/xscale)
+	y = np.linspace(-h/2., h/2., h/yscale)
 	if inverty:
-		y = np.arange(h-1, 0-1, -1) - ((h - 1) / 2.0)
-	else:
-		y = np.arange(0, h) - ((h - 1) / 2.0)
+		y = y[::-1]
 	return x.astype(typecode)[:,np.newaxis],y.astype(typecode)[np.newaxis,:]
 
+class ScaledSprite(object):
+	_list = []                            # all live sprites (for debugging)
+	_id = 0                               # unique id for each sprite
 
-class Sprite(object):
-	"""Sprite object (wrapper for pygame surface class).
+	def __init__(self, dwidth=None, dheight=None, rwidth=None, rheight=None,
+				 x=0, y=0, depth=0, fb=None, on=1, image=None,
+                 dx=0, dy=0, fname=None, name=None, icolor='black',
+                 centerorigin=0, rotation=0.0, contrast=1.0):
+		"""ScaledSprite Object -- pype's main tool for graphics generation.
 
-	Note about .centerorigin: If centerorigin is False (default condition),
-	the origin is the UPPER LEFT corner of the sprite, positive x values
-	to the right, positive y-values running down. If center origin is True,
-	then it's normal cartesian coords with (0,0) in the center of the sprite
-	postive x-values to the right, positive y-values up.
+        This is a basic sprite object. The improvement here is that the
+        sprite has both a real size (rwidth x rheight) and a display size
+        (dwidth x dheight). If these match, it's a standard
+        Sprite object. If they don't match, the coordinate system for sprite
+        makes it look like it's display size, so gratings etc are computed
+        properly. But only rwidth x rheight pixels are kepts around, so
+        you can use coarse sprites plus OpenGL scaling to get more speed.
 
-	"""
+        The standard Sprite class is now a subclass of ScaledSprite with
+        rwidth==dwidth and rheight==dheight..
 
-	# List of all live instantiated sprite id's
-	_list = []
+		:param dwidth, dheight: (int) sprite size on display in pixels -- this
+                is the physical size once the sprite gets drawn on the display
 
-	# used to make unique id for each sprite:
-	_id = 0
-
-	def __init__(self, width=100, height=100, x=0, y=0, depth=0,
-				 fb=None, on=1, image=None, dx=0, dy=0, fname=None,
-				 name=None, icolor='black', centerorigin=0,
-				 rotation=0.0, contrast=1.0, scale=1.0):
-		"""Sprite Object -- pype's main tool for graphics generation.
-
-		:param width, height: (int) sprite size in pixels
+		:param rwidth, rheight: (int) virtual sprite size -- this is the one
+                that actual computations get done on, so smaller is faster!
 
 		:param x, y: (int) sprite position in pixels
 
-		:param depth: (int; default 0) sprite stacking order for
-				DisplayList (0 is on top)
-
+		:param depth: (int; default 0) depth order for DisplayList (0=top)
 
 		:param fb: (FrameBuffer object) associated FrameBuffer object
 
@@ -1114,14 +1128,10 @@ class Sprite(object):
 				center of the sprite and increasing y goes UP and
 				increase X goes RIGHT.
 
-		:param rotation: (float degrees) GL-pipeline rotation
+        :param rotation: (float degrees) GL-pipeline rotation
 				factor. Very fast pre-blit rotation.
 
 		:param contrast: (float 0-1.0) GL-pipeline contrast scaling
-				factor. Very fast pre-blit scaling of all pixel
-				values.
-
-		:param scale: (float) GL-pipeline spatial scaling
 				factor. Very fast pre-blit scaling of all pixel
 				values.
 
@@ -1138,17 +1148,34 @@ class Sprite(object):
 		self.centerorigin = centerorigin
 		self.rotation = rotation
 		self.contrast = contrast
-		self.scale_ = scale
 		self.texture = None
 
+		if dheight is None: dheight = dwidth
+		if rheight is None: rheight = rwidth
+			
+		if dwidth and not rwidth:
+			rwidth, rheight = dwidth, dheight
+            
+		if rwidth and not dwidth:
+			dwidth, dheight = rwidth, rheight
+
 		if fname:
-			# load image data from file
+			# load image data from file; if a real size is specififed,
+            # resize image to the specified real size. display size
+            # can be use to scale it back up...
 			self.im = pygame.image.load(fname).convert(32, pygame.SRCALPHA)
+			if rwidth:
+                # if virtual size is specified, image is downscaled to
+                # the virtual size for speed
+				self.im = pygame.transform.scale(self.im, (rwidth, rheight))
 			self.userdict = {}
 			setalpha = 0
 		elif image:
 			import copy
-			# make a copy of the source sprite/image
+			# make a copy of the source sprite/image; like image data,
+            # if a real size is specififed, resize image to the
+            # specified real size. display size can be use to scale it
+            # back up...
 			try:
 				# pype Image object
 				self.im = image.im.convert(32, pygame.SRCALPHA)
@@ -1157,24 +1184,34 @@ class Sprite(object):
 				# pygame image/surface
 				self.im = image.convert(32, pygame.SRCALPHA)
 				self.userdict = {}
+			if rwidth:
+				self.im = pygame.transform.scale(self.im, (rwidth, rheight))
 			setalpha = 0
 		else:
-			# new image from scratch
-			# image/sprites should have 32 bits (RGBA)
-			self.im = pygame.Surface((width, height),
-									 flags=pygame.SRCALPHA, depth=32)
+			# new image from scratch of specified real size
+            self.im = pygame.Surface((rwidth, rheight), \
+                                     flags=pygame.SRCALPHA, depth=32)
 			self.userdict = {}
 			setalpha = 1
 
+		if rwidth is None:
+			rwidth = self.im.get_width()
+			rheight = self.im.get_height()
+		if dheight is None:
+			dwidth = rwidth
+			dheight = rheight
+
+		self.xscale = float(dwidth) / float(rwidth)
+		self.yscale = float(dheight) / float(rheight)
+
 		self.im.set_colorkey((0,0,0,0))
 
-		self.w = self.im.get_width()
-		self.h = self.im.get_height()
-		self.iw = self.w
-		self.ih = self.h
-
-		self.ax, self.ay = genaxes(self.w, self.h, inverty=0)
-		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
+		self.w = rwidth
+		self.h = rheight
+		self.dw = dwidth
+		self.dh = dheight
+		self.iw = self.dw				  # icon width
+		self.ih = self.dh				  # icon height
 
 		# make sure every sprite gets a name for debugging
 		# purposes..
@@ -1189,8 +1226,9 @@ class Sprite(object):
 		self._id = Sprite._id
 		Sprite._id = Sprite._id + 1
 
+        self.refresh_axes()
 		if SA_DIRECT:
-			self.surfarray_refresh()
+			self.refresh_surfarray()
 		else:
 			self.array = _SurfArrayAccess(self,
 										  get=pygame.surfarray.array3d,
@@ -1203,7 +1241,15 @@ class Sprite(object):
 		if setalpha:
 			self.alpha[::] = 255
 
-	def surfarray_refresh(self):
+    def refresh_axes(self):
+		self.ax, self.ay = genaxes(self.dw, self.dh,
+								   inverty=0,
+								   xscale=self.xscale, yscale=self.yscale)
+		self.xx, self.yy = genaxes(self.dw, self.dh,
+								   inverty=1,
+								   xscale=self.xscale, yscale=self.yscale)
+
+	def refresh_surfarray(self):
 		if SA_DIRECT:
 			self.array = pygame.surfarray.pixels3d(self.im)
 			self.alpha = pygame.surfarray.pixels_alpha(self.im)
@@ -1219,9 +1265,9 @@ class Sprite(object):
 		self.render(clear=1)
 
 	def __repr__(self):
-		return ('<Sprite "%s"@(%d,%d) %x%x depth=%d on=%d>' %
+		return ('<ScaledSprite "%s"@(%d,%d) V%dx%d D%dx%d depth=%d on=%d>' %
 				(self.name, self.x, self.y,
-				 self.w, self.h, self.depth, self._on,))
+				 self.w, self.h, self.dw, self.dh, self.depth, self._on,))
 
 	def XY(self, xy):
 		"""Correct for centerorigin flag"""
@@ -1240,6 +1286,7 @@ class Sprite(object):
 			return (self.h / 2) - y
 		else:
 			return y
+    
 
 	def set_rotation(self, deg):
 		"""
@@ -1254,13 +1301,6 @@ class Sprite(object):
 
 		"""
 		self.contrast = percent / 100.0
-
-	def set_scale(self, scale):
-		"""
-		Sets GL-pipeline scale term (FAST!)
-
-		"""
-		self.scale_ = scale / 100.0
 
 	def asPhotoImage(self, alpha=None, xscale=None, yscale=None):
 		"""Convert sprite to a Tkinter displayable PhotoImage.
@@ -1466,44 +1506,17 @@ class Sprite(object):
 		for n in range(3): self.array[mx:(x+w),my:(y+h),n] = color[n]
 		self.alpha[mx:(x+w),my:(y+h)] = color[3]
 
-	def axisflip(self, xaxis, yaxis):
-		"""flip sprite data around axes
+	def rotateCCW(self, angle, preserve_size=1):
+		self.rotate(-angle, preserve_size=preserve_size)
 
-		Flip image on x-axis or y-axis, whatever's true. Uses
-		pygame.transform primitives, so it's fast.
+	def rotateCW(self, angle, preserve_size=1):
+		self.rotate(angle, preserve_size=preserve_size)
 
-		:param xaxis,yaxis: (boolean) which axis to flip on
-
-		:return: nothing
-
-		"""
-		new = pygame.transform.flip(self.im, xaxis, yaxis)
-		self.im = new
-		if SA_DIRECT:
-			self.surfarray_refresh()
-
-		self.im.set_colorkey((0,0,0,0))
-		self.w = self.im.get_width()
-		self.h = self.im.get_height()
-		self.iw = self.w
-		self.ih = self.h
-
-	def rotateCCW(self, angle, preserve_size=1, trim=0):
-		self.rotate(-angle, preserve_size=preserve_size, trim=trim)
-
-	def rotateCW(self, angle, preserve_size=1, trim=0):
-		self.rotate(angle, preserve_size=preserve_size, trim=trim)
-
-	def rotate(self, angle, preserve_size=1, trim=0):
+	def rotate(self, angle, preserve_size=1):
 		"""Lossy rotation of spite image data
 
 		Rotate sprite image about the sprite's center.
 		Uses pygame.transform primitives.
-
-		*NB*
-
-		- 'trim' ignored for now - don't even remember what it was
-		  for... totally obsolete now.
 
 		- this is NOT invertable! Multiple rotations will accumulate
 		  errors, so keep an original and only rotate copies. Ideal
@@ -1511,7 +1524,7 @@ class Sprite(object):
 
 		- 03/07/2006: note rotation direction is CW!!
 
-<		:param angle: angle of rotation in degrees
+		:param angle: angle of rotation in degrees
 
 		:param preserve_size: (boolean) if true, the rotated sprite is
 				clipped back down to the size of the original image.
@@ -1519,6 +1532,9 @@ class Sprite(object):
 		:return: nothing
 
 		"""
+        if self.xscale != 1.0 or self.yscale != 1.0:
+			Logger("rotate only works for unscaled sprites!\n")
+            
 		new = pygame.transform.rotate(self.im, -angle)
 		if preserve_size:
 			w = new.get_width()
@@ -1527,15 +1543,19 @@ class Sprite(object):
 			y = (h/2) - (self.h/2)
 			new = new.subsurface(x, y, self.w, self.h)
 		self.im = new
-		if SA_DIRECT:
-			self.surfarray_refresh()
 
 		self.im.set_colorkey((0,0,0,0))
 		self.w = self.im.get_width()
 		self.h = self.im.get_height()
+		self.dw = self.w
+		self.dh = self.h
 		self.iw = self.w
 		self.ih = self.h
-
+        
+        self.refresh_axes()
+        self.refresh_surfarray()
+        
+        
 	def scale(self, new_width, new_height):
 		"""Resize this sprite (fast).
 
@@ -1554,50 +1574,25 @@ class Sprite(object):
 
 		:return: nothing
 
-		"""
-		new = pygame.transform.scale(self.im, (new_width, new_height))
-		self.im = new
-		if SA_DIRECT:
-			self.surfarray_refresh()
+        Warning: in general, this is obsolete -- you should use
+        xscale/yscale to do scaling through the GL pipeline
 
+		"""
+
+        nw = int(round(self.w * new_width / float(self.dw)))
+        nh = int(round(self.h * new_height / float(self.dh)))
+		self.im = pygame.transform.scale(self.im, (nw, nh))
 		self.im.set_colorkey((0,0,0,0))
 		self.w = self.im.get_width()
 		self.h = self.im.get_height()
-		self.iw = self.w
-		self.ih = self.h
+		self.dw = new_width
+		self.dh = new_height
+		self.iw = self.dw				  # icon width
+		self.ih = self.dh				  # icon height
 
-		self.ax, self.ay = genaxes(self.w, self.h, inverty=0)
-		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
-
-	def rotozoom(self, scale=1.0, angle=0.0):
-		"""Resize this sprite using rotozoom
-
-		This does combined scale and rotation and smooths on the
-		fly - probbaly not as fast as scale(), but will look better.
-
-		*NB* This is NOT invertable! Scaling down and back up will not
-		return the original sprite!!
-
-		:param scale: floating point scale factor
-
-		:param angle: angle in degrees to rotate CCW
-
-		:return: nothing
-
-		"""
-		new = pygame.transform.rotozoom(self.im, scale, angle)
-		self.im = new
-		if SA_DIRECT:
-			self.surfarray_refresh()
-
-		self.im.set_colorkey((0,0,0,0))
-		self.w = self.im.get_width()
-		self.h = self.im.get_height()
-		self.iw = self.w
-		self.ih = self.h
-
-		self.ax, self.ay = genaxes(self.w, self.h, inverty=0)
-		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
+        self.refresh_axes()
+		self.refresh_surfarray()
+        
 
 	def circmask(self, x, y, r):
 		"""hard vignette in place - was image_circmask"""
@@ -1807,7 +1802,7 @@ class Sprite(object):
 			texture_blit(self.fb, self.texture, x, y,
 						 rotation=self.rotation,
 						 contrast=self.contrast,
-						 scale=self.scale_)
+						 xscale=self.xscale, yscale=self.yscale)
 		else:
 			rgba = pygame.image.tostring(self.im, 'RGBA', 1)
 			#im = self.array[:,::-1,:]
@@ -1818,7 +1813,7 @@ class Sprite(object):
 			texture_blit(self.fb, tex, x, y,
 						 rotation=self.rotation,
 						 contrast=self.contrast,
-						 scale=self.scale_)
+						 xscale=self.xscale, yscale=self.yscale)
 			texture_del(tex)
 
 		if flip:
@@ -1870,7 +1865,7 @@ class Sprite(object):
 		if center:
 			x = self.X(x) - (w/2)
 			y = self.Y(y) - (h/2)
-		s = Sprite(image=self.im.subsurface((x, y, w, h)))
+		s = ScaledSprite(image=self.im.subsurface((x, y, w, h)))
 		s.x = self.x
 		s.y = self.y
 		s.dx = self.dx
@@ -1883,35 +1878,29 @@ class Sprite(object):
 	def clone(self):
 		"""Duplicate sprite
 
-		Clone this sprite; make's a new instance of class Sprite
-		with all data duplicated.
+		Clone this sprite by making a new instance with all
+		data, including image and alpha, duplicated.
 
 		*NB* Wed Apr 19 14:32:03 2006 mazer - Despite what the pygame
 		docs say about subsurface(), this function COPIES the image
 		data. Changes to the clone will *NOT* affect the parent!
+                         image=self.im.subsurface((0, 0, self.w, self.h)),
 
 		"""
 		import copy
 
-		name = self.name
-		s = Sprite(image=self.im.subsurface((0, 0, self.w, self.h)),
-				   name = name)
+		s = ScaledSprite(dwidth=self.dw, dheight=self.dh,
+                         rwidth=self.w, rheight=self.h,
+                         image=self,
+                         x=self.x, y=self.y, dx=self.dx, dy=self.dy,
+                         on=self._on, depth=self.depth,
+                         rotation=self.rotation, contrast=self.contrast,
+                         name='clone of '+self.name,
+                         fb=self.fb)
 		s.iw = self.iw
 		s.ih = self.ih
-		s.x = self.x
-		s.y = self.y
-		s.dx = self.dx
-		s.dy = self.dy
-		s.depth = self.depth
-		s.fb = self.fb
-		s._on = self._on
-		self.rotation = self.rotation
-		self.contrast = self.contrast
-		self.texture = None				# can't share textures!
-
-		# copy the alpha mask too..
-		s.alpha[::] = self.alpha[::]
-
+		self.texture = None                # can't share textures, force new one
+		s.alpha[::] = self.alpha[::]       # copy the alpha mask too..
 		s.userdict = copy.copy(self.userdict)
 
 		return s
@@ -1967,6 +1956,79 @@ class Sprite(object):
 		except IOError:
 			Logger("Can't write %s.\n" % fname)
 			return None
+		
+class Sprite(ScaledSprite):
+	"""Sprite object (wrapper for pygame surface class).
+
+	Note about .centerorigin: If centerorigin is False (default condition),
+	the origin is the UPPER LEFT corner of the sprite, positive x values
+	to the right, positive y-values running down. If center origin is True,
+	then it's normal cartesian coords with (0,0) in the center of the sprite
+	postive x-values to the right, positive y-values up.
+
+	"""
+
+	def __init__(self, width=100, height=100, x=0, y=0, depth=0,
+				 fb=None, on=1, image=None, dx=0, dy=0, fname=None,
+				 name=None, icolor='black', centerorigin=0,
+				 rotation=0.0, contrast=1.0, scale=1.0):
+		"""Sprite Object -- pype's main tool for graphics generation.
+
+		:param width, height: (int) sprite size in pixels
+
+		:param x, y: (int) sprite position in pixels
+
+		:param depth: (int; default 0) sprite stacking order for
+				DisplayList (0 is on top)
+
+
+		:param fb: (FrameBuffer object) associated FrameBuffer object
+
+		:param on: (boolean) on/off (for DisplayList)
+
+		:param image: (Sprite object) seed sprite to get data from
+
+		:param dx, dy: (int) xy velocity (shift/blit)
+
+		:param fname: (string) Filename of image to load sprite data from.
+
+		:param name: (string) Sprite name/info
+
+		:param icolor: (string color) icon color (for UserDisplay)
+
+		:param centerorigin: (boolean; default=0) If 0, then the upper
+				left corner of the sprite is 0,0 and increasing y goes
+				DOWN, increase x goes RIGHT. If 1, then 0,0 is in the
+				center of the sprite and increasing y goes UP and
+				increase X goes RIGHT.
+
+		:param rotation: (float degrees) GL-pipeline rotation
+				factor. Very fast pre-blit rotation.
+
+		:param contrast: (float 0-1.0) GL-pipeline contrast scaling
+				factor. Very fast pre-blit scaling of all pixel
+				values.
+
+		:param scale: (float) GL-pipeline spatial scaling
+				factor. Very fast pre-blit scaling of all pixel
+				values.
+
+		"""
+
+        if fname:
+            width, height = None, None
+        else:
+            width, height = width*scale, height*scale
+            
+        ScaledSprite.__init__(self,
+                              dwidth=width, dheight=height,
+                              rwidth=width, rheight=height,
+                              x=x, y=y, depth=depth,
+                              fb=fb, on=on, image=image,
+                              dx=dx, dy=dy,
+                              fname=fname, name=name, icolor=icolor,
+                              centerorigin=centerorigin,
+                              rotation=rotation, contrast=contrast)
 
 class PolySprite(object):
 	"""Polygon Sprite
@@ -2360,7 +2422,7 @@ def texture_create(rgbastr, w, h):
 	return (texture, w, h)
 
 def texture_blit(fb, texture, x, y,
-				 rotation=0, draw=1, contrast=1.0, scale=1.0):
+				 rotation=0, draw=1, contrast=1.0, xscale=1.0, yscale=1.0):
 	"""INTERNAL USE ONLY
 
 	NOTES:
@@ -2377,8 +2439,8 @@ def texture_blit(fb, texture, x, y,
 	"""
 
 	(texture, w, h) = texture
-	nw = w * scale
-	nh = h * scale
+	nw = w * xscale
+	nh = h * yscale
 	x = (x + fb.hw)
 	y = (y + fb.hh)
 	cx = x - (nw/2)
@@ -2702,7 +2764,7 @@ if __name__ == '__main__':
 
 	def drawtest2(fb):
 		s1 = Sprite(100, 100, -100, 0, fb=fb)
-		s2 = Sprite(100, 100, 100, 0, fb=fb)
+		s2 = Sprite(100, 100, 100, 0, fb=fb, scale=1)
 		s2.alpha_gradient(r1=40, r2=50)
 		for n in range(0,2*360,10):
 			fb.clear()
@@ -2717,9 +2779,32 @@ if __name__ == '__main__':
 			fb.flip()
 
 
+	def drawtest3(fb):
+		x = -200
+		w = 100
+		ss = []
+		for n in range(5):
+			ss.append(ScaledSprite(dwidth=100, rwidth=w, x=x, y=-100, fb=fb,
+                                   fname='lib/testpat.png'))
+            ss.append(ss[-1].clone())
+            singrat(ss[-1], 1, 0.0, n, WHITE)
+            ss[-1].moveto(x,100)
+            
+			x = x + 100
+			w = int(w/2)
+            
+		for n in range(0,2*360,10):
+			fb.clear()
+			for s in ss:
+				#singrat(s, 1, 0.0, n, WHITE)
+                s.set_rotation(n)
+				s.blit()
+			fb.flip()
+    
 	fb=quickfb(500,500)
 
 	if 1:
+		drawtest3(fb)
 		drawtest2(fb)
 		sys.stdout.write('>>>'); sys.stdout.flush()
 		sys.stdin.readline()

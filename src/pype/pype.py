@@ -2340,6 +2340,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				ask('run task', 'Task has changed\nRun anyway?',
 					['yes', 'no']) == 1):
 				return
+            
+			self._allowabort = 1
 
 			if self._validatefn:
 				# abort if validatefn returns False
@@ -2396,8 +2398,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					(server, tank, block) = self.tdt.newblock(record=1)
 					Logger('pype: tdt data = %s %s\n' % (tank, block))
 					self.con('tdt data = %s %s\n' % (tank, block))
-
-				self._allowabort = 1
 
 				# clear/reset result stack at the start of the run..
 				self.set_result()
@@ -4182,11 +4182,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				fname = pyperc('testpat');
 			else:
 				fname = self.pypedir + '/lib/testpat.png'
-			s = Sprite(x=0, y=0, fname=fname, fb=self.fb, depth=99,
-					   on=1, name='testpat')
-			s.scale(self.fb.w, self.fb.h)
-			self._testpat = s
+			self._testpat = ScaledSprite(x=0, y=0, fname=fname, fb=self.fb,
+                                         depth=99, on=1, name='testpat',
+                                         dwidth=self.fb.w, dheight=self.fb.h)
 		drawtest(self.fb, self._testpat)
+        
 
 	def plotEyetracesRange(self, start=None, stop=None):
 		"""Set time range for useful portion of the eye trace.

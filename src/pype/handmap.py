@@ -267,8 +267,7 @@ class _Probe(object):
 			self.s = None
 
 	def color(self):
-		colornames = ('noise', 'white', 'black', 'red', 'green', 'blue',
-					  'yellow', 'aqua', 'purple')
+		colornames = ('noise', 'white', 'black', 'red', 'green', 'blue')
 		bg = self.bg
 		maxi = max(255 - bg, bg)
 
@@ -308,9 +307,6 @@ class _Probe(object):
 			col = (x, 1, x)
 		return (col, colornames[self.colorn])
 
-	def nextcolor(self, incr=1):
-		self.colorn = (self.colorn + incr) % 9
-
 	def showprobe(self, x=0, y=0, redraw=1):
         import PIL.ImageTk
 
@@ -318,12 +314,12 @@ class _Probe(object):
             self.im = self.s.asImage(xscale=self.app.udpy.canvas.xscale,
                                      yscale=self.app.udpy.canvas.yscale)
             self.photoim = PIL.ImageTk.PhotoImage(self.im)
-			self.probeid = self.app.udpy.canvas.create_image(x, y, anchor=NW,
+			self.probeid = self.app.udpy.canvas.create_image(0, 0, anchor=NW,
 															 image=self.photoim)
-			self.app.udpy.canvas.lower(self.probeid)
-		else:
-			self.app.udpy.canvas.coords(self.probeid, x, y)
-			self.app.udpy.canvas.lower(self.probeid)
+        x = x - (self.im.size[0]/2)
+        y = y - (self.im.size[1]/2)
+		self.app.udpy.canvas.coords(self.probeid, x, y)
+		self.app.udpy.canvas.lower(self.probeid)
 
 
 	def draw(self):
@@ -357,103 +353,81 @@ class _Probe(object):
 
 			if self.barmode == BAR:
 				if color is None:
-                    self.s = Sprite(width=max(1,self.width/self.lw),
-                                    height=max(1,self.length/self.lw),
-                                    fb=self.app.fb, depth=99)
-                    #self.s.noise(0.5)
-                    #uniformnoise(self.s, binary=True)
+                    self.s = ScaledSprite(width=max(1,self.width/self.lw),
+                                          height=max(1,self.length/self.lw))
                     gaussiannoise(self.s)
                     self.s.scale(self.width, self.length)
 				else:
-                    self.s = Sprite(width=self.width,
-                                    height=self.length,
-                                    fb=self.app.fb, depth=99)
+                    self.s = ScaledSprite(width=self.width, height=self.length)
 					self.s.fill(color)
-				self.s.rotateCCW(self.a, 0, 1)
+                self.s.set_rotation(self.a)
 			elif self.barmode == RECT:
 				if color is None:
-                    self.s = Sprite(width=max(1,(self.width+2*self.lw)/self.lw),
-                                    height=max(1,
-                                               (self.length+2*self.lw)/self.lw),
-                                               fb=self.app.fb, depth=99)
-					#self.s.noise(0.5)
-                    #uniformnoise(self.s, binary=True)
+                    self.s = ScaledSprite(width=max(1,(self.width+2*self.lw)/self.lw),
+                                          height=max(1, (self.length+2*self.lw)/self.lw))
                     gaussiannoise(self.s)
                     self.s.scale(self.width+2*self.lw, self.length+2*self.lw)
 				else:
-                    self.s = Sprite(width=self.width+2*self.lw,
-                                    height=self.length+2*self.lw,
-                                    fb=self.app.fb, depth=99)
+                    self.s = ScaledSprite(width=self.width+2*self.lw, height=self.length+2*self.lw)
 					self.s.fill(color)
                 self.s.rect(0, 0, self.width, self.length, (0,0,0,0))
-				self.s.rotateCCW(self.a, 0, 1)
+				self.s.set_rotation(self.a)
 			elif self.barmode == DISK:
 				if color is None:
-                    self.s = Sprite(width=max(1,self.length/self.lw),
-                                    height=max(1,self.length/self.lw),
-                                    fb=self.app.fb, depth=99)
-					#self.s.noise(0.5)
-                    #uniformnoise(self.s, binary=True)
+                    self.s = ScaledSprite(width=max(1,self.length/self.lw))
                     gaussiannoise(self.s)
                     self.s.scale(self.length, self.length)
 				else:
-					self.s = Sprite(width=self.length, height=self.length,
-                                    fb=self.app.fb, depth=99)
+					self.s = ScaledSprite(width=self.length)
                     self.s.fill(color)
                 self.s.circmask(0, 0, self.length/2)
 			elif self.barmode == CIRCLE:
                 l = self.length
 				if color is None:
-                    self.s = Sprite(width=max(1,(l+2*self.lw)/self.lw),
-                                    height=max(1, (l+2*self.lw)/self.lw),
-                                    fb=self.app.fb, depth=99)
-					#self.s.noise(0.5)
-                    #uniformnoise(self.s, binary=True)
+                    self.s = ScaledSprite(width=max(1,(l+2*self.lw)/self.lw))
                     gaussiannoise(self.s)
                     self.s.scale(l+2*self.lw, l+2*self.lw)
 				else:
-                    self.s = Sprite(width=l+2*self.lw,
-                                    height=l+2*self.lw,
-                                    fb=self.app.fb, depth=99)
+                    self.s = ScaledSprite(width=l+2*self.lw,
+                                          height=l+2*self.lw,
+                                          fb=self.app.fb, depth=99)
 					self.s.fill(color)
-                r = l/2
                 self.s.circmask(0, 0, l/2+self.lw)
                 self.s.circlefill((0,0,0,0), l/2)
 			elif self.barmode == CART:
 				l = self.length
-				self.s = Sprite(width=l, height=l,
-								fb=self.app.fb, depth=99)
+				self.s = ScaledSprite(width=l, height=l,
+                                      rwidth=100, rheight=100)
 				if color is None or sum(color) < 3:
-					# 'black' is just 90deg phase shift of 'white'
 					rc,gc,bc = -1.0,-1.0,-1.0
 				singrat(self.s, abs(self.sfreq), phase, self.a,
-						1.0*rc, 1.0*gc, 1.0*bc)
+                        (255*rc, 255*gc, 255*bc))
 				self.s.alpha_aperture(l/2)
 			elif self.barmode == HYPER:
 				l = self.length
-				self.s = Sprite(width=l, height=l,
-								fb=self.app.fb, depth=99)
+				self.s = ScaledSprite(width=l, height=l,
+                                      rwidth=100, rheight=100)
 				if color is None or sum(color) < 3:
-					# 'black' is just 90deg phase shift of 'white'
 					rc,gc,bc = -1.0,-1.0,-1.0
 				hypergrat(self.s, abs(self.sfreq), phase, self.a,
-						  1.0*rc, 1.0*gc, 1.0*bc)
+                          (255*rc, 255*gc, 255*bc))
 				self.s.alpha_aperture(l/2)
 			elif self.barmode == POLAR:
 				l = self.length
-				self.s = Sprite(width=l, height=l,
-								fb=self.app.fb, depth=99)
+				self.s = ScaledSprite(width=l, height=l,
+                                      rwidth=100, rheight=100)
 				if self.rfreq < 0:
 					pol = -1
 				else:
 					pol = 1
 				if color is None or sum(color) < 3:
-					# 'black' is just 90deg phase shift of 'white'
 					rc,gc,bc = -1.0,-1.0,-1.0
 				polargrat(self.s, abs(self.sfreq), abs(self.rfreq), phase, pol,
-						  1.0*rc, 1.0*gc, 1.0*bc)
+                          (255*rc, 255*gc, 255*bc))
 				self.s.alpha_aperture(l/2)
-
+            self.s.fb = self.app.fb
+            self.s.depth = 99
+            
 			self.lastx = None
 			self.lasty = None
 
@@ -500,14 +474,13 @@ class _Probe(object):
 		dy = iw * math.sin(math.pi * -self.a / 180.0)
 
 		# compute photoimage position in canvas coords
-		cx = x - (self.s.w / 2.0)
-		cy = y - (self.s.h / 2.0)
-
+		#cx = x - (self.s.dw / 2.0)
+		#cy = y - (self.s.dh / 2.0)
 		if not self.s is olds:
 			# new sprite, redraw the probe
-			self.showprobe(x=cx, y=cy, redraw=1)
+			self.showprobe(x=x, y=y, redraw=1)
 		else:
-			self.showprobe(x=cx, y=cy, redraw=0)
+			self.showprobe(x=x, y=y, redraw=0)
 
 		if self.major_ax:
 			self.app.udpy.canvas.coords(self.major_ax, x1, y1, x2, y2)
@@ -610,12 +583,6 @@ def _key_handler(app, c, ev):
 		p.verbose = not p.verbose
 	elif c in '123456':
 		p.colorn = ord(c) - ord('1')
-		p.force_redraw()
-	elif c == 'n':
-		p.nextcolor(-1)
-		p.force_redraw()
-	elif c == 'N':
-		p.nextcolor(1)
 		p.force_redraw()
 	elif c == '8':
 		p.a = (p.a + 15) % 360

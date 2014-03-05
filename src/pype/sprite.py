@@ -189,59 +189,6 @@ YELLOW	= (255,255,1)
 MAGENTA = (255,1,255)
 CYAN	= (1,255,255)
 
-
-# Direct or indirect access to SurfArray data?
-#
-# direct or indirect access (via SurfArrayAccess class) to pygame
-# surfaces (alpha and array). If SA_DIRECT is true, then alpha and
-# array are direct links to the pygame sprite data and must be
-# refreshed every time ScaledSprite.im is changed to point to a new
-# pygame surface by calling the ScaledSprite.refresh_surfarray()
-# method. This is the preferred approach, the SurfArrayAccess
-# wrapper below is an old hack to make things work ~python2.4 on
-# the mac..
-
-SA_DIRECT = True
-#SA_DIRECT = False
-
-if not SA_DIRECT:
-	class _SurfArrayAccess(object):
-		"""
-		Surfarray accessor class for sprites.
-		Makes sprite.array, sprite.alpha behave almost as though they
-		were direct references to the surfarray array3d Numeric arrays.
-
-		For example::
-
-		  array = self.array[::]
-		  array = self.array[3:,4]
-		  self.array[::] = newarray
-		  self.array[4,3] = 12
-
-		However, self.array is not really a Numeric array itself, so don't do::
-
-		  BAD self.array = newarray (use self.array[::] = newarray)
-		  BAD sz = size(self.array) (use size(self.array[::])).
-
-		Similar for self.alpha.
-
-		"""
-		def __init__(self, s, get, set):
-			self.s = s
-			self.getfn = get
-			self.setfn = set
-
-		def __getitem__(self, idx):
-			array = self.getfn(self.s.im)
-			return array[idx]
-
-		def __setitem__(self, idx, value):
-			array = self.setfn(self.s.im)
-			if type(value) is np.ndarray:
-				array[idx] = value.astype(array.dtype.char)
-			else:
-				array[idx] = value
-
 class FrameBuffer(object):
 	_instance = None
 
@@ -1041,7 +988,7 @@ class FrameBuffer(object):
 		y = r * np.sin(t) + cy
 		self.lines(zip(x,y), color, width=width, closed=1, flip=flip)
 
-def genaxes(w, h=None, typecode=np.float64, inverty=0, xscale=1.0, yscale=1.0):
+def genaxes(w, h, rw, rh, typecode=np.float64, inverty=0):
 	"""Generate two arrays descripting sprite x- and y-coordinate axes
 	(like Matlab MESHGRID).
 
@@ -1051,8 +998,11 @@ def genaxes(w, h=None, typecode=np.float64, inverty=0, xscale=1.0, yscale=1.0):
 	function for is to compute eccentricity to shaping envelopes, but
 	wrong for most math. Use inverty=1 to get proper world coords..
 
-	:param w, h: scalar values indicating the width and height of the
-		sprite in needing axes in pixels
+	:param w, h: scalar values indicating the display width and
+        height of the sprite in needing axes in pixels
+
+    :param rw, th: scalar values indicating the "real" width and
+        height of the sprite (specifies actually array size)
 
 	:param typecode: Numeric-style typecode for the output array
 
@@ -1071,8 +1021,8 @@ def genaxes(w, h=None, typecode=np.float64, inverty=0, xscale=1.0, yscale=1.0):
 	"""
 	if h is None:
 		(w, h) = w						# size supplied as pair/tuple
-	x = np.linspace(-w/2., w/2., w/xscale)
-	y = np.linspace(-h/2., h/2., h/yscale)
+	x = np.linspace(-w/2.0, w/2.0, rw)
+	y = np.linspace(-h/2.0, h/2.0, rh)
 	if inverty:
 		y = y[::-1]
 	return x.astype(typecode)[:,np.newaxis],y.astype(typecode)[np.newaxis,:]
@@ -1081,9 +1031,10 @@ class ScaledSprite(object):
 	_list = []                            # all live sprites (for debugging)
 	_id = 0                               # unique id for each sprite
 
-	def __init__(self, dwidth=None, dheight=None, rwidth=None, rheight=None,
-				 x=0, y=0, depth=0, fb=None, on=1, image=None,
-                 dx=0, dy=0, fname=None, name=None, icolor='black',
+	def __init__(self, width=None, height=None, rwidth=None, rheight=None,
+				 x=0, y=0, depth=0, dx=0, dy=0,
+                 fname=None, name=None, fb=None, on=1, image=None,
+                 icolor='black', ifill='yellow',
                  centerorigin=0, rotation=0.0, contrast=1.0):
 		"""ScaledSprite Object -- pype's main tool for graphics generation.
 
@@ -1098,11 +1049,13 @@ class ScaledSprite(object):
         The standard Sprite class is now a subclass of ScaledSprite with
         rwidth==dwidth and rheight==dheight..
 
-		:param dwidth, dheight: (int) sprite size on display in pixels -- this
+		:param width, height: (int) sprite size on display in pixels -- this
                 is the physical size once the sprite gets drawn on the display
 
-		:param rwidth, rheight: (int) virtual sprite size -- this is the one
+		:param rwidth, rheight: (int/float) virtual sprite size -- this is the one
                 that actual computations get done on, so smaller is faster!
+                Ff these are <1.0, then they're assumed to be x and y-scaling
+                factors and applied to width and height
 
 		:param x, y: (int) sprite position in pixels
 
@@ -1120,7 +1073,9 @@ class ScaledSprite(object):
 
 		:param name: (string) Sprite name/info
 
-		:param icolor: (string color) icon color (for UserDisplay)
+		:param icolor: (string) icon outline (for UserDisplay)
+        
+		:param ifill: (string) icon fille (for UserDisplay)
 
 		:param centerorigin: (boolean; default=0) If 0, then the upper
 				left corner of the sprite is 0,0 and increasing y goes
@@ -1145,20 +1100,37 @@ class ScaledSprite(object):
 		self.fb = fb
 		self._on = on
 		self.icolor = icolor
+		self.ifill = ifill
 		self.centerorigin = centerorigin
 		self.rotation = rotation
 		self.contrast = contrast
 		self.texture = None
 
-		if dheight is None: dheight = dwidth
-		if rheight is None: rheight = rwidth
-			
+        # for backward compatibilty
+        dwidth, dheight = width, height
+
+        # if only height is provided, assume square
+		if dheight is None:     dheight = dwidth
+		if rheight is None:     rheight = rwidth
+
+        # if only display size is specified, make real same (no scaling)
 		if dwidth and not rwidth:
 			rwidth, rheight = dwidth, dheight
             
+        # if only real size is specified, make display same (again, no scaling)
 		if rwidth and not dwidth:
 			dwidth, dheight = rwidth, rheight
 
+        if rwidth < 1.0:
+            rwidth = int(round(dwidth * rwidth))
+        if rheight < 1.0:
+            rheight = int(round(dheight * rheight))
+            
+        if rwidth > dwidth:
+            rwidth = dwidth
+        if rheight > dheight:
+            rheight = dheight
+            
 		if fname:
 			# load image data from file; if a real size is specififed,
             # resize image to the specified real size. display size
@@ -1206,13 +1178,6 @@ class ScaledSprite(object):
 
 		self.im.set_colorkey((0,0,0,0))
 
-		self.w = rwidth
-		self.h = rheight
-		self.dw = dwidth
-		self.dh = dheight
-		self.iw = self.dw				  # icon width
-		self.ih = self.dh				  # icon height
-
 		# make sure every sprite gets a name for debugging
 		# purposes..
 		if name:
@@ -1226,33 +1191,28 @@ class ScaledSprite(object):
 		self._id = Sprite._id
 		Sprite._id = Sprite._id + 1
 
-        self.refresh_axes()
-		if SA_DIRECT:
-			self.refresh_surfarray()
-		else:
-			self.array = _SurfArrayAccess(self,
-										  get=pygame.surfarray.array3d,
-										  set=pygame.surfarray.pixels3d)
-			self.alpha = _SurfArrayAccess(self,
-										  get=pygame.surfarray.array_alpha,
-										  set=pygame.surfarray.pixels_alpha)
-
+        self.refresh()
+        
 		# this is to fix a Lucid problem, not tracked down now..
 		if setalpha:
 			self.alpha[::] = 255
 
-    def refresh_axes(self):
-		self.ax, self.ay = genaxes(self.dw, self.dh,
-								   inverty=0,
-								   xscale=self.xscale, yscale=self.yscale)
-		self.xx, self.yy = genaxes(self.dw, self.dh,
-								   inverty=1,
-								   xscale=self.xscale, yscale=self.yscale)
+    def refresh(self):
+        # this should be called each time the size or surface
+        # data for a sprite gets changed
 
-	def refresh_surfarray(self):
-		if SA_DIRECT:
-			self.array = pygame.surfarray.pixels3d(self.im)
-			self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		self.w = self.im.get_width()
+		self.h = self.im.get_height()
+		self.dw = int(round(self.xscale * self.w))
+		self.dh = int(round(self.yscale * self.h))
+        
+		self.ax, self.ay = genaxes(self.dw, self.dh, self.w, self.h,
+								   inverty=0)
+		self.xx, self.yy = genaxes(self.dw, self.dh, self.w, self.h,
+								   inverty=1)
+		self.array = pygame.surfarray.pixels3d(self.im)
+		self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		self.im.set_colorkey((0,0,0,0))
 
 	def __del__(self):
 		"""Sprite clean up.
@@ -1318,7 +1278,10 @@ class ScaledSprite(object):
 		"""
 
 		import PIL.ImageTk, PIL.ImageFilter
+        
 		pil = self.asImage(xscale=xscale, yscale=yscale)
+        pil = pil.resize((self.dw, self.dh))
+        pil = pil.rotate(self.rotation, expand=1)
 		if not alpha is None:
 			pil.putalpha(alpha)
 		self.pim = PIL.ImageTk.PhotoImage(pil)
@@ -1340,12 +1303,13 @@ class ScaledSprite(object):
 		"""
 
 		import PIL.Image
-
 		pil = PIL.Image.fromstring('RGBA', self.im.get_size(),
 								   pygame.image.tostring(self.im, 'RGBA'))
+        pil = pil.resize((self.dw, self.dh))
 		if xscale or yscale:
 			(w, h) = pil.size
 			pil = pil.resize((int(round(w*xscale)), int(round(h*yscale))))
+        pil = pil.rotate(self.rotation, expand=1)
 		return pil
 
 	def set_alpha(self, a):
@@ -1543,17 +1507,7 @@ class ScaledSprite(object):
 			y = (h/2) - (self.h/2)
 			new = new.subsurface(x, y, self.w, self.h)
 		self.im = new
-
-		self.im.set_colorkey((0,0,0,0))
-		self.w = self.im.get_width()
-		self.h = self.im.get_height()
-		self.dw = self.w
-		self.dh = self.h
-		self.iw = self.w
-		self.ih = self.h
-        
-        self.refresh_axes()
-        self.refresh_surfarray()
+        self.refresh()
         
         
 	def scale(self, new_width, new_height):
@@ -1582,16 +1536,7 @@ class ScaledSprite(object):
         nw = int(round(self.w * new_width / float(self.dw)))
         nh = int(round(self.h * new_height / float(self.dh)))
 		self.im = pygame.transform.scale(self.im, (nw, nh))
-		self.im.set_colorkey((0,0,0,0))
-		self.w = self.im.get_width()
-		self.h = self.im.get_height()
-		self.dw = new_width
-		self.dh = new_height
-		self.iw = self.dw				  # icon width
-		self.ih = self.dh				  # icon height
-
-        self.refresh_axes()
-		self.refresh_surfarray()
+        self.refresh()
         
 
 	def circmask(self, x, y, r):
@@ -1865,15 +1810,9 @@ class ScaledSprite(object):
 		if center:
 			x = self.X(x) - (w/2)
 			y = self.Y(y) - (h/2)
-		s = ScaledSprite(image=self.im.subsurface((x, y, w, h)))
-		s.x = self.x
-		s.y = self.y
-		s.dx = self.dx
-		s.dy = self.dy
-		s.depth = self.depth
-		s.fb = self.fb
-		s._on = self._on
-		return s
+        return ScaledSprite(image=self.im.subsurface((x, y, w, h)),
+                            x=self.x, y=self.y, dx=self.dx, dy=self.dy,
+                            depth=self.depth, fb=self.fb, on=self._on)
 
 	def clone(self):
 		"""Duplicate sprite
@@ -1889,7 +1828,7 @@ class ScaledSprite(object):
 		"""
 		import copy
 
-		s = ScaledSprite(dwidth=self.dw, dheight=self.dh,
+		s = ScaledSprite(width=self.dw, height=self.dh,
                          rwidth=self.w, rheight=self.h,
                          image=self,
                          x=self.x, y=self.y, dx=self.dx, dy=self.dy,
@@ -1897,12 +1836,8 @@ class ScaledSprite(object):
                          rotation=self.rotation, contrast=self.contrast,
                          name='clone of '+self.name,
                          fb=self.fb)
-		s.iw = self.iw
-		s.ih = self.ih
-		self.texture = None                # can't share textures, force new one
 		s.alpha[::] = self.alpha[::]       # copy the alpha mask too..
 		s.userdict = copy.copy(self.userdict)
-
 		return s
 
 	def setdir(self, angle, vel):
@@ -1919,17 +1854,23 @@ class ScaledSprite(object):
 		self.dx = vel * np.cos(angle)
 		self.dy = vel * np.sin(angle)
 
+    def displayim(self):
+        return pygame.transform.scale(self.im, (self.dw, self.dh))
+
 	def save(self, fname, mode='w'):
 		"""Save sprite using pygame builtins
 
+        Image is saved at the DISPLAYED size, not the memory/real size
+
 		"""
 		# use pygame's save function to write image to file (PNG, JPG)
-		return pygame.image.save(self.im, fname)
+		return pygame.image.save(self.displayim(), fname)
 
 	def save_ppm(self, fname, mode='w'):
 		"""Save sprite as PPM file (local implementation)
 
 		Alpha channel is not saved.
+        Saved WITHOUT rescaling
 
 		"""
 		try:
@@ -1945,6 +1886,7 @@ class ScaledSprite(object):
 		"""Save sprite alpha channel as PGM file (local implementation)
 
 		Alpha only -- no RGB data.
+        Saved WITHOUT rescaling
 
 		"""
 		try:
@@ -1970,8 +1912,8 @@ class Sprite(ScaledSprite):
 
 	def __init__(self, width=100, height=100, x=0, y=0, depth=0,
 				 fb=None, on=1, image=None, dx=0, dy=0, fname=None,
-				 name=None, icolor='black', centerorigin=0,
-				 rotation=0.0, contrast=1.0, scale=1.0):
+				 name=None, icolor='black', ifill='yellow',
+                 centerorigin=0, rotation=0.0, contrast=1.0, scale=1.0):
 		"""Sprite Object -- pype's main tool for graphics generation.
 
 		:param width, height: (int) sprite size in pixels
@@ -1994,7 +1936,9 @@ class Sprite(ScaledSprite):
 
 		:param name: (string) Sprite name/info
 
-		:param icolor: (string color) icon color (for UserDisplay)
+		:param icolor: (string) icon color (for UserDisplay)
+        
+		:param ifill: (string) icon fill (for UserDisplay)
 
 		:param centerorigin: (boolean; default=0) If 0, then the upper
 				left corner of the sprite is 0,0 and increasing y goes
@@ -2021,12 +1965,13 @@ class Sprite(ScaledSprite):
             width, height = width*scale, height*scale
             
         ScaledSprite.__init__(self,
-                              dwidth=width, dheight=height,
+                              width=width, height=height,
                               rwidth=width, rheight=height,
                               x=x, y=y, depth=depth,
                               fb=fb, on=on, image=image,
                               dx=dx, dy=dy,
-                              fname=fname, name=name, icolor=icolor,
+                              fname=fname, name=name,
+                              icolor=icolor, ifill=ifill,
                               centerorigin=centerorigin,
                               rotation=rotation, contrast=contrast)
 

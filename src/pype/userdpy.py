@@ -933,14 +933,13 @@ class UserDisplay(object):
 							ii.append(self.canvas.create_image(x, y, anchor=NW,
 																image=im))
 						else:
-							ii.append(self.icon(s.x, s.y, s.iw, s.ih,
-												type='box', color=s.icolor))
-							ii.append(self.icon(s.x, s.y, r=(s.iw+s.ih)/2.0/2.0,
-												type='circle', color=s.icolor))
+                            # square bounding box for sprite
+							ii.append(self.icon(s.x, s.y, s.dw, s.dh, type='box',
+                                                color=s.icolor, fill=s.ifill))
 					for i in ii: self._displaylist_icons.append(i)
 
-	def icon(self, x=None, y=None, w=5, h=5,
-			 text=None, color='black', type='box', dash=None, r=5):
+	def icon(self, x=None, y=None, w=5, h=5, text=None, color='black',
+             type='box', dash=None, r=5, fill=''):
 		if y is None and x is None:
 			self._iconlist = self.deltags(self._iconlist)
 		elif y is None:
@@ -954,23 +953,27 @@ class UserDisplay(object):
 			h = h / 2
 			if not text is None:
 				txt = self.canvas.create_text(x, y-(1.5*h),
-											   text=text, fill='red', dash=dash)
+                                              text=text,
+                                              fill='red', dash=dash)
 				self._iconlist.append(txt)
 
 			if type == 'box' or type == 1:
 				tag = self.canvas.create_rectangle(x-w, y-h, x+w, y+h,
-													fill='', outline=color,
-													dash=dash)
+                                                   fill=fill, outline=color,
+                                                   stipple='gray25',
+                                                   dash=dash)
 			elif type == 'oval' or type == 2:
 				tag = self.canvas.create_oval(x-w, y-h, x+h, y+h,
-											   fill='', outline=color,
-											   dash=dash)
+                                              fill=fill, outline=color,
+                                              stipple='gray25',
+                                              dash=dash)
 			elif type == 'circle' or type == 3:
 				if r is None:
 					r = (w + h) / 2.0
 				tag = self.canvas.create_oval(x-r, y-r, x+r, y+r,
-											   fill='', outline=color,
-											   dash=dash)
+                                              fill=fill, outline=color,
+                                              stipple='gray25',
+                                              dash=dash)
 			self._iconlist.append(tag)
 			return tag
 

@@ -4184,7 +4184,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				fname = self.pypedir + '/lib/testpat.png'
 			self._testpat = ScaledSprite(x=0, y=0, fname=fname, fb=self.fb,
                                          depth=99, on=1, name='testpat',
-                                         dwidth=self.fb.w, dheight=self.fb.h)
+                                         width=self.fb.w, height=self.fb.h)
 		drawtest(self.fb, self._testpat)
         
 

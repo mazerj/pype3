@@ -140,7 +140,7 @@ def genpolar(w, h=None, typecode=np.float64, degrees=False):
 	:return: (array) r and theta arrays
 
 	"""
-	x, y = sprite.genaxes(w, h)
+	x, y = sprite.genaxes(w, h, w, h)
 	r = np.hypot(x,y).astype(typecode)
 	if degrees:
 		t = (180.0 * np.arctan2(y, x) / np.pi).astype(typecode)

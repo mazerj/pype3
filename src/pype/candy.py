@@ -144,8 +144,7 @@ def _slideshow(app):
 				if s.w > 10 and s.h > 10:
 					break
 			except:
-				get_traceback(1)
-				app.write('dud file: %s\n' % fname)
+				print 'dud file: %s\n' % fname
 		maxd = 512.0
 		if s.w > maxd:
 			m = maxd / s.w

@@ -1121,9 +1121,9 @@ class ScaledSprite(object):
 		if rwidth and not dwidth:
 			dwidth, dheight = rwidth, rheight
 
-        if rwidth < 1.0:
+        if not fname and rwidth < 1.0:
             rwidth = int(round(dwidth * rwidth))
-        if rheight < 1.0:
+        if not fname and rheight < 1.0:
             rheight = int(round(dheight * rheight))
             
         if rwidth > dwidth:
@@ -2466,7 +2466,7 @@ def barsprite(w, h, angle, color, **kw):
 		s.noise(0.50)
 	else:
 		s.fill(color)
-	s.rotate(angle, 0, 1)
+	s.rotate(angle, 0)
 	return s
 
 def barspriteCW(w, h, angle, color, **kw):

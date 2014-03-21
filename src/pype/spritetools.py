@@ -467,6 +467,63 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 								meanlum).astype(np.uint8), axes=[1,2,0])
 
 
+def gabor(s, frequency, phase_deg, ori_deg, sigma,
+          R=1.0, G=1.0, B=1.0,
+          meanlum=0.5, moddepth=1.0, ppd=None, color=None):
+	"""2D gabor generator.
+
+	:param s: (Sprite) target sprite
+
+	:param frequency: frequency in cycles/sprite (or cyc/deg, if ppd
+		is given)
+
+	:param phase_deg: (degrees) (nb: 0deg phase centers the sine
+		function at sprite ctr)
+
+	:param ori_deg: (degrees) grating orientation
+    
+	:param sigma: (pixels) envelope width -- sprite should be at
+        least 6*sigma by 6*sigma in width and height
+
+	:param R,G,B: (either R is colortriple or R,G,B are 0-1 values)
+
+	:param ppd: (pixels/degree) if specified, then it means that freq
+		is being specified in cycles/degree
+
+	:param meanlum: mean (DC) value of grating (0-1); default is 0.5
+
+	:param moddepth: modulation depth (0-1)
+
+	:param color: RGB triple (alternative specification of color vector)
+
+	:return: nothing (works in place)
+
+	"""
+
+	if not ppd is None:
+		# c/deg -> c/sprite
+		frequency = frequency * np.mean([s.w, s.h]) / ppd
+	meanlum = 256.0 * meanlum
+	moddepth = 127.0 * moddepth
+
+	R, G, B = unpack_rgb(color, R, G, B)
+
+    gamma = 1.0
+    sf = frequency / np.mean([s.w, s.h])
+    lambda_ = 1.0 / sf
+    theta = np.pi * ori_deg / 180.0
+    phi = np.pi * phase_deg / 180.0
+
+    x = (s.xx * np.cos(theta)) + (s.yy * np.sin(theta))
+    y = (-s.xx * np.sin(theta)) + (s.yy * np.cos(theta))
+    g = np.exp(-((x**2) + ((gamma**2) * y**2))/(2 * (sigma**2))) * \
+      np.cos((2.0 * np.pi * x / lambda_) - phi)
+	i = moddepth * g
+	s.array[::] = np.transpose((np.array((R*i,G*i,B*i)) +
+								meanlum).astype(np.uint8),
+								axes=[1,2,0])
+
+
 def uniformnoise(s, binary=False,
 				 R=1.0, G=1.0, B=1.0, meanlum=0.5, moddepth=1.0, color=None):
 	"""Fill sprite with uniform white noise

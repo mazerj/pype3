@@ -2729,7 +2729,7 @@ if __name__ == '__main__':
 		w = 100
 		ss = []
 		for n in range(5):
-			ss.append(ScaledSprite(dwidth=100, rwidth=w, x=x, y=-100, fb=fb,
+			ss.append(ScaledSprite(width=100, height=w, x=x, y=-100, fb=fb,
                                    fname='lib/testpat.png'))
             ss.append(ss[-1].clone())
             singrat(ss[-1], 1, 0.0, n, WHITE)
@@ -2746,13 +2746,29 @@ if __name__ == '__main__':
 				s.blit()
 			fb.flip()
     
-	fb=quickfb(500,500)
+	def drawtest4(fb):
+		x = -200
+		w = 100
+		ss = []
+
+        sig = 20
+        s = ScaledSprite(width=sig*6, x=0, y=0, fb=fb)
+		for n in range(0,2*360,10):
+			fb.clear()
+            gabor(s, 3, n, 45., sig, WHITE)
+            #singrat(s, 1, 0.0, n, WHITE)
+            #s.set_rotation(n)
+			s.blit()
+			fb.flip()
+
+    fb=quickfb(500,500)
 
 	if 1:
-		drawtest3(fb)
-		drawtest2(fb)
-		sys.stdout.write('>>>'); sys.stdout.flush()
-		sys.stdin.readline()
+		drawtest4(fb)
+		#drawtest3(fb)
+		#drawtest2(fb)
+		#sys.stdout.write('>>>'); sys.stdout.flush()
+		#sys.stdin.readline()
 
 	if 0:
 		s1 = Sprite(100, 100, -100, 0, fb=fb, on=0)

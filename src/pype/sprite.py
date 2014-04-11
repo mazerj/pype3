@@ -889,7 +889,7 @@ class FrameBuffer(object):
 		cy = cy - (h/2)
 		oc = ((cx, cy), (cx+w, cy), (cx+w, cy+h), (cx, cy+h))
 		self.lines([(cx, cy), (cx+w, cy), (cx+w, cy+h), (cx, cy+h)],
-				   width=width, color=color, flip=flip)
+				   width=width, color=color, flip=flip, closed=1)
 
 	def lines(self, pts, color, width=1, contig=1, closed=0, joins=0, flip=None):
 		"""Draw line directly on framebuffer.
@@ -2742,9 +2742,12 @@ if __name__ == '__main__':
 			fb.clear()
 			for s in ss:
 				#singrat(s, 1, 0.0, n, WHITE)
-                s.set_rotation(n)
+                s.set_rotation(-n)
 				s.blit()
+                print s.rotation,
+            print
 			fb.flip()
+            sys.stdin.readline()
     
 	def drawtest4(fb):
 		x = -200
@@ -2764,8 +2767,8 @@ if __name__ == '__main__':
     fb=quickfb(500,500)
 
 	if 1:
-		drawtest4(fb)
-		#drawtest3(fb)
+		#drawtest4(fb)
+		drawtest3(fb)
 		#drawtest2(fb)
 		#sys.stdout.write('>>>'); sys.stdout.flush()
 		#sys.stdin.readline()

@@ -81,7 +81,8 @@ else
   n = length(oldpf.rec);
 end 
 
-cmd = sprintf('pype_expander %s %s %d %d', pypefile, tmpf, n, loadby);
+cmd = sprintf('LD_LIBRARY_PATH="" pype_expander %s %s %d %d', ...
+              pypefile, tmpf, n, loadby);
 tic;
 status = unix(cmd);
 pet = toc;

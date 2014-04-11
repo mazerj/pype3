@@ -86,7 +86,13 @@ for n = 1:length(files)
   % is to throttle p2m_.m to working 1000 trial batches. It
   % will iterate until all trials are converted.
   
-  [status, result] = unix(['pype_count ' pypefile]);
+  % there's some sort bad fortran library that breaks this command
+  % if the matlab LD_LIRBARY_PATH is in place, so get rid of it
+  % with env:
+  [status, result] = unix(['LD_LIBRARY_PATH="" pype_count ' pypefile]);
+  if status
+    error(['pype_count error - ' result]);
+  end
   ntrials = str2num(result);
   try
     loadedn = 0;

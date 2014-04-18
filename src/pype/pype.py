@@ -810,10 +810,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					   command=remotedebug)
 		mb.addmenuitem('File', 'command', label='Record Movie',
 					   command=lambda s=self: s.fb.recordtog())
-		mb.addmenuitem('File', 'separator')
-		mb.addmenuitem('File', 'command', label='Quit',
-					   command=self._shutdown)
-
 		mb.addmenuitem('File', 'command', label='benchmark',
 					   command=lambda s=self: benchmark(s.fb))
 
@@ -969,6 +965,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			mb.addmenuitem('File', 'command', label='elog',
 						   command=lambda s=self: s.open_elog())
 
+        # quit should be last entry
+		mb.addmenuitem('File', 'separator')
+		mb.addmenuitem('File', 'command', label='Quit',
+					   command=self._shutdown)
 
 		(commonp, rigp, icalp) = _base_ptables()
 
@@ -1423,8 +1423,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
             self.server_thread.start()
 
 	def open_elog(self):
+        # open elog for this animal, today w/o asking for confirmation
 		animal = self.sub_common.queryv('full_subject')
-		os.system('elog -animal=%s -today &' % (animal,))
+		os.system('elog -y -animal=%s -today &' % (animal,))
 
 	def elrestart(self):
 		dacq_elrestart()
@@ -2340,7 +2341,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				ask('run task', 'Task has changed\nRun anyway?',
 					['yes', 'no']) == 1):
 				return
-            
+
 			self._allowabort = 1
 
 			if self._validatefn:
@@ -4186,7 +4187,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
                                          depth=99, on=1, name='testpat',
                                          width=self.fb.w, height=self.fb.h)
 		drawtest(self.fb, self._testpat)
-        
+
 
 	def plotEyetracesRange(self, start=None, stop=None):
 		"""Set time range for useful portion of the eye trace.

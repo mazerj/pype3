@@ -443,9 +443,16 @@ def param_expand(s, integer=None):
 			else:
 				meanval, minval, maxval = v[0], v[1], v[2]
 
-			while 1:
+            ntries = 0
+			while ntries < 100:
 				# keep drawing until we get a range-valid value
 				# before 12/18/2012 draw was clipped with min/max
+                #
+                # NOTE: don't draw more than 100 times to avoid
+                # infinite loops -- this usually means bad params
+                # entered by user, or bad values during changes. In
+                # that case, just return mean..
+                #
 				x = np.random.exponential(meanval)
 				if s.lower()[0] == 'i':
 					#  shift by +0.5 then -1 to to avoid problems with the
@@ -453,6 +460,8 @@ def param_expand(s, integer=None):
 					x = int(round(x+0.5)-1)
 				if x >= minval and x <= maxval:
 					return x
+                ntries += 1
+            return meanval
 		except:
 			pass
 
@@ -466,7 +475,12 @@ def param_expand(s, integer=None):
 				return None
 
 			# search for a value until it falls within the specified range
-			while 1:
+            # NOTE: don't draw more than 100 times to avoid
+            # infinite loops -- this usually means bad params
+            # entered by user, or bad values during changes. In
+            # that case, just return mean..
+            ntries = 0
+			while ntries < 100:
 				val = np.random.exponential(meanval)
 				if val >= minval and val <= maxval:
 					binedges = np.linspace(minval,maxval,nbins+1)
@@ -475,11 +489,9 @@ def param_expand(s, integer=None):
 					divisor = (bincenters[-1]-(bincenters[0]-1))/nbins
 					val = int((round(val/divisor))*divisor)+(bincenters[0]-1)
 					return val
+            return meanval
 		except:
 			pass
-
-
-
 
 	if s[0] == '[' and s[-1] == ']':
 		# list syntax: pick one from [#,#,#,#]
@@ -641,6 +653,6 @@ if __name__ == '__main__':
         if k == 5:
             bucket.push(n)
     """
-    
+
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)
 	sys.exit(1)

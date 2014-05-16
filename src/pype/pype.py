@@ -542,8 +542,15 @@ def _base_ptables():
 			  'threshold for spike detection'),
 		pslot('spike_polarity', '1', is_int,
 			  'sign of threshold for spike detection'),
-		pyesno('save_raweye', 1,
-			   'save raw eye position data?'),
+		pyesno('save_ain0', 0, 'save raw AIN 0'),
+		pyesno('save_ain1', 0, 'save raw AIN 1'),
+        #pyesno('save_ain2', 0, 'save raw AIN 2 (photodiode) -- no effect'),
+        #pyesno('save_ain3', 0, 'save raw AIN 3 (spike detection) -- no effect'),
+		pyesno('save_ain4', 0, 'save raw AIN 4'),
+		pyesno('save_ain5', 0, 'save raw AIN 5'),
+		pyesno('save_ain6', 0, 'save raw AIN 6'),
+		pyesno('save_ain7', 0, 'save raw AIN 7'),
+
 
 		ptitle('Monitor (read-only: set in Config file)'),
 		pslot_ro('mon_id', '', is_any,
@@ -3786,17 +3793,35 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		p0 = np.zeros(n, np.int)
 		s0 = np.zeros(n, np.int)
 
+        if self.rig_common.queryv('save_ain0'):
+            ain0 = np.zeros(n, np.int)
+        else:
+            ain0 = None
+
+        if self.rig_common.queryv('save_ain1'):
+            ain1 = np.zeros(n, np.int)
+        else:
+            ain1 = None
+
+        if self.rig_common.queryv('save_ain5'):
+            ain5 = np.zeros(n, np.int)
+        else:
+            ain5 = None
+
+        if self.rig_common.queryv('save_ain6'):
+            ain6 = np.zeros(n, np.int)
+        else:
+            ain6 = None
+
+        if self.rig_common.queryv('save_ain7'):
+            ain7 = np.zeros(n, np.int)
+        else:
+            ain7 = None
+
 		# be careful here -- if you're trying to look at the photodiode
 		# signals, you'd better not set fast_tmp=1...
 		ndups = 0
 		if not fast_tmp or self._show_eyetrace.get():
-			if self.config.iget('save_raweye', 0):
-				rawx = np.zeros(n, np.int)
-				rawy = np.zeros(n, np.int)
-			else:
-				rawx = None
-				rawy = None
-
 			for i in range(0,n):
 				# convert dacq_adbuf_t() in 'us' to 'ms' for saving
 				self.eyebuf_t[i] = dacq_adbuf_t(i) / 1000.0
@@ -3804,11 +3829,18 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				self.eyebuf_y[i] = dacq_adbuf_y(i)
 				self.eyebuf_pa[i] = dacq_adbuf_pa(i)
 				self.eyebuf_new[i] = dacq_adbuf_new(i)
+                if not ain0 is None:
+					ain0[i] = dacq_adbuf_c0(i)
+                if not ain1 is None:
+					ain1[i] = dacq_adbuf_c1(i)
 				p0[i] = dacq_adbuf_c2(i) # photo diode
 				s0[i] = dacq_adbuf_c3(i) # spike detect
-				if not rawx is None:
-					rawx[i] = dacq_adbuf_c0(i)
-					rawy[i] = dacq_adbuf_c1(i)
+                if not ain5 is None:
+					ain5[i] = dacq_adbuf_c5(i)
+                if not ain6 is None:
+					ain6[i] = dacq_adbuf_c6(i)
+                if not ain7 is None:
+					ain7[i] = dacq_adbuf_c7(i)
 
 			###############################################################3
 			# (starting) Thu Oct 21 14:38:49 2010 mazer
@@ -3959,16 +3991,16 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				_tolist(self.photo_times),
 				_tolist(self.spike_times),
 				self.record_id,
-				_tolist(p0),			# photo diode trace (analog)
-				_tolist(s0),			# spike detect trace (TTL)
+				_tolist(p0),              # photo diode trace (analog)
+				_tolist(s0),              # spike detect trace (TTL)
 				(
-					_tolist(rawx),		# raw eye position X
-					_tolist(rawy),		# raw eye position Y
-					None,				# was photo diode trace (dup!)
-					None,				# was spike detect trace (dup!)
-					None,
-					None,
-					None,
+					_tolist(ain0),   # analog input channel 0
+					_tolist(ain1),   # analog input channel 1
+					None,            # photo diode trace (dup!)
+					None,            # spike detect trace (dup!)
+					_tolist(ain5),   # analog input channel 5
+					_tolist(ain6),   # analog input channel 6
+					_tolist(ain7),   # analog input channel 7
 					),
 				_tolist(self.eyebuf_pa),
 				self.xdacq_data_store,

@@ -3855,6 +3855,13 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			#
 			###############################################################3
 
+            if np.sum(np.diff(self.eyebuf_x)) == 0 and
+                np.sum(np.diff(self.eyebuf_y)) == 0:
+                sys.stderr.write('warning: looks like eyetracker is offline\n')
+                warn('record_write',
+                     'Check eyetracker! (Task paused; close to continue)',
+                     wait=1)
+
 		photo_thresh = int(self.rig_common.queryv('photo_thresh'))
 		photo_polarity = int(self.rig_common.queryv('photo_polarity'))
 		self.photo_times = _find_ttl(self.eyebuf_t, p0,

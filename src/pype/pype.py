@@ -1033,6 +1033,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.rig_common.set('mon_v_ppd', '%g' % yppd)
 		self.rig_common.set('mon_ppd', '%g' % ppd)
 
+        self.badeyelink = 0
 		et = self.config.get('EYETRACKER', 'NONE')
 		if et == 'ISCAN':
 			self.rig_common.set('eyetracker', et)
@@ -3855,12 +3856,20 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			#
 			###############################################################3
 
-            if np.sum(np.diff(self.eyebuf_x)) == 0 and
-                np.sum(np.diff(self.eyebuf_y)) == 0:
-                sys.stderr.write('warning: looks like eyetracker is offline\n')
-                warn('record_write',
-                     'Check eyetracker! (Task paused; close to continue)',
-                     wait=1)
+            # try to see if the eyetracker's dropped offline -- three trials
+            # in a row with ZERO eye displacement..
+            if (self.config.get('EYETRACKER', 'NONE') == 'EYELINK') and \
+              (np.sum(np.diff(self.eyebuf_x)) == 0) and \
+                (np.sum(np.diff(self.eyebuf_y)) == 0):
+                self.badeyelink += 1
+                if self.badeyelink > 1:
+                    sys.stderr.write('warning: looks like eyelink offline\n')
+                    warn('record_write',
+                         'Check eyetracker! (Task paused; close to continue)',
+                         wait=1)
+                    self.badeyelink = 0
+            else:
+                self.badeyelink = 0
 
 		photo_thresh = int(self.rig_common.queryv('photo_thresh'))
 		photo_polarity = int(self.rig_common.queryv('photo_polarity'))

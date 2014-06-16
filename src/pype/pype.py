@@ -1664,8 +1664,26 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		else:
 			self._results.append(type)
 			self._history(type[0])
-			self._tally(type=type)
-			self._runstats_update(resultcode=type)
+			s1 = self._tally(type=type)
+			s2 = self._runstats_update(resultcode=type)
+
+            fn = self.config.get('TALLYFILE', None)
+            if fn is not None:
+                open(fn, 'w').write("""
+<HTML>\n
+ <HEAD>\n
+  <TITLE>\n
+   %s tally
+  </TITLE>\n
+  <META HTTP-EQUIV="refresh" CONTENT="3">
+</HEAD>\n
+<H3>Current run</H1>
+<PRE>%s</PRE>\n
+<H3>Task and History</H1>
+<PRE>%s</PRE>\n
+</HTML>\n""" % (self.sub_common.queryv('full_subject'), s2, s1))
+
+            
 
 	def get_result(self, nback=1):
 		"""Get the nth to last saved trial result code.
@@ -1758,6 +1776,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		self.tallyw.clear()
 		self.tallyw.write(s)
+
+        return s        
 
 	def getcommon(self):
 		"""Get common params, extend with eyecoil settings.
@@ -2321,13 +2341,14 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		s = string.join((
 			' running = %d'	   % (self.isrunning(),),
 			'----------------------------------',
-			'  nerror = %d'		 % (ne,),
-			'ncorrect = %d [%d]' % (nc, self.sub_common.queryv('max_correct'),),
-			'	  nui = %d [%d]' % (nu, self.sub_common.queryv('max_ui'),),
-			' ntrials = %d [%d]' % (nt, self.sub_common.queryv('max_trials'),),
+			'Corrects = %d [%d]' % (nc, self.sub_common.queryv('max_correct'),),
+			'  Errors = %d'		 % (ne,),
+			'     UIs = %d [%d]' % (nu, self.sub_common.queryv('max_ui'),),
+			'  Trials = %d [%d]' % (nt, self.sub_common.queryv('max_trials'),),
 			'----------------------------------'), '\n')
 		self.statsw.configure(text=s)
-
+        return s
+        
 	def _start(self):
 		self._start_helper(temp=None)
 

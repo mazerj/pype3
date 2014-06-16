@@ -253,8 +253,9 @@ USERDISPLAY_HIDE (0|1)	hide usder display window on startup
 TICKS_MAJOR		(0|1)	show major (5deg) tickmarks on userdisplay
 TICKS_MINOR		(0|1)	show minor (1deg) tickmarks on userdisplay
 ELOG            (0|1)   link to 'elog' electronic log/notebook system
-TASKPATH        (str)   :-delimited search path for tasks
-TOOLS           (str)   ;-delimited list of individual tasks for quick-load
+TASKPATH        (str)   colon-delimited search path for tasks
+TOOLS           (str)   semicolon-delimited individual tasks for quick-load
+TALLYFILE       (str)   html tally file for remote monitoring
 
 Environment Vars (use setenv, not config file!)
 -----------------------------------------------

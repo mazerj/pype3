@@ -255,7 +255,7 @@ TICKS_MINOR		(0|1)	show minor (1deg) tickmarks on userdisplay
 ELOG            (0|1)   link to 'elog' electronic log/notebook system
 TASKPATH        (str)   colon-delimited search path for tasks
 TOOLS           (str)   semicolon-delimited individual tasks for quick-load
-TALLYFILE       (str)   html tally file for remote monitoring
+STATS           (0|1)   turn remote monitoring (~/pyperc/monitor.html) on/off
 
 Environment Vars (use setenv, not config file!)
 -----------------------------------------------

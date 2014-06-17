@@ -1667,9 +1667,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			s1 = self._tally(type=type)
 			s2 = self._runstats_update(resultcode=type)
 
-            fn = self.config.get('TALLYFILE', None)
-            if fn is not None:
-                open(fn, 'w').write("""
+            # by default -- keep running stats is ~/pyperc/monitor.html
+            # set MONITOR=0 to turns this feature off.
+            if self.config.iget('MONITOR', 1):
+                fn = subjectrc('monitor.html')
+                if fn is not None:
+                    open(fn, 'w').write("""
 <HTML>\n
  <HEAD>\n
   <TITLE>\n

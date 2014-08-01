@@ -119,6 +119,9 @@ for a in sys.argv:
         subj = a[5:]
     elif a == '--nogeo':
         __nogeo = 1
+    elif a == '--dir':
+        print pypedir
+        sys.exit(1)
     elif a == '--debug':
         __debug = 1
         __show_imports = 1

@@ -81,6 +81,9 @@ from guitools import *
 from filebox import Open, SaveAs
 from guitools import Logger
 
+from pypedebug import keyboard
+
+
 # (custom) validator functions must return one of these:
 VALID = Pmw.OK
 INVALID = Pmw.PARTIAL
@@ -624,7 +627,11 @@ class ParamTable(object):
                     if kraw in keys:
                         s = s + '%s = %s --> %s\n' % (k, self.query(k),
                                                     rec.params[kraw])
-                        self.set(k, rec.params[kraw])
+                        try:
+                            self.set(k, rec.params[kraw])
+                        except:
+                            # radio buttons etc..
+                            self._entries[k].invoke(rec.params[kraw])
                 warn('Loaded values', s, astext=1)
         
         

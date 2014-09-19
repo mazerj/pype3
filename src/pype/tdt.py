@@ -78,21 +78,25 @@ MODES = {
 class TDTError(Exception): pass
 
 class _Socket(object):
+	fmt = '!I'
 	def __init__(self, clientsocket=None, host=None, port=None):
 		if (clientsocket is None) and host and port:
 			clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			# set 250ms timeout on connection
 			# Mon Feb  4 13:28:52 2013 mazer -- uping timeout to 1s
-			clientsocket.settimeout(1.0)
+			# Fri Aug 22 09:47:16 2014 mazer -- uping gain to 5s
+			clientsocket.settimeout(5.0)
 			clientsocket.connect((host, port))
 		self.sockfd = clientsocket
 
 	def recv(self, packetsize=1024):
 		# returns None when connection is closed..
-		buf = self.sockfd.recv(struct.calcsize('!I'))
+        nbytes = struct.calcsize(_Socket.fmt)
+        # this is where the timeout error is occuring:
+		buf = self.sockfd.recv(nbytes)
 		if len(buf) == 0:
 			return None
-		N = struct.unpack('!I', buf)[0]
+		N = struct.unpack(_Socket.fmt, buf)[0]
 		data = ''
 		while len(data) < N:
 			packet = self.sockfd.recv(packetsize)
@@ -100,7 +104,7 @@ class _Socket(object):
 		return data
 
 	def send(self, data):
-		self.sockfd.send(struct.pack('!I', len(data)))
+		self.sockfd.send(struct.pack(_Socket.fmt, len(data)))
 		return self.sockfd.sendall(data)
 
 if _WINDOWS:
@@ -307,7 +311,7 @@ else: ## not _WINDOWS (ie, linux) ###########################################
 			if which == _TTANK and not self.gotTTank:
 				raise TDTError('No %s.X available; cmd=<%s>\n'
 							   'Make sure TDT circuit is open!' % \
-							   (which, method,))					
+							   (which, method,))
 
 			if _DEBUG:
 				sys.stderr.write(repr(('exec:', which, method, args,)))
@@ -464,9 +468,9 @@ else: ## not _WINDOWS (ie, linux) ###########################################
 					if nwaits == 0:
 						sys.stderr.write('newblock: old=<%s> new=<%s>\n' %
 										 (oldblock, newblock,))
-						sys.stderr.write('newblock: GetHotBlock blkd (2): ')
+						sys.stderr.write('newblock: waiting ')
 					nwaits += 1
-					sys.stderr.write('%d..' % nwaits)
+					sys.stderr.write('%d ' % nwaits)
 				if nwaits > 0:
 					sys.stderr.write('\n')
 			else:

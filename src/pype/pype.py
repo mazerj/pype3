@@ -822,6 +822,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 
 		mb.addmenu('Misc', '', '')
+		mb.addmenuitem('Misc', 'command', label='show params from pypefile',
+					   command=self._getparams_frompypefile)
 		mb.addmenuitem('Misc', 'command', label='Find param',
 					   command=self._findparam)
 		mb.addmenuitem('Misc', 'separator')
@@ -985,7 +987,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.balloon.bind(b, "subject specific parameters")
 
 		sub_common = DockWindow(checkbutton=b, title='Subject Params')
-		self.sub_common = ParamTable(sub_common, commonp, file='subject.par')
+		self.sub_common = ParamTable(sub_common, commonp, file='subject.par',\
+                                     loadable=0)
 		if self.use_elog:
 			# 'cell' (exper in elog database) not changable in elog mode:
 			self.sub_common.lockfield('cell')
@@ -995,15 +998,17 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.balloon.bind(b, "rig/computer specific parameters")
 		rig_common = DockWindow(checkbutton=b,
 								title='Rig Params (%s)' % hostname)
-		self.rig_common = ParamTable(rig_common,
-									 rigp, file='rig-%s.par' % hostname)
+		self.rig_common = ParamTable(rig_common, rigp,
+                                     file='rig-%s.par' % hostname,
+                                     loadable=0)
 
 		b = Checkbutton(c2pane, text='ical', relief=RAISED, anchor=W)
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
 		self.balloon.bind(b, "eye calibration params")
 		ical = DockWindow(checkbutton=b, title='ical')
 		self.ical = ParamTable(ical, icalp,
-							   file='%s-%s-ical.par' % (hostname, subject(),))
+							   file='%s-%s-ical.par' % (hostname, subject(),),
+                               loadable=0)
 
 		self.tallycount = {}
 		state = self._loadstate()
@@ -1544,6 +1549,27 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		finally:
 			self.showtestpat()
 
+    def _getparams_frompypefile(self):
+        import filebox
+        (file, mode) = filebox.Open(initialdir=os.getcwd(),
+                                    pattern='*.[0-9][0-9][0-9]',
+                                    initialfile='', datafiles=1)
+        if file:
+            pf = PypeFile(file)
+            rec = pf.nth(0)
+            if rec:
+                s = 'from: %s\n\n' % file
+                avoid = self.sub_common.keys() + \
+                  self.rig_common.keys() + self.ical.keys()
+                keys = rec.params.keys()
+                keys.sort()
+                for p in keys:
+                    if p.endswith('_raw_'):
+                        p = p[:-5]
+                        if not p in avoid:
+                            s = s + '%s = %s\n' % (p, rec.params[p])
+                warn('task params', s, astext=1)
+        
 	def _findparam(self):
 		s = Entry_(self.tk, 'find parameter:', '').go()
 		if s:

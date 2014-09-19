@@ -103,7 +103,7 @@ class ParamTable(object):
 	_list = []
 
 	def __init__(self, parent, table, file=None,
-				 decorate=1, locks=1, allowalt=True):
+				 decorate=1, locks=1, allowalt=True, loadable=1):
 		"""Parameter management table class"""
 
 		if parent is None and table is None: return
@@ -150,7 +150,12 @@ class ParamTable(object):
 		if decorate:
 			Button(f, text="View",
 				   command=self.view).pack(expand=0, fill=X, side=LEFT)
+            
+        if loadable:
+			Button(f, text="Load",
+				   command=self.frompypefile).pack(expand=0, fill=X, side=LEFT)
 
+            
 		f = Pmw.ScrolledFrame(parent)
 		f.pack(expand=1, fill=BOTH)
 
@@ -602,6 +607,27 @@ class ParamTable(object):
 		except ValueError:
 			return 0
 
+	def frompypefile(self):
+        import filebox, pypedata
+        
+        (file, mode) = filebox.Open(initialdir=os.getcwd(),
+                                    pattern='*.[0-9][0-9][0-9]',
+                                    initialfile='', datafiles=1)
+        if file:
+            pf = pypedata.PypeFile(file)
+            rec = pf.nth(0)
+            if rec:
+                s = ''
+                keys = rec.params.keys()
+                for k in self.keys():
+                    kraw = k + '_raw_'
+                    if kraw in keys:
+                        s = s + '%s = %s --> %s\n' % (k, self.query(k),
+                                                    rec.params[kraw])
+                        self.set(k, rec.params[kraw])
+                warn('Loaded values', s, astext=1)
+        
+        
 	def view(self):
 		"""View current contents of table (in a popup dialog box).
 

@@ -1,0 +1,5 @@
+drwxrwxr-x suganthan/suganthan 0 2014-09-16 11:49 ./
+drwxrwxr-x suganthan/suganthan 0 2014-09-16 11:49 ./usr/
+drwxrwxr-x suganthan/suganthan 0 2014-09-16 11:49 ./usr/bin/
+-rwxrwxr-x suganthan/suganthan 45444 2014-09-16 11:49 ./usr/bin/edf2asc_s
+-rwxrwxr-x suganthan/suganthan 121562 2014-09-16 11:49 ./usr/bin/edf2asc

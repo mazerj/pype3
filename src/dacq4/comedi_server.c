@@ -188,7 +188,7 @@
 #include <ezV24/ezV24.h>	/* for iscan serial I/O  */
 #include <eyelink.h>		/* eyelink API  */
 #include <eyetypes.h>		/* more eyelink API stuff */
-#include <my_core_expt.h>	/* my_... works with both 32bit & 64bit libs */
+#include <core_expt.h>	/* my_... works with both 32bit & 64bit libs */
 
 #include "dacqinfo.h"
 #include "sigs.h"

@@ -1,9 +1,0 @@
-OBJS = broadcast_main.o  broadcast_record_display.o
-EYELINK_LIB=../../../lib
-EYELINK_INCLUDE=../../../include
-LINKLIBS=-L$(EYELINK_LIB) -leyelink_core -leyelink_core_graphics  -lsdl_util `sdl-config --libs`  -lSDL_mixer -lrt
-CFLAGS=-I$(EYELINK_INCLUDE)
-broadcast: $(OBJS)
-	$(CC) -o broadcast $(OBJS) $(LINKLIBS)
-clean:
-	-rm -rf $(OBJS) broadcast

@@ -1,9 +1,0 @@
-OBJS = simpleexample.o
-EYELINK_LIB=../../../lib
-EYELINK_INCLUDE=../../../include
-LINKLIBS=-L$(EYELINK_LIB)  -leyelink_core -lrt -lm
-CFLAGS=-I$(EYELINK_INCLUDE) 
-simpleexample: $(OBJS)
-	$(CC) -o simpleexample $(OBJS) $(LINKLIBS)
-clean:
-	-rm -rf $(OBJS) simpleexample

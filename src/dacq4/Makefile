@@ -3,12 +3,7 @@ include ../../make.defs
 #DEBUG = -DDEBUG=1
 #DEBUG = -DDEBUG=0
 
-LIBEYELINK =  -lpthread -lm -lrt \
-	./eyelinksoftware/`uname -m`/lib/libeyelink_core.a
-INCEYELINK = ./eyelinksoftware/`uname -m`/include
-
-CFLAGS = -O6 -g -Wall -I$(INCEYELINK) -I./include \
-		$(GLOBAL_CFLAGS) $(PYTHONINC) $(DEBUG) -fPIC
+CFLAGS = -O6 -g -Wall $(GLOBAL_CFLAGS) -I$(PYTHONINC) $(DEBUG) -fPIC
 COMEDI_SERVER_OBJS = sigs.o psems.o usbjs.o
 
 CC = gcc
@@ -29,7 +24,8 @@ usbjs.o: usbjs.c usbjs.h
 comedi_server.o: comedi_server.c
 
 comedi_server: comedi_server.o $(COMEDI_SERVER_OBJS)
-	$(CC) -o $@ $< $(COMEDI_SERVER_OBJS) $(LIBEYELINK) -lcomedi -lm -lezV24
+	$(CC) -o $@ $< $(COMEDI_SERVER_OBJS) \
+		-lpthread -lcomedi -lm -lrt -lezV24 -leyelink_core
 
 dacq.c: dacq.h
 

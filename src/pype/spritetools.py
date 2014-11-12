@@ -468,8 +468,8 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 
 
 def gabor(s, frequency, phase_deg, ori_deg, sigma,
-          R=1.0, G=1.0, B=1.0,
-          meanlum=0.5, moddepth=1.0, ppd=None, color=None):
+		  R=1.0, G=1.0, B=1.0,
+		  meanlum=0.5, moddepth=1.0, ppd=None, color=None):
 	"""2D gabor generator.
 
 	:param s: (Sprite) target sprite
@@ -481,9 +481,9 @@ def gabor(s, frequency, phase_deg, ori_deg, sigma,
 		function at sprite ctr)
 
 	:param ori_deg: (degrees) grating orientation
-    
+	
 	:param sigma: (pixels) envelope width -- sprite should be at
-        least 6*sigma by 6*sigma in width and height
+		least 6*sigma by 6*sigma in width and height
 
 	:param R,G,B: (either R is colortriple or R,G,B are 0-1 values)
 
@@ -508,16 +508,16 @@ def gabor(s, frequency, phase_deg, ori_deg, sigma,
 
 	R, G, B = unpack_rgb(color, R, G, B)
 
-    gamma = 1.0
-    sf = frequency / np.mean([s.w, s.h])
-    lambda_ = 1.0 / sf
-    theta = np.pi * ori_deg / 180.0
-    phi = np.pi * phase_deg / 180.0
+	gamma = 1.0
+	sf = frequency / np.mean([s.w, s.h])
+	lambda_ = 1.0 / sf
+	theta = np.pi * ori_deg / 180.0
+	phi = np.pi * phase_deg / 180.0
 
-    x = (s.xx * np.cos(theta)) + (s.yy * np.sin(theta))
-    y = (-s.xx * np.sin(theta)) + (s.yy * np.cos(theta))
-    g = np.exp(-((x**2) + ((gamma**2) * y**2))/(2 * (sigma**2))) * \
-      np.cos((2.0 * np.pi * x / lambda_) - phi)
+	x = (s.xx * np.cos(theta)) + (s.yy * np.sin(theta))
+	y = (-s.xx * np.sin(theta)) + (s.yy * np.cos(theta))
+	g = np.exp(-((x**2) + ((gamma**2) * y**2))/(2 * (sigma**2))) * \
+	  np.cos((2.0 * np.pi * x / lambda_) - phi)
 	i = moddepth * g
 	s.array[::] = np.transpose((np.array((R*i,G*i,B*i)) +
 								meanlum).astype(np.uint8),

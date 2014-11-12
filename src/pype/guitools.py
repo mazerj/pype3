@@ -173,10 +173,10 @@ class Logger(object):					# !SINGLETON CLASS!
 				Logger.logwindow.write(s)
 			Logger.buffered = []
 		else:
-            if Logger.logwindow:
-                Logger.logwindow.write(text)
-            else:
-                Logger.buffered.append(text)
+			if Logger.logwindow:
+				Logger.logwindow.write(text)
+			else:
+				Logger.buffered.append(text)
 			sys.stderr.write(text)
 			sys.stderr.flush()
 
@@ -339,19 +339,19 @@ class TextWin(Toplevel):
 			self.iconname(iconname)
 		self.parent = self._nametowidget(self.winfo_parent())
 		self.transient(self.parent)
-        self.m = Text(self, font="Courier 10")
+		self.m = Text(self, font="Courier 10")
 		self.m.pack(expand=0)
 		apply(self.m.configure, (self.m,), kw)
-        self.lastmsg_ = None
-        
+		self.lastmsg_ = None
+		
 		self.protocol("WM_DELETE_WINDOW", lambda s=self: s.withdraw())
-        
-    def set(self, msg):
-        if self.lastmsg_ != msg:
-            self.m.delete("1.0", END)
-            self.m.insert(END, msg)
-            self.deiconify()
-            self.lastmsg_ = msg
+		
+	def set(self, msg):
+		if self.lastmsg_ != msg:
+			self.m.delete("1.0", END)
+			self.m.insert(END, msg)
+			self.deiconify()
+			self.lastmsg_ = msg
 
 class LogWindow(object):
 	def __init__(self, parent, height=20, width=70, bg='white',

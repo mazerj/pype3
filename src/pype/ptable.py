@@ -153,12 +153,12 @@ class ParamTable(object):
 		if decorate:
 			Button(f, text="View",
 				   command=self.view).pack(expand=0, fill=X, side=LEFT)
-            
-        if loadable:
+			
+		if loadable:
 			Button(f, text="Load",
 				   command=self.frompypefile).pack(expand=0, fill=X, side=LEFT)
 
-            
+			
 		f = Pmw.ScrolledFrame(parent)
 		f.pack(expand=1, fill=BOTH)
 
@@ -320,7 +320,7 @@ class ParamTable(object):
 				# this if evaluating
 				d[name+'_raw_'] = v
 				if validate and not (isinstance(validate, types.TupleType) or
-                                     isinstance(validate, types.DictType)):
+									 isinstance(validate, types.DictType)):
 					(r, v) = apply(validate, (v,), {"evaluate": 1})
 					if (runlock == _KEEPLOCKED) and not readonly:
 						continue
@@ -390,7 +390,7 @@ class ParamTable(object):
 			if name is qname:
 				v = self.query(name)
 				if validate and not (isinstance(validate, types.TupleType) or
-                                     isinstance(validate, types.DictType)):
+									 isinstance(validate, types.DictType)):
 					(r, v) = apply(validate, (v,), {"evaluate": 1})
 					if r != VALID:
 						(r, v) = apply(validate, (default,), {"evaluate": 1})
@@ -556,7 +556,7 @@ class ParamTable(object):
 				if default is None:
 					continue
 				if (isinstance(validate, types.TupleType) or
-                    isinstance(validate, types.DictType)):
+					isinstance(validate, types.DictType)):
 					self._entries[name].invoke(x[name])
 				else:
 					try:
@@ -594,7 +594,7 @@ class ParamTable(object):
 				if default is None:
 					continue
 				if (isinstance(validate, types.TupleType) or
-                    isinstance(validate, types.DictType)):
+					isinstance(validate, types.DictType)):
 					self._entries[name].invoke(x[name])
 				else:
 					try:
@@ -611,30 +611,30 @@ class ParamTable(object):
 			return 0
 
 	def frompypefile(self):
-        import filebox, pypedata
-        
-        (file, mode) = filebox.Open(initialdir=os.getcwd(),
-                                    pattern='*.[0-9][0-9][0-9]',
-                                    initialfile='', datafiles=1)
-        if file:
-            pf = pypedata.PypeFile(file)
-            rec = pf.nth(0)
-            if rec:
-                s = ''
-                keys = rec.params.keys()
-                for k in self.keys():
-                    kraw = k + '_raw_'
-                    if kraw in keys:
-                        s = s + '%s = %s --> %s\n' % (k, self.query(k),
-                                                    rec.params[kraw])
-                        try:
-                            self.set(k, rec.params[kraw])
-                        except:
-                            # radio buttons etc..
-                            self._entries[k].invoke(rec.params[kraw])
-                warn('Loaded values', s, astext=1)
-        
-        
+		import filebox, pypedata
+		
+		(file, mode) = filebox.Open(initialdir=os.getcwd(),
+									pattern='*.[0-9][0-9][0-9]',
+									initialfile='', datafiles=1)
+		if file:
+			pf = pypedata.PypeFile(file)
+			rec = pf.nth(0)
+			if rec:
+				s = ''
+				keys = rec.params.keys()
+				for k in self.keys():
+					kraw = k + '_raw_'
+					if kraw in keys:
+						s = s + '%s = %s --> %s\n' % (k, self.query(k),
+													rec.params[kraw])
+						try:
+							self.set(k, rec.params[kraw])
+						except:
+							# radio buttons etc..
+							self._entries[k].invoke(rec.params[kraw])
+				warn('Loaded values', s, astext=1)
+		
+		
 	def view(self):
 		"""View current contents of table (in a popup dialog box).
 
@@ -999,18 +999,18 @@ def is_rgba2(s, evaluate=None, meanlum=(128,128,128)):
 	"""RGBA triple where values are 0-1
 
 	"""
-    l, r = None, INVALID
+	l, r = None, INVALID
 	try:
 		l = tuple(eval(s))
-        if all(map(lambda x: x>=0 and x<=1, l)):
-            r = VALID
-            if len(l) == 3:
-                l = l + (1.0,)
+		if all(map(lambda x: x>=0 and x<=1, l)):
+			r = VALID
+			if len(l) == 3:
+				l = l + (1.0,)
 	except SyntaxError:
-        pass
+		pass
 
-    l = map(lambda x: int(x[0] + (255 * (x[1] - 0.5))),
-            zip(meanlum, x)) + (l[3],)
+	l = map(lambda x: int(x[0] + (255 * (x[1] - 0.5))),
+			zip(meanlum, x)) + (l[3],)
 	if evaluate:
 		return (r, l)
 	return r

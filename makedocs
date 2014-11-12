@@ -37,6 +37,9 @@ epydoc -v --no-private --simple-term --config=/tmp/$$.conf \
 	       --exclude=pype.im_down \
 	       --exclude=pype.pypedata \
 	       --exclude=pype.rootperm \
-	       --exclude=pype.pypeversion
+	       --exclude=pype.pypeversion\
+	       --exclude=pype.HTML \
+	       --exclude=pype.server \
+	       --exclude=pype.simpletimer
 
 /bin/rm -f /tmp/$$.conf

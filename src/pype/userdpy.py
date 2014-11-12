@@ -151,7 +151,7 @@ class ScaledCanvas(Canvas):
 
 class UserDisplay(object):
 	def __init__(self, master, fbsize, scale=1.0, pix_per_dva=1.0,
-                 xscale=1.0, yscale=1.0, app=None, eyemouse=False):
+				 xscale=1.0, yscale=1.0, app=None, eyemouse=False):
 		"""UserDisplay Class.
 
 		The UserDisplay is a pype local window on the user's computer
@@ -204,19 +204,19 @@ class UserDisplay(object):
 
 		self.barstate = Label(f, relief=RAISED)
 		self.barstate.pack(expand=0, side=RIGHT)
-        Label(f, font="Courier 10", \
-              text='%dppd' % (pix_per_dva,), \
-              relief=SUNKEN).pack(expand=0, side=RIGHT)
+		Label(f, font="Courier 10", \
+			  text='%dppd' % (pix_per_dva,), \
+			  relief=SUNKEN).pack(expand=0, side=RIGHT)
 		if xscale != 1.0 or yscale != 1.0:
-            Label(f, font="Courier 10", \
-                  text='%.1fx%.1f' % (xscale, yscale), \
-                  relief=SUNKEN).pack(expand=0, side=RIGHT)
+			Label(f, font="Courier 10", \
+				  text='%.1fx%.1f' % (xscale, yscale), \
+				  relief=SUNKEN).pack(expand=0, side=RIGHT)
 
-        self._mouseinfo_x = Label(f, font="Courier 10",
-                                  fg='red', bg='white', relief=SUNKEN)
-        self._mouseinfo_y = Label(f, font="Courier 10",
-                                  fg='red', bg='white', relief=SUNKEN)
-        self._mouseinfo_x.pack(expand=0, side=RIGHT)
+		self._mouseinfo_x = Label(f, font="Courier 10",
+								  fg='red', bg='white', relief=SUNKEN)
+		self._mouseinfo_y = Label(f, font="Courier 10",
+								  fg='red', bg='white', relief=SUNKEN)
+		self._mouseinfo_x.pack(expand=0, side=RIGHT)
 		self._mouseinfo_y.pack(expand=0, side=RIGHT)
 
 		# tkinter vars for linking GUI to python vars:
@@ -335,27 +335,27 @@ class UserDisplay(object):
 		self.markstack = []
 		self.markbox = None
 
-		self.w = cwidth                      # full width
-		self.h = cheight                     # full height
-		self.hw = int(round(self.w / 2.0))   # half width
-		self.hh = int(round(self.h / 2.0))   # half height
+		self.w = cwidth						 # full width
+		self.h = cheight					 # full height
+		self.hw = int(round(self.w / 2.0))	 # half width
+		self.hh = int(round(self.h / 2.0))	 # half height
 
 		self._axis = []
 
-        # Wed Oct 16 17:01:56 2013 mazer
-        # big mystery: if you do this coords are correct, otherwise,
-        # the y values are off. I think it has something to do with
-        # forcing the canvas widget to update its width and height
-        # parameters in a funny, buggy way.. just leave it for now.
-        bug = self.canvas.create_rectangle(0, 0, 0, 0,
-                                           fill="black", outline="")
-        del bug
+		# Wed Oct 16 17:01:56 2013 mazer
+		# big mystery: if you do this coords are correct, otherwise,
+		# the y values are off. I think it has something to do with
+		# forcing the canvas widget to update its width and height
+		# parameters in a funny, buggy way.. just leave it for now.
+		bug = self.canvas.create_rectangle(0, 0, 0, 0,
+										   fill="black", outline="")
+		del bug
 
-		self._eye_at = None            # current eye position marker
-		self._eye_trace = []           # trace history sample markers
-		self._eye_trace_lines = []     # trace history lines
-		self._eye_trace_maxlen = 20    # length of history buffer
-		self._eye_lxy = None           # last x,y eye position
+		self._eye_at = None			   # current eye position marker
+		self._eye_trace = []		   # trace history sample markers
+		self._eye_trace_lines = []	   # trace history lines
+		self._eye_trace_maxlen = 20	   # length of history buffer
+		self._eye_lxy = None		   # last x,y eye position
 
 		self.fix_x = 0
 		self.fix_y = 0
@@ -371,21 +371,21 @@ class UserDisplay(object):
 		self.msg_label = None
 		self.msg_win = None
 
-        if 0:
-            self.set_taskpopup()
-        else:
-            self.canvas.bind("<Button-2>",
-                             lambda ev,s=self: s._taskcallbackfn(ev))
+		if 0:
+			self.set_taskpopup()
+		else:
+			self.canvas.bind("<Button-2>",
+							 lambda ev,s=self: s._taskcallbackfn(ev))
 
 		self.visible = 1
 
 		self.canvas.config(scrollregion=self.canvas.bbox(ALL))
 
-    def set_taskcallback(self, callbackfn=None):
-        if callbackfn:
-            self._taskcallbackfn = callbackfn
-        else:
-            self._taskcallbackfn = lambda ev: None
+	def set_taskcallback(self, callbackfn=None):
+		if callbackfn:
+			self._taskcallbackfn = callbackfn
+		else:
+			self._taskcallbackfn = lambda ev: None
 
 
 	def showhide(self):
@@ -482,14 +482,14 @@ class UserDisplay(object):
 
 		C = self.canvas
 		if self._eye_lxy is not None:
-            l = C.create_line(self._eye_lxy[0], self._eye_lxy[1], x, y,
+			l = C.create_line(self._eye_lxy[0], self._eye_lxy[1], x, y,
 							  fill="red")
 			C.tag_lower(l)
-            self._eye_trace_lines.append(l)
+			self._eye_trace_lines.append(l)
 			if len(self._eye_trace_lines) > self._eye_trace_maxlen:
 				C.delete(self._eye_trace_lines[0])
 				self._eye_trace_lines.pop(0)
-        self._eye_lxy = (x, y)
+		self._eye_lxy = (x, y)
 
 		tag = C.create_text(x, y, text='+',
 							font=('Courier', 10),
@@ -497,19 +497,19 @@ class UserDisplay(object):
 		C.tag_lower(tag)
 
 		self._eye_trace.append(tag)
-        if len(self._eye_trace) > self._eye_trace_maxlen:
+		if len(self._eye_trace) > self._eye_trace_maxlen:
 			C.delete(self._eye_trace[0])
 			del self._eye_trace[0]
 
-        if self._eye_at is None:
-            self._eye_at = (C.create_text(x+1, y+1, text='o',
-                                          font=('Courier', 10),
-                                          fill='white', justify=CENTER),
-                            C.create_text(x, y, text='o',
-                                          font=('Courier', 10),
-                                          fill='black', justify=CENTER))
-        for i in self._eye_at:
-            C.coords(i, x, y)
+		if self._eye_at is None:
+			self._eye_at = (C.create_text(x+1, y+1, text='o',
+										  font=('Courier', 10),
+										  fill='white', justify=CENTER),
+							C.create_text(x, y, text='o',
+										  font=('Courier', 10),
+										  fill='black', justify=CENTER))
+		for i in self._eye_at:
+			C.coords(i, x, y)
 			C.tag_raise(i)
 
 		if xt:
@@ -527,9 +527,9 @@ class UserDisplay(object):
 
 	def canv2cart(self, x, y=None):
 		"""Convert canvas (including event position) coords to
-        frame buffer coords.
+		frame buffer coords.
 
-        Inverse of cart2canv() method.
+		Inverse of cart2canv() method.
 
 		Tkinter canvas coords have (0,0) in upper left, frame buffer
 		has 0,0 at center and has normal Cartesian directions.
@@ -545,7 +545,7 @@ class UserDisplay(object):
 		Inverse of canv2cart() method.
 		"""
 		if y is None:
-            (x, y) = x
+			(x, y) = x
 		return (self.hw + x, self.hh - y)
 
 	def drawaxis(self, axis=1, sync=1):
@@ -880,11 +880,11 @@ class UserDisplay(object):
 		if not ev is None:
 			x, y = self.canvas.window2scaled(ev.x, ev.y)
 			(self.mousex, self.mousey) = self.canv2cart(x, y)
-            rx, ry = (self.mousex-self.fix_x, self.mousey-self.fix_y,)
-        else:
-            rx, ry = 0, 0
-        self._mouseinfo_x.configure(text='X:%5d' % rx)
-        self._mouseinfo_y.configure(text='Y:%5d' % ry)
+			rx, ry = (self.mousex-self.fix_x, self.mousey-self.fix_y,)
+		else:
+			rx, ry = 0, 0
+		self._mouseinfo_x.configure(text='X:%5d' % rx)
+		self._mouseinfo_y.configure(text='Y:%5d' % ry)
 
 	def _mouse_enter(self, ev):
 		self.canvas.focus_set()
@@ -933,13 +933,13 @@ class UserDisplay(object):
 							ii.append(self.canvas.create_image(x, y, anchor=NW,
 																image=im))
 						else:
-                            # square bounding box for sprite
+							# square bounding box for sprite
 							ii.append(self.icon(s.x, s.y, s.dw, s.dh, type='box',
-                                                color=s.icolor, fill=s.ifill))
+												color=s.icolor, fill=s.ifill))
 					for i in ii: self._displaylist_icons.append(i)
 
 	def icon(self, x=None, y=None, w=5, h=5, text=None, color='black',
-             type='box', dash=None, r=5, fill=''):
+			 type='box', dash=None, r=5, fill=''):
 		if y is None and x is None:
 			self._iconlist = self.deltags(self._iconlist)
 		elif y is None:
@@ -953,27 +953,27 @@ class UserDisplay(object):
 			h = h / 2
 			if not text is None:
 				txt = self.canvas.create_text(x, y-(1.5*h),
-                                              text=text,
-                                              fill='red', dash=dash)
+											  text=text,
+											  fill='red', dash=dash)
 				self._iconlist.append(txt)
 
 			if type == 'box' or type == 1:
 				tag = self.canvas.create_rectangle(x-w, y-h, x+w, y+h,
-                                                   fill=fill, outline=color,
-                                                   stipple='gray25',
-                                                   dash=dash)
+												   fill=fill, outline=color,
+												   stipple='gray25',
+												   dash=dash)
 			elif type == 'oval' or type == 2:
 				tag = self.canvas.create_oval(x-w, y-h, x+h, y+h,
-                                              fill=fill, outline=color,
-                                              stipple='gray25',
-                                              dash=dash)
+											  fill=fill, outline=color,
+											  stipple='gray25',
+											  dash=dash)
 			elif type == 'circle' or type == 3:
 				if r is None:
 					r = (w + h) / 2.0
 				tag = self.canvas.create_oval(x-r, y-r, x+r, y+r,
-                                              fill=fill, outline=color,
-                                              stipple='gray25',
-                                              dash=dash)
+											  fill=fill, outline=color,
+											  stipple='gray25',
+											  dash=dash)
 			self._iconlist.append(tag)
 			return tag
 

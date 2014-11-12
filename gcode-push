@@ -1,2 +1,8 @@
 #!/bin/sh
+
+# push codebase to googlecode
 ./build gsync
+
+# push current docs to jackknife
+rsync -av ${PYPEDIR}/docs root@jackknife.med.yale.edu:/var/www
+

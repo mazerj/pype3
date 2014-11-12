@@ -443,16 +443,16 @@ def param_expand(s, integer=None):
 			else:
 				meanval, minval, maxval = v[0], v[1], v[2]
 
-            ntries = 0
+			ntries = 0
 			while ntries < 100:
 				# keep drawing until we get a range-valid value
 				# before 12/18/2012 draw was clipped with min/max
-                #
-                # NOTE: don't draw more than 100 times to avoid
-                # infinite loops -- this usually means bad params
-                # entered by user, or bad values during changes. In
-                # that case, just return mean..
-                #
+				#
+				# NOTE: don't draw more than 100 times to avoid
+				# infinite loops -- this usually means bad params
+				# entered by user, or bad values during changes. In
+				# that case, just return mean..
+				#
 				x = np.random.exponential(meanval)
 				if s.lower()[0] == 'i':
 					#  shift by +0.5 then -1 to to avoid problems with the
@@ -460,8 +460,8 @@ def param_expand(s, integer=None):
 					x = int(round(x+0.5)-1)
 				if x >= minval and x <= maxval:
 					return x
-                ntries += 1
-            return meanval
+				ntries += 1
+			return meanval
 		except:
 			pass
 
@@ -475,11 +475,11 @@ def param_expand(s, integer=None):
 				return None
 
 			# search for a value until it falls within the specified range
-            # NOTE: don't draw more than 100 times to avoid
-            # infinite loops -- this usually means bad params
-            # entered by user, or bad values during changes. In
-            # that case, just return mean..
-            ntries = 0
+			# NOTE: don't draw more than 100 times to avoid
+			# infinite loops -- this usually means bad params
+			# entered by user, or bad values during changes. In
+			# that case, just return mean..
+			ntries = 0
 			while ntries < 100:
 				val = np.random.exponential(meanval)
 				if val >= minval and val <= maxval:
@@ -489,7 +489,7 @@ def param_expand(s, integer=None):
 					divisor = (bincenters[-1]-(bincenters[0]-1))/nbins
 					val = int((round(val/divisor))*divisor)+(bincenters[0]-1)
 					return val
-            return meanval
+			return meanval
 		except:
 			pass
 
@@ -565,94 +565,92 @@ def dir2ori(dir):
 	return ori
 
 class ConditionBucket(object):
-    def __init__(self, conditions, randomize=True, freeze=False):
-        """Bucket to hold a set of conditions or stimulus parameters,.
+	def __init__(self, conditions, randomize=True, freeze=False):
+		"""Bucket to hold a set of conditions or stimulus parameters,.
 
-        Initialize with a list of conditions -- can be any type of
-        sequence object (list, tuple etc) to be provided to the
-        task on-demand.
+		Initialize with a list of conditions -- can be any type of
+		sequence object (list, tuple etc) to be provided to the
+		task on-demand.
 
-        :params conditions: (list) list of condition descriptions/parameters
+		:param conditions: (list) list of condition descriptions/parameters
 
-        :params randomize: (bool) automatically randomize order?
+		:param randomize: (bool) automatically randomize order?
 
-        :params freeze: (bool) randomize once and freeze sequence?
+		:param freeze: (bool) randomize once and freeze sequence?
 
-        :return nothing:
+		:return: nothing
 
-        """
-        self.conditions = conditions
-        self.randomize = randomize
-        self.block = 0
-        self.frozen_seq = None
-        self.reset()
-        if freeze:
-            self.frozen_seq = self.sequence[:]
+		"""
+		self.conditions = conditions
+		self.randomize = randomize
+		self.block = 0
+		self.frozen_seq = None
+		self.reset()
+		if freeze:
+			self.frozen_seq = self.sequence[:]
 
-    def reset(self):
-        """Reset the bucket -- usually task shouldn't need to call this.
+	def reset(self):
+		"""Reset the bucket -- usually task shouldn't need to call this.
 
-        This resets the bucket back to the starting point, potentially
-        re-randomizing the order. This is automatically called when the
-        bucket on initialization and when the bucket goes empty, so the
-        user should need need to call this directly.
+		This resets the bucket back to the starting point, potentially
+		re-randomizing the order. This is automatically called when the
+		bucket on initialization and when the bucket goes empty, so the
+		user should need need to call this directly.
 
-        :return nothing:
+		:return: nothing
 
-        """
+		"""
 
-        self.sequence = range(len(self.conditions))
-        if self.randomize:
-            if self.frozen_seq is None:
-                self.sequence = permute(self.sequence)
-            else:
-                self.sequence = self.frozen_seq[:]
+		self.sequence = range(len(self.conditions))
+		if self.randomize:
+			if self.frozen_seq is None:
+				self.sequence = permute(self.sequence)
+			else:
+				self.sequence = self.frozen_seq[:]
 
-    def pop(self):
-        """Get next condition from the bucket.
+	def pop(self):
+		"""Get next condition from the bucket.
 
-        Automatically refills bucket when it's empty. The index number
-        returned here is what needs to be passed to pop when putting
-        things back in the bucket.
+		Automatically refills bucket when it's empty. The index number
+		returned here is what needs to be passed to pop when putting
+		things back in the bucket.
 
-        :return tuple: (index number of condition, condition,
-          current block/repeat)
+		:return: tuple (index number of condition, condition,
+		  current block/repeat)
 
-        """
+		"""
 
-        if len(self.sequence) < 1:
-            self.reset()
-            self.block += 1
+		if len(self.sequence) < 1:
+			self.reset()
+			self.block += 1
 
-        n = self.sequence[0]
-        self.sequence.pop(0)
-        return n, self.conditions[n], self.block
+		n = self.sequence[0]
+		self.sequence.pop(0)
+		return n, self.conditions[n], self.block
 
-    def push(self, n):
-        """Put condition back in the bucket (if there's an error)
+	def push(self, n):
+		"""Put condition back in the bucket (if there's an error)
 
-        Automatically refills bucket when it's empty
+		Automatically refills bucket when it's empty
 
-        :return nothing:
+		:return: nothing
 
-        """
-        if self.randomize and self.frozen_seq is None:
-            self.sequence.append(n)
-        else:
-            self.sequence.insert(0,n)
-
-
+		"""
+		if self.randomize and self.frozen_seq is None:
+			self.sequence.append(n)
+		else:
+			self.sequence.insert(0,n)
 
 if __name__ == '__main__':
-    """
-    bucket = ConditionBucket('a,b,c,d'.split(','),
-                             randomize=True, freeze=True)
-    for k in range(10):
-        n, cond, block = bucket.pop()
-        print k, block, cond
-        if k == 5:
-            bucket.push(n)
-    """
+	"""
+	bucket = ConditionBucket('a,b,c,d'.split(','),
+							 randomize=True, freeze=True)
+	for k in range(10):
+		n, cond, block = bucket.pop()
+		print k, block, cond
+		if k == 5:
+			bucket.push(n)
+	"""
 
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)
 	sys.exit(1)

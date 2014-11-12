@@ -544,8 +544,8 @@ def _base_ptables():
 			  'sign of threshold for spike detection'),
 		pyesno('save_ain0', 0, 'save raw AIN 0'),
 		pyesno('save_ain1', 0, 'save raw AIN 1'),
-        #pyesno('save_ain2', 0, 'save raw AIN 2 (photodiode) -- no effect'),
-        #pyesno('save_ain3', 0, 'save raw AIN 3 (spike detection) -- no effect'),
+		#pyesno('save_ain2', 0, 'save raw AIN 2 (photodiode) -- no effect'),
+		#pyesno('save_ain3', 0, 'save raw AIN 3 (spike detection) -- no effect'),
 		pyesno('save_ain4', 0, 'save raw AIN 4'),
 		pyesno('save_ain5', 0, 'save raw AIN 5'),
 		pyesno('save_ain6', 0, 'save raw AIN 6'),
@@ -974,7 +974,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			mb.addmenuitem('File', 'command', label='elog',
 						   command=lambda s=self: s.open_elog())
 
-        # quit should be last entry
+		# quit should be last entry
 		mb.addmenuitem('File', 'separator')
 		mb.addmenuitem('File', 'command', label='Quit',
 					   command=self._shutdown)
@@ -988,7 +988,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		sub_common = DockWindow(checkbutton=b, title='Subject Params')
 		self.sub_common = ParamTable(sub_common, commonp, file='subject.par',\
-                                     loadable=0)
+									 loadable=0)
 		if self.use_elog:
 			# 'cell' (exper in elog database) not changable in elog mode:
 			self.sub_common.lockfield('cell')
@@ -999,8 +999,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		rig_common = DockWindow(checkbutton=b,
 								title='Rig Params (%s)' % hostname)
 		self.rig_common = ParamTable(rig_common, rigp,
-                                     file='rig-%s.par' % hostname,
-                                     loadable=0)
+									 file='rig-%s.par' % hostname,
+									 loadable=0)
 
 		b = Checkbutton(c2pane, text='ical', relief=RAISED, anchor=W)
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
@@ -1008,7 +1008,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		ical = DockWindow(checkbutton=b, title='ical')
 		self.ical = ParamTable(ical, icalp,
 							   file='%s-%s-ical.par' % (hostname, subject(),),
-                               loadable=0)
+							   loadable=0)
 
 		self.tallycount = {}
 		state = self._loadstate()
@@ -1277,8 +1277,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.eyebar = 0
 
 		# userdisplay: shadow of framebuffer window
-        # xscale=1./self.config.fget('XSCALE'),
-        # yscale=1./self.config.fget('YSCALE'),
+		# xscale=1./self.config.fget('XSCALE'),
+		# yscale=1./self.config.fget('YSCALE'),
 		self.udpy = userdpy.UserDisplay(rightpane,
 										fbsize=(self.fb.w, self.fb.h),
 										pix_per_dva=self.pix_per_dva,
@@ -1428,14 +1428,14 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		if self.psych:
 			self.fb.screen_close()
 
-        if 0:
-            self.server = PypeServer('', 5666)
-            self.server_thread = threading.Thread(target=asyncore.loop)
-            self.server_thread.daemon = True
-            self.server_thread.start()
+		if 0:
+			self.server = PypeServer('', 5666)
+			self.server_thread = threading.Thread(target=asyncore.loop)
+			self.server_thread.daemon = True
+			self.server_thread.start()
 
 	def open_elog(self):
-        # open elog for this animal, today w/o asking for confirmation
+		# open elog for this animal, today w/o asking for confirmation
 		animal = self.sub_common.queryv('full_subject')
 		os.system('elog -y -animal=%s -today &' % (animal,))
 
@@ -1549,27 +1549,27 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		finally:
 			self.showtestpat()
 
-    def _getparams_frompypefile(self):
-        import filebox
-        (file, mode) = filebox.Open(initialdir=os.getcwd(),
-                                    pattern='*.[0-9][0-9][0-9]',
-                                    initialfile='', datafiles=1)
-        if file:
-            pf = PypeFile(file)
-            rec = pf.nth(0)
-            if rec:
-                s = 'from: %s\n\n' % file
-                avoid = self.sub_common.keys() + \
-                  self.rig_common.keys() + self.ical.keys()
-                keys = rec.params.keys()
-                keys.sort()
-                for p in keys:
-                    if p.endswith('_raw_'):
-                        p = p[:-5]
-                        if not p in avoid:
-                            s = s + '%s = %s\n' % (p, rec.params[p])
-                warn('task params', s, astext=1)
-        
+	def _getparams_frompypefile(self):
+		import filebox
+		(file, mode) = filebox.Open(initialdir=os.getcwd(),
+									pattern='*.[0-9][0-9][0-9]',
+									initialfile='', datafiles=1)
+		if file:
+			pf = PypeFile(file)
+			rec = pf.nth(0)
+			if rec:
+				s = 'from: %s\n\n' % file
+				avoid = self.sub_common.keys() + \
+				  self.rig_common.keys() + self.ical.keys()
+				keys = rec.params.keys()
+				keys.sort()
+				for p in keys:
+					if p.endswith('_raw_'):
+						p = p[:-5]
+						if not p in avoid:
+							s = s + '%s = %s\n' % (p, rec.params[p])
+				warn('task params', s, astext=1)
+		
 	def _findparam(self):
 		s = Entry_(self.tk, 'find parameter:', '').go()
 		if s:
@@ -1693,12 +1693,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			s1 = self._tally(type=type)
 			s2 = self._runstats_update(resultcode=type)
 
-            # by default -- keep running stats is ~/pyperc/monitor.html
-            # set MONITOR=0 to turns this feature off.
-            if self.config.iget('MONITOR', 1):
-                fn = subjectrc('monitor.html')
-                if fn is not None:
-                    open(fn, 'w').write("""
+			# by default -- keep running stats is ~/pyperc/monitor.html
+			# set MONITOR=0 to turns this feature off.
+			if self.config.iget('MONITOR', 1):
+				fn = subjectrc('monitor.html')
+				if fn is not None:
+					open(fn, 'w').write("""
 <HTML>\n
  <HEAD>\n
   <TITLE>\n
@@ -1712,7 +1712,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 <PRE>%s</PRE>\n
 </HTML>\n""" % (self.sub_common.queryv('full_subject'), s2, s1))
 
-            
+			
 
 	def get_result(self, nback=1):
 		"""Get the nth to last saved trial result code.
@@ -1806,7 +1806,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.tallyw.clear()
 		self.tallyw.write(s)
 
-        return s        
+		return s		
 
 	def getcommon(self):
 		"""Get common params, extend with eyecoil settings.
@@ -2372,12 +2372,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			'----------------------------------',
 			'Corrects = %d [%d]' % (nc, self.sub_common.queryv('max_correct'),),
 			'  Errors = %d'		 % (ne,),
-			'     UIs = %d [%d]' % (nu, self.sub_common.queryv('max_ui'),),
+			'	  UIs = %d [%d]' % (nu, self.sub_common.queryv('max_ui'),),
 			'  Trials = %d [%d]' % (nt, self.sub_common.queryv('max_trials'),),
 			'----------------------------------'), '\n')
 		self.statsw.configure(text=s)
-        return s
-        
+		return s
+		
 	def _start(self):
 		self._start_helper(temp=None)
 
@@ -2829,7 +2829,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				while not self.fb.checkkeys() == []: pass
 			elif 'escape' in self.fb.checkkeys():
 				if self._allowabort:
-                    self.encode(ABORT)
+					self.encode(ABORT)
 					self.con('framebuffer:esc')
 					while not self.fb.checkkeys() == []: pass
 					self.con("[esc]", color='red')
@@ -3843,30 +3843,30 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		p0 = np.zeros(n, np.int)
 		s0 = np.zeros(n, np.int)
 
-        if self.rig_common.queryv('save_ain0'):
-            ain0 = np.zeros(n, np.int)
-        else:
-            ain0 = None
+		if self.rig_common.queryv('save_ain0'):
+			ain0 = np.zeros(n, np.int)
+		else:
+			ain0 = None
 
-        if self.rig_common.queryv('save_ain1'):
-            ain1 = np.zeros(n, np.int)
-        else:
-            ain1 = None
+		if self.rig_common.queryv('save_ain1'):
+			ain1 = np.zeros(n, np.int)
+		else:
+			ain1 = None
 
-        if self.rig_common.queryv('save_ain5'):
-            ain5 = np.zeros(n, np.int)
-        else:
-            ain5 = None
+		if self.rig_common.queryv('save_ain5'):
+			ain5 = np.zeros(n, np.int)
+		else:
+			ain5 = None
 
-        if self.rig_common.queryv('save_ain6'):
-            ain6 = np.zeros(n, np.int)
-        else:
-            ain6 = None
+		if self.rig_common.queryv('save_ain6'):
+			ain6 = np.zeros(n, np.int)
+		else:
+			ain6 = None
 
-        if self.rig_common.queryv('save_ain7'):
-            ain7 = np.zeros(n, np.int)
-        else:
-            ain7 = None
+		if self.rig_common.queryv('save_ain7'):
+			ain7 = np.zeros(n, np.int)
+		else:
+			ain7 = None
 
 		# be careful here -- if you're trying to look at the photodiode
 		# signals, you'd better not set fast_tmp=1...
@@ -3879,17 +3879,17 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				self.eyebuf_y[i] = dacq_adbuf_y(i)
 				self.eyebuf_pa[i] = dacq_adbuf_pa(i)
 				self.eyebuf_new[i] = dacq_adbuf_new(i)
-                if not ain0 is None:
+				if not ain0 is None:
 					ain0[i] = dacq_adbuf_c0(i)
-                if not ain1 is None:
+				if not ain1 is None:
 					ain1[i] = dacq_adbuf_c1(i)
 				p0[i] = dacq_adbuf_c2(i) # photo diode
 				s0[i] = dacq_adbuf_c3(i) # spike detect
-                if not ain5 is None:
+				if not ain5 is None:
 					ain5[i] = dacq_adbuf_c5(i)
-                if not ain6 is None:
+				if not ain6 is None:
 					ain6[i] = dacq_adbuf_c6(i)
-                if not ain7 is None:
+				if not ain7 is None:
 					ain7[i] = dacq_adbuf_c7(i)
 
 			###############################################################3
@@ -3952,8 +3952,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		self.udpy.info("%3dspk | %3dsync | %3ddup" %
 					   (len(self.spike_times),
-                        len(self.photo_times),
-                        ndups,))
+						len(self.photo_times),
+						ndups,))
 
 		# Completely wipe the buffers -- don't let them accidently
 		# get read TWICE!!	They're saved as self/app.eyebuf_[xyt]
@@ -4041,16 +4041,16 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				_tolist(self.photo_times),
 				_tolist(self.spike_times),
 				self.record_id,
-				_tolist(p0),              # photo diode trace (analog)
-				_tolist(s0),              # spike detect trace (TTL)
+				_tolist(p0),			  # photo diode trace (analog)
+				_tolist(s0),			  # spike detect trace (TTL)
 				(
-					_tolist(ain0),   # analog input channel 0
-					_tolist(ain1),   # analog input channel 1
-					None,            # photo diode trace (dup!)
-					None,            # spike detect trace (dup!)
-					_tolist(ain5),   # analog input channel 5
-					_tolist(ain6),   # analog input channel 6
-					_tolist(ain7),   # analog input channel 7
+					_tolist(ain0),	 # analog input channel 0
+					_tolist(ain1),	 # analog input channel 1
+					None,			 # photo diode trace (dup!)
+					None,			 # spike detect trace (dup!)
+					_tolist(ain5),	 # analog input channel 5
+					_tolist(ain6),	 # analog input channel 6
+					_tolist(ain7),	 # analog input channel 7
 					),
 				_tolist(self.eyebuf_pa),
 				self.xdacq_data_store,
@@ -4266,8 +4266,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			else:
 				fname = self.pypedir + '/lib/testpat.png'
 			self._testpat = ScaledSprite(x=0, y=0, fname=fname, fb=self.fb,
-                                         depth=99, on=1, name='testpat',
-                                         width=self.fb.w, height=self.fb.h)
+										 depth=99, on=1, name='testpat',
+										 width=self.fb.w, height=self.fb.h)
 		drawtest(self.fb, self._testpat)
 
 

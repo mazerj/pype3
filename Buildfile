@@ -66,3 +66,11 @@ gpush:
 gsync:
 	svnsync sync --username mazerj2006 https://pype3.googlecode.com/svn
 
+
+################################################################
+# push to github
+
+push:
+	git commit -a
+	git push
+

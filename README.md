@@ -9,6 +9,8 @@ in a single open source package.
 
 Designed for Linux -- all mandatory dependencies are open source.
 
+Migrated from googlecode to github 11/24/2014.
+
 # 1st time installation instructions
 
 1. Get a computer -- any commodity PC will do the trick -- we recommend a 64bit machine with an reasonably fast Nvidia graphics card supported by the NVidia proprietary linux drivers (most of the stimulus generation is currently done on the CPU, so a top-of-the-line video card won't be used to it's full capabilities).
@@ -45,5 +47,4 @@ To begin with, start pype in the pype3/Notes directory downloaded from googlecod
 # Other useful commands
 
 - *pypeconfig* - edit your config file (host specific!)
-
 - *pypedocs* - open a browser to the on-line docs

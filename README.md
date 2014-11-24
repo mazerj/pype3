@@ -51,4 +51,4 @@ To begin with, start pype in the pype3/Notes directory downloaded from googlecod
 
 # Subversion
 
-The file [https://github.com/mazerj/pype3/blob/master/svn-to-git.txt] svn-to-git.txt] contains a table for mappings from Subversion revision numbers (stored in pype files etc) to git hashes. You can use this to retrieve old versions of pype that match the data collection period.
+The file [svn-to-git.txt](https://github.com/mazerj/pype3/blob/master/svn-to-git.txt) contains a table for mappings from Subversion revision numbers (stored in pype files etc) to git hashes. You can use this to retrieve old versions of pype that match the data collection period.

@@ -12,18 +12,29 @@ Designed for Linux -- all mandatory dependencies are open source.
 # 1st time installation instructions
 
 1. Get a computer -- any commodity PC will do the trick -- we recommend a 64bit machine with an reasonably fast Nvidia graphics card supported by the NVidia proprietary linux drivers (most of the stimulus generation is currently done on the CPU, so a top-of-the-line video card won't be used to it's full capabilities).
+
 2. Install Ubuntu. We use 10.04 in the lab for data collection machines, but that's not longer supported by Ubuntu, so I suggest new users start with 12.04 LTS, which is currently stable and supported (pype will work out of the box with 12.04 LTS).
+
 3. Once Ubuntu is up and running, log in and open a terminal window. The first thing you need to do is to install subversion and pull down a current snapshot of pype:
+
     % sudo apt-get -yq install subversion
+	
 4. Then checkout the googlecode repository using svn:
+
     % svn checkout http://pype3.googlecode.com/svn/trunk/ pype3
+	
 5. Install all the dependency packages needed by pype. This will take ~10 mins. The fresh-install.sh script will download and install all the packages needed to build/run pype and then do the actual build/install into /usr/local/pype3:
+
     % cd pype3/Notes; sudo sh fresh-install.sh
+	
 6. Append pype3/Notes/bashrc.sample to your ~/.bashrc file to get your login environment setup with pype on the search path (if you're using csh/tcsh, it's finally time to switch to bash).
 7. Open a new terminal window to pick up the new .bashrc (or source ~/.bashrc etc)
 8. Create and initialize your ~/.pyperc directory (first time only):
+
     % pypesetup
+	
 9. Then you can actually get started. To fire up the GUI interface, just run the pype command:
+
     % pype
 
 # Sample Tasks

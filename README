@@ -1,4 +1,0 @@
-1. If you're installing for the first time look in README.1st
-
-2. Never run make directly -- use the 'build' script in this
-   directory to build/install/etc pype.

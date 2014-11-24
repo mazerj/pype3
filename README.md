@@ -19,11 +19,11 @@ Migrated from googlecode to github 11/24/2014.
 
 3. Once Ubuntu is up and running, log in and open a terminal window. The first thing you need to do is to install subversion and pull down a current snapshot of pype:
 
-    % sudo apt-get -yq install subversion
+    % sudo apt-get -yq install git-core
 	
-4. Then checkout the googlecode repository using svn:
+4. Then pull down the repository from github:
 
-    % svn checkout http://pype3.googlecode.com/svn/trunk/ pype3
+    % git clone https://github.com/mazerj/pype3.git pype3
 	
 5. Install all the dependency packages needed by pype. This will take ~10 mins. The fresh-install.sh script will download and install all the packages needed to build/run pype and then do the actual build/install into /usr/local/pype3:
 
@@ -48,3 +48,7 @@ To begin with, start pype in the pype3/Notes directory downloaded from googlecod
 
 - *pypeconfig* - edit your config file (host specific!)
 - *pypedocs* - open a browser to the on-line docs
+
+# Subversion
+
+The file [https://github.com/mazerj/pype3/blob/master/svn-to-git.txt svn-to-git.txt] contains a table for mappings from Subversion revision numbers (stored in pype files etc) to git hashes. You can use this to retrieve old versions of pype that match the data collection period.

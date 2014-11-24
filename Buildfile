@@ -71,6 +71,5 @@ gsync:
 # push to github
 
 push:
-	git commit -a
-	git push
+	git commit -a && git push
 

@@ -54,22 +54,9 @@ clobber:
 docs:
 	@sh ./makedocs
 
-###############################################################
-# push (initial setup only) and sync to googlecode svn mirror
-# located at https://code.google.com/p/pype3
-
-gpush:
-	svnsync init --username mazerj2006 \
-		https://pype3.googlecode.com/svn \
-		svn+ssh://svn/auto/share/repos/pype3/
-
-gsync:
-	svnsync sync --username mazerj2006 https://pype3.googlecode.com/svn
-
-
 ################################################################
-# push to github
+# push to github ('origin')
 
 push:
-	git commit -a && git push
+	git push
 

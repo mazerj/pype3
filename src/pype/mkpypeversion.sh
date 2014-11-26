@@ -2,7 +2,6 @@
 
 cat <<EOF
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
-# $Id: mkpypeversion.sh 2 2010-12-10 16:40:31Z mazer $
 
 """Version and compilation info.
 

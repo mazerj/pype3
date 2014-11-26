@@ -27,8 +27,6 @@ except NameError:
 
 class Task(fixmaster.Task):
 
-	TaskRev = "$Id: fixation.py 787 2013-07-11 13:32:22Z mazer $"
-
 	def task_params(self):
 		return ()
 

@@ -25,8 +25,6 @@ except NameError:
 
 class Task(fixmaster.Task):
 	
-	TaskRev = "$Id: spotmap.py 729 2013-04-16 15:17:49Z amarino $"
-	
 	def task_params(self):
 		return (
 			("spotmap params", None),

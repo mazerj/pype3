@@ -176,25 +176,8 @@ def destroyall(ws):
 
 class Task:
 
-	# don't touch or override this:
-	MasterRev = "$Id: fixmaster.py 785 2013-07-11 12:37:10Z mazer $"
-
-	# OVERRIDE:
-	TaskRev = None
-
 	def __init__(self, app, taskname=None, parent=None):
 		self.app = app
-
-		if self.TaskRev is not None:
-			self.version_no = (self.MasterRev.split()[2],
-							   self.TaskRev.split()[2])
-			self.version_info = (self.MasterRev,
-								 self.TaskRev)
-		else:
-			self.version_no = (self.MasterRev.split()[2],
-							   "-1")
-			self.version_info = (self.MasterRev, "none")
-		self.version_no = map(int, self.version_no)
 
 		# fixmaster shared/common parameters
 		commparams = ( \
@@ -411,8 +394,6 @@ class Task:
 
 		P['_trialtime'] = timestamp
 		P['_ntrials'] = ntrials
-		P['_version_no'] = self.version_no
-		P['_version_info'] = self.version_info
 		app.record_write(resultcode=resultcode, rt=rt, params=P)
 
 		# push result info onto history stack..

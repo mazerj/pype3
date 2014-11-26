@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
-# $Id: plx2asc.py 2 2010-12-10 16:40:31Z mazer $
 
 """
 Tools for extracting data from Plexon .plx files

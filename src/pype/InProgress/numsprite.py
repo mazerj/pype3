@@ -8,13 +8,6 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 """
 
-__author__   = '$Author: mazer $'
-__date__     = '$Date: 2010-12-10 11:40:31 -0500 (Fri, 10 Dec 2010) $'
-__revision__ = '$Revision: 2 $'
-__id__       = '$Id: numsprite.py 2 2010-12-10 16:40:31Z mazer $'
-__HeadURL__  = '$HeadURL$'
-
-
 """Revision History
 
 Tue Apr  7 10:34:35 2009 mazer

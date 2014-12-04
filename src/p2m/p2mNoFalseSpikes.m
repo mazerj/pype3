@@ -28,7 +28,10 @@ for n=1:length(pf.rec)
     if length(pf.rec(n).spike_times) & abs(pf.rec(n).spike_times(1) - ts(1)) < 5
       % false spike detection
       pf.rec(n).spike_times = pf.rec(n).spike_times(2:end);
-      pf.rec(n).ttl_times = pf.rec(n).ttl_times(2:end);
+      try
+        % old files don't have ttl_times...
+        pf.rec(n).ttl_times = pf.rec(n).ttl_times(2:end);
+      end
       ks = ks + 1;
     end
     if length(pf.rec(n).photo_times) & abs(pf.rec(n).photo_times(1) - ts(1)) < 5

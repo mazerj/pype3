@@ -2,7 +2,7 @@
 #include <unistd.h>		/* for geteuid() */
 #include <stdlib.h>		/* for exit() */
 
-main(int ac, char **av)
+int main(int ac, char **av)
 {
   char **newav;
   int newac, n;

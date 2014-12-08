@@ -1089,7 +1089,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.enable_on_start.append(w)
 
 		w = Button(bb, command=self._stopabort, state=DISABLED)
-		addicon(self, w, 'Cancel.gif')
+		addicon(self, w, 'cancel.gif')
 		w.pack(expand=1, fill=Y, side=LEFT)
 		self.balloon.bind(w, "stop run immediately")
 		self.enable_on_start.append(w)

@@ -951,7 +951,7 @@ int dacq_set_mypri(int pri)
     } else {
       result = 0;
     }
-    seteuid(old);
+    seteuid(old);		/* ok to ignore warning */
   } else {
     result = 0;
   }

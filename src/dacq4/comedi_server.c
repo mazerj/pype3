@@ -679,7 +679,7 @@ int ad_in(int chan)
 
 void dig_in()
 {
-  int i, success, last;
+  int i, last;
   unsigned int bits;
 
   if (gotdacq) {
@@ -692,10 +692,10 @@ void dig_in()
     UNLOCK(semid);
   } else {
     if (use8255) {
-      success = comedi_dio_bitfield(comedi_dev,dig_io,PCI_NOWRITEMASK,&bits);
+      comedi_dio_bitfield(comedi_dev,dig_io,PCI_NOWRITEMASK,&bits);
       bits = bits & PCI_READMASK;
     } else {
-      success = comedi_dio_bitfield(comedi_dev,dig_i,ISA_NOWRITEMASK,&bits);
+      comedi_dio_bitfield(comedi_dev,dig_i,ISA_NOWRITEMASK,&bits);
     }
     /* unpack inp word into the first 8 slots of the dacq struct's din array */
     for (i = 0; i < 4; i++) {
@@ -718,7 +718,7 @@ void dig_in()
 void dig_out()
 {
   unsigned int bits = 0;
-  int i, success;
+  int i;
 
   if (gotdacq) {
     return;
@@ -730,9 +730,9 @@ void dig_out()
     }
     if (use8255) {
       bits = bits<<BANK_B;
-      success = comedi_dio_bitfield(comedi_dev,dig_io,PCI_WRITEMASK,&bits);
+      comedi_dio_bitfield(comedi_dev,dig_io,PCI_WRITEMASK,&bits);
     } else {
-      success = comedi_dio_bitfield(comedi_dev,dig_o,ISA_WRITEMASK,&bits);
+      comedi_dio_bitfield(comedi_dev,dig_o,ISA_WRITEMASK,&bits);
     }
   }
 }

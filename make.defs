@@ -4,12 +4,5 @@
 PYPEDIR ?= /usr/local/pype3
 
 ######################################################################
-# where do the netpbm libs live on your machine?
-# redhat/std:
-PBMLIBS = -lpnm -lppm -lpbm -lpgm
-# debian:
-#PBMLIBS = -lnetpbm
-
-######################################################################
 # do as you wish here:
 GLOBAL_CFLAGS = -O -Wall -D_REENTRANT

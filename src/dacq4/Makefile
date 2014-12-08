@@ -41,13 +41,13 @@ dacq.i: dacq.c dacq.h dacq.i.pre
 
 # build extension module using disttools -- the recommended way!
 _dacq.so: dacq.i
-	swig -python dacq.i
-	python setup.py build_ext --inplace
+	@swig -python dacq.i
+	@python setup.py build_ext --inplace
 
 install: _dacq.so $(COMEDI_SERVER)
-	cp dacq.py $(PYPEDIR)/pype
-	cp _dacq.so $(PYPEDIR)/pype
-	if [ -x comedi_server ]; then cp comedi_server $(PYPEDIR)/bin; fi;
+	@cp dacq.py $(PYPEDIR)/pype
+	@cp _dacq.so $(PYPEDIR)/pype
+	@if [ -x comedi_server ]; then cp comedi_server $(PYPEDIR)/bin; fi;
 
 iscandump: iscandump.c
 	cc -o iscandump iscandump.c -lezV24

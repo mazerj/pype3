@@ -215,9 +215,11 @@
 #include <sys/wait.h>
 #include <sys/errno.h>
 #include <math.h>
-#include <sys/io.h>
 #include <sched.h>
 #include <errno.h>
+#ifndef __APPLE__
+# include <sys/io.h>
+#endif
 
 #include "dacqinfo.h"
 #include "psems.h"
@@ -923,6 +925,7 @@ int dacq_seteuid(int uid)
 
 int dacq_set_rt(int rt)
 {
+#ifndef __APPLE__
   struct sched_param p;
   /* change scheduler priority from OTHER to RealTime/RR or vice versa */
 
@@ -937,6 +940,10 @@ int dacq_set_rt(int rt)
     return(1);
   }
   return(0);
+#else
+  // for osx, sched_getparam doesn't seem to exist.. so just ignore calls..
+  return(1);
+#endif
 }
 
 int dacq_set_mypri(int pri)

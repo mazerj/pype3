@@ -1083,7 +1083,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.pause(state=False)
 
 		w = Button(bb, command=self._start_helper, state=DISABLED)
-		addicon(self, w, 'Stop.gif')
+		addicon(self, w, 'stop.gif')
 		w.pack(expand=1, fill=Y, side=LEFT)
 		self.balloon.bind(w, "stop run at end of trial")
 		self.enable_on_start.append(w)

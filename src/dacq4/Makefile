@@ -1,16 +1,22 @@
 include ../../make.defs
 
-#DEBUG = -DDEBUG=1
-#DEBUG = -DDEBUG=0
+UNAME := $(shell uname)
 
-CFLAGS = -O6 -g -Wall $(GLOBAL_CFLAGS) -I$(PYTHONINC) $(DEBUG) -fPIC
-COMEDI_SERVER_OBJS = sigs.o psems.o usbjs.o
+# only try to build the the comedi_server under linux..
+ifeq ($(UNAME), Linux)
+  COMEDI_SERVER = comedi_server
+else
+  COMEDI_SERVER = 
+endif
 
 CC = gcc
+CFLAGS = -O6 -g -Wall $(GLOBAL_CFLAGS) -I$(PYTHONINC) -fPIC
+COMEDI_SERVER_OBJS = sigs.o psems.o usbjs.o
+
 
 all: build install
 
-build: _dacq.so comedi_server
+build: _dacq.so $(COMEDI_SERVER)
 
 sigs.o: sigs.c sigs.h
 	$(CC) $(CFLAGS) -c sigs.c
@@ -38,7 +44,7 @@ _dacq.so: dacq.i
 	swig -python dacq.i
 	python setup.py build_ext --inplace
 
-install: _dacq.so comedi_server
+install: _dacq.so $(COMEDI_SERVER)
 	cp dacq.py $(PYPEDIR)/pype
 	cp _dacq.so $(PYPEDIR)/pype
 	if [ -x comedi_server ]; then cp comedi_server $(PYPEDIR)/bin; fi;

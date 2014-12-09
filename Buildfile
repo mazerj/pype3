@@ -43,11 +43,9 @@ pycompile:
 	    $(PYTHONEXE) $(PYCOMPILE) -q pype || $(PYTHONEXE) $(PYCOMPILE) pype)
 
 clobber: 
-	@echo "Finding temp files for deletion..."
 	@find . -name core -o -name music.raw -o -name \*.pyc | xargs rm -f
-	@echo "Cleaning in SUBDIRS..."
 	@for i in $(SUBDIRS); \
-		do (cd $$i ; echo ...Cleaning $$i ; $(MAKE) clean);\
+		do (cd $$i ; echo Cleaning $$i ... ; $(MAKE) clean);\
 		done
 
 # makedocs requires epydoc (should probably switch to sphinx...)

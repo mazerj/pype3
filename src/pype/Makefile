@@ -32,6 +32,5 @@ build:
 	@echo "nothing to do in `pwd` for build"
 
 clean:
-	(cd ./lib ; $(MAKE) clean)
 	@rm -f *.pyc .*~ prun __init__.py pypeversion.py
 

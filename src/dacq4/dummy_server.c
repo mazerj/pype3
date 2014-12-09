@@ -1,164 +1,9 @@
-/* title:   comedi_server.c
-
+/* title:   dummy_server.c
 ** author:  jamie mazer
 ** created: Wed Jan  8 17:21:15 2003 mazer 
-** info:    shm interface to COMEDI devices
+** info:    shm interface to dummy COMEDI devices
 ** history:
 **
-** Wed Jan  8 17:20:18 2003 mazer 
-**   - based on das16_server.c -- this is driver for the COMEDI
-**     data acq. library/device-driver kit.  It's GENERIC, designed
-**     to work with the ISA & PCI versions of the DAS-1602 card.
-**
-** Sun Mar  9 13:34:54 2003 mazer 
-**   added support for din_changes[] to dig_in()
-**
-** Wed Nov  3 15:02:41 2004 mazer 
-**   added support for the DAS08 board (no 8255!!)
-**
-** Tue Apr  3 08:37:59 2007 mazer 
-**   cleaned up error messages for comedit to make it easier to track
-**   down problems with non-DAS/ComputerBoards cards (like NI-6025E).
-**
-** Tue May  5 15:58:44 2009 mazer 
-**   joystick junk moved into separate JS device in das_common.c
-**
-** Thu Jul 22 12:06:45 2010 mazer 
-**   - looks like only das08 now is really pci-das08.. so pci-das08->das08
-**   - moreover, looks like driver name changed, so for the best..
-**   - also fixed some "signed" to "unsigned" that were probably always wrong..
-**
-******************************************************************************
-**
-**  Wed Sep 22 11:59:30 2010 mazer  -- from das_common.c
-**
-** title:   das_common.c
-** author:  jamie mazer
-** created: Mon Mar  4 16:41:26 2002 mazer 
-** info:    dasXX_server.c common functions
-** history:
-**
-** Thu Apr  4 14:06:25 2002 mazer 
-**   - changed calls to setpriority to also bump scheduler priority up to
-**	realtime (SCHED_RR)
-**
-** Fri Aug 23 16:53:54 2002 mazer 
-**   - Modified timestamp() to use the RDTSC for speed.  At
-**     1 gHz, the 8byte (64bit) counter would overflow in:
-**       (2^64) / (1e9) secs = 1.8e10s, or more than 500 years..
-**     so, I'm assuming overflow is NOT a problem right now..
-**
-** Thu Dec 19 14:03:32 2002 mazer 
-**   added EYELINK_TEST mode
-**
-** Wed Apr 16 10:41:16 2003 mazer 
-**   added parsing of $XXEYELINK_OPTS to allow setting of eyelink
-**   parameters in the pyperc config file...
-**
-** Sun Nov  6 10:06:36 2005 mazer 
-**   added $EYELINK_FILE to save native EDF file during run.
-**
-** Tue Jan 17 11:37:56 2006 mazer 
-**   - added $(CWD)/eyelink.ini file --> supplemental commands for the
-**     eyelink
-**   - made sure stderr messages all contain progname..
-**
-** Mon Jan 23 10:01:22 2006 mazer 
-**   Added handling of FIXWIN.vbias for vertical elongation of the
-**   fixation window.
-**
-** Fri Mar 10 10:08:25 2006 mazer 
-**   Added stub support of a usb joystick or keypad. Right now the
-**   device is detected and initialized, but nothing's done yet
-**   with the signals.
-**
-** Thu Apr 13 09:38:38 2006 mazer 
-**   merged stand-alone iscan_server code into the main event
-**   loop for das_common, so all XXX_server's will be able to
-**   talk to the iscan without competition from a separate
-**   process.
-**
-** Thu May 25 11:40:58 2006 mazer 
-**   changed z from int to float in mainloop() to avoid overflow
-**   errors on (x*x)+(y*y) with ISCAN...
-**
-** Tue Nov 28 16:58:07 2006 mazer 
-**   added support for a ms-resolution alarm that sends interupts
-**   the client/parent process
-**
-** Tue Apr  3 10:39:56 2007 mazer 
-**   added support for "-notracker" mode (for acutes)
-**
-** Fri Jun 15 15:09:05 2007 mazer 
-**   added arange (analog input range) for comedi drivers
-**
-** Thu Dec 18 11:39:36 2008 mazer 
-**   - moved eyelink and iscan specific code into separate files
-**     that get included here:
-**       - iscan.c
-**       - eyelink.c
-**   - reorganized the mainloop to sample each channel only once
-**     and then usleep for a bit to reduce CPU load. original
-**     behavior can be restored by #defining SPIN_SAMPLE (which
-**     averages over the 1ms interval in a tight loop).
-**
-** Tue May  5 14:40:33 2009 mazer 
-**   - removed EYELINK_TEST mode completely..
-**   - changed private XXxxx env vars to XX_xxxx
-**
-**************************************************************************
-** New 'merged' comedi_server notes follow (22-SEP-2010):
-**************************************************************************
-**
-** Wed Sep 22 12:12:25 2010 mazer 
-**   - merged das_common.[ch], iscan.c & eyelink.c directly into this
-**     file
-**  
-** Mon Oct 11 15:19:22 2010 mazer 
-**   - Changed timestamp to return timestamps in microsecs (us) instead
-**     of ms. SHM buffer adbuf_t values are now in us and need to be
-**     divided by 1000 to make things compatible.
-**
-** Fri Oct 15 09:42:32 2010 mazer 
-**   - pruned all hidden getenv() args in favor of proper command line arguments
-**   
-** Wed Oct 20 15:37:43 2010 mazer 
-**   - changed timestamp() to return a double instead of an unsigned long
-**   - adbuf_t (see dacqinfo.h) also changed to double, along with
-**     dacq:dacq_adbuf_t(), which now returns a double instead of an
-**     unsigned long
-**
-** Tue Dec 14 17:24:36 2010 mazer 
-**   - upped sleep time from 0.250ms to 0.750ms and added busy wait
-**     to enforce 1khz sampling
-**
-** Wed Dec 22 09:26:06 2010 mazer 
-**   - store RAW (unsmoothed) eye position in adbuf_x/y, but use
-**     smoothed values for display & fixwins etc..
-**
-** Wed Mar 16 16:03:58 2011 mazer 
-**   - got rid of EYEJOY crap (and changed NONE to 99)
-**
-** Thu Mar 24 12:42:52 2011 mazer 
-**   - pressing buttons 1 and 2 on joystick now sends SIGUSR2 to
-**     pype, which should be caught, withdraw the full screen
-**     window and stop any run in progress.
-**
-** Mon Apr  4 12:18:23 2011 mazer 
-**   - changed iscan code to accept P-CR (fewer bytes) directly
-**     instead of doing subtraction on pype side..
-**
-** Fri Apr  8 09:17:36 2011 mazer 
-**   - added eyenew (adbuf_new[t]) --> this is a boolean indicating
-**     whether or not the eye tracker sample is a "new" sample, or
-**     propagated from the last time point.
-**
-** Tue Apr 26 13:03:58 2011 mazer 
-**   - added support for on-line affine transform matrix
-**
-** Fri Aug 26 16:53:00 2011 mazer 
-**   - added lastadc_chan to reduce load by not sampling any
-**     more channels than necessary.
 */
 
 #include <sys/types.h>
@@ -181,16 +26,20 @@
 #endif
 #include <signal.h>
 #include <math.h>
-#include <comedilib.h>
+//#include <comedilib.h>
 #include <getopt.h>
 
 #define __USE_GNU 1
 #include <sched.h>		/* need __USE_GNU=1 to get CPU_* macros */
 
+#ifdef EZ
 #include <ezV24/ezV24.h>	/* for iscan serial I/O  */
+#endif
+#ifdef SR
 #include <eyelink.h>		/* eyelink API  */
 #include <eyetypes.h>		/* more eyelink API stuff */
 #include <core_expt.h>	/* my_... works with both 32bit & 64bit libs */
+#endif
 
 #include "dacqinfo.h"
 #include "sigs.h"
@@ -220,7 +69,7 @@ static int	semid;
 static double	arange;
 static int	das08 = 0;	/* board is das08? (was pci-das08)*/
 static char	*comedi_devname = "/dev/comedi0";
-static comedi_t *comedi_dev;	/* main handle to comedi lib */
+//static comedi_t *comedi_dev;	/* main handle to comedi lib */
 static int	analog_in = -1;	/* subdevice for analog input */
 static int	use8255;	/* 0 for ISA, 1 for PCI */
 static int	dig_io = -1;	/* combined digital I/O subdevice */
@@ -234,8 +83,12 @@ static int	iscan_x, iscan_y, iscan_p, iscan_new;
 static double	arange = 10.0;
 
 static int	usbjs_dev = -1;	/* usb joystick handle */
+#ifdef SR
 static int	eyelink_camera = -1;  /* eyelink handle */
+#endif
+#ifdef EZ
 static v24_port_t *iscan_port = NULL;	/* iscan handle */
+#endif
 
 static int	debugint = 0;
 
@@ -264,10 +117,12 @@ void perror2(char *s, char *file, int line)
 
 void iscan_halt()
 {
+#ifdef EZ
   if (iscan_port) {
     v24ClosePort(iscan_port);
     fprintf(stderr, "%s: closed iscan_port\n", progname);
   }
+#endif
 }
 
 #ifdef PYPE_INTERNAL_CR
@@ -280,6 +135,7 @@ void iscan_halt()
 
 int iscan_read()
 {
+#ifdef EZ
   static unsigned char buf[6];
   static short *ibuf = NULL;
   int n, k, c;
@@ -318,114 +174,15 @@ int iscan_read()
     }
   }
   return(1);
-}
-
-int OLD_iscan_read()
-{
-  static unsigned char buf[25];
-  static int c, bp = -1;
-  static short *ibuf;
-  static int lastc = -1;
-  static int first_time = 1;
-  static int first_fail = 1;
-
-  /* initialize the read buffer */
-  if (bp < 0) {
-    for (bp = 0; bp < sizeof(buf); bp++) {
-      buf[bp] = 0;
-    }
-    bp = -1;
-    ibuf = (short *)buf;
-    iscan_x = ISCAN_NODATA;
-    iscan_y = ISCAN_NODATA;
-    iscan_p = 0;
-    iscan_new = 0;
-  }
-
-  if ((c = v24Getc(iscan_port)) < 0) {
-    if (first_fail) {
-      fprintf(stderr, "%s: warning can't read iscan (check baudrate!)\n",
-	      progname);
-      first_fail = 0;
-    }
-    return(0);
-  }
-
-  // each packet begins with a 'DD', wait to get two D's in a row
-  if (c == 'D') {
-    if (lastc == 'D') {
-      lastc = -1;
-      bp = 0;
-    } else {
-      lastc = c;
-    }
-    if (first_time) {
-      first_time = 1;
-      fprintf(stderr, "%s: iscan synced up!\n", progname);
-      first_time = 0;
-    }
-    return(1);
-  }
-  // char is part of the data payload
-  if (bp >= 0) {
-    buf[bp] = 0x00ff & c;
-    if (bp == (ISCAN_PACKETLEN - 1)) {
-      // payload is complete -- packet ends
-
-      // Thu Apr 28 11:16:30 2011 mazer 
-      // originally PUPIL and CR data were collected independently
-      // and 0's indicated pupil lock lost, this isn't the case
-      // for PUP-CR mode.. there's kind of a potential problem here,
-      // in that you can't really tell when the track's lost. But
-      // we'd rather have 120hz data for psychophysics..
-      //
-      // Actually, there's a slight problem -- even int PUP-CR mode,
-      // the tracker returns a 0,0 when signal lock is lost. Technically
-      // this means that looking at 0,0's not possible..
-
-#ifdef PYPE_INTERNAL_CR
-      if (ibuf[0] || ibuf[1]) {
-        // 2+8 bytes from iscan:  <PUP_H1,CR_H1,PUP_V1,CR_V1>
-	iscan_x = ibuf[0] - ibuf[2] + 4096;
-	iscan_y = ibuf[1] - ibuf[3] + 4096;
-	iscan_p = 1000;
-	iscan_new = 1;
-	return(1);
-      } else {
-	iscan_x = ISCAN_NODATA;	// out of range or no pupil lock
-	iscan_y = ISCAN_NODATA;
-	iscan_p = 0;
-	iscan_new = 1;
-	return(1);
-      }
 #else
-      if (ibuf[0] && ibuf[1]) {
-	// 2+4 bytes from iscan: <PUP_H1-CR,PUP_V1-CR>  (better 120hz perf)
-	iscan_x = ibuf[0] + 128; /* 128 gets things centered ~0 */
-	iscan_y = (2*ibuf[1]) + 128;
-	iscan_p = 1000;
-	iscan_new = 1;
-	return(1);
-      } else {
-	// both params are 0 means tracking/lock lost..
-	iscan_x = ISCAN_NODATA;
-	iscan_y = ISCAN_NODATA;
-	iscan_p = 0;
-	iscan_new = 1;
-	return(1);
-      }
+  return(0);
 #endif
-    } else {
-      if (++bp > (ISCAN_PACKETLEN - 1)) {
-	fprintf(stderr, "iscan packet overrun, reseting.\n");
-      }
-    }
-  }
-  return(1);
+
 }
 
 void eyelink_init(char *ip_address, char *el_opts, char *el_cam)
 {
+#ifdef SR
   char *p, *q, buf[100];
   extern char *__progname;
   char *saved;
@@ -501,10 +258,12 @@ void eyelink_init(char *ip_address, char *el_opts, char *el_cam)
 
   fprintf(stderr, "%s eyelink_init connected ok\n", progname);
   itracker = EYELINK;
+#endif
 }
 
 void eyelink_halt()
 {
+#ifdef SR
   if (itracker == EYELINK) {
     stop_recording();
     set_offline_mode();
@@ -512,34 +271,13 @@ void eyelink_halt()
     fprintf(stderr, "%s: closed eyelink connection\n", progname);
     itracker = ANALOG;
   }
+#endif
 }
 
 int eyelink_read(float *x, float *y,  float *p,
 		 unsigned int *t, int *new)
 {
-  static FSAMPLE sbuf;
-  int e;
-
-  if (! eyelink_is_connected()) {
-    // send parent process an interupt..
-    eyelink_halt();
-    fprintf(stderr, "%s: warning, lost eyelink connection\n", progname);
-    dacq_data->int_class = INT_FATAL;
-    dacq_data->int_arg = 1;
-    kill(pypepid, SIGUSR1);
-  }
-
-  if ((e = eyelink_newest_float_sample(&sbuf)) < 0) {
-    return(0);
-  } else {
-    /* there are new data about eye positions */
-    *t = (unsigned int) sbuf.time;
-    *x = sbuf.px[eyelink_camera];		/* xpos, RIGHT/LEFT */
-    *y = sbuf.py[eyelink_camera];		/* ypos, RIGHT/LEFT */
-    *p = sbuf.pa[eyelink_camera];		/* pupil area, RIGHT/LEFT */
-    *new = (e == 1);
-    return(1);
-  }
+  return(1);
 }
 
 // for cards with 8255 digital i/o (autodetectged), we have banks
@@ -556,187 +294,28 @@ int eyelink_read(float *x, float *y,  float *p,
 
 int comedi_init()
 {
-  const char *devname;
-  comedi_range *r;
-  int n;
-
-  if (!(comedi_dev = comedi_open(comedi_devname))) {
-    fprintf(stderr, "%s: can't find comedi board.\n", progname);
-    return(0);
-  }
-  devname = comedi_get_driver_name(comedi_dev);
-  
-  fprintf(stderr, "%s: found DAQ device board=<%s> driver=<%s>\n",
-	  progname, comedi_get_board_name(comedi_dev), devname);
-
-  if (strncmp(devname, "das16", 5) == 0) {
-    fprintf(stderr, "%s: 8255 disabled.\n", progname);
-    use8255 = 0;
-  } else if (strncmp(devname, "das08", 5) == 0) {
-    use8255 = 0;
-    das08 = 1;
-    fprintf(stderr, "%s: 8255 disabled.\n", progname);
-    fprintf(stderr, "%s: detected das08 -- using comedi_data_read_delayed\n",
-	    progname);
-  } else {
-    fprintf(stderr, "%s: 8255 enabled.\n", progname);
-    use8255 = 1;
-  }
-
-  // find which comedi subdevices correspond the the facilities we need
-  analog_in  = comedi_find_subdevice_by_type(comedi_dev,COMEDI_SUBD_AI,0);
-  if (analog_in == -1) {
-    comedi_perror("analog_in");
-  } else {
-    fprintf(stderr, "%s: analog input OK\n", progname);
-  }
-
-  n = comedi_get_n_channels(comedi_dev, analog_in);
-  fprintf(stderr, "%s: %d analog inputs available.\n", progname, n);
-  n = comedi_get_n_ranges(comedi_dev, analog_in, 0);
-  fprintf(stderr, "%s: %d analog ranges available.\n", progname, n);
-  if (n > 1) {
-    // try to find the +/- 10V range.  the 4th parm means 'volts'.
-    // BW: I THINK THIS ASSUMES ALL CHANNELS ARE THE SAME
-    //analog_range = comedi_find_range(comedi_dev,analog_in,0,0,-10,10);
-    analog_range = comedi_find_range(comedi_dev,analog_in,0,0,-arange,arange);
-    if (analog_range == -1) {
-      comedi_perror("analog_range");
-    }
-  } else {
-    // DAS08 doesn't have programmable ranges -- use 0
-    analog_range = 0;
-  }
-  r = comedi_get_range(comedi_dev, analog_in, 0, analog_range);
-  fprintf(stderr, "%s: analog range (%.1f%s)-(%.1f%s)\n", progname,
-	  r->min, (r->unit==UNIT_volt) ? "V" : "??",
-	  r->max, (r->unit==UNIT_volt) ? "V" : "??");
-
-  if (use8255) {
-    dig_io = comedi_find_subdevice_by_type(comedi_dev,COMEDI_SUBD_DIO,0);
-    if (dig_io == -1) {
-      comedi_perror("dig_io");
-    } else {
-      fprintf(stderr, "%s: digital IO OK\n", progname);
-      dig_i = -1;
-      dig_o = -1;
-    }
-  } else {
-    dig_i  = comedi_find_subdevice_by_type(comedi_dev,COMEDI_SUBD_DI,0);
-    if (dig_i == -1) {
-      comedi_perror("dig_i");
-    } else {
-      fprintf(stderr, "%s: digital input OK\n", progname);
-    }
-    dig_o = comedi_find_subdevice_by_type(comedi_dev,COMEDI_SUBD_DO,0);
-    if (dig_o == -1) {
-      comedi_perror("dig_o");
-    } else {
-      fprintf(stderr, "%s: digital output OK\n", progname);
-    }
-  }
-
-  if (use8255) {
-    // configure digital I/O bank A as input, and bank B as output
-    if (comedi_dio_config(comedi_dev,dig_io,BANK_A,COMEDI_INPUT) &&
-	comedi_dio_config(comedi_dev,dig_io,BANK_B,COMEDI_OUTPUT)) {
-      return(1);
-    } else {
-      return(0);
-    }
-  }
-  return(1);
+  fprintf(stderr, "%s: init comedi dummy driver\n", progname);
+  return(0);
 }
 
 int ad_in(int chan)
 {
-  lsampl_t sample;
-  int success;
-
-  if (gotdacq) {
-    return(0);
-  } else {
-    // need to set aref correctly: either AREF_GROUND or AREF_COMMON
-    if (das08) {
-      // das08 is screwy -- needs time for multiplexer to settle:
-      success = comedi_data_read_delayed(comedi_dev,analog_in,
-					 chan,analog_range,AREF_GROUND,
-					 &sample, 0);
-      if (success < 0) {
-	comedi_perror("comedi_data_read_delayed");
-      }
-    } else {
-      success = comedi_data_read(comedi_dev,analog_in,
-				 chan,analog_range,AREF_GROUND,
-				 &sample);
-      if (success < 0) {
-	comedi_perror("comedi_data_read");
-      }
-    }
-    // note: lsampl is an unsigned int; we are casting to int. it won't
-    // matter for 12 bit cards
-    return((int)sample);
-  }
+  return(0);
 }
 
 void dig_in()
 {
-  int i, last;
-  unsigned int bits;
-
-  if (gotdacq) {
-    // just lock these down -- polarities are
-    // from the old taks -- hardcoded to work in NAF...
-    LOCK(semid);
-    dacq_data->din[0] = 0;	/* monkey bar NOT down */
-    dacq_data->din[2] = 1;	/* user button 2 NOT down */
-    dacq_data->din[3] = 1;	/* user button 1 NOT down */
-    UNLOCK(semid);
-  } else {
-    if (use8255) {
-      comedi_dio_bitfield(comedi_dev,dig_io,PCI_NOWRITEMASK,&bits);
-      bits = bits & PCI_READMASK;
-    } else {
-      comedi_dio_bitfield(comedi_dev,dig_i,ISA_NOWRITEMASK,&bits);
-    }
-    /* unpack inp word into the first 8 slots of the dacq struct's din array */
-    for (i = 0; i < 4; i++) {
-      LOCK(semid);
-      last = dacq_data->din[i];
-      dacq_data->din[i] = ((bits & 1<<i) != 0);
-      if (dacq_data->din[i] != last) {
-	dacq_data->din_changes[i] += 1;
-	if (dacq_data->din_intmask[i]) {
-	  dacq_data->int_class = INT_DIN;
-	  dacq_data->int_arg = i;
-	  kill(pypepid, SIGUSR1);
-	}
-      }
-      UNLOCK(semid);
-    }
-  }
+  // just lock these down -- polarities are
+  // from the old taks -- hardcoded to work in NAF...
+  LOCK(semid);
+  dacq_data->din[0] = 0;	/* monkey bar NOT down */
+  dacq_data->din[2] = 1;	/* user button 2 NOT down */
+  dacq_data->din[3] = 1;	/* user button 1 NOT down */
+  UNLOCK(semid);
 }
 
 void dig_out()
 {
-  unsigned int bits = 0;
-  int i;
-
-  if (gotdacq) {
-    return;
-  } else {
-    for (i = 0; i < 8 && i < NDIGOUT; i++) {
-      LOCK(semid);
-      bits = bits | (dacq_data->dout[i] << i);
-      UNLOCK(semid);
-    }
-    if (use8255) {
-      bits = bits<<BANK_B;
-      comedi_dio_bitfield(comedi_dev,dig_io,PCI_WRITEMASK,&bits);
-    } else {
-      comedi_dio_bitfield(comedi_dev,dig_o,ISA_WRITEMASK,&bits);
-    }
-  }
 }
 
 static void sigusr2_handler(int signum)
@@ -812,6 +391,7 @@ int mainloop_init()
 
 void iscan_init(char *dev)
 {
+#ifdef EZ
   if ((iscan_port = v24OpenPort(dev, V24_NO_DELAY | V24_NON_BLOCK)) == NULL) {
     fprintf(stderr, "%s: iscan_init can't open \"%s\"\n.", progname, dev);
     exit(1);
@@ -820,7 +400,22 @@ void iscan_init(char *dev)
 
   itracker = ISCAN;
   fprintf(stderr, "%s: opened iscan_port (%s)\n", progname, dev);
+#endif
 }
+
+#ifdef __MACH__
+#include <sys/time.h>
+#define CLOCK_MONOTONIC 0
+//clock_gettime is not implemented on OSX
+int clock_gettime(int clk_id, struct timespec* t) {
+    struct timeval now;
+    int rv = gettimeofday(&now, NULL);
+    if (rv) return rv;
+    t->tv_sec  = now.tv_sec;
+    t->tv_nsec = now.tv_usec * 1000;
+    return 0;
+}
+#endif
 
 double timestamp(int init) /* return elapsed time in us */
 {
@@ -841,20 +436,6 @@ double timestamp(int init) /* return elapsed time in us */
 
 static int locktocore(int corenum) /* -1 for no lock; else corenum (0,1..) */
 {
-  /* 0 for first core etc.. -1 for no lock */
-  cpu_set_t mask;
-  int result = 1;
-
-  if (corenum >= 0) {
-    CPU_ZERO(&mask);
-    CPU_SET(corenum, &mask);
-    result = sched_setaffinity(0, sizeof(mask), &mask);
-    if (result < 0) {
-      return(-1);
-    } else {
-      return(corenum);
-    }
-  }
   return(-1);
 }
 
@@ -1424,7 +1005,7 @@ int main(int ac, char **av)
   }
 
   mainloop();
-  comedi_close(comedi_dev);
+  //comedi_close(comedi_dev);
   if (dacq_data != NULL) {
     shmdt(dacq_data);
     fprintf(stderr, "%s: SHM released\n", progname);

@@ -13,7 +13,9 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
-#include <linux/joystick.h>
+#ifndef __APPLE__
+# include <linux/joystick.h>
+#endif
 
 #include "usbjs.h"
 
@@ -32,6 +34,7 @@ void usbjs_close(int fd)
 int usbjs_query(int fd, int *buttonp, int *number, int *value,
 		unsigned long *time)
 {
+#ifndef __APPLE__
   struct js_event e;
 
   if (read(fd, &e, sizeof(struct js_event)) < 0) {
@@ -63,4 +66,7 @@ int usbjs_query(int fd, int *buttonp, int *number, int *value,
     }
     return(1);
   }
+#else
+  return(1);
+#endif
 }

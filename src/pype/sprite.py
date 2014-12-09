@@ -285,9 +285,13 @@ class FrameBuffer(object):
 		if fullscreen:
 			self.flags = self.flags | HWSURFACE | FULLSCREEN
 		elif not frame:
-			self.flags = self.flags | NOFRAME
+            if sys.platform.startswith('darwin'):
+				# for some reason, it appears that NOFRAME hides window
+				# completely under OSX, but this only happens from pypenv,
+				# it doesn't happen from straight python2.7...
+				self.flags = self.flags | NOFRAME
 
-		if sys.platform=='linux2':
+		if sys.platform.startswith('linux'):
 			os.environ['__GL_SYNC_TO_VBLANK'] = '1' # nvidia specific!
 
 		if dpy:

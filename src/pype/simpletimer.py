@@ -12,63 +12,71 @@ for sthis
 
 """
 
-import os
-import ctypes
+import os, sys
 
-class timespec(ctypes.Structure):
-	_fields_ = [
-		('tv_sec', ctypes.c_long),
-		('tv_nsec', ctypes.c_long)
-	]
+if sys.platform.startswith('darwin'):
+    import ctypes
+    
+    # src:
+    #   http://twistedmatrix.com/trac/attachment/ticket/2424/linux_and_osx.py
+    libSystem = ctypes.CDLL('libSystem.dylib', use_errno=True)
+    CoreServices = ctypes.CDLL(
+        '/System/Library/Frameworks/CoreServices.framework/CoreServices',
+        use_errno=True)
+    mach_absolute_time = libSystem.mach_absolute_time
+    mach_absolute_time.restype = ctypes.c_uint64
+    AbsoluteToNanoseconds = CoreServices.AbsoluteToNanoseconds
+    AbsoluteToNanoseconds.restype = ctypes.c_uint64
+    AbsoluteToNanoseconds.argtypes = [ctypes.c_uint64]
+    
+    def _get_monotonic_ms():
+        return AbsoluteToNanoseconds(mach_absolute_time()) * 1e-6
+else:
+    # linux/posix: 
+    import ctypes
+    class timespec(ctypes.Structure):
+        _fields_ = [
+            ('tv_sec', ctypes.c_long),
+            ('tv_nsec', ctypes.c_long)
+        ]
 
-librt = ctypes.CDLL('librt.so.1', use_errno=True)
-clock_gettime = librt.clock_gettime
-clock_gettime.argtypes = [ctypes.c_int, ctypes.POINTER(timespec)]
-CLOCK_MONOTONIC = 1 # see <linux/time.h>
+    librt = ctypes.CDLL('librt.so.1', use_errno=True)
+    clock_gettime = librt.clock_gettime
+    clock_gettime.argtypes = [ctypes.c_int, ctypes.POINTER(timespec)]
+    CLOCK_MONOTONIC = 1 # see <linux/time.h>
+
+    def get__monotonic_ms():
+        ts = timespec()
+        clock_gettime(CLOCK_MONOTONIC, ctypes.pointer(ts))
+        return int(round((ts.tv_sec + (ts.tv_nsec * 1e-9)) * 1000.0))
 
 class Timer(object):
-	"""Like Timer class, but uses built in clock"""
-	def __init__(self, on=True):
-		self._t = timespec()
-		if on:
-			self.reset()
-		else:
-			self.disable()
+    """Like Timer class, but uses built in clock"""
+    def __init__(self, on=True):
+        if on:
+            self.reset()
+        else:
+            self.disable()
 
-	def disable(self):
+    def disable(self):
         self._start_at = None
 
-	def reset(self):
-		"""Reset timer.
+    def reset(self):
+        """Reset timer.
 
-		:return: nothing
+        :return: nothing
 
-		"""
-		self._start_at = self._monotonic_time_ms()
+        """
+        self._start_at = _get_monotonic_ms()
 
-	def ms(self):
-		"""Query timer.
+    def ms(self):
+        """Query timer.
 
-		:return: (ms) elapsed time
+        :return: (ms) elapsed time
 
-		"""
+        """
         try:
-            return self._monotonic_time_ms() - self._start_at
+            return _get_monotonic_ms() - self._start_at
         except TypeError:
             return 0
 
-	def _monotonic_time_ms(self):
-		clock_gettime(CLOCK_MONOTONIC, ctypes.pointer(self._t))
-		return int(round((self._t.tv_sec + (self._t.tv_nsec * 1e-9)) * 1000.0))
-
-		if clock_gettime(CLOCK_MONOTONIC, ctypes.pointer(self._t)) != 0:
-			errno_ = ctypes.get_errno()
-			raise OSError(errno_, os.strerror(errno_))
-		return int(round((self._t.tv_sec + (self._t.tv_nsec * 1e-9)) * 1000.0))
-
-def exact_time_sec():
-    t = timespec()
-    if clock_gettime(CLOCK_MONOTONIC, ctypes.pointer(t)) != 0:
-        errno_ = ctypes.get_errno()
-        raise OSError(errno_, os.strerror(errno_))
-    return t.tv_sec + (t.tv_nsec * 1e-9)

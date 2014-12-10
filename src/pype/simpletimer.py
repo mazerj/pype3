@@ -31,7 +31,7 @@ if sys.platform.startswith('darwin'):
     
     def _get_monotonic_ms():
         return AbsoluteToNanoseconds(mach_absolute_time()) * 1e-6
-else:
+elif sys.platform.startswith('linux'):
     # linux/posix: 
     import ctypes
     class timespec(ctypes.Structure):
@@ -49,6 +49,12 @@ else:
         ts = timespec()
         clock_gettime(CLOCK_MONOTONIC, ctypes.pointer(ts))
         return int(round((ts.tv_sec + (ts.tv_nsec * 1e-9)) * 1000.0))
+else:
+    # fallback to using plain old time.time() and converting from s to ms
+    import time
+    def get__monotonic_ms():
+        return int(round(time.time() * 1000.0))
+    
 
 class Timer(object):
     """Like Timer class, but uses built in clock"""

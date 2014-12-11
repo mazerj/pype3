@@ -193,6 +193,7 @@ if __show_version:
 try:
     from importer import importer
 except ImportError:
+    # warning: this can also happen because tkinter's not installed!
     sys.stderr.write('Failed to import <importer> module -- check PATH?\n')
     sys.exit(1)
 
@@ -268,8 +269,9 @@ else:
             sys.stderr.write("pype: can't 'mkdir %s'\n" % subjectrc())
             sys.exit(1)
 
-    if os.system('chmod -R a+rw /dev/snd 2>/dev/null') > 0:
-        sys.stderr.write("pyperun: warning -- can't access /dev/snd\n")
+    if sys.platform.startswith('linux'):
+        if os.system('chmod -R a+rw /dev/snd 2>/dev/null') > 0:
+            sys.stderr.write("pyperun: warning -- can't access /dev/snd\n")
 
     args = sys.argv[1:]
 	try:

@@ -16,7 +16,11 @@ pype process. Not really for general use.
 
 import pwd
 import os
-from dacq import *
+import sys
+if sys.platform.startswith('linux'):
+	from dacq import *
+else:
+	from dacqfallback import *
 
 def _realuid():
 	"""Get real/effective UID.

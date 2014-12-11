@@ -56,3 +56,13 @@ Automatically generated documentation is available from the [Mazer lab web site]
 # Subversion
 
 The file [svn-to-git.txt](https://github.com/mazerj/pype3/blob/master/svn-to-git.txt) contains a table for mappings from Subversion revision numbers (stored in pype files etc) to git hashes. You can use this to retrieve old versions of pype that match the data collection period.
+
+# Notes for mac -- use macports instead of fink!
+
+- sudo port install py27-scipy
+- sudo port -f activate python27
+- sudo port select --set python python27
+- sudo port install py-matplotlib
+- sudo port install py-game
+- sudo port install py-matplotlib
+- sudo port install py-opengl

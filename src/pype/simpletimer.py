@@ -29,7 +29,7 @@ if sys.platform.startswith('darwin'):
     AbsoluteToNanoseconds.restype = ctypes.c_uint64
     AbsoluteToNanoseconds.argtypes = [ctypes.c_uint64]
     
-    def _get_monotonic_ms():
+    def get_monotonic_ms():
         return AbsoluteToNanoseconds(mach_absolute_time()) * 1e-6
 elif sys.platform.startswith('linux'):
     # linux/posix: 
@@ -45,16 +45,16 @@ elif sys.platform.startswith('linux'):
     clock_gettime.argtypes = [ctypes.c_int, ctypes.POINTER(timespec)]
     CLOCK_MONOTONIC = 1 # see <linux/time.h>
 
-    def get__monotonic_ms():
+    def get_monotonic_ms():
         ts = timespec()
         clock_gettime(CLOCK_MONOTONIC, ctypes.pointer(ts))
         return int(round((ts.tv_sec + (ts.tv_nsec * 1e-9)) * 1000.0))
 else:
     # fallback to using plain old time.time() and converting from s to ms
     import time
-    def get__monotonic_ms():
+    def get_monotonic_ms():
         return int(round(time.time() * 1000.0))
-    
+
 
 class Timer(object):
     """Like Timer class, but uses built in clock"""
@@ -73,7 +73,7 @@ class Timer(object):
         :return: nothing
 
         """
-        self._start_at = _get_monotonic_ms()
+        self._start_at = get_monotonic_ms()
 
     def ms(self):
         """Query timer.
@@ -82,7 +82,7 @@ class Timer(object):
 
         """
         try:
-            return _get_monotonic_ms() - self._start_at
+            return get_monotonic_ms() - self._start_at
         except TypeError:
             return 0
 

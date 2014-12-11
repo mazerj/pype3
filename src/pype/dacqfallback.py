@@ -1,15 +1,10 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
-"""Wrapper for dacq fallback module.
-
-Import this instead of dacq and it'll automatically provide
-a set of pure-pythong fallback definitions.
+"""Fallback dacq module for non-comedi systems (ie, osx)
 
 """
 
-"""Revision History
-
-"""
+from simpletimer import get_monotonic_ms
 
 def dacq_start(server, tracker, port, elopt, elcam, swapxy, usbjs, force):
     return 1
@@ -33,8 +28,7 @@ def dacq_eye_read(which):
     return 1
 
 def dacq_ts():
-    # return long..
-    return 1
+    return get_monotonic_ms()
 
 def dacq_usts():
     return 1.0

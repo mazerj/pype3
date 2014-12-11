@@ -420,16 +420,14 @@ from events import *
 from guitools import *
 from pypeerrors import *
 from pypedata import *
-
-try:
+if sys.platform.startswith('linux'):
 	from dacq import *
-except:
+else:
 	from dacqfallback import *
-	
 import pypeversion
 
 import prand
-prand.validate(exit=True)
+prand.validate(exit=True)				# validate the mers-sieve..
 
 def MYNAME(level=0):
 	"""Get name of calling function (or, if level=1: caller of caller, etc.
@@ -2191,35 +2189,36 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		# NOTE: No attempt is made to make sure the built in commands
 		# don't conflict with user commands.
 
-		if self.config.iget('PUPILXTALK', default=-666) != -666:
-			Logger("pype: change PUPILXTALK to EYELINK_XTALK in Config file\n")
-			raise PypeStartupError
+		if sys.platform.startswith('linux'):
+			if self.config.iget('PUPILXTALK', default=-666) != -666:
+				Logger("pype: change PUPILXTALK to EYELINK_XTALK in Config file\n")
+				raise PypeStartupError
 
-		eyelink_opts = self.config.get('EYELINK_OPTS')
-		if len(eyelink_opts) > 0:
-			eyelink_opts = eyelink_opts + ':'
-		eyelink_opts = eyelink_opts + ('pupil_crosstalk_fixup=%s' %
-									   self.config.get('EYELINK_XTALK'))
-		eyelink_opts = eyelink_opts + ':active_eye=both'
-		eyelink_opts = eyelink_opts + ':link_sample_data=PUPIL,AREA'
-		eyelink_opts = eyelink_opts + ':heuristic_filter=0 0'
-		eyelink_opts = eyelink_opts + ':pup_size_diameter=NO'
+			eyelink_opts = self.config.get('EYELINK_OPTS')
+			if len(eyelink_opts) > 0:
+				eyelink_opts = eyelink_opts + ':'
+			eyelink_opts = eyelink_opts + ('pupil_crosstalk_fixup=%s' %
+										   self.config.get('EYELINK_XTALK'))
+			eyelink_opts = eyelink_opts + ':active_eye=both'
+			eyelink_opts = eyelink_opts + ':link_sample_data=PUPIL,AREA'
+			eyelink_opts = eyelink_opts + ':heuristic_filter=0 0'
+			eyelink_opts = eyelink_opts + ':pup_size_diameter=NO'
 
-		s = dacq_start('comedi_server',
-					   '--tracker=%s' % self.config.get('EYETRACKER'),
-					   '--port=%s' % self.config.get('EYETRACKER_DEV'),
-					   '--elopt="%s"' % eyelink_opts,
-					   '--elcam=%s' % self.config.get('EYELINK_CAMERA'),
-					   '--swapxy=%d' % self.config.iget('SWAP_XY'),
-					   '--usbjs=%s' % self.config.get('USB_JS_DEV'), 0)
+			s = dacq_start('comedi_server',
+						   '--tracker=%s' % self.config.get('EYETRACKER'),
+						   '--port=%s' % self.config.get('EYETRACKER_DEV'),
+						   '--elopt="%s"' % eyelink_opts,
+						   '--elcam=%s' % self.config.get('EYELINK_CAMERA'),
+						   '--swapxy=%d' % self.config.iget('SWAP_XY'),
+						   '--usbjs=%s' % self.config.get('USB_JS_DEV'), 0)
 
-		# <0: fatal error -- exit regardless of force..
-		# =0: overridable error, ok to retry..
-		# =1: success
-		if s <= 0:
-			Logger("init_dacq: comedi_server can't start.\n")
-			Logger("init_dacq: try running 'pypekill' or 'pypekill -s'\n")
-			raise PypeStartupError
+			# <0: fatal error -- exit regardless of force..
+			# =0: overridable error, ok to retry..
+			# =1: success
+			if s <= 0:
+				Logger("init_dacq: comedi_server can't start.\n")
+				Logger("init_dacq: try running 'pypekill' or 'pypekill -s'\n")
+				raise PypeStartupError
 
 		# Tue Jan  8 15:08:12 2013 mazer
 		#	- This basically works -- the lag between the comedi
@@ -2826,6 +2825,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					self.dotrialtag()
 
 			# process keys from the framebuffer window
+			xxx = self.fb.checkkeys()
+			if len(xxx):
+				print type(xxx), len(xxx), xxx
+			
 			if 'f8' in self.fb.checkkeys():
 				self.eyeshift(zero=1)
 				self.con('framebuffer:f8')

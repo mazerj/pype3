@@ -57,12 +57,18 @@ Automatically generated documentation is available from the [Mazer lab web site]
 
 The file [svn-to-git.txt](https://github.com/mazerj/pype3/blob/master/svn-to-git.txt) contains a table for mappings from Subversion revision numbers (stored in pype files etc) to git hashes. You can use this to retrieve old versions of pype that match the data collection period.
 
-# Notes for mac -- use macports instead of fink!
+# Notes for mac
 
-- sudo port install py27-scipy
-- sudo port -f activate python27
-- sudo port select --set python python27
-- sudo port install py-matplotlib
-- sudo port install py-game
-- sudo port install py-matplotlib
-- sudo port install py-opengl
+1. Everything works except the actual data collect (comedi_server).
+
+2. Best bet is to use python2.7 from fink. First install fink
+following instructions on the distribution site. Then the needed
+packages:
+
+    % sudo fink install scipy-py27
+    % sudo fink install pygame-py27
+    % sudo fink install swig
+
+3. Then you should be able to follow the regular install instructions.
+
+4. Everything seems to work, but hasn't been extensively tested yet.

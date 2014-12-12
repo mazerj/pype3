@@ -6,3 +6,10 @@ PYPEDIR ?= /usr/local/pype3
 ######################################################################
 # do as you wish here:
 GLOBAL_CFLAGS = -O -Wall -D_REENTRANT
+
+
+######################################################################
+# don't change anythin below this line
+UNAME := $(shell uname)
+
+

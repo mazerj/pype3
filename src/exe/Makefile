@@ -1,7 +1,5 @@
 include ../../make.defs
 
-UNAME := $(shell uname)
-
 all: clean install
 
 install: exe

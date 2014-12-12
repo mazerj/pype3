@@ -294,6 +294,11 @@ class FrameBuffer(object):
 		if sys.platform.startswith('linux'):
 			os.environ['__GL_SYNC_TO_VBLANK'] = '1' # nvidia specific!
 
+		if sys.platform.startswith('darwin'):
+			# force use of x11 driver for osx (needed to get keyboard input)
+			os.environ['SDL_VIDEODRIVER'] = 'x11'
+			
+
 		if dpy:
 			self.gui_dpy = os.environ['DISPLAY']
 			self.fb_dpy = dpy
@@ -406,7 +411,7 @@ class FrameBuffer(object):
 
 	def screen_close(self):
 		# hide screen by making it tiny (homebrew iconify)
-		self.screen = pygame.display.set_mode((1,1), self.flags|NOFRAME)
+		self.screen = pygame.display.set_mode((1,1), self.flags)
 
 	def __del__(self):
 		"""FrameBuffer cleanup.

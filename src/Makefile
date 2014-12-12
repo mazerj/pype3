@@ -4,7 +4,15 @@ DACQDIR = dacq4
 PYDIR   = pype
 SUBDIRS = exe p2m
 
-install: install-subdirs install-py install-dacq
+ifeq ($(UNAME), Linux)
+  INSTALL-DACQ=install-dacq
+  BUILD-DACQ=build-dacq
+else
+  INSTALL-DACQ=
+  BUILD-DACQ=
+endif
+
+install: install-subdirs install-py $(INSTALL-DACQ)
 
 install-shared: install-subdirs install-py-shared
 
@@ -36,7 +44,7 @@ install-dacq:
 install-dummydacq:
 	@(cd $(DUMMYDIR); $(MAKE) install)
 
-build: build-dacq build-subdirs
+build: $(BUILD-DACQ) build-subdirs
 
 build-subdirs:
 	@for i in $(SUBDIRS); \

@@ -1,13 +1,6 @@
 include ../../make.defs
 
-UNAME := $(shell uname)
-
-# only try to build the the comedi_server under linux..
-ifeq ($(UNAME), Linux)
-  COMEDI_SERVER = comedi_server
-else
-  COMEDI_SERVER = dummy_server
-endif
+COMEDI_SERVER = comedi_server
 
 CC = gcc
 CFLAGS = -O6 -g -Wall $(GLOBAL_CFLAGS) -I$(PYTHONINC) -fPIC

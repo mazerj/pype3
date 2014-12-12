@@ -2191,7 +2191,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		if sys.platform.startswith('linux'):
 			if self.config.iget('PUPILXTALK', default=-666) != -666:
-				Logger("pype: change PUPILXTALK to EYELINK_XTALK in Config file\n")
+				Logger("pype: change PUPILXTALK to EYELINK_XTALK "
+					   "in Config file\n")
 				raise PypeStartupError
 
 			eyelink_opts = self.config.get('EYELINK_OPTS')
@@ -2263,16 +2264,17 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		if self.fb.set_gamma(g):
 			Logger("pype: gamma set to %f\n" % g)
 		else:
-			Logger("pype: hardware does not support gamma correction\n")
+			Logger("pype: warning, no support for gamma correction\n")
 
-		# turn off the xserver's audible bell and screensaver!
-		d = self.config.get('SDLDPY')
-		if os.system("xset -display %s b off" % d):
-			Logger("Can't run xset to turn off bell!\n")
-		if os.system("xset -display %s s off" % d):
-			Logger("Can't run xset to turn off screen saver!\n")
-		if os.system("xset -display %s -dpms" % d):
-			Logger("Can't run xset to turn off DPMS!\n")
+		if sys.platform.startswith('linux'):
+			# turn off the xserver's audible bell and screensaver!
+			d = self.config.get('SDLDPY')
+			if os.system("xset -display %s b off" % d):
+				Logger("Can't run xset to turn off bell!\n")
+			if os.system("xset -display %s s off" % d):
+				Logger("Can't run xset to turn off screen saver!\n")
+			if os.system("xset -display %s -dpms" % d):
+				Logger("Can't run xset to turn off DPMS!\n")
 
 		return fps
 
@@ -2825,10 +2827,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					self.dotrialtag()
 
 			# process keys from the framebuffer window
-			xxx = self.fb.checkkeys()
-			if len(xxx):
-				print type(xxx), len(xxx), xxx
-			
 			if 'f8' in self.fb.checkkeys():
 				self.eyeshift(zero=1)
 				self.con('framebuffer:f8')

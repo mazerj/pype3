@@ -842,6 +842,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					   command=self.warn_trial_incorrect)
 		mb.addmenuitem('Misc', 'command', label='where am i?',
 					   command=self._whereami)
+		mb.addmenuitem('Misc', 'command', label='do gamma calibration',
+                       command=self._do_gamma_cal)
 
 		mb.addmenu('Set', '', '')
 		mb.addmenuitem('Set', 'checkbutton', label='show trace window',
@@ -1436,6 +1438,14 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self.server_thread.daemon = True
 			self.server_thread.start()
 
+    def _do_gamma_cal(self):
+        import gammacal
+        try:
+            gammacal.Calibrater().run(self)
+            app.showtestpat()
+        except:
+            warn(MYNAME(), 'Missing pyusb or DTP94!')
+    
 	def open_elog(self):
 		# open elog for this animal, today w/o asking for confirmation
 		animal = self.sub_common.queryv('full_subject')

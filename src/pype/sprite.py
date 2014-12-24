@@ -271,6 +271,7 @@ class FrameBuffer(object):
 		self._font = None
 		self.xscale = xscale
 		self.yscale = yscale
+        self.gamma = (1.0, 1.0, 1.0)
 		if not width or not height:
 			Logger('sprite: must specify display width and height\n')
 		else:
@@ -297,7 +298,6 @@ class FrameBuffer(object):
 		if sys.platform.startswith('darwin'):
 			# force use of x11 driver for osx (needed to get keyboard input)
 			os.environ['SDL_VIDEODRIVER'] = 'x11'
-			
 
 		if dpy:
 			self.gui_dpy = os.environ['DISPLAY']
@@ -509,6 +509,7 @@ class FrameBuffer(object):
 		"""
 		if g is None: g = r
 		if b is None: b = r
+        self.gamma = (r,g,b)
 		return pygame.display.set_gamma(r, g, b)
 
 	def cursor(self, on=0):
@@ -1130,9 +1131,9 @@ class ScaledSprite(object):
 		if rwidth and not dwidth:
 			dwidth, dheight = rwidth, rheight
 
-		if not fname and rwidth < 1.0:
+ 		if not image and not fname and rwidth < 1.0:
 			rwidth = int(round(dwidth * rwidth))
-		if not fname and rheight < 1.0:
+		if not image and not fname and rheight < 1.0:
 			rheight = int(round(dheight * rheight))
 			
 		if rwidth > dwidth:
@@ -1154,7 +1155,7 @@ class ScaledSprite(object):
 		elif image:
 			import copy
 			# make a copy of the source sprite/image; like image data,
-			# if a real size is specififed, resize image to the
+			# if a real size is specified, resize image to the
 			# specified real size. display size can be use to scale it
 			# back up...
 			try:
@@ -1166,7 +1167,7 @@ class ScaledSprite(object):
 				self.im = image.convert(32, pygame.SRCALPHA)
 				self.userdict = {}
 			if rwidth:
-				self.im = pygame.transform.scale(self.im, (rwidth, rheight))
+                self.im = pygame.transform.scale(self.im, (rwidth, rheight))
 			setalpha = 0
 		else:
 			# new image from scratch of specified real size
@@ -1816,10 +1817,16 @@ class ScaledSprite(object):
 		:return: new sprite
 
 		"""
+        if self.xscale != 1.0 or self.yscale != 1.0:
+			Logger("Can't subimage scaled sprites yet!\n")
+            return None
+
 		if center:
 			x = self.X(x) - (w/2)
 			y = self.Y(y) - (h/2)
+
 		return ScaledSprite(image=self.im.subsurface((x, y, w, h)),
+                            rwidth=int(round(w)), rheight=int(round(h)),
 							x=self.x, y=self.y, dx=self.dx, dy=self.dy,
 							depth=self.depth, fb=self.fb, on=self._on)
 

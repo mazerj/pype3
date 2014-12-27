@@ -77,6 +77,11 @@ packages:
 
 As of Dec 2014, pype has a built-in gamma calibration module derrived
 from the standalone [optix2](https://github.com/mazerj/optix2). This
-uses X-Rite [MonacoOPTIX DTP94](http://www.xrite.com/product_overview.aspx?ID=607&Action=Support) USB device to measure Yxy values of the)
+uses X-Rite [MonacoOPTIX DTP94](http://www.xrite.com/product_overview.aspx?ID=730&Action=support) USB device to measure Yxy values of the)
 frame buffer and then fit gamma functions (and the full color gamut,
 if you want it).
+
+Note: The DTP94 is no longer available, but there is a recommended
+replacement (i1Display Pro). If anyone tests this for protocol
+compatibility, please let me know.
+

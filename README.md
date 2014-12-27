@@ -55,7 +55,7 @@ Automatically generated documentation is available from the [Mazer lab web site]
 
 # Subversion
 
-The file [svn-to-git.txt](https://github.com/mazerj/pype3/blob/master/svn-to-git.txt) contains a table for mappings from Subversion revision numbers (stored in pype files etc) to git hashes. You can use this to retrieve old versions of pype that match the data collection period.
+For existing users, the file [svn-to-git.txt](https://github.com/mazerj/pype3/blob/master/svn-to-git.txt) contains a table for mappings from Subversion revision numbers (stored in pype files etc) to git hashes. You can use this to retrieve old versions of pype that match the data collection period.
 
 # Notes for mac
 
@@ -72,3 +72,11 @@ packages:
 3. Then you should be able to follow the regular install instructions.
 
 4. Everything seems to work, but hasn't been extensively tested yet.
+
+# Gamma calibration
+
+As of Dec 2014, pype has a built-in gamma calibration module derrived
+from the standalone [optix2](https://github.com/mazerj/optix2). This
+uses X-Rite MonacoOPTIX DTP94 USB device to measure Yxy values of the
+frame buffer and then fit gamma functions (and the full color gamut,
+if you want it).

@@ -1440,11 +1440,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
     def _do_gamma_cal(self):
         import gammacal
-        try:
-            gammacal.Calibrater().run(self)
-            app.showtestpat()
-        except:
-            warn(MYNAME(), 'Missing pyusb or DTP94!')
+        gammacal.calibrate(self)
     
 	def open_elog(self):
 		# open elog for this animal, today w/o asking for confirmation
@@ -2270,9 +2266,14 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		fps = self.fb.calcfps(duration=250)
 
 		self.fb.app = self
-		g = self.config.fget('GAMMA')
-		if self.fb.set_gamma(g):
-			Logger("pype: gamma set to %f\n" % g)
+        gstr = self.config.get('GAMMA')
+        g = map(float, gstr.split(','))
+        print gstr
+        print g
+        if len(g) == 1:
+            g = [g, g, g]
+		if self.fb.set_gamma(g[0], g[1], g[2]):
+			Logger("pype: gamma set to %s\n" % (g,))
 		else:
 			Logger("pype: warning, no support for gamma correction\n")
 

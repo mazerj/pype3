@@ -10,7 +10,7 @@ TIMEOUT    = 20000
 
 import sys, string
 
-class OptixMissing(Exception): pass
+class OptixMissingDevice(Exception): pass
 
 class Optix():
     def __init__(self):

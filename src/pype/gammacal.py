@@ -10,18 +10,25 @@ from sprite import *
 import guitools
 import optix
 
+STEPSIZE=40
+
 class Calibrater():
     def __init__(self):
         self.dtp = optix.Optix()
 
-    def run(self, app, rgb=True, lcd=1, filename=None):
+    def run(self, app, rgb=True, lcd=1, filename=None, validate=False):
+        # note: when not in full screen mode, the mouse must be in
+        # the framebuffer window for gamma to take effect!
         if rgb:
             masks = ((0,1,1,1), (1,1,0,0), (2,0,1,0), (3,0,0,1),)
         else:
             masks = ((0,1,1,1),)
 
         if filename is None:
+            # save calibration file in current directory
             filename = '%s.gammacal' % app._gethostname()
+            if validate:
+                filename = 'v-' + filename
             
         if ask('gamma cal', 'Calibrate offsets?', ['Yes', 'No']) == 0:
             ask('gamma cal', 'Place device on opaque surface.', ['Ok'])
@@ -34,7 +41,12 @@ class Calibrater():
         # save current gamma
         gamma = app.fb.gamma
         try:
-            app.fb.set_gamma(1.0, 1.0, 1.0)
+            if not validate:
+                app.fb.set_gamma(1.0, 1.0, 1.0)
+            else:
+                warn('Calibrater',
+                     'In windowed mode, mouse must stay in window!', wait=1)
+                
             outfile = open(filename, 'w')
             outfile.write("%% lcd=%s\n" % lcd)
             outfile.write("%% columns: chan|r|g|b|Y|x|y|\n")
@@ -42,7 +54,7 @@ class Calibrater():
 
             d = []
             app.con("RGB -> Yxy", color='red')
-            for l in range(255, 0, -10):
+            for l in range(255, 0, -STEPSIZE):
                 for (color,rw,gw,bw) in masks:
                     r, g, b = rw*l, gw*l, bw*l
                     app.fb.clear(color=(r, g, b))
@@ -53,19 +65,21 @@ class Calibrater():
                     outfile.flush()
                     d.append(row)
                     app.con("%s -> %s" % ((r,g,b), (Y,x,y)))
+                    print "%s -> %s" % ((r,g,b), (Y,x,y))
             # estimate and save gamma value(s)
-            g = estimateGamma(data=np.array(d), plot=False)
+            g = estimateGamma(data=np.array(d), plot=True)
             outfile.write("%% gamma: %s\n" % (g,))
             outfile.close()
 
             # restore old gamma
         finally:
-            app.fb.set_gamma(gamma[0], gamma[1], gamma[2]);
+            if not validate:
+                app.fb.set_gamma(gamma[0], gamma[1], gamma[2]);
         app.idlefn()
         app.con('gamma(Lrgb): %s' % (g,), color='red')
         return g
 
-def estimateGamma(data=None, calfile=None, plot=False):
+def estimateGamma(data=None, calfile=None, plot=False, wait=False):
     """Fit gamma function to calibration data.
 
     data: matrix of calibration results, each row should be:
@@ -77,7 +91,11 @@ def estimateGamma(data=None, calfile=None, plot=False):
     """
     import numpy as np
     from scipy.optimize import curve_fit
-    import matplotlib.pyplot as pyplot
+
+    if plot and not wait:
+        import pylab as plt
+    else:
+        import matplotlib.pyplot as plt
 
     if data is None:
         data = []
@@ -86,11 +104,15 @@ def estimateGamma(data=None, calfile=None, plot=False):
                 data.append(map(float, l.split()))
         data = np.array(data)
 
-
     c = 'krgb'
     g = []
     p0 = None
     lines = []
+    if plot:
+        if not wait:
+            plt.ion()
+        plt.subplot(1,2,1)
+        
     for n in range(4):
         if n == 0:
             col = 1
@@ -108,22 +130,47 @@ def estimateGamma(data=None, calfile=None, plot=False):
             if plot:
                 xx = np.linspace(min(x),max(x), 100)
                 yy = params[0]*(xx**params[2])+params[1]
-                l = pyplot.plot(x, y, c[n]+'o', xx, yy, c[n]+'-')
+                l = plt.plot(x, y, c[n]+'o', xx, yy, c[n]+'-')
                 lines.append(l[1])
-                pyplot.hold(1)
+                plt.hold(1)
     if plot:
-        pyplot.hold(0)
-        pyplot.xlabel('computer output [0-255]')
-        pyplot.ylabel('luminance [cd/m^2]')
-        pyplot.legend(lines, map(lambda x:'%s'%x, g), loc=0)
+        plt.hold(0)
+        plt.xlabel('computer output [0-255]')
+        plt.ylabel('luminance [cd/m^2]')
+        plt.legend(lines, map(lambda x:'%s'%x, g), loc=0)
         if calfile:
-            pyplot.title(calfile)
+            plt.title(calfile)
+
+        # plot color gamut
+        plt.subplot(1,2,2)
+        x = data[:,5].squeeze()
+        y = data[:,6].squeeze()
+        plt.plot(x, y, 'k.');
+        plt.hold(1)
+        a = np.nonzero(x == np.max(x))[0]
+        b = np.nonzero(y == np.max(y))[0]
+        plt.plot([x[a[0]], x[b[0]]], [y[a[0]], y[b[0]]], 'k-')
+        a = np.nonzero(x == np.max(x))[0]
+        b = np.nonzero(y == np.min(y))[0]
+        plt.plot([x[a[0]], x[b[0]]], [y[a[0]], y[b[0]]], 'k-')
+        a = np.nonzero(y == np.max(y))[0]
+        b = np.nonzero(y == np.min(y))[0]
+        plt.plot([x[a[0]], x[b[0]]], [y[a[0]], y[b[0]]], 'k-')
+        plt.axis('equal')
+        plt.xlabel('CIE x')
+        plt.ylabel('CIE y')        
+        plt.title('gamut')
+        
+    if plot and not wait:
+        plt.draw()
+    elif plot:
+        plt.show()
     return g
 
-def calibrate(app):
+def calibrate(app, validate=False):
     try:
         import usb
-        Calibrater().run(app)
+        Calibrater().run(app, validate=validate)
         app.showtestpat()
     except ImportError:
         app.showtestpat()
@@ -134,6 +181,8 @@ def calibrate(app):
     
 
 if __name__ == '__main__':
-    print estimateGamma(calfile=sys.argv[1], plot=1)
-    import matplotlib.pyplot as pyplot
-    pyplot.show()
+    import pylab
+    if len(sys.argv) < 2:
+        sys.stderr.write('usage: %s calibrationfile\n' % sys.argv[0])
+        sys.exit(1)
+    print estimateGamma(calfile=sys.argv[1], plot=True, wait=1)

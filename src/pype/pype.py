@@ -842,8 +842,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					   command=self.warn_trial_incorrect)
 		mb.addmenuitem('Misc', 'command', label='where am i?',
 					   command=self._whereami)
-		mb.addmenuitem('Misc', 'command', label='do gamma calibration',
-                       command=self._do_gamma_cal)
+		mb.addmenuitem('Misc', 'command', label='run gamma calibration',
+                       command=lambda: self._do_gamma_cal(validate=False))
+		mb.addmenuitem('Misc', 'command', label='check gamma calibration',
+                       command=lambda: self._do_gamma_cal(validate=True))
+		mb.addmenuitem('Misc', 'command', label='plot gamma calibration',
+                       command=lambda: self._plot_gamma_cal())
 
 		mb.addmenu('Set', '', '')
 		mb.addmenuitem('Set', 'checkbutton', label='show trace window',
@@ -1438,9 +1442,15 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self.server_thread.daemon = True
 			self.server_thread.start()
 
-    def _do_gamma_cal(self):
+    def _do_gamma_cal(self, validate):
         import gammacal
-        gammacal.calibrate(self)
+        gammacal.calibrate(self, validate=validate)
+
+    def _plot_gamma_cal(self):
+        import gammacal, filebox
+		file, mode = filebox.Open(initialdir=os.getcwd(),
+                                  pattern='*.gammacal', initialfile='')
+        gammacal.estimateGamma(calfile=file, plot=True)
     
 	def open_elog(self):
 		# open elog for this animal, today w/o asking for confirmation
@@ -2268,8 +2278,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.fb.app = self
         gstr = self.config.get('GAMMA')
         g = map(float, gstr.split(','))
-        print gstr
-        print g
         if len(g) == 1:
             g = [g, g, g]
 		if self.fb.set_gamma(g[0], g[1], g[2]):

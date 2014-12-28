@@ -10,7 +10,8 @@ from sprite import *
 import guitools
 import optix
 
-STEPSIZE=40
+# resolution (in units of 0-255)
+STEPSIZE=10
 
 class Calibrater():
     def __init__(self):

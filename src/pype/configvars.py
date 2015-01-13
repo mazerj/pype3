@@ -193,7 +193,7 @@ def defaults(srcfile=None):
     # experimental options
     c.set('MONITOR', 0,
           doc='dump html tally file in SUBJECTDIR/monitor.html')
-    c.set('HTTP_SERVER', 0,
+    c.set('HTTP_SERVER', 1,
           doc='enable integrated HTTP server?')
     c.set('HTTP_PORT', 8080,
           doc='port number for built in HTTP server')

@@ -1440,9 +1440,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		if self.config.iget('HTTP_SERVER'):
             self.server = HTTPServer(('', self.config.iget('HTTP_PORT')),
                                     PypeHandler)
-			self.server_thread = threading.Thread(target=self.server.serve_forever)
+			self.server_thread = \
+              threading.Thread(target=self.server.serve_forever)
 			self.server_thread.daemon = True
 			self.server_thread.start()
+            Logger('http: started server on port %d\n' % \
+                   self.config.iget('HTTP_PORT'))
         else:
             self.server = None
 
@@ -1827,6 +1830,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		self.tallyw.clear()
 		self.tallyw.write(s)
+
+        self.last_tally = s
 
 		return s		
 
@@ -4968,13 +4973,32 @@ class PypeHandler(BaseHTTPRequestHandler):
 		self.end_headers()
         
         cmd = self.path
-		if cmd.startswith('/status'):
+        
+		if cmd == '/':
+            h = socket.gethostname().split('.')[0]
+            s = string.replace(getapp().last_tally, '\n', '<br>')
+			self.wfile.write("""<META HTTP-EQUIV="refresh" CONTENT="5">\n""")
+            self.wfile.write("""<em>pype on %s at %s\n</em>\n""" % \
+                             (h, time.strftime('%c')))
+            self.wfile.write("""<hr>\n""")
+            if getapp().running:
+                self.wfile.write("""RUNNING: %s<br>\n""" % getapp().task_name)
+            else:
+                self.wfile.write("""IDLE<br>\n""")
+            self.wfile.write("""<hr>\n""")
+            self.wfile.write("""<tt>\n%s</tt>\n""" % s)
+		elif cmd ==  '/status':
 			self.wfile.write('ALIVE\n');
-		elif cmd.startswith('/info'):
+		elif cmd ==  '/info':
 			self.wfile.write('running=%d\n' % (PypeApp().running,))
 		else:
 			self.wfile.write('Unknown command: %s\n' % cmd);
 		return
+
+	def log_message(self, format, *args):
+        # stop loggin to stdout
+        return
+    
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

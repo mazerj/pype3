@@ -2288,7 +2288,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
         gstr = self.config.get('GAMMA')
         g = map(float, gstr.split(','))
         if len(g) == 1:
-            g = [g, g, g]
+            g = [g[0], g[0], g[0]]
 		if self.fb.set_gamma(g[0], g[1], g[2]):
 			Logger("pype: gamma set to %s\n" % (g,))
 		else:

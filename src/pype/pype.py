@@ -373,6 +373,7 @@ import glob
 import cPickle
 import math
 import numpy as np
+from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 # THIS IS REALLY UGLY -- THERE ARE TWO ISSUES:
 #  1. matplotlib-0.9.9 uses some sort of cache file that's not compatible
@@ -1436,11 +1437,14 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		if self.psych:
 			self.fb.screen_close()
 
-		if 0:
-			self.server = PypeServer('', 5666)
-			self.server_thread = threading.Thread(target=asyncore.loop)
+		if self.config.iget('HTTP_SERVER'):
+            self.server = HTTPServer(('', self.config.iget('HTTP_PORT')),
+                                    PypeHandler)
+			self.server_thread = threading.Thread(target=self.server.serve_forever)
 			self.server_thread.daemon = True
 			self.server_thread.start()
+        else:
+            self.server = None
 
     def _do_gamma_cal(self, validate):
         import gammacal
@@ -2638,6 +2642,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			Logger('pype: terminal save state.\n')
 			self._savestate()			# Do this NOW in case of lockup on exit
 			Logger('pype: user shutdown/close -- terminating.\n')
+            if self.server:
+                self.server.shutdown()
 			self.terminate = 1
 
 	def ts(self):
@@ -4955,35 +4961,20 @@ def show_about(file, timeout=None):
 	if timeout:
 		w.after(timeout, w.destroy)
 
-class PypeServer(asyncore.dispatcher):
-	def __init__(self, host, port):
-		import socket
-
-		asyncore.dispatcher.__init__(self)
-		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		self.bind(('', port))
-		self.listen(1)
-		Logger('pype: listening for connections on port %d\n' % port)
-
-	def handle_accept(self):
-		# when we get a client connection start a dispatcher for that
-		# client
-		socket, address = self.accept()
-		sys.stderr.write('pype: connection from %s\n' % repr(address))
-		PypeHandler(socket)
-
-class PypeHandler(asyncore.dispatcher_with_send):
-	def handle_read(self):
-		packet = self.recv(1024)
-		cmd = packet.upper()
-		if cmd.startswith('STATUS'):
-			self.send('ALIVE\n');
-			self.close()
-		elif cmd.startswith('INFO'):
-			self.send('running=%d\n' % (PypeApp().running,))
+class PypeHandler(BaseHTTPRequestHandler):
+	def do_GET(self):
+        self.send_response(200)
+		self.send_header('Content-type','text/html')
+		self.end_headers()
+        
+        cmd = self.path
+		if cmd.startswith('/status'):
+			self.wfile.write('ALIVE\n');
+		elif cmd.startswith('/info'):
+			self.wfile.write('running=%d\n' % (PypeApp().running,))
 		else:
-			self.send('? unknown command\n');
+			self.wfile.write('Unknown command: %s\n' % cmd);
+		return
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

@@ -189,6 +189,15 @@ def defaults(srcfile=None):
 	c.set('ELOG', 1,
 		  doc='enable/disable use of elog api/interface')
 
+	#####################################################
+    # experimental options
+    c.set('MONITOR', 0,
+          doc='dump html tally file in SUBJECTDIR/monitor.html')
+    c.set('HTTP_SERVER', 0,
+          doc='enable integrated HTTP server?')
+    c.set('HTTP_PORT', 8080,
+          doc='port number for built in HTTP server')
+
 	return c
 
 def defaults_show():

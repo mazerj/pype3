@@ -1438,14 +1438,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self.fb.screen_close()
 
 		if self.config.iget('HTTP_SERVER'):
-            self.server = HTTPServer(('', self.config.iget('HTTP_PORT')),
-                                    PypeHandler)
-			self.server_thread = \
-              threading.Thread(target=self.server.serve_forever)
-			self.server_thread.daemon = True
-			self.server_thread.start()
-            Logger('http: started server on port %d\n' % \
-                   self.config.iget('HTTP_PORT'))
+            self.server = PypeHTTPServer(self)
+            self.server.start()
         else:
             self.server = None
 
@@ -2306,7 +2300,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		return fps
 
-	def _gethostname(self):
+	def _gethostname(self, fqdn=False):
 		"""Safe version of socket.gethostname().
 
 		:return: first part of socket.gethostname(), if a hostname is
@@ -2314,9 +2308,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		"""
 		try:
-			return socket.gethostname().split('.')[0]
+            if fqdn:
+                return socket.getfqdn()
+            else:
+                return socket.gethostname().split('.')[0]
 		except:
-			return 'NOHOST'
+			return 'no-host'
 
 	def _tallyfile(self, save=1):
 		"""load/save tallyfile
@@ -4973,13 +4970,15 @@ class PypeHandler(BaseHTTPRequestHandler):
 		self.end_headers()
         
         cmd = self.path
+        #print 'cmd: <%s>' % cmd
         
 		if cmd == '/':
             h = socket.gethostname().split('.')[0]
-            s = string.replace(getapp().last_tally, '\n', '<br>')
+            s = string.replace(getapp().last_tally, '\n', '<br>\n')
 			self.wfile.write("""<META HTTP-EQUIV="refresh" CONTENT="5">\n""")
-            self.wfile.write("""<em>pype on %s at %s\n</em>\n""" % \
-                             (h, time.strftime('%c')))
+            self.wfile.write("""<link rel="stylesheet" href="style.css">\n""")
+            self.wfile.write("""<h1>pype on %s</h1>\n""" % (h,))
+            self.wfile.write("""<h2>%s</h1>\n""" % (time.strftime('%c'),))
             self.wfile.write("""<hr>\n""")
             if getapp().running:
                 self.wfile.write("""RUNNING: %s<br>\n""" % getapp().task_name)
@@ -4989,6 +4988,9 @@ class PypeHandler(BaseHTTPRequestHandler):
             self.wfile.write("""<tt>\n%s</tt>\n""" % s)
 		elif cmd ==  '/status':
 			self.wfile.write('ALIVE\n');
+		elif cmd ==  '/style.css':
+            import style
+			self.wfile.write('%s\n' % style.style);
 		elif cmd ==  '/info':
 			self.wfile.write('running=%d\n' % (PypeApp().running,))
 		else:
@@ -4996,9 +4998,37 @@ class PypeHandler(BaseHTTPRequestHandler):
 		return
 
 	def log_message(self, format, *args):
-        # stop loggin to stdout
+        # stop logging to stdout
         return
-    
+
+class PypeHTTPServer():
+    def __init__(self, app):
+        self.app = app
+        self.server = None
+
+    def start(self):
+        self.server = HTTPServer(('', self.app.config.iget('HTTP_PORT')),
+                                 PypeHandler)
+        self.server_thread = threading.Thread(target=self.non_int_serve_forever)
+        self.server_thread.daemon = True
+        self.server_thread.start()
+        Logger('http: started server at http://%s:%d\n' % \
+               (self.app._gethostname(fqdn=True),
+                self.app.config.iget('HTTP_PORT')))
+
+    def shutdown(self):
+        self.server.shutdown()
+
+    def non_int_serve_forever(self, poll_interval=0.5):
+        # prevent signals (SIGALRM and stuff from comedi_server etc
+        # from interupting select call
+        while 1:
+            try:
+                self.server.serve_forever()
+                break
+            except:
+                pass
+        
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

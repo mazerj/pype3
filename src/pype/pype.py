@@ -373,7 +373,6 @@ import glob
 import cPickle
 import math
 import numpy as np
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 # THIS IS REALLY UGLY -- THERE ARE TWO ISSUES:
 #  1. matplotlib-0.9.9 uses some sort of cache file that's not compatible
@@ -1711,27 +1710,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			self._history(type[0])
 			s1 = self._tally(type=type)
 			s2 = self._runstats_update(resultcode=type)
-
-			# by default -- keep running stats is ~/pyperc/monitor.html
-			# set MONITOR=0 to turns this feature off.
-			if self.config.iget('MONITOR', 1):
-				fn = subjectrc('monitor.html')
-				if fn is not None:
-					open(fn, 'w').write("""
-<HTML>\n
- <HEAD>\n
-  <TITLE>\n
-   %s tally
-  </TITLE>\n
-  <META HTTP-EQUIV="refresh" CONTENT="3">
-</HEAD>\n
-<H3>Current run</H1>
-<PRE>%s</PRE>\n
-<H3>Task and History</H1>
-<PRE>%s</PRE>\n
-</HTML>\n""" % (self.sub_common.queryv('full_subject'), s2, s1))
-
-			
 
 	def get_result(self, nback=1):
 		"""Get the nth to last saved trial result code.
@@ -4962,6 +4940,8 @@ def show_about(file, timeout=None):
 	w.update_idletasks()
 	if timeout:
 		w.after(timeout, w.destroy)
+
+from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 class PypeHandler(BaseHTTPRequestHandler):
 	def do_GET(self):

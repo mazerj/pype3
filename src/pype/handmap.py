@@ -202,13 +202,7 @@ class _Probe(object):
 			del self.s
 			self.s = None
 
-	def pp(self):
-		# Tue Mar  7 15:44:49 2006 mazer
-		# this little bug-fixer is no longer needed -- the grating
-		# functions were fixed today!
-		#	a = -(self.a-90)+180
-		#	a1 = a % 180
-
+	def infostr(self):
 		angle = ((self.a % 180), (self.a % 180)+180)
 		try:
 			color = string.join(map(lambda x:"%d"%x, self.colorshow),',')
@@ -480,6 +474,7 @@ class _Probe(object):
 			# new sprite, redraw the probe
 			self.showprobe(x=x, y=y, redraw=1)
 		else:
+			# no change, just update position
 			self.showprobe(x=x, y=y, redraw=0)
 
 		if self.major_ax:
@@ -522,7 +517,7 @@ class _Probe(object):
                                                    width=1+(4*c))
 
 		if self.showinfo:
-			s = self.pp()
+			s = self.infostr()
 		else:
 			s = "  h: show info"
         if 1:
@@ -541,7 +536,7 @@ def _key_handler(app, c, ev):
 	p = app.hmapstate.probe
 
 	if c == 'p':
-		warn('handmap', p.pp(), grab=0, astext=1)
+		warn('handmap', p.infostr(), grab=0, astext=1)
 	elif c == 'z':
 		p.lock = not p.lock
 	elif c == 'h':

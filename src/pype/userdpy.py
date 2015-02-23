@@ -901,7 +901,7 @@ class UserDisplay(object):
 
 		"""
 
-		# first clear previsou displaylist icons
+		# first clear previous displaylist icons
 		for icon in self._displaylist_icons:
 			self.icon(icon)
 

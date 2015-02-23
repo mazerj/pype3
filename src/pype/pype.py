@@ -1949,22 +1949,29 @@ class PypeApp(object):					# !SINGLETON CLASS!
 							command=self.loadtask)
 
 	def make_toolbar(self, parent):
+        import imp
+        
 		if self.config.get('TOOLS', None) is None:
 			return
 
 		toolbar = None
-		for tool in self.config.get('TOOLS').split(';'):
-			if posixpath.exists(tool):
-				d = os.path.abspath(os.path.dirname(tool))
+		for tool in self.config.get('TOOLS').split(':'):
+            try:
 				t = os.path.basename(tool).replace('.py','')
+                file, fullpath, descr = imp.find_module(t)
+                d = string.join(fullpath.split('/')[:-1],'/')
 				if toolbar is None:
-					toolbar = Frame(parent, borderwidth=1, relief=RIDGE)
-					toolbar.pack(fill=Y, padx=10)
-				b = Button(toolbar, text=t,
-						   background='orange',
-						   command=lambda s=self, t=t, d=d:s.loadtask(t,d))
+                    
+					toolbar = Frame(parent, borderwidth=2)
+					toolbar.pack(anchor=CENTER, padx=10, pady=10)
+				b = Button(toolbar, text=t[:3],
+						   background='lightgreen',
+                           font=('Courier', 8),
+						   command=lambda s=self, t=t, d=d: s.loadtask(t, d))
 				b.pack(side=LEFT)
-				self.balloon.bind(b, 'quick load '+tool)
+				self.balloon.bind(b, d)
+            except ImportError:
+                pass
 
 	def prevtask(self):
 		if len(self.recent) > 1:

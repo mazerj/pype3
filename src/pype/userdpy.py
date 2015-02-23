@@ -934,9 +934,30 @@ class UserDisplay(object):
 																image=im))
 						else:
 							# square bounding box for sprite
-							ii.append(self.icon(s.x, s.y, s.dw, s.dh, type='box',
-												color=s.icolor, fill=s.ifill))
+                            if s.rotation:
+                                for i in self.rrect(s):
+                                    ii.append(i)
+                            else:
+                                ii.append(self.icon(s.x, s.y, s.dw, s.dh, type='box',
+                                                    color=s.icolor, fill=s.ifill))
 					for i in ii: self._displaylist_icons.append(i)
+
+    def rrect(self, s):
+        import numpy as np
+        h2 = s.h/2.
+        w2 = s.w/2.
+        x = np.array([s.x-w2, s.x+w2, s.x+w2, s.x-w2, s.x-w2])
+        y = np.array([s.y-h2, s.y-h2, s.y+h2, s.y+h2, s.y-h2])
+        t = np.arctan2(y-s.y, x-s.x)-(np.pi*(90.-s.rotation)/180.)
+        r = np.hypot(y-s.y, x-s.x)
+        x = r * np.cos(t) + s.x
+        y = r * np.sin(t) + s.y
+        tags = []
+        for n in range(1,len(x)):
+			(x0, y0) = self.cart2canv((x[n-1], y[n-1]))
+			(x1, y1) = self.cart2canv((x[n], y[n]))
+            tags.append(self.canvas.create_line(x0,y0,x1,y1, width=1, fill='blue'))
+        return tags
 
 	def icon(self, x=None, y=None, w=5, h=5, text=None, color='black',
 			 type='box', dash=None, r=5, fill=''):

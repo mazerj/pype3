@@ -1961,15 +1961,14 @@ class PypeApp(object):					# !SINGLETON CLASS!
                 file, fullpath, descr = imp.find_module(t)
                 d = string.join(fullpath.split('/')[:-1],'/')
 				if toolbar is None:
-                    
 					toolbar = Frame(parent, borderwidth=2)
 					toolbar.pack(anchor=CENTER, padx=10, pady=10)
 				b = Button(toolbar, text=t[:3],
-						   background='lightgreen',
+						   background='white',
                            font=('Courier', 8),
 						   command=lambda s=self, t=t, d=d: s.loadtask(t, d))
 				b.pack(side=LEFT)
-				self.balloon.bind(b, d)
+				self.balloon.bind(b, fullpath)
             except ImportError:
                 pass
 

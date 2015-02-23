@@ -2725,7 +2725,17 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.eyeset(xoff=x, yoff=y)
 		self.encode(EYESHIFT)
 
-	def idlefn(self, ms=None, update=1, toplevel=None, fast=None):
+    def mainloop(self):
+        while not self.terminate:
+            try:
+                self._allowabort = 0
+                self.idlefn()
+            except UserAbort:
+                Logger('pype: mainloop caught abort\n');
+                pass
+        
+
+	def idlefn(self, ms=None, update=1, fast=None):
 		"""Idle function -- call when there's nothing to do to update GUI.
 
 		The idle function -- this function should be call periodically

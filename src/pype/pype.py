@@ -730,9 +730,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			Logger('pype: set MONW, MONW & VIEWDIST in %s\n' % cfile)
 			raise PypeStartupError
 
-		#self.tallycount = {}
-		#state = self._loadstate()
-
 		self.terminate = 0
 		self.running = 0
 		self._startfn = None
@@ -1017,9 +1014,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.ical = ParamTable(ical, icalp,
 							   file='%s-%s-ical.par' % (hostname, subject(),),
 							   loadable=0)
-
-		self.tallycount = {}
-		state = self._loadstate()
 
 		# JAM 07-feb-2003: Compute ppd values based on current setup.
 		# Then place these in the rig menu automatically.
@@ -1426,6 +1420,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.recording = 0
 		self.record_state(0)
 
+		self.tallycount = {}
+        self._loadstate()            
+
 		self.migrate_pypestate()
 
 		self._testpat = None
@@ -1442,6 +1439,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
             self.server.start()
         else:
             self.server = None
+            
 
     def _do_gamma_cal(self, validate):
         import gammacal
@@ -2263,7 +2261,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
         if len(g) == 1:
             g = [g[0], g[0], g[0]]
 		if self.fb.set_gamma(g[0], g[1], g[2]):
-			Logger("pype: gamma set to %s\n" % (g,))
+			Logger("pype: gamma set to (%.1f,%.1f,%.1f)\n" % tuple(g))
 		else:
 			Logger("pype: warning, no support for gamma correction\n")
 
@@ -2326,10 +2324,12 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.rig_common.save()
 		self.sub_common.save()
 		self.ical.save()
+        print 'xxx'
 		self._tallyfile(save=1)
 
 	def _loadstate(self):
 		# rig,sub,ical etc are automatically loaded by the ptable object..
+        print 'yyy'
 		self._tallyfile(save=0)
 
 	def _runstats_update(self, clear=None, resultcode=None):

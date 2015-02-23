@@ -1152,7 +1152,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				   command=lambda s=self: s._tally(cleartask=1)).pack(side=LEFT)
 		self.tallyw = LogWindow(tally, bg='gray90')
 		self._runstats_update(clear=1)
-		self._tally(type=None)
 
 		f = Frame(itrack1)
 		f.pack(expand=0, fill=X, side=TOP)
@@ -1422,6 +1421,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		self.tallycount = {}
         self._loadstate()            
+		self._tally(type=None)
 
 		self.migrate_pypestate()
 
@@ -2324,12 +2324,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.rig_common.save()
 		self.sub_common.save()
 		self.ical.save()
-        print 'xxx'
 		self._tallyfile(save=1)
 
 	def _loadstate(self):
 		# rig,sub,ical etc are automatically loaded by the ptable object..
-        print 'yyy'
 		self._tallyfile(save=0)
 
 	def _runstats_update(self, clear=None, resultcode=None):

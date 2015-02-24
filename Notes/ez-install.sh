@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Looks like Ubuntu/Mint no longer provides the libezV24 library, so
+# Looks like Ubuntu/Mint/debian no longer provides the libezV24 library, so
 # this will quickly compile and install the library using a tweaked
 # version of the sources (makefile fixed!)
 #
@@ -10,7 +10,7 @@
 
 D=`pwd`
 mkdir /tmp/$$ && cd /tmp/$$
-tar xfz $D/mint-libezV24-0.1.3.tar.gz
+tar xfz $D/fixed-libezV24-0.1.3.tar.gz
 cd libez*
 pwd
 make

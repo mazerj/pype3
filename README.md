@@ -63,7 +63,9 @@ Migrated from googlecode to github 11/24/2014.
 
 To try things out, go ahead and start pype in the pype3/example-tasks directory that came with the distribution. This directory contains some sample tasks to play with and test things out. To load a tasks, just pick the task from the 'cwd' ('current working directory') tab in the main menu at the top of the GUI.
 
-# Other useful commands
+The first one to try is the basic `fixation` task -- if you're not actually running in a rig with and eye tracker etc, you should go to the `subject` worksheet and set the `win_size` parameter to 0, which will basically allow you to play without requiring a working eye tracker.
+
+# Other useful shell commands
 
 - *pypeconfig* - edit your config file (host specific!)
 - *pypedocs* - open a browser to the on-line docs

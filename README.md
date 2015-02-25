@@ -15,34 +15,53 @@ Migrated from googlecode to github 11/24/2014.
 
 1. Get a computer -- any commodity PC will do the trick -- we recommend a 64bit machine with an reasonably fast Nvidia graphics card supported by the NVidia proprietary linux drivers (most of the stimulus generation is currently done on the CPU, so a top-of-the-line video card won't be used to it's full capabilities).
 
-2. Install Ubuntu. We use 10.04 in the lab for data collection machines, but that's not longer supported by Ubuntu, so I suggest new users start with 12.04 LTS, which is currently stable and supported (pype will work out of the box with 12.04 LTS).
+2. Install Debian/Ubuntu linux. We use Ubuntu 10.04 in the lab for data collection machines, but that's not longer supported by Ubuntu, so I suggest new users start with 12.04 LTS, which is currently stable and supported (pype will work out of the box with 12.04 LTS). Debian's a much lighter weight installation, so if you're new to linux and just playing with pype for the first time, Debian's much quicker to get up and running.
 
-3. Once Ubuntu is up and running, log in and open a terminal window. The first thing you need to do is to install subversion and pull down a current snapshot of pype:
+3. Once Linux is up and running, log in and open a terminal window. You'll need to have root access to set up and install, so setup sudo or use su to become the root user.
 
-    % sudo apt-get -yq install git-core
+4. The first thing you need to do is to install git and pull down a current snapshot of pype:
+
+        % sudo apt-get -yq install git
 	
-4. Then pull down the repository from github:
+5. Then pull down the latest version of pype from github:
 
-    % git clone https://github.com/mazerj/pype3.git pype3
+        % git clone https://github.com/mazerj/pype3.git pype3
 	
-5. Install all the dependency packages needed by pype. This will take ~10 mins. The fresh-install.sh script will download and install all the packages needed to build/run pype and then do the actual build/install into /usr/local/pype3:
+6. Install all the packages needed by pype:
 
-    % cd pype3/Notes; sudo sh fresh-install.sh
+        % cd pype3
+        % sudo sh ./Notes/install-packages.sh
 	
-6. Append pype3/Notes/bashrc.sample to your ~/.bashrc file to get your login environment setup with pype on the search path (if you're using csh/tcsh, it's finally time to switch to bash).
-7. Open a new terminal window to pick up the new .bashrc (or source ~/.bashrc etc)
-8. Create and initialize your ~/.pyperc directory (first time only):
+7. Add eyelink repository and install dev kit:
 
-    % pypesetup
+		% sudo sh ./Notes/eyelink-repo.sh
+		...say 'y' to everything..
+
+8. Install libezV24 (needed for access to serial port):
+
+		% sudo sh ./Notes/ez-install.sh
+
+9. Build and install local copy of pype:
+
+		% ./localinstall
+
+10. Append pype3/Notes/bashrc.sample to your ~/.bashrc file to getyourlogin environment setup with pype on the search path (if you'reusing csh/tcsh, it's finally time to switch to bash).
+
+		% cat ./Notes/bashrc.sample >> ~/.bashrc
+
+11. Open a new terminal window to pick up the new .bashrc (or source ~/.bashrc etc)
+
+12. Create and initialize your ~/.pyperc directory (first time only):
+
+        % pypesetup
 	
-9. Then you can actually get started. To fire up the GUI interface, just run the pype command:
+13. Then you can actually get started. To fire up the GUI interface, just run the pype command:
 
-    % pype
+        % pype
 
 # Sample Tasks
 
-To begin with, start pype in the pype3/Notes directory downloaded from googlecode. This directory contains some sample tasks to play with and test things out. To load a tasks, just pick the task from the 'cwd' ('current working directory') tab in the main menu at the top of the GUI.
-
+To try things out, go ahead and start pype in the pype3/example-tasks directory that came with the distribution. This directory contains some sample tasks to play with and test things out. To load a tasks, just pick the task from the 'cwd' ('current working directory') tab in the main menu at the top of the GUI.
 
 # Other useful commands
 
@@ -57,9 +76,9 @@ Automatically generated documentation is available from the [Mazer lab web site]
 
 For existing users, the file [svn-to-git.txt](https://github.com/mazerj/pype3/blob/master/svn-to-git.txt) contains a table for mappings from Subversion revision numbers (stored in pype files etc) to git hashes. You can use this to retrieve old versions of pype that match the data collection period.
 
-# Notes for mac
+# Notes for mac/osx
 
-1. Everything works except the actual data collect (comedi_server).
+1. Everything works except the actual data collection (comedi_server).
 
 2. Best bet is to use python2.7 from fink. First install fink
 following instructions on the distribution site. Then the needed

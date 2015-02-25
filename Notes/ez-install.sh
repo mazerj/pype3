@@ -8,6 +8,8 @@
 # shared version of pype.
 #
 
+cd Notes
+
 D=`pwd`
 mkdir /tmp/$$ && cd /tmp/$$
 tar xfz $D/fixed-libezV24-0.1.3.tar.gz

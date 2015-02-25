@@ -160,6 +160,11 @@ from pype_aux import *
 from Tkinter import *
 from events import *
 
+import pypedata as pd
+
+#import xhandmap as handmap
+import handmap
+
 class NoResponse(Exception): pass
 
 def clearfix(fixwin):
@@ -173,11 +178,30 @@ def destroyall(ws):
 	for w in ws:
 		if w: w.destroy()
 
-
 class Task:
+
+	# don't touch or override this:
+	MasterRev = "$Id$"
+
+	# OVERRIDE:
+	TaskRev = None
 
 	def __init__(self, app, taskname=None, parent=None):
 		self.app = app
+
+        try:
+            if self.TaskRev is not None:
+                self.version_no = (self.MasterRev.split()[2],
+                                   self.TaskRev.split()[2])
+                self.version_info = (self.MasterRev,
+                                     self.TaskRev)
+            else:
+                self.version_no = (self.MasterRev.split()[2],
+                                   "-1")
+                self.version_info = (self.MasterRev, "none")
+        except IndexError:
+            self.version_no = ('none', 'none')
+            self.version_info = ('none', 'none')
 
 		# fixmaster shared/common parameters
 		commparams = ( \
@@ -188,12 +212,12 @@ class Task:
                  'stimulus y pos (pix)'),
 
 			psection('Fixation'),
+			pyesno('fixadapt', 0,
+                   'enable adaptive adjustment of eyecal offsets?'),
 			pyesno('fixring', 0,
                    'bg-colored ring around fixspot?'),
 			pyesno('stim_to_end', 0,
                    'stimulate past fixspot dimming?'),
-			pcolor('errcolor', '( 200,128,128)',
-                   'screen error color'),
 			pyesno('eyecal', 0,
                    'eyecal mode or udpy [fx, fy]'),
 			piparam('fx', '0',
@@ -275,18 +299,19 @@ class Task:
 		self.dlist.clear()
 		del self.dlist
 
-	def start_run(self, app, pre=1, run=1, post=1, clear=1):
+	def getP(self, app):
+		P = app.getcommon()
+		if self.parent:
+			P = self.parent.params[0].check(mergewith=P)
+			self.parent.params[0].save()
+		for p in self.params: P = p.check(mergewith=P)
+		for p in self.params: p.save()
+        return P
+
+	def start_run(self, app, pre=1, run=1, post=1):
 		if pre:
             self.record = 1
-			if clear:
-				app.con()
-
-			P = app.getcommon()
-			if self.parent:
-				P = self.parent.params[0].check(mergewith=P)
-				self.parent.params[0].save()
-			for p in self.params: P = p.check(mergewith=P)
-			for p in self.params: p.save()
+			P = self.getP(app)
 
 			# Acute Mode Warning -- disabled..
 			if 0 and P['acute']:
@@ -323,9 +348,7 @@ class Task:
 					self.run_trial_wrapper(app)
 				except UserAbort:
 					pass
-				if app.ispaused():
-					warn("Paused", "Task is paused, close to continue", wait=1)
-					app.set_state(paused=0)
+				app.pause()
 
 		if post:
 			P = app.getcommon()
@@ -343,6 +366,8 @@ class Task:
 		if P['win_size'] > 0:
 			ws = P['win_size'] + P['win_size_adj']
 			adj = ((P['fx']**2 +  P['fy']**2)**0.5) * P['win_scale']
+			if P['fixadapt']:
+				ws = ws * 5
 			fixwin = FixWin(P['fx'], P['fy'], int(ws + adj), app, P['vbias'])
 			fixwin.draw(color='black')
 		else:
@@ -394,12 +419,24 @@ class Task:
 
 		P['_trialtime'] = timestamp
 		P['_ntrials'] = ntrials
-		app.record_write(resultcode=resultcode, rt=rt, params=P)
+		P['_version_no'] = self.version_no
+		P['_version_info'] = self.version_info
+
+		r = app.record_write(resultcode=resultcode, rt=rt, params=P,
+                             returnall=True)
+        if r:
+            if P['fixadapt'] and resultcode[0] == 'C':
+                a = pd.find_events(r.events, FIX_ACQUIRED)[0]
+                b = pd.find_events(r.events, BAR_CHANGE)[0]
+                ix = np.where((r.eyet > a) & (r.eyet <= b))
+                xm = r.params['fx'] - np.mean(r.eyex[ix])/2.0
+                ym = r.params['fy'] - np.mean(r.eyey[ix])/2.0
+                app.eyeshift(x=-xm, y=-ym)
 
 		# push result info onto history stack..
 		self.behav_hist.append((resultcode, rt, P))
 
-	def do_dim(self, sprite=None, P=None, app=None):
+	def do_dim(self, sprite=None, P=None, app=None, forceflip=1):
 		if sprite:
 			# the dimmed sprite actually will become visible on the next
 			# update/flip.. which should be within a frame, unless the
@@ -410,13 +447,12 @@ class Task:
 			else:
 				sprite.fill(P['spotcolor2'])
 			self.dimat = self.app.encode('approx_'+TEST_OFF)
+            if forceflip:
+                self.dlist.update(flip=1)
 		else:
 			self.dimat = None
 
-        #if app: app.con('DIM')
-
 	def do_miss(self, acute, app):
-        #if app: app.con('MISS')
 		if acute:
 			raise NoProblem
 		else:
@@ -476,7 +512,7 @@ class Task:
 			spot = Sprite(width=bb, height=bb, x=P['fx'], y=P['fy'],
 						  depth=10, fb=spotfb, name="spot")
 			spot.off()
-			spot.fill(P['bg'])
+			spot.fill(app.fb.bg)
 			spot.rect(0, 0, ssz-1, ssz-1, P['spotcolor1'])
 		else:
 			spot = Sprite(width=ssz, height=ssz, x=P['fx'], y=P['fy'],
@@ -560,7 +596,7 @@ class Task:
 					if P['stim_to_end']:
 						maxhold = P['hold'] + P['maxrt']
 						app.queue_action(P['hold'],
-										 lambda s=spot,P=P,app=app:self.do_dim(s, P, app))
+										 lambda s=spot,P=P,app=app:self.do_dim(s, P, app, forceflip=self))
 						app.queue_action(maxhold,
 										 lambda a=P['acute'],app=app:self.do_miss(a, app))
 						app.encode('stimdelay')
@@ -714,12 +750,18 @@ class Task:
 				beep(500, 500, vol=0.5, wait=0)
 			spot.off()
 			self.dlist.clear()
-			self.dlist.update()
+            self.dlist.update()
+            enable = False
             try:
-                app.fb.clear(P['errcolor'], flip=1)
+                if handmap.hmap_state(app):
+                    handmap.hmap_state(app, enable=False)
+                    enable = True
+                app.fb.clear(RED, flip=1)
                 app.idlefn(ms=250)
             finally:
                 app.fb.clear(flip=1)
+                if enable:
+                    handmap.hmap_state(app, enable=True)
 			app.udpy.display(self.dlist)
 		except UserAbort:
 			print "caught abort in errorsig"

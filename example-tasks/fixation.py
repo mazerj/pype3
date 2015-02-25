@@ -20,12 +20,12 @@ try:
 except NameError:
 	import fixmaster
 
-try:
-	hmap = reload(hmap)
-except NameError:
-	import handmap as hmap
+#import xhandmap as handmap
+import handmap
 
 class Task(fixmaster.Task):
+
+	TaskRev = "$Id$"
 
 	def task_params(self):
 		return ()
@@ -43,15 +43,15 @@ class Task(fixmaster.Task):
 
 	def stimulate(self, app, P, timer, duration):
 		# called duration fixation
-		# your function **MUST** yeild control at the end of
+		# your function **MUST** yield control at the end of
 		# duration ms. 'timer' is already running!
 		try:
-			hmap.hmap_show(app)
+			handmap.hmap_show(app)
 			while timer.ms() < duration:
 				app.idlefn()
 		finally:
 			# make sure to hide the
-			hmap.hmap_hide(app, update=1)
+			handmap.hmap_hide(app, update=1)
 
 
 	def post_fixation(self, app):
@@ -62,12 +62,12 @@ class Task(fixmaster.Task):
 def main(app):
 	t = Task(app)
 	app.set_startfn(lambda app,task=t: task.start_run(app))
-	hmap.hmap_install(app)
-	hmap.hmap_set_dlist(app, t.dlist)
+	handmap.hmap_install(app)
+	handmap.hmap_set_dlist(app, t.dlist)
 
 def cleanup(app):
-	hmap.hmap_set_dlist(app, None)
-	hmap.hmap_uninstall(app)
+	handmap.hmap_set_dlist(app, None)
+	handmap.hmap_uninstall(app)
 
 if not __name__ == '__main__':
 	loadwarn(__name__)

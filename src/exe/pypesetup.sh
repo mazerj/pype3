@@ -51,8 +51,8 @@ FULLSCREEN: 0
 EYETRACKER: ANALOG
 FLIP_BAR: 1
 USB_JS_DEV: /dev/input/js0
-DPYW: 800
-DPYH: 800
+DPYW: 400
+DPYH: 300
 DPYBITS: 24
 GAMMA: 2.17
 VIEWDIST: 80
@@ -66,5 +66,9 @@ AUDIODRIVER: alsa
 EOF
 fi
 
+cat <<EOF
 
-echo "It's ok to ignore any errors about missing files!"
+WARNING:
+  It's ok to ignore any errors about missing files!
+
+EOF

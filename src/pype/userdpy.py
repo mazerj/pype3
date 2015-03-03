@@ -324,6 +324,8 @@ class UserDisplay(object):
 		self.canvas.bind("<Enter>", self._mouse_enter)
 		self.canvas.bind("<Leave>", self._mouse_leave)
 		self.canvas.bind("<KeyPress>", self._key)
+		self.canvas.bind("<Button-4>", self._roll)
+		self.canvas.bind("<Button-5>", self._roll)
 
 		self.canvas.pack(expand=0)
 
@@ -653,6 +655,11 @@ class UserDisplay(object):
 														 fill=None,
 														 outline="red",
 														 dash=(5,5))
+	def _roll(self, ev):
+        # ev.num==4 is up
+        # ev.num==5 is down
+        #print ev.num, ev.delta
+        pass
 
 	def _key(self, ev):
 		# ev.state values:

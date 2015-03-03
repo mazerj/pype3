@@ -311,7 +311,8 @@ class Dialog_(Toplevel):
 			self.bind('<Return>', self._return_event)
 
 	def go(self, wait=1):
-		screencenter(self)
+		#screencenter(self)
+		undermouse(self)
 		self.parent.bell()
 
 		if wait:

@@ -289,6 +289,8 @@ class UserDisplay(object):
 		m.add_command(label="Set a box corner (/)", command=self.setbox)
 		m.add_command(label="Clear box", command=self.clearbox)
 		m.add_command(label='Enter box position', command=self.manualbox)
+		m.add_command(label='Save box to file', command=self.savebox)
+		m.add_command(label='Load box from file', command=self.loadbox)
 		p.add_cascade(label='Box', menu=m)
 
 		m = Menu(p, tearoff=0)
@@ -597,6 +599,7 @@ class UserDisplay(object):
 		s = askstring('position box exactly',
 					  'Enter center-x, center-y, width, height:',
 					  initialvalue='%d,%d,%d,%d' % (cx, cy, w, h))
+		if s is None: return
 		try:
 			s = map(int, s.split(','))
 		except ValueError:
@@ -610,9 +613,35 @@ class UserDisplay(object):
 		else:
 			return
 		self.clearbox()
-		self.markstack.append(((cx-w), (cy-h)))
-		self.markstack.append(((cx+w), (cy+h)))
+		self.markstack.append((round(cx-w/2), round(cy-h/2)))
+		self.markstack.append((round(cx+w/2), round(cy+h/2)))
 		self.drawbox()
+
+    def savebox(self):
+        import cPickle
+
+		(file, mode) = SaveAs(initialdir=os.getcwd(),
+                              pattern='*.box',
+							  append=None,
+							  text='Save box file')
+
+		if not (file is None):
+            with open(file, 'w') as f:
+                cPickle.dump(self.markstack, f)
+        
+    def loadbox(self):
+        import cPickle
+        
+		(file, mode) = filebox.Open(initialdir=os.getcwd(),
+										pattern="*.box",
+										text='Load box from file')
+
+		if not (file is None):
+            with open(file, 'r') as f:
+                ms = cPickle.load(f)
+                self.clearbox()
+                self.markstack = ms
+                self.drawbox()
 
 	def clearbox(self):
 		self.setbox(clear=1)

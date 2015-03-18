@@ -9,4 +9,4 @@ EOF
 
 apt-get update
 apt-get install eyelinkcore-1.9 eyelinkcoregraphics-1.9
-
+apt-get install -f

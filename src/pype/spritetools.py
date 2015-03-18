@@ -467,6 +467,40 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 								meanlum).astype(np.uint8), axes=[1,2,0])
 
 
+def hartley(s, kx, ky, R=1.0, G=1.0, B=1.0,
+			meanlum=0.5, moddepth=1.0, color=None):
+	"""Hartley basis function generator (after Ringach et al, 1997)
+
+	:param s: (Sprite) target sprite
+
+	:param kx, ky: combind ori/sf/phase params (see paper) these are
+       basically in cycles/sprite, so the nyquist limit is size/2..
+
+	:param R,G,B: (either R is colortriple or R,G,B are 0-1 values)
+
+	:param meanlum: mean (DC) value of grating (0-1); default is 0.5
+
+	:param moddepth: modulation depth (0-1)
+
+	:param color: RGB triple (alternative specification of color vector)
+
+	:return: nothing (works in place)
+
+	"""
+
+	meanlum = 256.0 * meanlum
+	moddepth = 127.0 * moddepth
+	R, G, B = unpack_rgb(color, R, G, B)
+
+    M = (s.w + s.h) / 2
+    l = s.xx + M/2
+    m = s.yy + M/2
+    t = 2.0 * np.pi * ((kx * l) + (ky * m)) / M
+	i = moddepth * (np.sin(t) + np.cos(t)) / np.sqrt(2.0)
+	s.array[::] = np.transpose((np.array((R*i,G*i,B*i)) +
+								meanlum).astype(np.uint8),
+								axes=[1,2,0])
+
 def gabor(s, frequency, phase_deg, ori_deg, sigma,
 		  R=1.0, G=1.0, B=1.0,
 		  meanlum=0.5, moddepth=1.0, ppd=None, color=None):

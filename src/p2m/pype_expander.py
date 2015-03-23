@@ -195,7 +195,7 @@ def expandRecord(fname, fp, n, d, xd):
 		printify(fp, vname, d.rest[n])
 
     v = tmpvar()
-    times = map(lambda e:e[0], d.events)
+    times = map(lambda e:float(e[0]), d.events)
     events = map(lambda e:e[1], d.events)
     
     fp.write("%s.ev_t=%s;\n" % (objname, times, ))

@@ -147,8 +147,8 @@ def defaults(srcfile=None):
 	#####################################################
 	# eye tracker parameters
 
-	c.set('EYETRACKER', 'ANALOG',
-		  doc='eye tracker mode: ANALOG, ISCAN, EYELINK or NONE')
+	c.set('EYETRACKER', 'NONE',
+		  doc='tracker type: ANALOG, ISCAN, EYELINK, EYETRIBE, EYEMOUSE or NONE')
 	c.set('EYETRACKER_DEV', '',
 		  doc='serial port or IP address')
 	c.set('SWAP_XY', '0',

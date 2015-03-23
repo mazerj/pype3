@@ -1050,3 +1050,14 @@ void dacq_elrestart(void)
   dacq_data->elrestart = 1;
   UNLOCK(semid);
 }
+
+void dacq_set_xtracker(int x, int y, int pa)
+{
+  /* set externally read tracker (eg, eyetribe or similar) */
+  LOCK(semid);
+  dacq_data->xx = x;
+  dacq_data->xy = y;
+  dacq_data->xpa = pa;
+  dacq_data->xnew = 1;
+  UNLOCK(semid);
+}

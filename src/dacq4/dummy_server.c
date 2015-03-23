@@ -50,7 +50,6 @@
 #define ANALOG		0	/* eye tracker mode flags */
 #define ISCAN		1
 #define EYELINK		2
-#define MOUSE		3
 #define NONE		99
 
 #define INSIDE		1	/* fixwin status flags */
@@ -76,7 +75,7 @@ static int	dig_io = -1;	/* combined digital I/O subdevice */
 static int	dig_i = -1;	/* digital IN only subdevice (ISA) */
 static int	dig_o = -1;	/* digital OUT only subdevice (ISA)*/
 static int	analog_range;
-static int	itracker = ANALOG;
+static int	itracker = NONE;
 static int	semid = -1;
 static int	swap_xy = 0;
 static int	iscan_x, iscan_y, iscan_p, iscan_new;
@@ -269,7 +268,7 @@ void eyelink_halt()
     set_offline_mode();
     close_eyelink_connection();
     fprintf(stderr, "%s: closed eyelink connection\n", progname);
-    itracker = ANALOG;
+    itracker = NONE;
   }
 #endif
 }
@@ -604,7 +603,7 @@ void mainloop(void)
       dacq_data->elrestart = 0;
       // only allow resets if initial connection was eyelink and
       // no longer currently connected (analog fallback mode)
-      if (port != NULL && itracker == ANALOG) {
+      if (port != NULL && itracker == NONE) {
 	fprintf(stderr, "%s: trying to reconnect to eyelink\n", progname);
 	eyelink_init(port, elopts, elcam);
       }
@@ -612,18 +611,6 @@ void mainloop(void)
 
     switch (itracker)
       {
-      case NONE:
-	// eyenew = x = y = pa = 0;
-	dacq_data->adc[0] = x;
-	dacq_data->adc[1] = y;
-	break;
-      case MOUSE:
-	dacq_data->adc[0] = x = dacq_data->mx;
-	dacq_data->adc[1] = y = dacq_data->my;
-	pa = 0;
-	eyenew = dacq_data->mnew;
-	dacq_data->mnew = 0;
-	break;
       case ISCAN:
 	x = iscan_x;
 	y = iscan_y;
@@ -644,11 +631,23 @@ void mainloop(void)
 	dacq_data->adc[0] = x;
 	dacq_data->adc[1] = y;
 	break;
-      default:
+      case ANALOG:
 	x = dacq_data->adc[0];
 	y = dacq_data->adc[1];
 	pa = -1;
 	eyenew = 1;
+	break;
+      case NONE:
+	/* This is for any sort of tracker that will inject it's data
+	 * stream into data_data->xx,xy,xpa,xnew directly via SHM.
+	 * In general, this means something running in a thread in the
+	 * parent process.. mouse, usb tracker etc..
+	 */
+	dacq_data->adc[0] = x = dacq_data->xx;
+	dacq_data->adc[1] = y = dacq_data->xy;
+	pa = dacq_data->xpa;
+	eyenew = dacq_data->xnew;
+	dacq_data->xnew = 0;
 	break;
       }
 
@@ -984,9 +983,9 @@ int main(int ac, char **av)
     iscan_init(port);
   } else if (strcasecmp(tracker, "eyelink") == 0) {
     eyelink_init(port, elopts, elcam);
-  } else if (strcasecmp(tracker, "mouse") == 0) {
-    itracker = MOUSE;
-  } else if (strcasecmp(tracker, "none") == 0) {
+  } else if (strcasecmp(tracker, "analog") == 0) {
+    itracker = ANALOG;
+  } else {
     itracker = NONE;
   }
 

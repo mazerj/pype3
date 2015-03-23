@@ -105,3 +105,6 @@ extern void dacq_setmouse(int mx, int my);
 
 extern void dacq_elrestart(void);
 
+extern void dacq_set_xtracker(int x, int y, int pa);
+
+

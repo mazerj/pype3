@@ -317,8 +317,9 @@ class UserDisplay(object):
 		m.add_command(label='show shortcuts', command=self.help)
 		p.add_cascade(label='Help', menu=m)
 
+        self.eyemouse = eyemouse
+        
 		if eyemouse:
-			self.canvas.bind("<Button-1>", self._mouse1)
 			self.canvas.bind("<Key-space>", self._space)
 			self.canvas.bind("<KeyRelease-space>", self._space)
 		self.canvas.bind("<Button-3>", lambda ev,p=p,s=self: s._dopopup(ev,p))
@@ -384,7 +385,8 @@ class UserDisplay(object):
 		self.visible = 1
 
 		self.canvas.config(scrollregion=self.canvas.bbox(ALL))
-
+        self.set_taskcallback(None)
+        
 	def set_taskcallback(self, callbackfn=None):
 		if callbackfn:
 			self._taskcallbackfn = callbackfn
@@ -898,11 +900,6 @@ class UserDisplay(object):
 	def _phototoggle(self):
 		self._photomode = self._photomode_tvar.get()
 
-	def _mouse1(self, ev=None):
-		x, y = self.canvas.window2scaled(ev.x, ev.y)
-		x, y = self.canv2cart(x, y)
-		self.app.eyeshift(x=x, y=y, rel=False)
-
 	def _space(self, ev=None):
 		if ev.type == "2":
 			# key-press
@@ -917,6 +914,8 @@ class UserDisplay(object):
 			x, y = self.canvas.window2scaled(ev.x, ev.y)
 			(self.mousex, self.mousey) = self.canv2cart(x, y)
 			rx, ry = (self.mousex-self.fix_x, self.mousey-self.fix_y,)
+            if self.eyemouse:
+                dacq_set_xtracker(int(round(rx)), int(round(ry)), 0)
 		else:
 			rx, ry = 0, 0
 		self._mouseinfo_x.configure(text='X:%5d' % rx)

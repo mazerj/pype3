@@ -1040,24 +1040,44 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.rig_common.set('mon_v_ppd', '%g' % yppd)
 		self.rig_common.set('mon_ppd', '%g' % ppd)
 
-		et = self.config.get('EYETRACKER', 'NONE')
-		if et == 'ISCAN':
-			self.rig_common.set('eyetracker', et)
+		trackertype = self.config.get('EYETRACKER', 'NONE')
+        self.itribe = None
+        self.eyemouse = None
+		self.eyebar = 0
+        
+		if trackertype == 'ISCAN':
+			self.rig_common.set('eyetracker', trackertype)
 			self.rig_common.set('eyelag', '16')
-		elif et == 'EYELINK':
-			self.rig_common.set('eyetracker', et)
+		elif trackertype == 'EYELINK':
+			self.rig_common.set('eyetracker', trackertype)
 			self.rig_common.set('eyelag', '0')
 			mb.addmenuitem('Misc', 'separator')
 			mb.addmenuitem('Misc', 'command', label='reconnect to eyelink',
 						   command=self.elrestart)
-		elif et == 'ANALOG' or et == 'NONE':
-			self.rig_common.set('eyetracker', et)
+		elif trackertype == 'ANALOG':
+			self.rig_common.set('eyetracker', trackertype)
 			self.rig_common.set('eyelag', '0')
-		elif et == 'MOUSE':
-			self.rig_common.set('eyetracker', et)
+		elif trackertype == 'NONE':
+			self.rig_common.set('eyetracker', trackertype)
 			self.rig_common.set('eyelag', '0')
+		elif trackertype == 'MOUSE':
+			self.rig_common.set('eyetracker', trackertype)
+			self.rig_common.set('eyelag', '0')
+		elif trackertype == 'EYEMOUSE':
+			self.rig_common.set('eyetracker', trackertype)
+			self.rig_common.set('eyelag', '0')
+            self.eyemouse = 1
+			self.fb.cursor(on=1)
+		elif trackertype == 'EYETRIBE':
+            try:
+                self.itribe = EyeTribeThreadRunner(host='pippin')
+                self.rig_common.set('eyetracker', trackertype)
+                self.rig_common.set('eyelag', '0')
+            except socket.error:
+                Logger("pype: can't connect to eyetribe device\n")
+                raise PypeStartupError
 		else:
-			Logger("pype: %s is not a valid EYETRACKER.\n" % et)
+			Logger("pype: %s is not a valid EYETRACKER.\n" % trackertype)
 			raise PypeStartupError
 		self.rig_common.set('eyefreq', self.config.get('EYEFREQ', '-1'))
 
@@ -1229,6 +1249,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		self.dacq_going = 1
 		self.eyeset()
+        if self.eyemouse:
+            self.eyeset(xgain=1.0, ygain=1.0, xoff=0, yoff=0)
 
 		# stash info on port states
 		# this is a hack -- some buttons are down/true others are
@@ -1266,16 +1288,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.rig_common.set('mon_fps', '%g' % fps)
 		Logger('pype: estimated fps = %g\n' % fps)
 
-		# use mouse in userdpy as substitute for eye tracker?
-		#  - if set, then mouse button-1 clicking will simulate saccade
-		#	 to indicate location
-		#  - should work in either the userdisplay or the framebuffer
-		#	 window
-		self.eyemouse = self.config.iget('EYEMOUSE', 0)
-		if self.eyemouse:
-			self.eyeset(xgain=1.0, ygain=1.0, xoff=0, yoff=0)
-			self.fb.cursor(on=1)
-		self.eyebar = 0
 
 		# userdisplay: shadow of framebuffer window
 		# xscale=1./self.config.fget('XSCALE'),
@@ -1432,6 +1444,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		if self.psych:
 			self.fb.screen_close()
+
+        if self.itribe:
+            self.itribe.start()
+            
 
 		if self.config.iget('HTTP_SERVER'):
             import pypehttpd
@@ -1646,10 +1662,15 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 	def _show_stateinfo(self):
 		barstate = self.bardown()			# this will handle BAR_FLIP setting
+        if self.itribe:
+            s = self.itribe.status + ' '
+        else:
+            s = ''
+            
 		if barstate:
-			t = 'BAR:DN '
+			t = s+'BAR:DN '
 		else:
-			t = 'BAR:UP '
+			t = s+'BAR:UP '
 		if dacq_jsbut(-1):
 			t = t + " "
 			for n in range(10):
@@ -2157,13 +2178,13 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		dacq_eye_smooth(self.rig_common.queryv('eye_smooth'))
 		dacq_fixbreak_tau(self.rig_common.queryv('fixbreak_tau'))
 
-		xg = self.ical.queryv('xgain_')
-		yg = self.ical.queryv('ygain_')
-		xo = -self.ical.queryv('xoff_')
-		yo = -self.ical.queryv('yoff_')
-		rot = self.ical.queryv('rot_')
+		self._xg = self.ical.queryv('xgain_')
+		self._yg = self.ical.queryv('ygain_')
+		self._xo = -self.ical.queryv('xoff_')
+		self._yo = -self.ical.queryv('yoff_')
+		self._rot = self.ical.queryv('rot_')
 
-		dacq_eye_params(xg, yg, xo, yo, rot)
+		dacq_eye_params(self._xg, self._yg, self._xo, self._yo, self._rot)
 
 		# it is possible to merge xgain/xoff/ygain/yoff into a single
 		# matrix, by:
@@ -2662,11 +2683,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		"""
 
-		ts = dacq_ts()
-		if (self._last_eyepos) is None or (ts > self._last_eyepos):
-			self._eye_x = dacq_eye_read(1)
-			self._eye_y = dacq_eye_read(2)
-			self._last_eyepos = ts
+        ts = dacq_ts()
+        if (self._last_eyepos) is None or (ts > self._last_eyepos):
+            self._eye_x = dacq_eye_read(1)
+            self._eye_y = dacq_eye_read(2)
+            self._last_eyepos = ts
 		return (self._last_eyepos, self._eye_x, self._eye_y)
 
 	def eyepos(self):
@@ -2717,7 +2738,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			x = 0
 			y = 0
 		elif zero:
-			(x0, y0) = (dacq_eye_read(1), dacq_eye_read(2))
+            (x0, y0) = (dacq_eye_read(1), dacq_eye_read(2))
 			x = float(self.ical.queryv('xoff_')) + x0 - self._eyetarg_x
 			y = float(self.ical.queryv('yoff_')) + y0 - self._eyetarg_y
 		elif rel:
@@ -2874,9 +2895,9 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					# UserDisplay; here we handle eyemouse events in the
 					# FrameBuffer:
 					doint = 0
-					if pev.type is pygame.MOUSEBUTTONDOWN and pev.button==1:
-						self.eyeshift(x=pev.pos[0] - (self.fb.w/2),
-									  y=(self.fb.h/2) - pev.pos[1], rel=False)
+					if pev.type is pygame.MOUSEMOTION:
+                        dacq_set_xtracker(pev.pos[0] - (self.fb.w/2),
+                                          (self.fb.h/2) - pev.pos[1], 0)
 					elif pev.type is pygame.KEYDOWN and unichr(pev.key) == u' ':
 						if ~self.eyebar:
 							doint = 1
@@ -4836,7 +4857,7 @@ def _get_plexon_events(plex, fc=40000):
 
 def _addpath(d, atend=None):
 	"""
-	Add directory to the HEAD (or TAIL) of the python search path.
+	Add directory to the HEAD (or TAIL) of the pytahon search path.
 
 	**NOTE:**
 	This function also lives in pyperun.py.template.
@@ -4919,9 +4940,36 @@ class SimplePlotWindow(Toplevel):
 	def drawnow(self):
 		self._canvas.show()
 
+
+class EyeTribeThreadRunner(object):
+    def __init__(self, host='127.0.0.1'):
+        import peyetribe
+
+        self.h = peyetribe.EyeTribe(host=host)
+        self.h.connect()
+        self.h.pullmode()
+        self.poll()
+
+    def poll(self):
+        self.e = self.h.next()
+        self.status = self.e.statestr()
+        self.x = int(round(self.e.raw.x))
+        self.y = -int(round(self.e.raw.y))
+
+    def run(self):
+        while 1:
+            self.poll()
+            if 'G' in self.status:
+                dacq_set_xtracker(self.x, self.y, 0)
+
+    def start(self):
+        Logger('pype: starting itribe thread\b');
+		thread.start_new_thread(self.run, ())
+            
+
 def show_about(file, timeout=None):
 	"""Display a about/splash screen. If transient is True, then return,
-	but use callback to clsoe it after 10 secs, otherwise user must close.
+	but use callback to close it after 10 secs, otherwise user must close.
 
 	"""
 

@@ -1034,16 +1034,6 @@ void dacq_set_alarm(int ms_from_now)
   UNLOCK(semid);
 }
 
-void dacq_setmouse(int mx, int my)
-{
-  LOCK(semid);
-  dacq_data->mx = mx;
-  dacq_data->my = my;
-  dacq_data->mnew = 1;
-  UNLOCK(semid);
-}
-
-
 void dacq_elrestart(void)
 {
   LOCK(semid);

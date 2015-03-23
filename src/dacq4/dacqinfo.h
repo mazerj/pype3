@@ -139,8 +139,6 @@ typedef struct {
   int		js_y;
 
 
-  int		mx, my, mnew;	/* mouse params */
-
   /* input from external eye tracker: x, y, pupil, new? */
   int		xx, xy, xpa, xnew;
 

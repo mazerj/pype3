@@ -174,5 +174,5 @@ def dacq_setmouse(mx, my):
 def dacq_elrestart():
     return
 
-def  dacq_set_xtracker(x, y, pa):
+def dacq_set_xtracker(x, y, pa):
     return

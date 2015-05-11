@@ -1,4 +1,4 @@
-function pf = p2msummary(pf)
+function pf = p2mSummary(pf)
 
 fprintf('%s\n', pf.src);
 
@@ -31,8 +31,23 @@ end
 
 fprintf('\nTime series\n');
 fprintf('-------------------\n');
-fprintf('%s\n', arrayfun(@(x) x.result(1), pf.rec));
-
+ts = arrayfun(@(x) x.result(1), pf.rec);
+nn = 1;
+for n=1:5:length(ts)
+  if nn > 10
+    fprintf('\n');
+    nn = 2;
+  else
+    nn = nn+1;
+  end
+  for k=1:5
+    if k+n < length(ts)
+      fprintf('%c', ts(k+n));
+    end;
+  end;
+  fprintf(' ');
+end
+fprintf('\n');
 
 function r = ifel(cond, t, f)
 if cond

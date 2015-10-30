@@ -271,7 +271,7 @@ class FrameBuffer(object):
 		self._font = None
 		self.xscale = xscale
 		self.yscale = yscale
-        self.gamma = (1.0, 1.0, 1.0)
+		self.gamma = (1.0, 1.0, 1.0)
 		if not width or not height:
 			Logger('sprite: must specify display width and height\n')
 		else:
@@ -286,7 +286,7 @@ class FrameBuffer(object):
 		if fullscreen:
 			self.flags = self.flags | HWSURFACE | FULLSCREEN
 		elif not frame:
-            if sys.platform.startswith('darwin'):
+			if sys.platform.startswith('darwin'):
 				# for some reason, it appears that NOFRAME hides window
 				# completely under OSX, but this only happens from pypenv,
 				# it doesn't happen from straight python2.7...
@@ -509,7 +509,7 @@ class FrameBuffer(object):
 		"""
 		if g is None: g = r
 		if b is None: b = r
-        self.gamma = (r,g,b)
+		self.gamma = (r,g,b)
 		return pygame.display.set_gamma(r, g, b)
 
 	def cursor(self, on=0):
@@ -1131,7 +1131,7 @@ class ScaledSprite(object):
 		if rwidth and not dwidth:
 			dwidth, dheight = rwidth, rheight
 
- 		if not image and not fname and rwidth < 1.0:
+		if not image and not fname and rwidth < 1.0:
 			rwidth = int(round(dwidth * rwidth))
 		if not image and not fname and rheight < 1.0:
 			rheight = int(round(dheight * rheight))
@@ -1167,7 +1167,7 @@ class ScaledSprite(object):
 				self.im = image.convert(32, pygame.SRCALPHA)
 				self.userdict = {}
 			if rwidth:
-                self.im = pygame.transform.scale(self.im, (rwidth, rheight))
+				self.im = pygame.transform.scale(self.im, (rwidth, rheight))
 			setalpha = 0
 		else:
 			# new image from scratch of specified real size
@@ -1817,16 +1817,16 @@ class ScaledSprite(object):
 		:return: new sprite
 
 		"""
-        if self.xscale != 1.0 or self.yscale != 1.0:
+		if self.xscale != 1.0 or self.yscale != 1.0:
 			Logger("Can't subimage scaled sprites yet!\n")
-            return None
+			return None
 
 		if center:
 			x = self.X(x) - (w/2)
 			y = self.Y(y) - (h/2)
 
 		return ScaledSprite(image=self.im.subsurface((x, y, w, h)),
-                            rwidth=int(round(w)), rheight=int(round(h)),
+							rwidth=int(round(w)), rheight=int(round(h)),
 							x=self.x, y=self.y, dx=self.dx, dy=self.dy,
 							depth=self.depth, fb=self.fb, on=self._on)
 

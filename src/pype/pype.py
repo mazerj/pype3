@@ -840,11 +840,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		mb.addmenuitem('Misc', 'command', label='where am i?',
 					   command=self._whereami)
 		mb.addmenuitem('Misc', 'command', label='run gamma calibration',
-                       command=lambda: self._do_gamma_cal(validate=False))
+					   command=lambda: self._do_gamma_cal(validate=False))
 		mb.addmenuitem('Misc', 'command', label='check gamma calibration',
-                       command=lambda: self._do_gamma_cal(validate=True))
+					   command=lambda: self._do_gamma_cal(validate=True))
 		mb.addmenuitem('Misc', 'command', label='plot gamma calibration',
-                       command=lambda: self._plot_gamma_cal())
+					   command=lambda: self._plot_gamma_cal())
 
 		mb.addmenu('Set', '', '')
 		mb.addmenuitem('Set', 'checkbutton', label='show trace window',
@@ -1041,10 +1041,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.rig_common.set('mon_ppd', '%g' % ppd)
 
 		trackertype = self.config.get('EYETRACKER', 'NONE')
-        self.itribe = None
-        self.eyemouse = None
+		self.itribe = None
+		self.eyemouse = None
 		self.eyebar = 0
-        
+		
 		if trackertype == 'ISCAN':
 			self.rig_common.set('eyetracker', trackertype)
 			self.rig_common.set('eyelag', '16')
@@ -1066,16 +1066,16 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		elif trackertype == 'EYEMOUSE':
 			self.rig_common.set('eyetracker', trackertype)
 			self.rig_common.set('eyelag', '0')
-            self.eyemouse = 1
+			self.eyemouse = 1
 			self.fb.cursor(on=1)
 		elif trackertype == 'EYETRIBE':
-            try:
-                self.itribe = EyeTribeThreadRunner(host='pippin')
-                self.rig_common.set('eyetracker', trackertype)
-                self.rig_common.set('eyelag', '0')
-            except socket.error:
-                Logger("pype: can't connect to eyetribe device\n")
-                raise PypeStartupError
+			try:
+				self.itribe = EyeTribeThreadRunner(host='pippin')
+				self.rig_common.set('eyetracker', trackertype)
+				self.rig_common.set('eyelag', '0')
+			except socket.error:
+				Logger("pype: can't connect to eyetribe device\n")
+				raise PypeStartupError
 		else:
 			Logger("pype: %s is not a valid EYETRACKER.\n" % trackertype)
 			raise PypeStartupError
@@ -1249,8 +1249,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		self.dacq_going = 1
 		self.eyeset()
-        if self.eyemouse:
-            self.eyeset(xgain=1.0, ygain=1.0, xoff=0, yoff=0)
+		if self.eyemouse:
+			self.eyeset(xgain=1.0, ygain=1.0, xoff=0, yoff=0)
 
 		# stash info on port states
 		# this is a hack -- some buttons are down/true others are
@@ -1432,7 +1432,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.record_state(0)
 
 		self.tallycount = {}
-        self._loadstate()            
+		self._loadstate()			 
 		self._tally(type=None)
 
 		self.migrate_pypestate()
@@ -1445,28 +1445,28 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		if self.psych:
 			self.fb.screen_close()
 
-        if self.itribe:
-            self.itribe.start()
-            
+		if self.itribe:
+			self.itribe.start()
+			
 
 		if self.config.iget('HTTP_SERVER'):
-            import pypehttpd
-            self.server = pypehttpd.PypeHTTPServer(self)
-            self.server.start()
-        else:
-            self.server = None
-            
+			import pypehttpd
+			self.server = pypehttpd.PypeHTTPServer(self)
+			self.server.start()
+		else:
+			self.server = None
+			
 
-    def _do_gamma_cal(self, validate):
-        import gammacal
-        gammacal.calibrate(self, validate=validate)
+	def _do_gamma_cal(self, validate):
+		import gammacal
+		gammacal.calibrate(self, validate=validate)
 
-    def _plot_gamma_cal(self):
-        import gammacal, filebox
+	def _plot_gamma_cal(self):
+		import gammacal, filebox
 		file, mode = filebox.Open(initialdir=os.getcwd(),
-                                  pattern='*.gammacal', initialfile='')
-        gammacal.estimateGamma(calfile=file, plot=True)
-    
+								  pattern='*.gammacal', initialfile='')
+		gammacal.estimateGamma(calfile=file, plot=True)
+	
 	def open_elog(self):
 		# open elog for this animal, today w/o asking for confirmation
 		animal = self.sub_common.queryv('full_subject')
@@ -1662,11 +1662,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 	def _show_stateinfo(self):
 		barstate = self.bardown()			# this will handle BAR_FLIP setting
-        if self.itribe:
-            s = self.itribe.status + ' '
-        else:
-            s = ''
-            
+		if self.itribe:
+			s = self.itribe.status + ' '
+		else:
+			s = ''
+			
 		if barstate:
 			t = s+'BAR:DN '
 		else:
@@ -1823,7 +1823,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.tallyw.clear()
 		self.tallyw.write(s)
 
-        self.last_tally = s
+		self.last_tally = s
 
 		return s		
 
@@ -1970,28 +1970,28 @@ class PypeApp(object):					# !SINGLETON CLASS!
 							command=self.loadtask)
 
 	def make_toolbar(self, parent):
-        import imp
-        
+		import imp
+		
 		if self.config.get('TOOLS', None) is None:
 			return
 
 		toolbar = None
 		for tool in self.config.get('TOOLS').split(':'):
-            try:
+			try:
 				t = os.path.basename(tool).replace('.py','')
-                file, fullpath, descr = imp.find_module(t)
-                d = string.join(fullpath.split('/')[:-1],'/')
+				file, fullpath, descr = imp.find_module(t)
+				d = string.join(fullpath.split('/')[:-1],'/')
 				if toolbar is None:
 					toolbar = Frame(parent, borderwidth=2)
 					toolbar.pack(anchor=CENTER, padx=10, pady=10)
 				b = Button(toolbar, text=t[:3],
 						   background='white',
-                           font=('Courier', 8),
+						   font=('Courier', 8),
 						   command=lambda s=self, t=t, d=d: s.loadtask(t, d))
 				b.pack(side=LEFT)
 				self.balloon.bind(b, fullpath)
-            except ImportError:
-                pass
+			except ImportError:
+				pass
 
 	def prevtask(self):
 		if len(self.recent) > 1:
@@ -2283,10 +2283,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		fps = self.fb.calcfps(duration=250)
 
 		self.fb.app = self
-        gstr = self.config.get('GAMMA')
-        g = map(float, gstr.split(','))
-        if len(g) == 1:
-            g = [g[0], g[0], g[0]]
+		gstr = self.config.get('GAMMA')
+		g = map(float, gstr.split(','))
+		if len(g) == 1:
+			g = [g[0], g[0], g[0]]
 		if self.fb.set_gamma(g[0], g[1], g[2]):
 			Logger("pype: gamma set to (%.1f,%.1f,%.1f)\n" % tuple(g))
 		else:
@@ -2312,10 +2312,10 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		"""
 		try:
-            if fqdn:
-                return socket.getfqdn()
-            else:
-                return socket.gethostname().split('.')[0]
+			if fqdn:
+				return socket.getfqdn()
+			else:
+				return socket.gethostname().split('.')[0]
 		except:
 			return 'no-host'
 
@@ -2648,8 +2648,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			Logger('pype: terminal save state.\n')
 			self._savestate()			# Do this NOW in case of lockup on exit
 			Logger('pype: user shutdown/close -- terminating.\n')
-            if self.server:
-                self.server.shutdown()
+			if self.server:
+				self.server.shutdown()
 			self.terminate = 1
 
 	def ts(self):
@@ -2683,11 +2683,11 @@ class PypeApp(object):					# !SINGLETON CLASS!
 
 		"""
 
-        ts = dacq_ts()
-        if (self._last_eyepos) is None or (ts > self._last_eyepos):
-            self._eye_x = dacq_eye_read(1)
-            self._eye_y = dacq_eye_read(2)
-            self._last_eyepos = ts
+		ts = dacq_ts()
+		if (self._last_eyepos) is None or (ts > self._last_eyepos):
+			self._eye_x = dacq_eye_read(1)
+			self._eye_y = dacq_eye_read(2)
+			self._last_eyepos = ts
 		return (self._last_eyepos, self._eye_x, self._eye_y)
 
 	def eyepos(self):
@@ -2738,7 +2738,7 @@ class PypeApp(object):					# !SINGLETON CLASS!
 			x = 0
 			y = 0
 		elif zero:
-            (x0, y0) = (dacq_eye_read(1), dacq_eye_read(2))
+			(x0, y0) = (dacq_eye_read(1), dacq_eye_read(2))
 			x = float(self.ical.queryv('xoff_')) + x0 - self._eyetarg_x
 			y = float(self.ical.queryv('yoff_')) + y0 - self._eyetarg_y
 		elif rel:
@@ -2752,15 +2752,15 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		self.eyeset(xoff=x, yoff=y)
 		self.encode(EYESHIFT)
 
-    def mainloop(self):
-        while not self.terminate:
-            try:
-                self._allowabort = 0
-                self.idlefn()
-            except UserAbort:
-                Logger('pype: mainloop caught abort\n');
-                pass
-        
+	def mainloop(self):
+		while not self.terminate:
+			try:
+				self._allowabort = 0
+				self.idlefn()
+			except UserAbort:
+				Logger('pype: mainloop caught abort\n');
+				pass
+		
 
 	def idlefn(self, ms=None, update=1, fast=None):
 		"""Idle function -- call when there's nothing to do to update GUI.
@@ -2896,8 +2896,8 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					# FrameBuffer:
 					doint = 0
 					if pev.type is pygame.MOUSEMOTION:
-                        dacq_set_xtracker(pev.pos[0] - (self.fb.w/2),
-                                          (self.fb.h/2) - pev.pos[1], 0)
+						dacq_set_xtracker(pev.pos[0] - (self.fb.w/2),
+										  (self.fb.h/2) - pev.pos[1], 0)
 					elif pev.type is pygame.KEYDOWN and unichr(pev.key) == u' ':
 						if ~self.eyebar:
 							doint = 1
@@ -4942,30 +4942,30 @@ class SimplePlotWindow(Toplevel):
 
 
 class EyeTribeThreadRunner(object):
-    def __init__(self, host='127.0.0.1'):
-        import peyetribe
+	def __init__(self, host='127.0.0.1'):
+		import peyetribe
 
-        self.h = peyetribe.EyeTribe(host=host)
-        self.h.connect()
-        self.h.pullmode()
-        self.poll()
+		self.h = peyetribe.EyeTribe(host=host)
+		self.h.connect()
+		self.h.pullmode()
+		self.poll()
 
-    def poll(self):
-        self.e = self.h.next()
-        self.status = self.e.statestr()
-        self.x = int(round(self.e.raw.x))
-        self.y = -int(round(self.e.raw.y))
+	def poll(self):
+		self.e = self.h.next()
+		self.status = self.e.statestr()
+		self.x = int(round(self.e.raw.x))
+		self.y = -int(round(self.e.raw.y))
 
-    def run(self):
-        while 1:
-            self.poll()
-            if 'G' in self.status:
-                dacq_set_xtracker(self.x, self.y, 0)
+	def run(self):
+		while 1:
+			self.poll()
+			if 'G' in self.status:
+				dacq_set_xtracker(self.x, self.y, 0)
 
-    def start(self):
-        Logger('pype: starting itribe thread\b');
+	def start(self):
+		Logger('pype: starting itribe thread\b');
 		thread.start_new_thread(self.run, ())
-            
+			
 
 def show_about(file, timeout=None):
 	"""Display a about/splash screen. If transient is True, then return,

@@ -317,8 +317,8 @@ class UserDisplay(object):
 		m.add_command(label='show shortcuts', command=self.help)
 		p.add_cascade(label='Help', menu=m)
 
-        self.eyemouse = eyemouse
-        
+		self.eyemouse = eyemouse
+		
 		if eyemouse:
 			self.canvas.bind("<Key-space>", self._space)
 			self.canvas.bind("<KeyRelease-space>", self._space)
@@ -385,8 +385,8 @@ class UserDisplay(object):
 		self.visible = 1
 
 		self.canvas.config(scrollregion=self.canvas.bbox(ALL))
-        self.set_taskcallback(None)
-        
+		self.set_taskcallback(None)
+		
 	def set_taskcallback(self, callbackfn=None):
 		if callbackfn:
 			self._taskcallbackfn = callbackfn
@@ -619,31 +619,31 @@ class UserDisplay(object):
 		self.markstack.append((round(cx+w/2), round(cy+h/2)))
 		self.drawbox()
 
-    def savebox(self):
-        import cPickle
+	def savebox(self):
+		import cPickle
 
 		(file, mode) = SaveAs(initialdir=os.getcwd(),
-                              pattern='*.box',
+							  pattern='*.box',
 							  append=None,
 							  text='Save box file')
 
 		if not (file is None):
-            with open(file, 'w') as f:
-                cPickle.dump(self.markstack, f)
-        
-    def loadbox(self):
-        import cPickle
-        
+			with open(file, 'w') as f:
+				cPickle.dump(self.markstack, f)
+		
+	def loadbox(self):
+		import cPickle
+		
 		(file, mode) = filebox.Open(initialdir=os.getcwd(),
 										pattern="*.box",
 										text='Load box from file')
 
 		if not (file is None):
-            with open(file, 'r') as f:
-                ms = cPickle.load(f)
-                self.clearbox()
-                self.markstack = ms
-                self.drawbox()
+			with open(file, 'r') as f:
+				ms = cPickle.load(f)
+				self.clearbox()
+				self.markstack = ms
+				self.drawbox()
 
 	def clearbox(self):
 		self.setbox(clear=1)
@@ -687,10 +687,10 @@ class UserDisplay(object):
 														 outline="red",
 														 dash=(5,5))
 	def _roll(self, ev):
-        # ev.num==4 is up
-        # ev.num==5 is down
-        #print ev.num, ev.delta
-        pass
+		# ev.num==4 is up
+		# ev.num==5 is down
+		#print ev.num, ev.delta
+		pass
 
 	def _key(self, ev):
 		# ev.state values:
@@ -914,8 +914,8 @@ class UserDisplay(object):
 			x, y = self.canvas.window2scaled(ev.x, ev.y)
 			(self.mousex, self.mousey) = self.canv2cart(x, y)
 			rx, ry = (self.mousex-self.fix_x, self.mousey-self.fix_y,)
-            if self.eyemouse:
-                dacq_set_xtracker(int(round(rx)), int(round(ry)), 0)
+			if self.eyemouse:
+				dacq_set_xtracker(int(round(rx)), int(round(ry)), 0)
 		else:
 			rx, ry = 0, 0
 		self._mouseinfo_x.configure(text='X:%5d' % rx)
@@ -969,33 +969,33 @@ class UserDisplay(object):
 																image=im))
 						else:
 							# square bounding box for sprite
-                            if s.rotation:
-                                for i in self.rrect(s):
-                                    ii.append(i)
-                            else:
-                                ii.append(self.icon(s.x, s.y, s.dw, s.dh,
-                                                    type='box',
-                                                    color=s.icolor,
-                                                    fill=s.ifill))
+							if s.rotation:
+								for i in self.rrect(s):
+									ii.append(i)
+							else:
+								ii.append(self.icon(s.x, s.y, s.dw, s.dh,
+													type='box',
+													color=s.icolor,
+													fill=s.ifill))
 					for i in ii: self._displaylist_icons.append(i)
 
-    def rrect(self, s):
-        import numpy as np
-        h2 = s.h/2.
-        w2 = s.w/2.
-        x = np.array([-w2, w2, w2, -w2, -w2])
-        y = np.array([-h2, -h2, h2, h2, -h2])
-        t = np.arctan2(y, x)-(np.pi*(180-s.rotation)/180.)
-        r = np.hypot(y, x)
-        x = r * np.cos(t) + s.x
-        y = r * np.sin(t) + s.y
-        tags = []
-        for n in range(1,len(x)):
+	def rrect(self, s):
+		import numpy as np
+		h2 = s.h/2.
+		w2 = s.w/2.
+		x = np.array([-w2, w2, w2, -w2, -w2])
+		y = np.array([-h2, -h2, h2, h2, -h2])
+		t = np.arctan2(y, x)-(np.pi*(180-s.rotation)/180.)
+		r = np.hypot(y, x)
+		x = r * np.cos(t) + s.x
+		y = r * np.sin(t) + s.y
+		tags = []
+		for n in range(1,len(x)):
 			(x0, y0) = self.cart2canv((x[n-1], y[n-1]))
 			(x1, y1) = self.cart2canv((x[n], y[n]))
-            tags.append(self.canvas.create_line(x0, y0, x1, y1,
-                                                 width=1, fill='blue'))
-        return tags
+			tags.append(self.canvas.create_line(x0, y0, x1, y1,
+												 width=1, fill='blue'))
+		return tags
 
 	def icon(self, x=None, y=None, w=5, h=5, text=None, color='black',
 			 type='box', dash=None, r=5, fill=''):

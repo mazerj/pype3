@@ -869,10 +869,10 @@ class FrameBuffer(object):
 			self.rectangle(x, y, s.get_width()*1.1, s.get_height*1.1,
 						   bg, width=0)
 
-		tex = texture_create(pygame.image.tostring(s, 'RGBA', 1),
-							 s.get_width(), s.get_height())
-		texture_blit(self, tex, x, y, rotation=rotation)
-		texture_del(tex)
+		tex = _texture_create(pygame.image.tostring(s, 'RGBA', 1),
+							  s.get_width(), s.get_height())
+		_texture_blit(self, tex, x, y, rotation=rotation)
+		_texture_del(tex)
 
 		if flip:
 			self.flip()
@@ -1754,22 +1754,22 @@ class ScaledSprite(object):
 
 		if self.texture:
 			# pre-rendered texture -- just blit it
-			texture_blit(self.fb, self.texture, x, y,
-						 rotation=self.rotation,
-						 contrast=self.contrast,
-						 xscale=self.xscale, yscale=self.yscale)
+			_texture_blit(self.fb, self.texture, x, y,
+						  rotation=self.rotation,
+						  contrast=self.contrast,
+						  xscale=self.xscale, yscale=self.yscale)
 		else:
 			rgba = pygame.image.tostring(self.im, 'RGBA', 1)
 			#im = self.array[:,::-1,:]
 			#alpha = self.alpha[:][:,:,np.newaxis]
 			#rgba = np.concatenate((im, alpha), axis=2)
 			#rgba = np.transpose(rgba, axes=[1,0,2]).tostring()	 <-- killer!
-			tex = texture_create(rgba, self.w, self.h)
-			texture_blit(self.fb, tex, x, y,
-						 rotation=self.rotation,
-						 contrast=self.contrast,
-						 xscale=self.xscale, yscale=self.yscale)
-			texture_del(tex)
+			tex = _texture_create(rgba, self.w, self.h)
+			_texture_blit(self.fb, tex, x, y,
+						  rotation=self.rotation,
+						  contrast=self.contrast,
+						  xscale=self.xscale, yscale=self.yscale)
+			_texture_del(tex)
 
 		if flip:
 			fb.flip()
@@ -1790,10 +1790,10 @@ class ScaledSprite(object):
 
 		"""
 		if self.texture:
-			texture_del(self.texture)
+			_texture_del(self.texture)
 		if not clear:
 			s = pygame.image.tostring(self.im, 'RGBA', 1)
-			self.texture = texture_create(s, self.w, self.h)
+			self.texture = _texture_create(s, self.w, self.h)
 
 	def subimage(self, x, y, w, h, center=None):
 		"""Extract sub-region of sprite into new sprite
@@ -2361,13 +2361,19 @@ class DisplayList(object):
 			self.fb.flip()
 		return encodes
 
-def texture_del(texture):
-	"""INTERNAL USE ONLY
+def _texture_del(texture):
+	"""Delete existing GL texture on video card.
+
+	:note: INTERNAL USE ONLY
+
 	"""
 	ogl.glDeleteTextures(texture[0])
 
-def texture_create(rgbastr, w, h):
-	"""INTERNAL USE ONLY
+def _texture_create(rgbastr, w, h):
+	"""Create GL texture on video card.
+
+	:note: INTERNAL USE ONLY
+
 	"""
 	ogl.glPushAttrib(ogl.GL_TEXTURE_BIT)
 	texture = ogl.glGenTextures(1)
@@ -2381,11 +2387,9 @@ def texture_create(rgbastr, w, h):
 	ogl.glPopAttrib(ogl.GL_TEXTURE_BIT)
 	return (texture, w, h)
 
-def texture_blit(fb, texture, x, y,
-				 rotation=0, draw=1, contrast=1.0, xscale=1.0, yscale=1.0):
-	"""INTERNAL USE ONLY
-
-	NOTES:
+def _texture_blit(fb, texture, x, y,
+				  rotation=0, draw=1, contrast=1.0, xscale=1.0, yscale=1.0):
+	"""Transfer (BLIT) GL texture to display.
 
 	(x, y) are center coords, where (0,0) is screen center.
 
@@ -2395,6 +2399,8 @@ def texture_blit(fb, texture, x, y,
 	GL_TEXTURE_MIN_FILTER (default is GL_NEAREST_MIPMAP_LINEAR)
 	and/or GL_TEXTURE_MAG_FILTER (default is GL_LINEAR). First is
 	for scaling down, second scaling up.
+
+	:note: INTERNAL USE ONLY
 
 	"""
 

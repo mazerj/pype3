@@ -40,6 +40,12 @@ epydoc -v --no-private --simple-term --config=/tmp/$$.conf \
 	       --exclude=pype.pypeversion\
 	       --exclude=pype.HTML \
 	       --exclude=pype.server \
+	       --exclude=pype.pypehttpd \
+	       --exclude=pype.gammacal \
+	       --exclude=pype.guitools \
+	       --exclude=pype.peyetribe \
+	       --exclude=pype.style \
+	       --exclude=pype.userdpy \
 	       --exclude=pype.simpletimer
 
 /bin/rm -f /tmp/$$.conf

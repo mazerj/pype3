@@ -202,22 +202,23 @@ class UserDisplay(object):
 		self._info = Label(f, font="Courier 10", relief=SUNKEN)
 		self._info.pack(expand=1, fill=X, side=LEFT)
 
-		self.barstate = Label(f, relief=RAISED)
-		self.barstate.pack(expand=0, side=RIGHT)
+		self.barstate = Label(f, relief=SUNKEN)
+		self.barstate.pack(expand=0, side=RIGHT, padx=2)
 		Label(f, font="Courier 10", \
 			  text='%dppd' % (pix_per_dva,), \
-			  relief=SUNKEN).pack(expand=0, side=RIGHT)
+			  relief=SUNKEN).pack(expand=0, side=RIGHT, padx=2)
 		if xscale != 1.0 or yscale != 1.0:
 			Label(f, font="Courier 10", \
 				  text='%.1fx%.1f' % (xscale, yscale), \
-				  relief=SUNKEN).pack(expand=0, side=RIGHT)
+				  relief=SUNKEN).pack(expand=0, side=RIGHT, padx=2)
 
-		self._mouseinfo_x = Label(f, font="Courier 10",
-								  fg='red', bg='white', relief=SUNKEN)
 		self._mouseinfo_y = Label(f, font="Courier 10",
 								  fg='red', bg='white', relief=SUNKEN)
-		self._mouseinfo_x.pack(expand=0, side=RIGHT)
-		self._mouseinfo_y.pack(expand=0, side=RIGHT)
+		self._mouseinfo_y.pack(expand=0, side=RIGHT, padx=2)
+		self._mouseinfo_x = Label(f, font="Courier 10",
+								  fg='red', bg='white', relief=SUNKEN)
+		self._mouseinfo_x.pack(expand=0, side=RIGHT, padx=2)
+
 
 		# tkinter vars for linking GUI to python vars:
 		self._photomode_tvar = IntVar()

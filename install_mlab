@@ -1,0 +1,15 @@
+#!/bin/sh
+
+grep -q 10.04.4 /etc/issue
+if [ $? -ne 0 ]; then
+ echo "Wrong arch -- running on udon..."
+ ssh -t udon "(cd /auto/share/src/pype3; ./mlabinstall $*)"
+else
+  if [ "$*" = "" ]; then
+    sudo -p"mlab install: " \
+	./install_private /auto/share/pype3/`uname -m` clobber install docs
+  else
+    sudo -p"mlab install: " \
+	./install_private /auto/share/pype3/`uname -m` $*
+  fi
+fi

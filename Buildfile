@@ -19,6 +19,7 @@ install:
 		done
 	(cd $(PYPEDIR); \
 	    $(PYTHONEXE) $(PYCOMPILE) -q pype || $(PYTHONEXE) $(PYCOMPILE) pype)
+	@./mksetup.sh $(PYPEDIR)
 
 _reinstall:
 	/bin/rm -rf $(PYPEDIR)/pype $(PYPEDIR)/lib

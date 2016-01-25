@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# install a private copy of pype (for testing/development)
+#
+
+
+if [ "$1" = "" ]; then
+  echo "usage: `basename $0` targetdir [options]"
+  exit 1
+fi
+
+INSTDIR=$1; shift
+rm -rf $INSTDIR
+mkdir $INSTDIR
+
+if [ "$1" = "" ]; then
+  env PYPEDIR=$INSTDIR ./build install
+else
+  env PYPEDIR=$INSTDIR ./build $*
+fi

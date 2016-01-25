@@ -1,2 +1,2 @@
 #!/bin/sh
-sudo ./install_private /usr/local $*
+sudo -p"local install:" ./install_private /usr/local $*

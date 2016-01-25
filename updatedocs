@@ -5,6 +5,6 @@ if [ $? -ne 0 ]; then
  echo "Wrong arch -- running on udon..."
  ssh -t udon "(cd /auto/share/src/pype3; ./mlabdocs $*)"
 else
-  sudo env PYPEDIR=/auto/share/pype3/`uname -m` ./build clobber install docs
-  ssh -t zed "(sudo cp -pra /auto/share/pype3/*/docs/* /auto/www/pypedocs)"
+  sudo -pdocs: env PYPEDIR=/auto/share/pype3/`uname -m` ./build clobber install docs
+  ssh -t zed "(sudo -pdocs: cp -pra /auto/share/pype3/*/docs/* /auto/www/pypedocs)"
 fi

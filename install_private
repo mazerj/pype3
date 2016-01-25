@@ -10,8 +10,7 @@ if [ "$1" = "" ]; then
 fi
 
 INSTDIR=$1; shift
-rm -rf $INSTDIR
-mkdir $INSTDIR
+mkdir -p $INSTDIR
 
 if [ "$1" = "" ]; then
   env PYPEDIR=$INSTDIR ./build install

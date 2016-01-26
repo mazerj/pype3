@@ -12,7 +12,7 @@ done
 
 # copy .py scripts to p2mdir and make executable (strip .py)
 for i in pype_expander.py pype_count.py matlab-nh.py \
-    p2mupdate.py pypeinfo.py showpypefile.py showparams.py ; do
+    pypeinfo.py showpypefile.py showparams.py ; do
   ii=`echo $i | sed s/.py$//g`
 
   # .py and non-.py file are required so pypenv can import as module!!

@@ -4,10 +4,10 @@ SUBDIRS = src
 
 detect:
 	@echo "Autodectected version info:"
-	@echo " "PYTHONEXE=$(PYTHONEXE)
-	@echo " "PYTHONINC=$(PYTHONINC)
-	@echo " "PYCOMPILE=$(PYCOMPILE)
-	@echo " "PYPEDIR=$(PYPEDIR)
+	@echo " PYTHONEXE=$(PYTHONEXE)"
+	@echo " PYTHONINC=$(PYTHONINC)"
+	@echo " PYCOMPILE=$(PYCOMPILE)"
+	@echo " PYPEDIR=$(PYPEDIR)"
 
 setenv:
 	@echo "setenv PYTHONEXE $(PYTHONEXE)"

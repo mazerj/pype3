@@ -169,8 +169,7 @@ except ImportError:
 try:
 	import pygame
 	from pygame.constants import *
-	v = map(int, pygame.version.ver[:-len('release')].split('.'))
-	if v[0] <= 1 and v[1] < 9:
+	if pygame.version.vernum[0] <= 1 and pygame.version.vernum[1] < 9:
 		Logger('sprite: pygame >= 1.9 required')
 		sys.exit(1)
 	pygame.surfarray.use_arraytype('numpy')	# force numpy over Numeric!

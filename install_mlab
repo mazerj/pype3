@@ -1,4 +1,9 @@
 #!/bin/sh
+#
+# Install for mazer lab -- this ensures that a global build and install
+# takes place on an ubuntu 10.04.4 machine in the lab. 10.04.4 binaries
+# pretty much work on everything in the lab including debian/mint systems.
+#
 
 grep -q 10.04.4 /etc/issue
 if [ $? -ne 0 ]; then

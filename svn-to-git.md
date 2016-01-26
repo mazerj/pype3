@@ -1,3 +1,19 @@
+Mapping from SVN revision numbers to git hashes. This is potentially
+useful the git repo contains all the old SVN version of pype, but without
+this sort of table, it's difficult to match the SVN revision number
+stored in the datafiles with the right git hash to retrieve the
+relevant version of the source code.
+
+Once you lookup the right hash here, you can do something like:
+
+    % git clone https://github.com/mazerj/pype3.git temp
+	% cd temp
+    % git checkout HASH
+
+Which will pull down a temporary copy of the appropriate version
+of the pype source tree.
+
+
 svn  githash
 ---- ----------------------------------------
 r446 228385b9d69bbde5f2221968a7ab11fadb8ae027

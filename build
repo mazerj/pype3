@@ -5,23 +5,16 @@ if [ "${PYPEDIR-0}" = "0" ]; then
   exit 1
 fi
 
-export PYTHONEXE=$(which python)
-libdir=$(python -c "from distutils.sysconfig import get_python_lib; \
-		print(get_python_lib())" | xargs dirname)
-incdir=$(python -c "from distutils.sysconfig import get_python_lib; \
-		print(get_python_lib())" | sed s/lib/include/g | xargs dirname)
-export PYCOMPILE=$libdir/compileall.py
-export PYTHONINC=$incdir/compileall.py
-
-#
-#if [ -d /usr/include/python2.7 ]; then
-#  export PYTHONINC=$(ls -d /usr/include/python2.7 | sort | tail -1)
-#else
-#  pydir=$(dirname $(dirname ${PYTHONEXE}))
-#  export PYTHONINC=$pydir/include
-#  export PYCOMPILE=$pydir/lib/python2.7/compileall.py
-#fi
-
 export WHO=`/usr/bin/whoami`
+export PYTHONEXE=$(which python)
+
+libdir=$(${PYTHONEXE} -c "from distutils.sysconfig import get_python_lib; \
+		print(get_python_lib())" | xargs dirname)
+incdir=$(${PYTHONEXE} -c "from distutils.sysconfig import get_python_lib; \
+		print(get_python_lib())" | sed s/lib/include/g | xargs dirname)
+export PYTHONINC=$incdir
+export PYCOMPILE=$libdir/compileall.py
+
+
 
 /usr/bin/make -f Buildfile $*

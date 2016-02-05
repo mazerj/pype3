@@ -155,7 +155,7 @@ class ParamTable(object):
 				   command=self.view).pack(expand=0, fill=X, side=LEFT)
 			
 		if loadable:
-			Button(f, text="Load",
+			Button(f, text="Load (<-datafile)",
 				   command=self.frompypefile).pack(expand=0, fill=X, side=LEFT)
 
 			

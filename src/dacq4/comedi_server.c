@@ -571,7 +571,8 @@ int comedi_init()
   if (strncmp(devname, "das16", 5) == 0) {
     fprintf(stderr, "%s: 8255 disabled.\n", progname);
     use8255 = 0;
-  } else if (strncmp(devname, "das08", 5) == 0) {
+  } else if (strncmp(devname, "das08", 5) == 0 ||
+	     strncmp(devname, "pci-das08", 9) == 0) {
     use8255 = 0;
     das08 = 1;
     fprintf(stderr, "%s: 8255 disabled.\n", progname);

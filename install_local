@@ -3,4 +3,4 @@
 #  install pype to /usr/local
 #
 
-sudo -p"local install:" ./install_private /usr/local $*
+./install_private /usr/local/pype3 $*

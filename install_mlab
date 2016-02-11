@@ -11,10 +11,10 @@ if [ $? -ne 0 ]; then
  ssh -t udon "(cd /auto/share/src/pype3; ./install_mlab $*)"
 else
   if [ "$*" = "" ]; then
-    sudo -p"mlab install: " \
+    sudo -p"sudo [mlab install]: " \
 	./install_private /auto/share/pype3/`uname -m` clobber install docs
   else
-    sudo -p"mlab install: " \
+    sudo -p"mlab [mlab install]: " \
 	./install_private /auto/share/pype3/`uname -m` $*
   fi
 fi

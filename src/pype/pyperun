@@ -48,7 +48,8 @@ Fri Oct 12 14:55:42 2012 mazer
 
 __debug = 0
 __show_help = 0
-__show_imports = 0
+__show_pypeimports = 0
+__show_allimports = 0
 __show_config = 0
 __show_version = 0
 __psych_mode = None
@@ -118,8 +119,10 @@ for a in sys.argv:
         sys.exit(1)
     elif a == '--debug':
         __debug = 1
-        __show_imports = 1
+        __show_pypeimports = 1
         os.environ['PYPEDEBUG'] = "1"
+    elif a == '--idebug':
+        __show_allimports = 1
     elif a == '--config':
         __show_config = 1
     elif a == '--help':
@@ -145,6 +148,7 @@ pypenv/pype options:
   --vversion|-vv verbose show version numbers (libs, etc)
   --config       show list of available config vars
   --debug        set DEBUG mode (or use env var DEBUG)
+  --idebug       import debugger -- track all imports
   --help         this message
   --psych|-p     psychophysics mode (start with framebuffer hidden)
   --nogeo        clear all window geometry (for lost windows!)
@@ -197,9 +201,21 @@ except ImportError:
     sys.stderr.write('Failed to import <importer> module -- check PATH?\n')
     sys.exit(1)
 
-if __show_imports:
+if __show_pypeimports:
     importer(report=1)
     sys.stderr.write('reporting imports\n')
+
+if __show_allimports:
+    import inspect
+    import __builtin__
+    savimp = __builtin__.__import__
+    
+    def newimp(name, *x):
+        caller = inspect.currentframe().f_back
+        print 'IMPORTING', name, 'in', caller.f_globals.get('__name__')
+        return savimp(name, *x)
+    
+    __builtin__.__import__ = newimp
 
 try:
     from pype import *

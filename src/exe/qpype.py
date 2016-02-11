@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# simple tool to quiet python internal network server
+# simple tool to query python internal network server
 #
 
 import asyncore, socket, sys

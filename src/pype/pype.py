@@ -373,6 +373,8 @@ import glob
 import cPickle
 import math
 import numpy as np
+import pygame
+
 
 # THIS IS REALLY UGLY -- THERE ARE TWO ISSUES:
 #  1. matplotlib-0.9.9 uses some sort of cache file that's not compatible
@@ -2784,8 +2786,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 		exception!!!
 
 		"""
-		import pygame
-
 		if self._post_fixbreak:
 			self._post_fixbreak = 0
 			raise FixBreak

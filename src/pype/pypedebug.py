@@ -52,59 +52,35 @@ def remotedebug():
 	except ImportError:
 		pass
 
-try:
-	import IPython.Shell
+def keyboard(banner='Type EOF/^D to continue', builtin=0):
+    """Clone of the matlab keyboard() function.
 
-	def keyboard(banner='Type EOF/^D to continue (? for help)', builtin=0):
-		if builtin:
-			import pdb
-			print '[->pdb]', banner
-			pdb.set_trace()
-		else:
-			# use exception trick to pick up the current frame
-			try:
-				raise None
-			except:
-				frame = sys.exc_info()[2].tb_frame.f_back
+    Drop down into interactive shell for debugging
+    Use it like the matlab keyboard command -- dumps you into
+    interactive shell where you can poke around and look at
+    variables in the current stack frame
 
-			# evaluate commands in current namespace
-			namespace = frame.f_globals.copy()
-			namespace.update(frame.f_locals)
+    The idea and code are stolen from something Fredrick
+    Lundh posted on the web a while back.
 
-			sh = IPython.Shell.IPShellEmbed(user_ns=namespace, banner=banner)
-			sh.IP.rc.confirm_exit = 0
-			sh()
+    """
 
-except ImportError:
-	def keyboard(banner='Type EOF/^D to continue', builtin=0):
-		"""Clone of the matlab keyboard() function.
+    if builtin:
+        import pdb
+        print '[->pdb]', banner
+        pdb.set_trace()
+    else:
+        # use exception trick to pick up the current frame
+        try:
+            raise None
+        except:
+            frame = sys.exc_info()[2].tb_frame.f_back
 
-		Drop down into interactive shell for debugging
-		Use it like the matlab keyboard command -- dumps you into
-		interactive shell where you can poke around and look at
-		variables in the current stack frame
+        # evaluate commands in current namespace
+        namespace = frame.f_globals.copy()
+        namespace.update(frame.f_locals)
 
-		The idea and code are stolen from something Fredrick
-		Lundh posted on the web a while back.
-
-		"""
-
-		if builtin:
-			import pdb
-			print '[->pdb]', banner
-			pdb.set_trace()
-		else:
-			# use exception trick to pick up the current frame
-			try:
-				raise None
-			except:
-				frame = sys.exc_info()[2].tb_frame.f_back
-
-			# evaluate commands in current namespace
-			namespace = frame.f_globals.copy()
-			namespace.update(frame.f_locals)
-
-			code.interact(banner=banner, local=namespace)
+        code.interact(banner=banner, local=namespace)
 
 def get_exception(show=None):
 	"""Get info about where exception came from"""

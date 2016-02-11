@@ -2,7 +2,7 @@
 
 if [ "$1" != "" ]; then
     # with any args rerun as root using sudo (needed to clear SHM stuff)
-    sudo $0
+    sudo -p"sudo [pypekill]:" $0
     exit 0
 fi
 

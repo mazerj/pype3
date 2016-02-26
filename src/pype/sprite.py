@@ -711,7 +711,7 @@ class FrameBuffer(object):
 		return map(pygame.key.name, np.where(pygame.key.get_pressed())[0])
 
 	def checkmouse(self):
-		"""Get list of pressed keys."""
+		"""Get list of pressed mouse buttons."""
 		pygame.event.pump()
 		return pygame.mouse.get_pressed()
 
@@ -727,11 +727,16 @@ class FrameBuffer(object):
 			if len(pygame.event.get()) == 0:
 				return
 
-	def mousemotion(self):
+	def mouseposition(self):
+        """Query mouse position.
+
+        Returns (x,y) coords of mouse in frame buffer coordinates.
+        
+        """
 		pygame.event.pump()
 		pos = pygame.mouse.get_pos()
 		return (pos[0] - self.hw, -pos[1] + self.hh)
-
+    
 	def getkey(self, wait=None, down=1):
 		"""Get next keystroke from queue.
 
@@ -749,32 +754,24 @@ class FrameBuffer(object):
 				queue.
 
 		"""
+        c = 0
 		if pygame.display.get_init():
-			return 0
-
-		if len(self._keystack) > 0:
-			c = self._keystack[0]
-			self._keystack = self._keystack[1:]
-		else:
-			c = None
-			while c is None:
-				if not down:
-					events = pygame.event.get([KEYUP,KEYDOWN])
-				else:
-					events = pygame.event.get([KEYDOWN])
-				if len(events) > 0:
-					if events[0] == KEYUP:
-						c =	 -(events[0].key)
-					else:
-						c = events[0].key
-				elif not wait:
-					c = 0
-		if c == 19:
-			# ESCAPE key for emergency exit..
-			Logger('User Requested Emergency Abort\n')
-			Logger('remember to run: pypekill\n')
-			sys.exit(1)
-
+            if len(self._keystack) > 0:
+                c = self._keystack[0]
+                self._keystack = self._keystack[1:]
+            else:
+                while not c:
+                    if not down:
+                        events = pygame.event.get([KEYUP,KEYDOWN])
+                    else:
+                        events = pygame.event.get([KEYDOWN])
+                    if len(events) > 0:
+                        if events[0] == KEYUP:
+                            c =	 -(events[0].key)
+                        else:
+                            c = events[0].key
+                    elif not wait:
+                        break
 		return c
 
 	def ungetkey(self, c):

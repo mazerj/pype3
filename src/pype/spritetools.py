@@ -67,8 +67,6 @@ Fri May 22 15:27:42 2009 mazer
 """
 
 import numpy as np
-import pygame.surfarray
-from pygame.constants import *
 import sprite
 
 ##########################################################################

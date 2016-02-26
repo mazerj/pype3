@@ -196,7 +196,7 @@ if __show_config:
     sys.stdout.write('# end config file\n')
     sys.exit(0)
 if __show_version:
-    import pypeversion, libinfo
+    import pypeversion
 
     sys.stderr.write("        pype: %s\n" % pypeversion.PypeVersion)
     sys.stderr.write("       verid: %s\n" % pypeversion.PypeVersionID)
@@ -205,7 +205,7 @@ if __show_version:
         sys.stderr.write("    build by: %s@%s\n" % (pypeversion.PypeBuildBy,
                                                 pypeversion.PypeBuildHost))
         sys.stderr.write("    build on: %s\n" % pypeversion.PypeBuildDate)
-        libinfo.print_version_info()
+        
     sys.exit(0)
 
 try:

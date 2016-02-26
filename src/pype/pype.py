@@ -373,7 +373,6 @@ import glob
 import cPickle
 import math
 import numpy as np
-import pygame
 
 
 # THIS IS REALLY UGLY -- THERE ARE TWO ISSUES:
@@ -1422,10 +1421,6 @@ class PypeApp(object):					# !SINGLETON CLASS!
 				pypeversion.PypeBuildHost) +
 			   'pype: PYPERC=%s\n' % pyperc() +
 			   'pype: CWD=%s\n' % os.getcwd())
-
-		if debug():
-			import libinfo
-			libinfo.print_version_info()
 
 		if dacq_jsbut(-1):
 			self._console.writenl("Joystick button #1 is BAR!", color='blue')
@@ -2880,35 +2875,25 @@ class PypeApp(object):					# !SINGLETON CLASS!
 					self.con("[esc]", color='red')
 					raise UserAbort
 
+            if self.eyemouse:
+                # use framebuffer mouse position as eye position
+				dacq_set_xtracker(pev.pos[0] - (self.fb.w/2),
+                                  (self.fb.h/2) - pev.pos[1], 0)
+
 			while 1:
-				pev = pygame.event.poll()
-				if pev.type is pygame.NOEVENT:
-					break
-				elif pev.type is pygame.KEYDOWN and \
-					(pev.key < 256) and (pev.mod & pygame.KMOD_ALT) and \
-					unichr(pev.key) == u's' and self._allowabort:
+                key = self.fb.getkey()
+                if key == 0:
+                    break
+                elif key == 27 and self._allowabort:
 					self.con("stopping run", color='red')
 					self.running = 0
 					raise UserAbort
-				elif self.eyemouse:
-					# UserDisplay object handles eyemouse events in the
-					# UserDisplay; here we handle eyemouse events in the
-					# FrameBuffer:
-					doint = 0
-					if pev.type is pygame.MOUSEMOTION:
-						dacq_set_xtracker(pev.pos[0] - (self.fb.w/2),
-										  (self.fb.h/2) - pev.pos[1], 0)
-					elif pev.type is pygame.KEYDOWN and unichr(pev.key) == u' ':
-						if ~self.eyebar:
-							doint = 1
-						self.eyebar = 1
-					elif pev.type is pygame.KEYUP and unichr(pev.key) == u' ':
-						if self.eyebar:
-							doint = 1
-						self.eyebar = 0
-					if doint:
-						# simulated barTransition..
-						self._int_handler(None, None, iclass=1, iarg=0)
+				elif self.eyemouse and key == 32:
+                    self.eyebar = 1
+                    self._int_handler(None, None, iclass=1, iarg=0)
+				elif self.eyemouse and key == -32:
+                    self.eyebar = 0
+                    self._int_handler(None, None, iclass=1, iarg=0)
 
 			x, y = self.eyepos()
 			if (x is not None) and (y is not None):

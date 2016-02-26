@@ -24,6 +24,10 @@ Fri Oct 19 10:08:12 2012 mazer
   this is probably IPython 10.3-ish specific and will probably not work
   with later versions..
 
+Fri Feb 26 10:42:07 2016 mazer
+
+- got rid of all ipython stuff -- never used it, not necessary..
+
 """
 
 import sys

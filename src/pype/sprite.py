@@ -2442,6 +2442,70 @@ def is_sequence(x):
 	"""
 	return (type(x) is types.ListType) or (type(x) is types.TupleType)
 
+def colr(*args, **kwargs):
+    """Improved C() -- converts argument to RGBA color in useful way.
+       By default generates values 0-255, but normal keyword is True,
+       colors are assumed to be specified/generated on the range [0-1].
+
+       Handled cases:
+          colr() -> transparent color key (0,0,0,0)
+          colr(r,g,b)
+          colr((r,g,b))
+          colr(lum) --> (lum,lum,lum)
+          colr(r,g,b,a)
+          colr((r,g,b,a))
+          colr(lum) --> (lum,lum,lum, 255)
+          colr('name') --> simple named color
+          colr('r,g,b') --> color as string
+          colr('r,g,b,a') --> color with alpha as string
+    
+    """
+    normal = kwargs.has_key('normal') and kwargs['normal']
+    if normal:
+        max = 1.0
+    else:
+        max = 255
+
+    if len(args) == 0:
+        c = np.array((0,0,0,0))           # transparent
+    elif len(args) == 1:
+        if type(args[0]) is types.StringType:
+            if args[0].lower() == 'black' or args[0].lower() == 'k':
+                c = np.array((1,1,1,max))
+            elif args[0].lower() == 'white' or args[0].lower() == 'w':
+                c = np.array((max,max,max,max))
+            elif args[0].lower() == 'red' or args[0].lower() == 'r':
+                c = np.array((max,0,0,max))
+            elif args[0].lower() == 'green' or args[0].lower() == 'g':
+                c = np.array((0,max,0,max))
+            elif args[0].lower() == 'blue' or args[0].lower() == 'b':
+                c = np.array((0,0,max,max))
+            else:
+                c = np.array(map(float, string.split(args[0], ',')))
+        else:
+            try:
+                l = len(args[0])
+                if l > 1:
+                    c = np.array(args[0])
+                else:
+                    c = np.array((args[0][0], args[0][0], args[0][0],))
+            except TypeError:
+                c = np.array((args[0], args[0], args[0],))
+    else:
+        c = np.array(args)
+    if len(c) < 4:
+        if not normal:
+            c = np.concatenate((c, [255],))
+        else:
+            c = np.concatenate((c, [1.0],))
+
+    if not normal:
+        c = np.round(c)
+            
+    return c
+
+
+
 def C(color, gl=0):
 	"""Color specification/normalization
 

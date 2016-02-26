@@ -2,7 +2,7 @@
 
 """Pygame/SDL/OpenGL based sprite engine.
 
-Pygame/Numeric-based sprite engine for doing real-time graphics
+Pygame-based sprite engine for doing real-time graphics
 during behavioral/neurophysiological experiments.
 
 Author -- James A. Mazer (james.mazer@yale.edu)
@@ -172,7 +172,9 @@ try:
 	if pygame.version.vernum[0] <= 1 and pygame.version.vernum[1] < 9:
 		Logger('sprite: pygame >= 1.9 required')
 		sys.exit(1)
-	pygame.surfarray.use_arraytype('numpy')	# force numpy over Numeric!
+	# force pygame to use numpy over Numeric in case they are both
+    # installed
+	pygame.surfarray.use_arraytype('numpy')
 except ImportError:
 	Logger('sprite: python pygame package required.\n' % __name__)
 	sys.exit(1)
@@ -1010,7 +1012,7 @@ def genaxes(w, h, rw, rh, typecode=np.float64, inverty=0):
 	:param rw, rh: scalar values indicating the "real" width and
 		height of the sprite (specifies actually array size)
 
-	:param typecode: Numeric-style typecode for the output array
+	:param typecode: numpy-style typecode for the output array
 
 	:param inverty: (boolean) if true, then axes are matlab-style with
 		0th row at the top, y increasing in the downward direction

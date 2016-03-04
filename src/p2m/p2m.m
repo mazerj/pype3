@@ -57,7 +57,7 @@
 % p2m_lreg.m            -
 % p2mpp.m               - pretty print p2m record
 % p2mset.m              - NOT DONE
-% strsplit.m            - split string based on specified delimeter char
+% p2mStrsplit.m         - split string based on specified delimeter char
 % xdacq_lfp.m           - obsolete?
 % xdacq_spk.m           - obsolete?
 % xdacq_spw.m           - obsolete?

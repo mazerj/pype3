@@ -1,5 +1,5 @@
-function c = strsplit(str, delim)
-%function c = strsplit(str, delim)
+function c = p2mStrsplit(str, delim)
+%function c = p2mStrsplit(str, delim)
 %
 %  split string into token based on specified delimiter
 %

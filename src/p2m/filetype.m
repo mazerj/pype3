@@ -8,6 +8,6 @@ function t = filetype(fname)
 if ~any(fname == '.')
   t = '';
 else
-  t = strsplit(fname, '.');
+  t = p2mStrsplit(fname, '.');
   t = t{end};
 end

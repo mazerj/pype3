@@ -16,7 +16,7 @@ function [cellid, taskname, taskver, fileno] = p2mFileInfo(pf)
 
 pf=p2mLoad(pf);
 
-x = strsplit(pf.src, '/');
+x = p2mStrsplit(pf.src, '/');
 fname = strrep(x{end}, '.gz', '');
 x = strsplit(fname, '.');
 cellid = x{1};

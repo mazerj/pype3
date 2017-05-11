@@ -209,7 +209,7 @@ class _Probe(object):
 		except TypeError:
 			color = 'noise'
 
-		z = self.sfreq/self.length
+		z = self.sfreq * self.length
 
 		s = ""
 		s = s +	"  p:post info\n"
@@ -234,9 +234,11 @@ class _Probe(object):
 		s = s +		" yY  drift freq %.1f Hz\n" % self.drift_freq
 		s = s +		" kK  blink freq %.1f Hz\n" % self.blink_freq
 		s = s + "\n"
-		s = s +     " []  sp-freq    %.1f c/rf\n" % self.sfreq
-		s = s +     "                %.4f c/deg\n" % z
-		s = s +     "                %.4f c/pix\n" % (z * self.ppd)
+
+        ppc = self.length / self.sfreq
+        cpd = self.sfreq / self.length * self.ppd
+		s = s +     " []  sp-freq    %.1f c/rf\n" % (self.sfreq,)
+		s = s +     "     (%.1f px/c,%.1f c/d)\n" % (ppc, cpd)
 		s = s +     " {}  rad-freq   %.1f c/rf\n" % self.rfreq
 
 		if s[:-1] == '\n':
@@ -394,7 +396,7 @@ class _Probe(object):
                                       rwidth=100, rheight=100)
 				if color is None or sum(color) < 3:
 					rc,gc,bc = -1.0,-1.0,-1.0
-				singrat(self.s, abs(self.sfreq), phase, self.a,
+				singrat(self.s, abs(self.sfreq)/2, phase, self.a,
                         (255*rc, 255*gc, 255*bc))
 				self.s.alpha_aperture(l/2)
 			elif self.barmode == HYPER:
@@ -403,7 +405,7 @@ class _Probe(object):
                                       rwidth=100, rheight=100)
 				if color is None or sum(color) < 3:
 					rc,gc,bc = -1.0,-1.0,-1.0
-				hypergrat(self.s, abs(self.sfreq), phase, self.a,
+				hypergrat(self.s, abs(self.sfreq)/2, phase, self.a,
                           (255*rc, 255*gc, 255*bc))
 				self.s.alpha_aperture(l/2)
 			elif self.barmode == POLAR:
@@ -416,7 +418,7 @@ class _Probe(object):
 					pol = 1
 				if color is None or sum(color) < 3:
 					rc,gc,bc = -1.0,-1.0,-1.0
-				polargrat(self.s, abs(self.sfreq), abs(self.rfreq), phase, pol,
+				polargrat(self.s, abs(self.sfreq)/2, abs(self.rfreq), phase, pol,
                           (255*rc, 255*gc, 255*bc))
 				self.s.alpha_aperture(l/2)
             self.s.fb = self.app.fb
@@ -497,7 +499,7 @@ class _Probe(object):
               self.app.udpy.canvas.create_text(x, y,
                                                text=BTAG[self.blink_state],
                                                anchor=CENTER,
-                                               font=('Courier', 30),
+                                               font=('Andale Mono', 30),
                                                fill='cyan')
 			for l in (self.minor_ax, self.major_ax):
 				self.app.udpy.canvas.lower(l)
@@ -701,14 +703,15 @@ def hmap_install(app):
     for n in [0, 1]:
         app.hmapstate.probe.text.append(
             app.udpy.canvas.create_text(11, 36+n,
-                                        font=('Courier', 8),
+                                        font=('Andale Mono', 8),
                                         anchor=NW,
                                         justify=LEFT,
                                         fill=['black', 'red'][n])
                                         )
     app.udpy.set_taskcallback(lambda ev, app=app: _key_handler(app, 'z', ev))
 
-    app.hmapstate.infobox = TextWin('handmap', fg='blue', font='Courier 8')
+    app.hmapstate.infobox = TextWin('handmap', fg='blue',
+                                        font=('Andale Mono', 8))
     app.setgeo(app.hmapstate.infobox, default='-0-0')
     
     app.hmapstate.infobox.set('a\n\b\n\c')

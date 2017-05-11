@@ -199,23 +199,23 @@ class UserDisplay(object):
 
 		f = Frame(self.frame)
 		f.pack(expand=1, fill=X)
-		self._info = Label(f, font="Courier 10", relief=SUNKEN)
+		self._info = Label(f, font=('Andale Mono', 10), relief=SUNKEN)
 		self._info.pack(expand=1, fill=X, side=LEFT)
 
 		self.barstate = Label(f, relief=SUNKEN)
 		self.barstate.pack(expand=0, side=RIGHT, padx=2)
-		Label(f, font="Courier 10", \
+		Label(f, font=('Andale Mono', 10), \
 			  text='%dppd' % (pix_per_dva,), \
 			  relief=SUNKEN).pack(expand=0, side=RIGHT, padx=2)
 		if xscale != 1.0 or yscale != 1.0:
-			Label(f, font="Courier 10", \
+			Label(f, font=('Andale Mono', 10), \
 				  text='%.1fx%.1f' % (xscale, yscale), \
 				  relief=SUNKEN).pack(expand=0, side=RIGHT, padx=2)
 
-		self._mouseinfo_y = Label(f, font="Courier 10",
+		self._mouseinfo_y = Label(f, font=('Andale Mono', 10), \
 								  fg='red', bg='white', relief=SUNKEN)
 		self._mouseinfo_y.pack(expand=0, side=RIGHT, padx=2)
-		self._mouseinfo_x = Label(f, font="Courier 10",
+		self._mouseinfo_x = Label(f, font=('Andale Mono', 10),
 								  fg='red', bg='white', relief=SUNKEN)
 		self._mouseinfo_x.pack(expand=0, side=RIGHT, padx=2)
 
@@ -234,7 +234,7 @@ class UserDisplay(object):
 								   width=round(xscale*cwidth),
 								   height=round(yscale*cheight))
 		self.canvas.pack()
-		self.canvas.configure(cursor='tcross', bg='grey80')
+		self.canvas.configure(cursor='tcross', bg='grey10')
 
 		self.canvas.bind("<FocusIn>",
 						 lambda ev,s=self:
@@ -284,7 +284,7 @@ class UserDisplay(object):
 		m.add_command(label='Load (l)', command=self.loadfidmarks)
 		m.add_command(label='View (v)', command=self._showfidmarks)
 		m.add_command(label='clear closest (c)')
-		p.add_cascade(label='Fiduciary Marks', menu=m)
+		p.add_cascade(label='Fiduciary Marks', background='green', menu=m)
 
 		m = Menu(p, tearoff=0)
 		m.add_command(label="Set a box corner (/)", command=self.setbox)
@@ -307,7 +307,7 @@ class UserDisplay(object):
 					  command=lambda s=self: s.loadpoints_ascii(merge=1))
 		m.add_command(label='set (.)', state=DISABLED)
 		m.add_command(label='clear closest (,)', state=DISABLED)
-		p.add_cascade(label='Tracker calibration', menu=m)
+		p.add_cascade(label='Tracker calibration', background='yellow', menu=m)
 
 		m = Menu(p, tearoff=0)
 		m.add_checkbutton(label='Photo mode', command=self._phototoggle,
@@ -426,9 +426,9 @@ class UserDisplay(object):
 				self.msg_win = self.canvas.create_window(5, 25, window=f,
 														  anchor=NW)
 				self.msg_label = Label(f, text=msg, justify=LEFT,
-									   font="Courier 10",
-									   borderwidth=3, relief=RIDGE,
-									   bg='white', fg='black')
+                                        font=('Andale Mono', 10),
+                                        borderwidth=3, relief=RIDGE,
+                                        bg='white', fg='black')
 				self.msg_label.pack(ipadx=3, ipady=3)
 				self._placenote()
 			else:
@@ -499,7 +499,7 @@ class UserDisplay(object):
 		self._eye_lxy = (x, y)
 
 		tag = C.create_text(x, y, text='+',
-							font=('Courier', 10),
+							font=('Andale Mono', 10),
 							fill='red', justify=CENTER)
 		C.tag_lower(tag)
 
@@ -510,10 +510,10 @@ class UserDisplay(object):
 
 		if self._eye_at is None:
 			self._eye_at = (C.create_text(x+1, y+1, text='o',
-										  font=('Courier', 10),
+										  font=('Andale Mono', 10),
 										  fill='white', justify=CENTER),
 							C.create_text(x, y, text='o',
-										  font=('Courier', 10),
+										  font=('Andale Mono', 10),
 										  fill='black', justify=CENTER))
 		for i in self._eye_at:
 			C.coords(i, x, y)
@@ -579,9 +579,9 @@ class UserDisplay(object):
 					for (sx, sy) in ((1,1),(-1,1),(-1,-1),(1,-1)):
 						if x != 0 and y != 0:
 							if ((round(x/d)%5) == 0 or (round(y/d)%5) == 0):
-								color = 'gray50'
+								color = '#00ff00'
 							else:
-								color = 'gray70'
+								color = '#008000'
 							self._axis.append(
 								self.canvas.create_rectangle(xo+(sx*x),
 															 yo+(sy*y),
@@ -670,8 +670,8 @@ class UserDisplay(object):
 			y1 = self.fix_y + y1
 			x1,y1 = self.cart2canv(x1, y1)
 			self.markbox = self.canvas.create_rectangle(x1-1,y1-1,x1+1,y1+1,
-														 fill='black',
-														 outline="black")
+														 fill='blue',
+														 outline="blue")
 		elif len(self.markstack) == 2:
 			x1, y1 = self.markstack[0][0], self.markstack[0][1]
 			x1 = self.fix_x + x1
@@ -755,10 +755,10 @@ class UserDisplay(object):
 	def addpoint(self, x, y):
 		"""(x, y) specifies point in CANVAS coords (0,0) is upper left"""
 		(px, py) = (int(round(x - (self.w/2.0))), int(round((self.h/2.0) - y)))
-		d = 2; o = 6;
-		tb = self.canvas.create_oval(x-o, y-o, x+o, y+o, fill='red', width=0)
+		d = 2; o = 10;
+		tb = self.canvas.create_oval(x-o, y-o, x+o, y+o, fill='yellow', width=0)
 		t = self.canvas.create_text(x, y, anchor=CENTER, justify=CENTER,
-									text='i', fill='white')
+									text='i', fill='black')
 		self.points.append((px, py, t, tb))
 
 	def deletepoint(self, x, y):
@@ -1214,11 +1214,11 @@ class UserDisplay(object):
 		ay = my + self.fix_y
 		(cx, cy) = self.cart2canv(ax, ay)
 
-		o = 6
+		o = 10
 		tagb = self.canvas.create_oval(cx-o, cy-o, cx+o, cy+o,
 									   fill='green', width=0)
 		tag = self.canvas.create_text(cx, cy, anchor=CENTER, justify=CENTER,
-									   fill='black', text='x')
+									   fill='black', text='+')
 
 		# save mark in retinal coords
 		self._fid_list.append((tag, tagb, mx, my))
@@ -1307,7 +1307,7 @@ class UserDisplay(object):
 			(x, y) = self.cart2canv(x, y)
 			self._fixtag = self.canvas.create_rectangle(x-5, y-5, x+5, y+5,
 														 fill='',
-														 outline='blue')
+														 outline='red')
 		self._redrawfidmarks()
 		self.drawbox()
 

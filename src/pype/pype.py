@@ -898,7 +898,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         self._repinfo = Label(f, text=None)
         self._repinfo.pack(side=RIGHT)
 
-        self._stateinfo = Label(f, text=None, font=('Courier', 10))
+        self._stateinfo = Label(f, text=None, font=('Andale Mono', 10))
         self._stateinfo.pack(side=RIGHT)
         self.mldown = None
         self.balloon.bind(self._stateinfo, "state info: bar, juice etc")
@@ -1163,7 +1163,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
         self.statsw = Label(stats, text='',
                             anchor=W, justify=LEFT,
-                            font=('Courier', 10))
+                            font=('Andale Mono', 10))
         self.statsw.pack(expand=0, fill=BOTH, side=TOP)
 
 
@@ -1689,11 +1689,11 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             try:
                 if barstate:
                     self.udpy.barstate.config(text='DOWN',
-                                              font=('Courier', 10),
+                                              font=('Andale Mono', 10),
                                               fg='blue')
                 else:
                     self.udpy.barstate.config(text=' UP ',
-                                              font=('Courier', 10),
+                                              font=('Andale Mono', 10),
                                               fg='red')
                 self._last_stateinfo = t
             except AttributeError:
@@ -1907,7 +1907,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         self._loadmenu.addmenu('Recent', '', '')
         for (t, d) in self.recent:
             self._loadmenu.addmenuitem('Recent', 'command',
-                                       font=('Courier', 10),
+                                       font=('Andale Mono', 10),
                                        label=t,
                                        command=lambda s=self,t=t,d=d: \
                                                 s.loadtask(t, d))
@@ -1958,7 +1958,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 self.tasklist[t] = 1
             tasklabel = '%-15s %s' % (t, taskdescrs[t])
             menubar.addmenuitem(menulabel, 'command', label=tasklabel,
-                                font=('Courier', 10),
+                                font=('Andale Mono', 10),
                                 foreground=c,
                                 command=lambda s=self,t=t,d=dirname:
                                 s.loadtask(t, d))
@@ -1983,7 +1983,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                     toolbar.pack(anchor=CENTER, padx=10, pady=10)
                 b = Button(toolbar, text=t[:3],
                            background='white',
-                           font=('Courier', 8),
+                           font=('Andale Mono', 8),
                            command=lambda s=self, t=t, d=d: s.loadtask(t, d))
                 b.pack(side=LEFT)
                 self.balloon.bind(b, fullpath)

@@ -66,7 +66,7 @@ def B(x, on='ON ', off='OFF'):
 	else: return off
 
 BLINK_STATES = ['OFF', 'ON', 'BLINK']
-BTAG = ['OFF', '', '']
+BTAG = ['X', 'S', 'B']
 
 _n = 0
 BAR=_n ; _n += 1
@@ -495,12 +495,13 @@ class _Probe(object):
                                                arrow=LAST,
                                                fill='magenta',
                                                width=4)
+
 			self.onoff = \
               self.app.udpy.canvas.create_text(x, y,
                                                text=BTAG[self.blink_state],
                                                anchor=CENTER,
                                                font=('Andale Mono', 30),
-                                               fill='cyan')
+                                               fill='green')
 			for l in (self.minor_ax, self.major_ax):
 				self.app.udpy.canvas.lower(l)
 

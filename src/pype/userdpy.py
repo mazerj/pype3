@@ -78,6 +78,8 @@ import filebox
 
 from pypedebug import keyboard
 
+MONOFONT = 'Andale Mono'
+
 class ScaledCanvas(Canvas):
 	def __init__(self, *args, **kwargs):
 		if 'xscale' in kwargs:
@@ -199,26 +201,28 @@ class UserDisplay(object):
 
 		f = Frame(self.frame)
 		f.pack(expand=1, fill=X)
-		self._info = Label(f, font=('Andale Mono', 10), relief=SUNKEN)
+		self.barstate = Label(f, fg='green', bg='black', relief=FLAT)
+		self.barstate.pack(expand=0, side=LEFT, padx=2)
+		self._mouseinfo_x = Label(f, font=(MONOFONT, 10),
+								  fg='green', bg='black', relief=FLAT)
+		self._mouseinfo_x.pack(expand=0, side=LEFT, padx=2)
+		self._mouseinfo_y = Label(f, font=(MONOFONT, 10), \
+								  fg='green', bg='black', relief=FLAT)
+		self._mouseinfo_y.pack(expand=0, side=LEFT, padx=2)
+
+		self._info = Label(f, font=(MONOFONT, 10),
+								  fg='green', bg='black', relief=FLAT)
 		self._info.pack(expand=1, fill=X, side=LEFT)
-
-		self.barstate = Label(f, relief=SUNKEN)
-		self.barstate.pack(expand=0, side=RIGHT, padx=2)
-		Label(f, font=('Andale Mono', 10), \
+        
+		Label(f, font=(MONOFONT, 10), \
 			  text='%dppd' % (pix_per_dva,), \
-			  relief=SUNKEN).pack(expand=0, side=RIGHT, padx=2)
+              fg='green', bg='black',
+			  relief=FLAT).pack(expand=0, side=LEFT, padx=2)
 		if xscale != 1.0 or yscale != 1.0:
-			Label(f, font=('Andale Mono', 10), \
+			Label(f, font=(MONOFONT, 10), \
 				  text='%.1fx%.1f' % (xscale, yscale), \
-				  relief=SUNKEN).pack(expand=0, side=RIGHT, padx=2)
-
-		self._mouseinfo_y = Label(f, font=('Andale Mono', 10), \
-								  fg='red', bg='white', relief=SUNKEN)
-		self._mouseinfo_y.pack(expand=0, side=RIGHT, padx=2)
-		self._mouseinfo_x = Label(f, font=('Andale Mono', 10),
-								  fg='red', bg='white', relief=SUNKEN)
-		self._mouseinfo_x.pack(expand=0, side=RIGHT, padx=2)
-
+                  fg='green', bg='black',
+				  relief=FLAT).pack(expand=0, side=LEFT, padx=2)
 
 		# tkinter vars for linking GUI to python vars:
 		self._photomode_tvar = IntVar()
@@ -247,13 +251,12 @@ class UserDisplay(object):
 
 		self._htrace = []
 		self._vtrace = []
-		self._tracecursor = self.canvas.create_line(1, 50-20, 1, 50+20,
-													 fill='black')
+		self._tracecursor = self.canvas.create_line(1, 50-20, 1, 50+20, fill='white')
 		for x in range(1,cwidth):
 			self._htrace.append(self.canvas.create_line(x-1, 50, x, 50,
-														 fill='red', width=3))
+                                                        fill='red', width=3))
 			self._vtrace.append(self.canvas.create_line(x-1, 50, x, 50,
-														 fill='violet', width=3))
+                                                        fill='violet', width=3))
 		self._traceptr = 0
 
 
@@ -284,7 +287,7 @@ class UserDisplay(object):
 		m.add_command(label='Load (l)', command=self.loadfidmarks)
 		m.add_command(label='View (v)', command=self._showfidmarks)
 		m.add_command(label='clear closest (c)')
-		p.add_cascade(label='Fiduciary Marks', background='green', menu=m)
+		p.add_cascade(label='Fiduciary Marks', background='blue', menu=m)
 
 		m = Menu(p, tearoff=0)
 		m.add_command(label="Set a box corner (/)", command=self.setbox)
@@ -426,7 +429,7 @@ class UserDisplay(object):
 				self.msg_win = self.canvas.create_window(5, 25, window=f,
 														  anchor=NW)
 				self.msg_label = Label(f, text=msg, justify=LEFT,
-                                        font=('Andale Mono', 10),
+                                        font=(MONOFONT, 10),
                                         borderwidth=3, relief=RIDGE,
                                         bg='white', fg='black')
 				self.msg_label.pack(ipadx=3, ipady=3)
@@ -499,7 +502,7 @@ class UserDisplay(object):
 		self._eye_lxy = (x, y)
 
 		tag = C.create_text(x, y, text='+',
-							font=('Andale Mono', 10),
+							font=(MONOFONT, 10),
 							fill='red', justify=CENTER)
 		C.tag_lower(tag)
 
@@ -510,11 +513,8 @@ class UserDisplay(object):
 
 		if self._eye_at is None:
 			self._eye_at = (C.create_text(x+1, y+1, text='o',
-										  font=('Andale Mono', 10),
-										  fill='white', justify=CENTER),
-							C.create_text(x, y, text='o',
-										  font=('Andale Mono', 10),
-										  fill='black', justify=CENTER))
+										  font=(MONOFONT, 10),
+										  fill='white', justify=CENTER),)
 		for i in self._eye_at:
 			C.coords(i, x, y)
 			C.tag_raise(i)
@@ -560,15 +560,17 @@ class UserDisplay(object):
 			# draw cardinal axis (0,0)
 			(x, y) = self.cart2canv(0, 0)
 			self.canvas.create_line(x, 0, x, self.h, width=1,
-									 fill='black', dash=(7,2))
+									 fill='white', dash=(7,2))
 			self.canvas.create_line(0, y, self.w, y, width=1,
-									 fill='black', dash=(7,2))
+									 fill='white', dash=(7,2))
 
 		if sync and self.app.fb.syncinfo:
 			(sx, sy, ss) = self.app.fb.syncinfo
 			(a, b) = self.cart2canv(sx - ss/2, sy - ss/2)
 			(c, d) = self.cart2canv(sx + ss/2, sy + ss/2)
-			self.canvas.create_rectangle(a, b, c, d, fill='black')
+			self.canvas.create_rectangle(a, b, c, d,
+                                             stipple='gray12',
+                                             fill='white')
 
 		# gridinterval is pix/deg
 		d = int(round(self.gridinterval))
@@ -579,9 +581,9 @@ class UserDisplay(object):
 					for (sx, sy) in ((1,1),(-1,1),(-1,-1),(1,-1)):
 						if x != 0 and y != 0:
 							if ((round(x/d)%5) == 0 or (round(y/d)%5) == 0):
-								color = '#00ff00'
-							else:
 								color = '#008000'
+							else:
+								color = '#003000'
 							self._axis.append(
 								self.canvas.create_rectangle(xo+(sx*x),
 															 yo+(sy*y),
@@ -755,10 +757,11 @@ class UserDisplay(object):
 	def addpoint(self, x, y):
 		"""(x, y) specifies point in CANVAS coords (0,0) is upper left"""
 		(px, py) = (int(round(x - (self.w/2.0))), int(round((self.h/2.0) - y)))
-		d = 2; o = 10;
-		tb = self.canvas.create_oval(x-o, y-o, x+o, y+o, fill='yellow', width=0)
+		o = 6;
+		tb = self.canvas.create_oval(x-o, y-o, x+o, y+o,
+                                     outline='yellow', width=1)
 		t = self.canvas.create_text(x, y, anchor=CENTER, justify=CENTER,
-									text='i', fill='black')
+									text='e', fill='yellow')
 		self.points.append((px, py, t, tb))
 
 	def deletepoint(self, x, y):
@@ -956,7 +959,7 @@ class UserDisplay(object):
 							(x1, y1) = self.cart2canv(xy[n])
 							ii.append(self.canvas.create_line(x0, y0, x1, y1,
 															   width=s.width,
-															   fill='black'))
+															   fill='white'))
 					else:
 						forcephoto = 0
 						if hasattr(s, 'forcephoto'):
@@ -998,7 +1001,7 @@ class UserDisplay(object):
 												 width=1, fill='blue'))
 		return tags
 
-	def icon(self, x=None, y=None, w=5, h=5, text=None, color='black',
+	def icon(self, x=None, y=None, w=5, h=5, text=None, color='white',
 			 type='box', dash=None, r=5, fill=''):
 		if y is None and x is None:
 			self._iconlist = self.deltags(self._iconlist)
@@ -1037,7 +1040,7 @@ class UserDisplay(object):
 			self._iconlist.append(tag)
 			return tag
 
-	def texticon(self, x=None, y=None, text=None, color='black'):
+	def texticon(self, x=None, y=None, text=None, color='white'):
 		if y is None and x is None:
 			self._iconlist = self.deltags(self._iconlist)
 		elif y is None:
@@ -1214,11 +1217,11 @@ class UserDisplay(object):
 		ay = my + self.fix_y
 		(cx, cy) = self.cart2canv(ax, ay)
 
-		o = 10
+		o = 6
 		tagb = self.canvas.create_oval(cx-o, cy-o, cx+o, cy+o,
-									   fill='green', width=0)
+									   outline='blue', width=1)
 		tag = self.canvas.create_text(cx, cy, anchor=CENTER, justify=CENTER,
-									   fill='black', text='+')
+									   fill='blue', text='+')
 
 		# save mark in retinal coords
 		self._fid_list.append((tag, tagb, mx, my))

@@ -2359,7 +2359,7 @@ def _texture_del(texture):
 	"""
 
     # I think this changed with 3.1.0 release... not sure!
-    if ogl.version.__version__ > "3.0.0":
+    if OpenGL.version.__version__ > "3.0.0":
         (textureid, w, h) = texture
         ogl.glDeleteTextures(np.array([textureid]))
     else:

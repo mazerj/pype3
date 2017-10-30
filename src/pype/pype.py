@@ -2272,7 +2272,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                               syncx=sx, syncy=sy,
                               synclevel=self.config.iget('SYNCLEVEL'),
                               mouse=self.config.iget('MOUSE'),
-                              frame = self.config.iget('FRAME'),
                               xscale=self.config.fget('XSCALE'),
                               yscale=self.config.fget('YSCALE'),
                               app=self)

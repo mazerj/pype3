@@ -405,7 +405,7 @@ finally:
 
 from types import *
 from Tkinter import *
-from Pmw import *
+import Pmw
 
 #####################################################################
 #  pype internal modules
@@ -796,7 +796,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         self._show_xt_traces.set(0)
 
         mb = Pmw.MenuBar(f1)
-
         mb.pack(side=LEFT, expand=0)
 
         mb.addmenu('File', '', '')
@@ -852,7 +851,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                        variable=self._show_eyetrace)
         mb.addmenuitem('Set', 'checkbutton', label='X-T eye traces',
                        variable=self._show_xt_traces)
-
 
         # make top-level menubar for task loaders that can be
         # disabled when it's not safe to load new tasks...
@@ -1139,8 +1137,8 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                                    command=lambda s=self,f=fn: s._candyplay(f))
 
         self.make_toolbar(bb)
-
-        mb.addmenu('|', '', '')
+        if not sys.platform.startswith('darwin'):
+            mb.addmenu('|', '', '')
 
         self.recent = []                # list of recently used tasks
 
@@ -1875,6 +1873,8 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
         for p in taskpathlist:
             for d in p.split(':'):
+                if len(posixpath.basename(d)) == 0:
+                    d = d[:-1]
                 try:
                     self.add_tasks(menubar, posixpath.basename(d), d)
                 except ValueError:
@@ -3392,10 +3392,11 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             # turn bell and screensaver back on -- this isn't really
             # quite right -- it always gets turned back on, even if they
             # weren't on to start with..
-            d = self.config.get('SDLDPY')
-            os.system("xset -display %s b on" % d)
-            os.system("xset -display %s s on" % d)
-            os.system("xset -display %s +dpms" % d)
+            if sys.platform.startswith('linux'):
+                d = self.config.get('SDLDPY')
+                os.system("xset -display %s b on" % d)
+                os.system("xset -display %s s on" % d)
+                os.system("xset -display %s +dpms" % d)
 
         if self.dacq_going:
             dacq_stop()

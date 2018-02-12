@@ -158,12 +158,24 @@ if ~dups
                                  r.rec(n).eyet);
       r.rec(n).eyey = naninterp1(r.rec(n).oeyet, r.rec(n).oeyey, ...
                                  r.rec(n).eyet);
-      r.rec(n).eyep = naninterp1(r.rec(n).oeyet, r.rec(n).oeyep, ...
-                                 r.rec(n).eyet);
-      r.rec(n).raw_photo = naninterp1(r.rec(n).oeyet, r.rec(n).oraw_photo, ...
-                                      r.rec(n).eyet);
-      r.rec(n).raw_spike = naninterp1(r.rec(n).oeyet, r.rec(n).oraw_spike, ...
-                                      r.rec(n).eyet); 
+      if length(r.rec(n).oeyep) > 0
+        r.rec(n).eyep = naninterp1(r.rec(n).oeyet, r.rec(n).oeyep, ...
+                                   r.rec(n).eyet);
+      else
+        r.rec(n).eyep = [];
+      end
+      if length(r.rec(n).raw_photo) > 0
+        r.rec(n).raw_photo = naninterp1(r.rec(n).oeyet, r.rec(n).oraw_photo, ...
+                                        r.rec(n).eyet);
+      else
+        r.rec(n).raw_photo = [];
+      end
+      if length(r.rec(n).raw_spike) > 0
+        r.rec(n).raw_spike = naninterp1(r.rec(n).oeyet, r.rec(n).oraw_spike, ...
+                                        r.rec(n).eyet); 
+      else
+        r.rec(n).raw_spike = [];
+      end
     end
   end
 end

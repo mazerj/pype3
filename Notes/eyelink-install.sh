@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# this sets the system up to use SR's software repository for linux
+# and installs the latest versions of the required libraries.
+
 if [ `whoami` != root ]; then
     echo "run as root!"
     exit 1

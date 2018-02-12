@@ -34,7 +34,7 @@ Migrated from googlecode to github 11/24/2014.
 	
 7. Add eyelink repository and install dev kit:
 
-		% sudo sh ./Notes/eyelink-repo.sh
+		% sudo sh ./Notes/eyelink-install.sh
 		...say 'y' to everything..
 
 8. Install libezV24 (needed for access to serial port):

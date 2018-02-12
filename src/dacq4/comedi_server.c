@@ -214,7 +214,7 @@
 static char	*progname = NULL;
 static DACQINFO *dacq_data = NULL;
 static int	mem_locked = 0;
-static int	gotdacq = 0;
+static int	nodacq = 0;
 static int	semid;
 static double	arange;
 static int	das08 = 0;	/* board is das08? (was pci-das08)*/
@@ -571,6 +571,9 @@ int comedi_init()
   if (strncmp(devname, "das16", 5) == 0) {
     fprintf(stderr, "%s: 8255 disabled.\n", progname);
     use8255 = 0;
+  } else if (strcmp(devname, "cb_pcimdas") == 0) {
+    fprintf(stderr, "%s: 8255 disabled.\n", progname);
+    use8255 = 0;
   } else if (strncmp(devname, "das08", 5) == 0 ||
 	     strncmp(devname, "pci-das08", 9) == 0) {
     use8255 = 0;
@@ -588,7 +591,7 @@ int comedi_init()
   if (analog_in == -1) {
     comedi_perror("analog_in");
   } else {
-    fprintf(stderr, "%s: analog input OK\n", progname);
+    fprintf(stderr, "%s: analog input OK (subdev=%d)\n", progname, analog_in);
   }
 
   n = comedi_get_n_channels(comedi_dev, analog_in);
@@ -653,7 +656,7 @@ int ad_in(int chan)
   lsampl_t sample;
   int success;
 
-  if (gotdacq) {
+  if (nodacq) {
     return(0);
   } else {
     // need to set aref correctly: either AREF_GROUND or AREF_COMMON
@@ -684,7 +687,7 @@ void dig_in()
   int i, last;
   unsigned int bits;
 
-  if (gotdacq) {
+  if (nodacq) {
     // just lock these down -- polarities are
     // from the old taks -- hardcoded to work in NAF...
     LOCK(semid);
@@ -722,7 +725,7 @@ void dig_out()
   unsigned int bits = 0;
   int i;
 
-  if (gotdacq) {
+  if (nodacq) {
     return;
   } else {
     for (i = 0; i < 8 && i < NDIGOUT; i++) {
@@ -749,11 +752,11 @@ int mainloop_init()
   int shmid;
 
   if (comedi_init()) {
-    gotdacq = 0;
+    nodacq = 0;
     fprintf(stderr, "%s: comedi initialized.\n", progname);
   } else {
+    nodacq = 1;
     fprintf(stderr, "%s: no dacq mode.\n", progname);
-    gotdacq = 1;
   }
 
   if (dig_io >= 0) {

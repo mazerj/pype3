@@ -660,7 +660,7 @@ int ad_in(int chan)
     return(0);
   } else {
     // need to set aref correctly: either AREF_GROUND or AREF_COMMON
-    if (das08) {
+    if (das08 || 1) {
       // das08 is screwy -- needs time for multiplexer to settle:
       success = comedi_data_read_delayed(comedi_dev,analog_in,
 					 chan,analog_range,AREF_GROUND,

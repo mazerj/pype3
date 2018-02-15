@@ -2358,21 +2358,19 @@ def _texture_del(texture):
 
 	"""
 
-    if 0:
-        #
-        # THIS IS NOT CORRECT - NEED TO TRACK DOWN SOURCE!!!!
-        #
-        # I think this changed with 3.1.0 release... not sure!
-        if OpenGL.version.__version__ > "3.0.0":
-            (textureid, w, h) = texture
-            ogl.glDeleteTextures(np.array([textureid]))
-        else:
-            ogl.glDeleteTextures(texture[0])
-    ogl.glDeleteTextures(texture[0])
+	if 0:
+		#
+		# THIS IS NOT CORRECT - NEED TO TRACK DOWN SOURCE!!!!
+		#
+		# I think this changed with 3.1.0 release... not sure!
+		if OpenGL.version.__version__ > "3.0.0":
+			(textureid, w, h) = texture
+			ogl.glDeleteTextures(np.array([textureid]))
+		else:
+			ogl.glDeleteTextures(texture[0])
+	ogl.glDeleteTextures(texture[0])
     
     
-        
-
 def _texture_create(rgbastr, w, h):
     """Create GL texture on video card.
 

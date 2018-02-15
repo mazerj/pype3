@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+# Install pype to /usr/local
+#
+
+./install-to /usr/local/pype3 $*

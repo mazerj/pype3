@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# install pype to specified target (base) directory
+#
+
+if [ "$1" = "" ]; then
+  echo "usage: `basename $0` targetdir [options]"
+  exit 1
+fi
+
+INSTDIR=$1; shift
+mkdir -p $INSTDIR
+
+if [ "$1" = "" ]; then
+  env PYPEDIR=$INSTDIR ./build install
+else
+  env PYPEDIR=$INSTDIR ./build $*
+fi

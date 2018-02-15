@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# Install for mazer lab
+#
+
+DEST=/auto/share/pype3/`uname -m`
+
+if [ "$*" = "" ]; then
+  sudo -p"sudo [mlab install]: " ./install-to $DEST clobber install docs
+else
+  sudo -p"mlab [mlab install]: " ./install-to $DEST $*
+fi

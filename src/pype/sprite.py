@@ -190,6 +190,19 @@ YELLOW	= (255,255,1)
 MAGENTA = (255,1,255)
 CYAN	= (1,255,255)
 
+import PIL.Image
+
+if PIL.Image.VERSION >= '1.1.7':
+    # newer versions of PIL use .frombytes() instead of .fromstring()
+	def image2pil(image):
+		return PIL.Image.frombytes('RGBA', image.get_size(),
+								   pygame.image.tostring(image, 'RGBA'))
+else:
+    # old version
+	def image2pil(image):
+		return PIL.Image.fromstring('RGBA', image.get_size(),
+								    pygame.image.tostring(image, 'RGBA'))
+
 class FrameBuffer(object):
 	_instance = None
 
@@ -799,10 +812,7 @@ class FrameBuffer(object):
 				Tkinter/Canvas..)
 
 		"""
-		import PIL.Image
-
-		pil = PIL.Image.fromstring('RGBA', self.screen.get_size(),
-								   pygame.image.tostring(self.screen, 'RGBA'))
+		pil = image2pil(self.screen)
 		if filename:
 			if size:
 				pil.resize(size).save(filename)
@@ -1302,9 +1312,7 @@ class ScaledSprite(object):
 
 		"""
 
-		import PIL.Image
-		pil = PIL.Image.fromstring('RGBA', self.im.get_size(),
-								   pygame.image.tostring(self.im, 'RGBA'))
+		pil = image2pil(self.im)
 		pil = pil.resize((self.dw, self.dh))
 		if xscale or yscale:
 			(w, h) = pil.size

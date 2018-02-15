@@ -1,6 +1,0 @@
-#!/bin/sh
-#
-#  install pype to /usr/local
-#
-
-./install_private /usr/local/pype3 $*

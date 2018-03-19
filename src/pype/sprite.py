@@ -262,8 +262,6 @@ class FrameBuffer(object):
 
 		:param mouse: show mouse cursor? default is no
 
-		:param frame: show window frame? default is no
-
 		:param app: (PypeApp) application handle
 
 		:param eyefn: (optional fn that returns (x,y)) If provided should

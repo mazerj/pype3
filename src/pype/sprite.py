@@ -299,6 +299,9 @@ class FrameBuffer(object):
 		self.flags = OPENGL | DOUBLEBUF
 		if fullscreen:
 			self.flags = self.flags | HWSURFACE | FULLSCREEN
+		else:
+			if sys.platform.startswith('linux'):
+				self.flags = self.flags | NOFRAME
 
 		if sys.platform.startswith('linux'):
 			os.environ['__GL_SYNC_TO_VBLANK'] = '1' # nvidia specific!
@@ -351,15 +354,21 @@ class FrameBuffer(object):
 		# disable the sync pulse in config with 'SYNCSIZE: -1'
 		self.sync_mode = not (syncsize <= 0 or (not sync))
 		if self.sync_mode:
-
-			# If location (ie, center!) of sync pulse is not specified
-			# (None), then put it in the lower right corner. Coords are
-			# standard fb coords: (+,-) is lower-right quadrant!
+			# If sync pulse location is not specified, then put it in
+			# the lower right corner:
 			if syncx is None:
 				syncx = int(round(self.w/2))
 			if syncy is None:
 				syncy = int(round(-self.h/2))
 
+			# if sync position is [-1,+1] -- consider it as normalized
+			# position relative to the screen geometry (-1,-1) is lower
+			# left corner..
+			if abs(syncx) <= 1:
+				syncx = syncx * int(round(self.w/2))
+			if abs(syncy) <= 1:
+				syncy = syncy * int(round(self.h/2))
+			
 			# pre-build sync/photodiode driving sprites:
 			self._sync_low = Sprite(syncsize, syncsize, syncx, syncy,
 									name='sync_low', on=1, fb=self)

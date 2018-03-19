@@ -2864,14 +2864,17 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             # process keys from the framebuffer window
             if 'f8' in self.fb.checkkeys():
                 self.eyeshift(zero=1)
-                self.con('framebuffer:f8')
-                while not self.fb.checkkeys() == []: pass
+                self.con('[f8]', color='red')
+                # debounce: wait for keys to be released..
+                while not self.fb.checkkeys() == []:
+                    pass
             elif 'escape' in self.fb.checkkeys():
                 if self._allowabort:
                     self.encode(ABORT)
-                    self.con('framebuffer:esc')
-                    while not self.fb.checkkeys() == []: pass
                     self.con("[esc]", color='red')
+                    # debounce: wait for keys to be released..
+                    while not self.fb.checkkeys() == []:
+                        pass
                     raise UserAbort
 
             if self.eyemouse:

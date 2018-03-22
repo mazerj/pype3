@@ -53,7 +53,7 @@ clobber:
 
 # makedocs requires epydoc (should probably switch to sphinx...)
 docs:
-	@sh ./makedocs
+	@sh ./makedocs.sh
 
 ################################################################
 # push to github ('origin')

@@ -74,6 +74,7 @@ class SamplerU3(object):
 			self.d = deviceHandle
 		self.samplingRate = samplingRate
 
+		self.config = self.d.configU3()
 		self.frags = []
 		self.nsamps = 0
 		self.running = 0

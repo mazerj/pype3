@@ -2250,11 +2250,21 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         #     comedi_server completely..
         try:
             import labjack
-            self.u3 = labjack.SamplerU3()
-            Logger("pype: found a labjack u3 -- validation mode\n")
+            Logger("pype: found LabJack drivers\n")
+            lj = True
         except ImportError:
             Logger("pype: LabJack drivers not installed.\n")
-            self.u3 = None
+            lj = False
+            
+        if lj:
+            try:
+                self.u3 = labjack.SamplerU3()
+                Logger("pype: found labjack %s\n" % self.u3.config['DeviceName'])
+                print self.u3
+            except:
+                self.u3 = None
+                Logger("pype: can't find a labjack.\n")
+                
 
     def init_framebuffer(self):
         sx = self.config.get('SYNCX', None)

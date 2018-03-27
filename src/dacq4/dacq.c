@@ -561,8 +561,8 @@ double dacq_ts0(void)		/* retrieve raw timestamp 0-basis */
 {
   double f;
   LOCK(semid);
-  f = dacq_data->ts0;
-  UNLOCK(semid);
+  f = dacq_data->ts0;		/* ts0 is time  comedi server */
+  UNLOCK(semid);		/* was initialized */
   return(f);
 }
 

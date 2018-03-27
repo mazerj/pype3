@@ -2241,30 +2241,41 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 Logger("init_dacq: try running 'pypekill' or 'pypekill -s'\n")
                 raise PypeStartupError
 
-        # Tue Jan  8 15:08:12 2013 mazer
-        #   - This basically works -- the lag between the comedi
-        #     datastream and the labjack is ~0.7ms as far as I can
-        #     tell (using cross correlation against FM chirps).
-        #   - However, integration is not complete... not sure how
-        #     I want to do this -- could use it to get rid of
-        #     comedi_server completely..
-        try:
-            import labjack
-            Logger("pype: found LabJack drivers\n")
-            lj = True
-        except ImportError:
-            Logger("pype: LabJack drivers not installed.\n")
-            lj = False
-            
-        if lj:
+        self.u3test = False
+
+        if self.u3test:
+            # Tue Jan  8 15:08:12 2013 mazer
+            #   - This basically works -- the lag between the comedi
+            #     datastream and the labjack is ~0.7ms as far as I can
+            #     tell (using cross correlation against FM chirps).
+            #   - However, integration is not complete... not sure how
+            #     I want to do this -- could use it to get rid of
+            #     comedi_server completely..
             try:
-                self.u3 = labjack.SamplerU3()
-                Logger("pype: found labjack %s\n" % self.u3.config['DeviceName'])
-                print self.u3
-            except:
-                self.u3 = None
-                Logger("pype: can't find a labjack.\n")
-                
+                import labjack
+                Logger("pype: found LabJack drivers\n")
+                lj = True
+            except ImportError:
+                Logger("pype: LabJack drivers not installed.\n")
+                lj = False
+
+            if lj:
+                try:
+                    self.u3 = labjack.SamplerU3()
+                    Logger("pype: labjack %s H:v%s F:v%s\n" % \
+                           (self.u3.config['DeviceName'],
+                            self.u3.config['HardwareVersion'],
+                            self.u3.config['FirmwareVersion'],))
+                    self.u3.count = 0
+                except:
+                    self.u3 = None
+                    Logger("pype: can't find a labjack.\n")
+
+            if lj and self.u3:
+                # trip labjack once to force init and load
+                self.u3.start()
+                time.sleep(0.01)
+                self.u3.stop(wait=1)
 
     def init_framebuffer(self):
         sx = self.config.get('SYNCX', None)
@@ -3551,8 +3562,8 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
         # tell plexon trial is BEGINNING
         self.record_state(1)
-        if self.u3:
-            self.u3.go()
+        if self.u3test:
+            self.u3.start()
         t = self.encode(START)
 
         # Mon Oct 27 12:56:47 2008 mazer
@@ -3580,7 +3591,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         self.recording = 0
         self.record_state(0)
         t = self.encode(STOP)
-        if self.u3:
+        if self.u3test:
             self.u3.stop(wait=1)
 
         # Mon Oct 27 12:56:47 2008 mazer
@@ -3590,7 +3601,8 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         # bump back down the data collect process priorities
         dacq_set_pri(0)
         dacq_set_mypri(0)
-        dacq_set_rt(0)
+        if self.rig_common.queryv('rt_sched'):
+            dacq_set_rt(0)
 
         if self.plex is not None:
             self.xdacq_data_store = _get_plexon_events(self.plex, fc=40000)
@@ -3958,25 +3970,37 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         self.spike_times = _find_ttl(self.eyebuf_t, s0,
                                       spike_thresh, spike_polarity)
 
-        if self.u3:
-            # here's problem: labjack timestamps are free running
-            # clock monotonic.. pype's are zero'd to when comedi_server
-            # was initialized!
+        ut = []
+        a0 = []
+        if self.u3test and self.u3 and len(self.eyebuf_t) > 0:
+            # ..only do this if there's real data to write..
+
+            # dacq_ts0 is the time at which comedi_server was initialized,
+            # which is time zero as far as pype is concerned, since labjack
+            # data is timestamped from clock_monotonic, we need to
+            # subtract of ts0 from incoming timestamps
             #
             # Mon Jan  7 15:12:15 2013 mazer
             #  this looks like the two are synced to within 0.7ms (LJ
             #  seems to lag the comedi stream by about 0.7 ms).
-            (ut, a0, a1, a2, a3) = self.u3.get(t0=dacq_ts0())
+            # Tue Mar 27 10:56:09 2018 mazer
+            #  confirmed: <1ms lag between u3 and das1602
 
-            tmpf = open('foo.asc', 'w')
-            for n in range(len(ut)):
-                tmpf.write('%d %f %f\n' % (1, ut[n], a0[n],))
+            (rawut, ut, a0, a1, a2, a3) = self.u3.get()
+            ut = ut - dacq_ts0()
+            tf = open('u3-%04d.asc' % self.u3.count, 'w')
+            ut = ut * 1000.             # convert s->ms
+            ix = np.where(np.logical_and(ut >= self.eyebuf_t[0],
+                                         ut <= self.eyebuf_t[-1]))[0]
+            for n in ix:
+                tf.write('%f %f\n' % (ut[n], a0[n],))
+            tf.close()
+
+            tf = open('com-%04d.asc' % self.u3.count, 'w')
             for n in range(len(self.eyebuf_t)):
-                tmpf.write('%d %f %f\n' % (0, self.eyebuf_t[n], p0[n],))
-            tmpf.close()
-        else:
-            ut = []
-            a0 = []
+                tf.write('%f %f\n' % (self.eyebuf_t[n], p0[n],))
+            tf.close()
+            self.u3.count = (self.u3.count + 1) % 10000
 
         self.update_rt((resultcode, rt, params, taskinfo))
         if 1 or resultcode[0] == CORRECT_RESPONSE:

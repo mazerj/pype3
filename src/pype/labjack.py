@@ -3,11 +3,24 @@
 """
 Sampler Class for LabJack U3.
 
-This basically provides a simple common interface for both
-foreground or background sampling of AIN lines from the U3
-using streaming mode. The incoming data stream is synced
-to the host clock (posix monotonic clock) to within 1ms
-(verified 03/27/2018 by cross correlation.
+This basically provides a class that allows streaming
+of data from a LabJack U3 device. The sampling runs
+in a separte thread (note: potential for GIL blocking
+here). The thread collects 4 channels of analog input
+from the U3 and stores it synced to the host clock. Sync
+is within 1ms (verified 03/27/2018 by cross correlation
+against dacq4 comedi drivers).
+
+While AIN data is streaming a second stream controls
+the digital inputs and outputs, allowing pulses to be
+generated and detected. Latency of DOUT is <1ms (verified
+03/27/2018 by recording DOUT using dacq4/comedi).
+
+AINO[0-3] are used for analog input (fixed on U3-HV)
+FIO4: digital output 0
+FIO5: digital output 1
+FIO6: digital input 0
+FIO7: digital input 1
 
 Notes:
   - timestamps are in SECONDS
@@ -25,11 +38,13 @@ Problem:
 	about 12ms AFTER it was recorded (at 2khz). It seems somewhat
 	sampling rate dependent, but not in any obvious way. Nor is
 	it consistent enough to correct for.
+  - are signals being generated on DIN transitions? need to
+    check. which thread gets the signal??
 
 """
 
 import u3
-import os, time, threading, signal
+import os, threading, signal
 import numpy as np
 from monoclock import monotonic_time
 
@@ -88,10 +103,7 @@ class SamplerU3(object):
 		self.d.writeRegister(6106, 0)		# Dig IN
 		self.d.writeRegister(6107, 0)		# Dig IN
 
-		signal.signal(signal.SIGUSR1, self.interrupt_handler)
-
-
-	def start(self, bg=False):
+	def start(self):
 		"""Start acquistion threads.
 
 		This launches two threads:
@@ -100,7 +112,10 @@ class SamplerU3(object):
 		  locked to the host system clock.
 		- The other monitors the two DigitalInput lines (FIO6,7) and
 		  sends a SIGUSR1 to the parent if they change state.
-		  Information about the state change is stored in
+		- Note that in python, signals are always handled in the
+		  main thread, even though posix doesn't specify. See
+		  https://docs.python.org/dev/library/signal.html
+		- Details about the state change are stored in
 		  self.ievent
 
 		Method returns after starting the threads. To stop the
@@ -173,14 +188,17 @@ class SamplerU3(object):
 
 		"""
 
-		# monitor digital input lines in tight loop in order to
-		# generate an interrupt if something changes..
-		self.idisable()
+		# Watch digital input lines in tight loop.
+		# If inputs change state when signals are
+		# enabled, SIGUSR1 will be generated..
+		#
+		# Starts with interrupts disabled!
+		self.signals(enable=False)
 		self.nrunning += 1
 		laststate = None
 		try:
 			while self.running:
-				# use modbus to read FIO6 and FIO7; these were set to
+				# Read FIO6 and FIO7; these were set to
 				# be INPUTs in __init__()
 				state = self.d.readRegister(6006, 2)
 				if laststate is None:
@@ -189,7 +207,7 @@ class SamplerU3(object):
 					# if the state of either line has changed, interrupt
 					# the main thread will os.kill(). self.ievent is used
 					# to pass info about the event.
-					if self.ienabled:
+					if self._gen_signals:
 						if laststate[0] != state[0]:
 							self.ievent = ('din', 0, state[0],
 										   monotonic_time())
@@ -202,18 +220,11 @@ class SamplerU3(object):
 		finally:
 			self.nrunning -= 1
 
-	def ienable(self):
-		"""Enable interupt genration.
+	def signals(self, enable=True):
+		"""Enable/disable signal/interrupt generation.
 
 		"""
-		self.ievent = []
-		self.ienabled = True
-
-	def idisable(self):
-		"""Disable interupt genration.
-
-		"""
-		self.ienabled = False
+		self._gen_signals = enable
 		self.ievent = []
 
 	def get(self, t0=0.0):
@@ -266,11 +277,6 @@ class SamplerU3(object):
 
 		return (rawts, ts, a0, a1, a2, a3)
 
-	def interrupt_handler(self, signal, frame):
-		# self.ievent contains information about what caused the
-		# interrupt: channel, time etc..
-		print self.ievent
-
 	def digout(self, line, state):
 		if line in [0, 1]:
 			self.d.writeRegister(6004+line, state)
@@ -280,17 +286,17 @@ class SamplerU3(object):
 		if line in [0, 1]:
 			return self.d.readRegister(6006+line)
 
-
 if __name__ == "__main__":
+	import time
+	
 	s = SamplerU3()
 	try:
 		while 1:
 			s.start()
-			time.sleep(2.0)
+			time.sleep(5.0)
 			s.stop(wait=1)
 
 			(rawts, ts, a0, a1, a2, a3) = s.get()
-			print np.unique(1000. * np.diff(ts))
 
 	except KeyboardInterrupt:
 		print 'shutting down'

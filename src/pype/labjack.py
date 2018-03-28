@@ -52,21 +52,25 @@ from monoclock import monotonic_time
 U3CLOCK = 4000000.
 
 class SamplerU3(object):
-	def __init__(self, deviceHandle=None, samplingRate=2000.0):
+	def __init__(self, samplingRate=2000.0, dig_callback=None):
 		"""Setup a LabJack U3 for multithreaded sampling.
 
 		Open the LabJack using standard LabJack library calls, then
 		instantiate this specifying the deviceHandle (really object
 		you get back from u3.U3()) and optional samplingRate in Hz.
 
-		Since this is threaded and uses signals -- you
-		must instantiate this ONLY in the main thread!!!!
+		Should be instantiated in main thread -- signals be caught
+		by the main thread!
+
+		If dig_callback is provided, then the callback function will
+		be called when the DIN lines change state with two args: (self
+		(this object), event-details). Either callback OR signals will
+		happen, not both: callback, if defined, otherwise signal. In
+		both cases, this will only happen if `running` and din_alerts
+		are enabled!
 
 		"""
-		if deviceHandle is None:
-			self.d = u3.U3()			# take first available U3
-		else:
-			self.d = deviceHandle
+		self.d = u3.U3()			# take first available U3
 		self.samplingRate = samplingRate
 
 		self.config = self.d.configU3()
@@ -76,6 +80,7 @@ class SamplerU3(object):
 		self.nrunning = 0
 		self.errorcount = 0
 		self.fragstart_host = None
+		self.dig_callback = dig_callback
 
 		# setup a timer on EIO0 (DB15) -- timers use an EIO or FIO line.
 		# offset of 8 pushed it to the DB15 connector...
@@ -193,7 +198,7 @@ class SamplerU3(object):
 		# enabled, SIGUSR1 will be generated..
 		#
 		# Starts with interrupts disabled!
-		self.signals(enable=False)
+		self.din_alerts(enable=False)
 		self.nrunning += 1
 		laststate = None
 		try:
@@ -203,38 +208,35 @@ class SamplerU3(object):
 				state = self.d.readRegister(6006, 2)
 				if laststate is None:
 					laststate = state
-				else:
+				elif self._gen_alerts:
 					# if the state of either line has changed, interrupt
 					# the main thread will os.kill(). self.ievent is used
 					# to pass info about the event.
-					if self._gen_signals:
-						if laststate[0] != state[0]:
-							self.ievent = ('din', 0, state[0],
-										   monotonic_time())
-							os.kill(os.getpid(), signal.SIGUSR1)
-						if laststate[1] != state[1]:
-							self.ievent = ('din', 1, state[0],
-										   monotonic_time())
-							os.kill(os.getpid(), signal.SIGUSR1)
+					self.ievent = ('din', state, monotonic_time())
+					if self.dig_callback:
+						self.dig_callback(self, self.ievent)
+					else:
+						os.kill(os.getpid(), signal.SIGUSR1)
 					laststate = state
 		finally:
 			self.nrunning -= 1
 
-	def signals(self, enable=True):
-		"""Enable/disable signal/interrupt generation.
+	def din_alerts(self, enable):
+		"""Enable/disable `alert` generation - alerts are either
+		calling of the defined callback function OR SIGUSR1 to
+		main thread.
 
 		"""
-		self._gen_signals = enable
+		self._gen_alerts = enable
 		self.ievent = []
 
 	def get(self, t0=0.0):
-		"""Retrieve available data from fragment pool.
+		"""Retrieve and assemble data from fragment pool.
 
 		Timestamp and Analog streams are reassembled from the fragment
 		pool into numeric vectors and recorded as a tuple. Timestamps
 		are in SECONDS, and by default aligned to the host's monotonic
-		clock. Note: t0 is not required, but you can get precision
-		problems if you don't use it!
+		clock.
 
 		You should be able to call this in mid-acquisition, but
 		in general, you should probably call .start(), .stop() and
@@ -287,16 +289,26 @@ class SamplerU3(object):
 			return self.d.readRegister(6006+line)
 
 if __name__ == "__main__":
-	import time
+	import sys, time
+
+	# sample for 5s (or CLI specified time) and dump AIN data to stdou
+	if len(sys.argv) > 1:
+		t = int(sys.argv[1])
+	else:
+		t = 5.0
 	
 	s = SamplerU3()
 	try:
-		while 1:
-			s.start()
-			time.sleep(5.0)
-			s.stop(wait=1)
+		s.start()
+		time.sleep(t)
+		s.stop(wait=1)
 
-			(rawts, ts, a0, a1, a2, a3) = s.get()
+		(rawts, ts, a0, a1, a2, a3) = s.get()
+
+		print '# u3clk hostclk a0 a1 a2 a3'
+		for n in range(len(rawts)):
+			print '%.0f\t%.0f\t%f\t%f\t%f\t%f' % \
+				  (rawts[n], ts[n], a0[n], a1[n], a2[n], a3[n],)
 
 	except KeyboardInterrupt:
 		print 'shutting down'

@@ -27,7 +27,7 @@ import filebox
 class LandingZone(object):
 	"""
 	Circular Landing zone detector -- this is sort of like a FixWin,
-	but all done in pype, without dacq_server intervention. A landing
+	but all done in pype (vs comedi_server subproc). A landing
 	zone is circular region located at (x,y) with a radius of size
 	pixels.  Once the eyes enter the landing zone, a counter is
 	started. If the eyes are still in the landing zone after fixtime,

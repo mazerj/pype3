@@ -917,12 +917,6 @@ void dacq_set_pri(int dacq_pri)
   UNLOCK(semid);
 }
 
-
-int dacq_seteuid(int uid)
-{
-  return(seteuid((uid_t) uid));
-}
-
 int dacq_set_rt(int rt)
 {
 #ifndef __APPLE__

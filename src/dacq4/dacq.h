@@ -88,7 +88,6 @@ extern int dacq_eye_smooth(int kn);
 extern void dacq_set_pri(int dacq_pri);
 
 extern int dacq_set_rt(int rt);
-extern int dacq_seteuid(int uid);
 extern int dacq_set_mypri(int pri);
 
 extern int dacq_int_class(void);

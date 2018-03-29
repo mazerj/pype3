@@ -17,10 +17,6 @@ pype process. Not really for general use.
 import pwd
 import os
 import sys
-if sys.platform.startswith('linux'):
-	from dacq import *
-else:
-	from dacqfallback import *
 
 def _realuid():
 	"""Get real/effective UID.
@@ -48,7 +44,11 @@ def root_take():
 	:return: (boolean) now root?
 
 	"""
-	return (dacq_seteuid(0) == 0)
+	try:
+		os.seteuid(0)
+		return True
+	except OSError:
+		return False
 
 def root_drop():
 	"""Give of root access.
@@ -61,4 +61,8 @@ def root_drop():
 	:return: (boolean) error releasing root access?
 
 	"""
-	return (dacq_seteuid(_realuid()) == 0)
+	try:
+		os.seteuid(_realuid())
+		return True
+	except OSError:
+		return False

@@ -3986,7 +3986,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             # Tue Mar 27 10:56:09 2018 mazer
             #  confirmed: <1ms lag between u3 and das1602
 
-            (rawut, ut, a0, a1, a2, a3) = self.u3.get()
+            (rawut, ut, _rt, a0, a1, a2, a3) = self.u3.get()
             ut = ut - dacq_ts0()
             tf = open('u3-%04d.asc' % self.u3.count, 'w')
             ut = ut * 1000.             # convert s->ms

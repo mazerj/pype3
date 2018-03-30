@@ -161,12 +161,16 @@ class SamplerU3(object):
 		self.d.streamStart()
 		self.clockoffset_host = monotonic.monotonic()
 
-		if 0:
-			# read clock directly
-			lo = self.d.getFeedback(u3.Timer0(),)[0] # timer LSB
-			hi = self.d.getFeedback(u3.Timer1(),)[0] # timer MSB
-			u3_clock = (hi<<16) + lo
-			
+
+		# The buffered stream data lags about 18ms.
+		# That is -- each fragment of 200 samples) is received
+		# by the host 18ms after the last sample was digitized.
+		# This is NOT samplingRate dependent!
+		#
+		# You can see this lab if you plot the ts values (hostclock
+		# times of the actual samples) vs the rects values (hostclock
+		# at the time data was received by the host)
+
 		try:
 			for r in self.d.streamData():
 				if r is not None:
@@ -174,7 +178,9 @@ class SamplerU3(object):
 					hi = np.bitwise_and(np.array(r['AIN224']), 0xffff)
 					lo = np.bitwise_and(np.array(r['AIN200']), 0xffff)
 					ts = (hi<<16) + lo
+					rects = np.zeros_like(ts) + monotonic.monotonic()
 					self.frags.append((ts,
+									   rects,
 									   np.array(r['AIN0']),
 									   np.array(r['AIN1']),
 									   np.array(r['AIN2']),
@@ -246,14 +252,16 @@ class SamplerU3(object):
 		# reassemble analog datastream from fragment pool
 		rawts = np.array([])
 		ts = np.array([])
+		rects = np.array([])		# receipt time.. only for testing
 		a0 = np.array([])
 		a1 = np.array([])
 		a2 = np.array([])
 		a3 = np.array([])
 
-		for (ts_, a0_, a1_, a2_, a3_) in self.frags:
+		for (ts_, rects_, a0_, a1_, a2_, a3_,) in self.frags:
 			rawts = np.concatenate((rawts, ts_,))
 			ts = np.concatenate((ts, ts_,))
+			rects = np.concatenate((rects, rects_,))
 			a0 = np.concatenate((a0, a0_,))
 			a1 = np.concatenate((a1, a1_,))
 			a2 = np.concatenate((a2, a2_,))
@@ -277,7 +285,7 @@ class SamplerU3(object):
 		# the clock_monotonic time to get real system time back
 		ts = ((ts - ts[0]) / U3CLOCK) + self.clockoffset_host - t0
 
-		return (rawts, ts, a0, a1, a2, a3)
+		return (rawts, ts, rects, a0, a1, a2, a3)
 
 	def digout(self, line, state):
 		if line in [0, 1]:
@@ -303,12 +311,17 @@ if __name__ == "__main__":
 		time.sleep(t)
 		s.stop(wait=1)
 
-		(rawts, ts, a0, a1, a2, a3) = s.get()
+		(rawts, ts, rect, a0, a1, a2, a3,) = s.get()
 
-		print '# u3clk hostclk a0 a1 a2 a3'
+		print 'rects,u3clk,hostclk,a0,a1,a2,a3'
 		for n in range(len(rawts)):
-			print '%.0f\t%.0f\t%f\t%f\t%f\t%f' % \
-				  (rawts[n], ts[n], a0[n], a1[n], a2[n], a3[n],)
+			print '%.2f,%.2f,%.2f,%f,%f,%f,%f' % \
+				  (1000*rect[n], 1000*rawts[n], 1000*ts[n], \
+				   a0[n], a1[n], a2[n], a3[n],)
+
+		if s.errorcount:
+			sys.stderr.write('%d errors!\n' % s.errorcount)
+
 
 	except KeyboardInterrupt:
 		print 'shutting down'

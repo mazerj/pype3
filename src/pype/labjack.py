@@ -46,7 +46,7 @@ Problem:
 import u3
 import os, threading, signal
 import numpy as np
-from monoclock import monotonic_time
+import monotonic
 
 # U3 internal clock speed (used for streaming timestamps)
 U3CLOCK = 4000000.
@@ -159,7 +159,7 @@ class SamplerU3(object):
 		self.errorcount = 0
 
 		self.d.streamStart()
-		self.clockoffset_host = monotonic_time()
+		self.clockoffset_host = monotonic.monotonic()
 
 		if 0:
 			# read clock directly
@@ -212,7 +212,7 @@ class SamplerU3(object):
 					# if the state of either line has changed, interrupt
 					# the main thread will os.kill(). self.ievent is used
 					# to pass info about the event.
-					self.ievent = ('din', state, monotonic_time())
+					self.ievent = ('din', state, monotonic.monotonic())
 					if self.dig_callback:
 						self.dig_callback(self, self.ievent)
 					else:

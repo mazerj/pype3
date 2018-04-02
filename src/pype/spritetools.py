@@ -69,6 +69,8 @@ Fri May 22 15:27:42 2009 mazer
 import numpy as np
 import sprite
 
+class SpritetoolsError(Exception): pass
+
 ##########################################################################
 # new, faster, clean support functions added 04-mar-2004 JAM .. stop
 # using the old versions..
@@ -208,9 +210,12 @@ def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 
 	"""
 
+	if s.w != s.h:
+		raise SpritetoolsError, 'sprite must be square'
+
 	if not ppd is None:
 		# c/deg -> c/sprite
-		frequency = np.mean([s.w, s.h]) / ppd * frequency
+		frequency = s.w / ppd * frequency
 	meanlum = 256.0 * meanlum
 	moddepth = 127.0 * moddepth
 
@@ -276,9 +281,12 @@ def singrat2(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 
 	"""
 
+	if s.w != s.h:
+		raise SpritetoolsError, 'sprite must be square'
+
 	if not ppd is None:
 		# c/deg -> c/sprite
-		frequency = np.mean([s.w, s.h]) / ppd * frequency
+		frequency = s.w / ppd * frequency
 	meanlum = 256.0 * meanlum
 	moddepth = 127.0 * moddepth
 
@@ -357,9 +365,12 @@ def polargrat(s, cfreq, rfreq, phase_deg, polarity,
 
 	"""
 
+	if s.w != s.h:
+		raise SpritetoolsError, 'sprite must be square'
+
 	if not ppd is None:
 		# c/deg -> c/sprite
-		cfreq = np.mean([s.w, s.h]) / ppd * cfreq
+		cfreq = s.w / ppd * cfreq
 	meanlum = 256.0 * meanlum
 	moddepth = 127.0 * moddepth
 
@@ -448,9 +459,13 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 	:return: nothing (works in place)
 
 	"""
+
+	if s.w != s.h:
+		raise SpritetoolsError, 'sprite must be square'
+
 	if not ppd is None:
 		# c/deg -> c/sprite
-		freq = np.mean([s.w, s.h]) / ppd * freq
+		freq = s.w / ppd * freq
 	meanlum = 256.0 * meanlum
 	moddepth = 127.0 * moddepth
 
@@ -486,11 +501,14 @@ def hartley(s, kx, ky, R=1.0, G=1.0, B=1.0,
 
 	"""
 
+	if s.w != s.h:
+		raise SpritetoolsError, 'sprite must be square'
+
 	meanlum = 256.0 * meanlum
 	moddepth = 127.0 * moddepth
 	R, G, B = unpack_rgb(color, R, G, B)
 
-	M = (s.w + s.h) / 2
+	M = s.w
 	l = s.xx + M/2
 	m = s.yy + M/2
 	t = 2.0 * np.pi * ((kx * l) + (ky * m)) / M
@@ -532,16 +550,19 @@ def gabor(s, frequency, phase_deg, ori_deg, sigma,
 
 	"""
 
+	if s.w != s.h:
+		raise SpritetoolsError, 'sprite must be square'
+
 	if not ppd is None:
 		# c/deg -> c/sprite
-		frequency = frequency * np.mean([s.w, s.h]) / ppd
+		frequency = frequency * s.w / ppd
 	meanlum = 256.0 * meanlum
 	moddepth = 127.0 * moddepth
 
 	R, G, B = unpack_rgb(color, R, G, B)
 
 	gamma = 1.0
-	sf = frequency / np.mean([s.w, s.h])
+	sf = frequency / s.w
 	lambda_ = 1.0 / sf
 	theta = np.pi * ori_deg / 180.0
 	phi = np.pi * phase_deg / 180.0
@@ -575,7 +596,6 @@ def uniformnoise(s, binary=False,
 	:return: nothing (works in place)
 
 	"""
-
 
 	R, G, B = unpack_rgb(color, R, G, B)
 	lmin = meanlum - (modepth/2.0)

@@ -218,8 +218,10 @@ class FrameBuffer(object):
 
 	def __init__(self, dpy, width, height, fullscreen,
 				 bg=(128, 128, 128),
-				 sync=1, syncsize=50, syncx=None, syncy=None, synclevel=255,
+				 sync=1, syncsize=50, syncx=None,
+				 syncy=None, synclevel=255,
 				 mouse=0, app=None, eyefn=None,
+				 fbw=None, fbh=None,
 				 xscale=1.0, yscale=1.0):
 		"""pygame+GL-based framebuffer class for pype.
 
@@ -231,7 +233,10 @@ class FrameBuffer(object):
 		:param dpy: string containing name of X11 display to contact
 				(None for default, taken from os.environ['DISPLAY']
 
-		:param width, height: (pixels) size of requested display
+		:param width, height: (pixels) size of requested display. This
+				corresponds to the PHYSICAL size of the display. In full
+				screen mode, it must match one of the available hardware
+				modes. See [xy]scale and fb[wh] below.
 
 		:param fullscreen: (boolean) full screen or windowed mode?
 
@@ -268,7 +273,17 @@ class FrameBuffer(object):
 				be a function that returns the current eye position. Flip's
 				will add a mark on the framebuffer at this location (for
 				debugging!)
-
+				
+		:param fb[wh]: (optional) specify the size of the internal
+				framebuffer. If specified and not equal to width and
+				height above, specifies the size of the virtual framebuffer
+				that will be scaled onto the physical display.
+		
+		:param [xy]scale: (optional) alternative (older) method for
+				specifying size of framebuffer. The internal framebuffer
+				will be set to be (width*xscale, height*yscale). fb[wh]
+				overrides this parameter.
+		
 		:return: nothing
 
 		"""
@@ -281,6 +296,11 @@ class FrameBuffer(object):
 		self.record = 0
 		self._keystack = []
 		self._font = None
+		
+		if fbw:
+			xscale = fbw / float(width)
+		if fbh:
+			yscale = fbh / float(height)
 		self.xscale = xscale
 		self.yscale = yscale
 		self.gamma = (1.0, 1.0, 1.0)
@@ -342,6 +362,9 @@ class FrameBuffer(object):
 		except pygame.error:
 			Logger('FrameBuffer: check X server status!');
 			sys.exit(1)
+
+		Logger("sprite: physical=%dx%d" % (self.physicalw, self.physicalh))
+		Logger("sprite: framebuffer=%dx%d" % (self.w, self.h))
 
 		# in theory, it works to open and close the pygame display
 		# on the fly to hide the graphics window..
@@ -1047,7 +1070,6 @@ def genaxes(w, h, rw, rh, typecode=np.float64, inverty=0):
 	return x.astype(typecode)[:,np.newaxis],y.astype(typecode)[np.newaxis,:]
 
 class ScaledSprite(object):
-	_list = []							  # all live sprites (for debugging)
 	_id = 0								  # unique id for each sprite
 
 	def __init__(self, width=None, height=None, rwidth=None, rheight=None,
@@ -2703,6 +2725,16 @@ def drawtest(fb, s):
 
 	fb.clear((1,1,1))
 	if s: s.blit(force=1)
+
+	# draw fixed 10 cycles/display vert grating
+	dy = -100
+	gr = Sprite(fb.w, fb.w, 0, dy, fb=fb)
+	singrat(gr, 10.0, 90.0, 0.0)
+	gr = gr.subimage(0, 0, gr.w, 50)
+	gr.alpha[:] = 250
+	gr.blit(force=1)
+	fb.string(0, dy, '< 10 cycles >', (255, 0, 0))
+	
 	if 1:
 		# alpha tests
 		s = Sprite(x=50, y=50, width=150, height=150,

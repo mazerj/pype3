@@ -104,6 +104,10 @@ def defaults(srcfile=None):
 		  doc='display width (pix)')
 	c.set('DPYH', '768',
 		  doc='display height (pix)')
+	c.set('FBW', '0',
+		  doc='width of internal framebuffer (pix)')
+	c.set('FBH', '0',
+		  doc='height of internal framebuffer (pix)')
 	c.set('XSCALE', '1.0',
 		  doc='x-scale factor for framebuffer (fraction)')
 	c.set('YSCALE', '1.0',

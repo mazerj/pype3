@@ -2293,6 +2293,8 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                               syncx=sx, syncy=sy,
                               synclevel=self.config.iget('SYNCLEVEL'),
                               mouse=self.config.iget('MOUSE'),
+                              fbw=self.config.iget('FBW'),
+                              fbh=self.config.iget('FBH'),
                               xscale=self.config.fget('XSCALE'),
                               yscale=self.config.fget('YSCALE'),
                               app=self)
@@ -4320,6 +4322,8 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
         Not really for users -- this is really only used by the
         candy module to clear the screen when candy exits.
+
+        Note: test pattern is scaled to fill entire screeen
 
         """
         if not self.fb: return

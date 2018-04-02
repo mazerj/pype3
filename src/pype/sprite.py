@@ -323,12 +323,14 @@ class FrameBuffer(object):
 		if not (self.physicalw, self.physicalh) in modes:
 			Logger('sprite: warning %dx%d not an avialable resolution\n' %
 				   (self.physicalw, self.physicalh))
-			
-
-		Logger('sprite: available modes are %s\n' % pygame.display.list_modes())
-		
-		(dpyw, dpyh) = pygame.display.list_modes()[0]
-		os.environ['SDL_VIDEO_WINDOW_POS'] = '%d,%d' % (dpyw - self.physicalw, 0,)
+		if fullscreen:
+			Logger('sprite: available modes are %s\n' % \
+				   pygame.display.list_modes())
+		else:
+			# anchor non-fullscreen window in upper right corner of screen
+			(dpyw, dpyh) = pygame.display.list_modes()[0]
+			os.environ['SDL_VIDEO_WINDOW_POS'] = '%d,%d' % \
+												 (dpyw - self.physicalw, 0,)
 
 		try:
 			if pygame.display.mode_ok((self.physicalw, self.physicalh),

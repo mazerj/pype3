@@ -1,8 +1,0 @@
-drwxrwxr-x suganthan/suganthan 0 2014-09-16 11:49 ./
-drwxrwxr-x suganthan/suganthan 0 2014-09-16 11:49 ./usr/
-drwxrwxr-x suganthan/suganthan 0 2014-09-16 11:49 ./usr/bin/
-drwxrwxr-x suganthan/suganthan 0 2014-09-16 11:49 ./usr/bin/EdfConverter/
--r-xr-xr-x suganthan/suganthan 1069 2014-09-16 11:49 ./usr/bin/EdfConverter/edfconverter
--rwxrwxr-x suganthan/suganthan 134393 2014-09-16 11:49 ./usr/bin/EdfConverter/libedfapi.so
--rwxrwxr-x suganthan/suganthan  57596 2014-09-16 11:49 ./usr/bin/EdfConverter/libedfapidll.so
--rw-rw-r-- suganthan/suganthan  35109 2014-09-16 11:49 ./usr/bin/EdfConverter/edfconverter.jar

@@ -594,7 +594,7 @@ def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
 
 	"""
 	R, G, B = (np.array(unpack_rgb(None, R, G, B)) * 255.0).astype(np.int)
-	r, t = sprite.genpolar(s.w, s.h, degrees=True)
+	r, t = genpolar(s.w, s.h, degrees=True)
 	t += ori_deg
 	x = r * np.cos(t)
 	y = r * np.sin(t)

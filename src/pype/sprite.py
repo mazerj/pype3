@@ -18,7 +18,6 @@ import math
 
 try:
 	from guitools import Logger
-	from spritetools import *
 	from pypedebug import keyboard
 	from events import MARKFLIP
 	from pypeerrors import Obsolete
@@ -2666,6 +2665,7 @@ def tickbox(x, y, width, height, lwidth, color, fb):
 
 if __name__ == '__main__':
 	from simpletimer import Timer
+	from spritetools import *
 
 	def drawtest2(fb):
 		s1 = Sprite(100, 100, -100, 0, fb=fb)
@@ -2681,33 +2681,34 @@ if __name__ == '__main__':
 			s2.moveto(100, 0)
 			s2.threshold(127)
 			s2.blit()
+			fb.string(0, 0, 'test2', (255, 0, 0))
 			fb.flip()
-
+			
 
 	def drawtest3(fb):
 		x = -200
-		w = 100
 		ss = []
+		s = 1.0
 		for n in range(5):
-			ss.append(ScaledSprite(width=100, height=w, x=x, y=-100, fb=fb,
-								   fname='lib/testpat.png'))
-			ss.append(ss[-1].clone())
+			ss.append(Sprite(width=100, height=100, x=x, y=-100,
+							 scale=s,fb=fb))
 			singrat(ss[-1], 1, 0.0, n, WHITE)
-			ss[-1].moveto(x,100)
-			
+			ss.append(ScaledSprite(rwidth=int(s*100), rheight=int(s*100),
+							 x=x, y=100, fb=fb,
+							 fname='lib/testpat.png'))
 			x = x + 100
-			w = int(w/2)
+			s = s / 2.0
 			
 		for n in range(0,2*360,10):
 			fb.clear()
 			for s in ss:
-				#singrat(s, 1, 0.0, n, WHITE)
 				s.set_rotation(-n)
 				s.blit()
-				print s.rotation,
-			print
+			fb.string(0, 0, 'test3', (255, 0, 0))
 			fb.flip()
-			sys.stdin.readline()
+			if 0:
+				print '%d deg, <return>' % (n,),
+				sys.stdin.readline()
 	
 	def drawtest4(fb):
 		x = -200
@@ -2718,43 +2719,17 @@ if __name__ == '__main__':
 		s = ScaledSprite(width=sig*6, x=0, y=0, fb=fb)
 		for n in range(0,2*360,10):
 			fb.clear()
-			gabor(s, 3, n, 45., sig, WHITE)
-			#singrat(s, 1, 0.0, n, WHITE)
-			#s.set_rotation(n)
+			gabor(s, 3.0, float(n), 45., sig, WHITE)
 			s.blit()
+			fb.string(0, 0, 'test4', (255, 0, 0))
 			fb.flip()
 
 	fb=quickfb(500,500)
 
-	if 1:
-		#drawtest4(fb)
-		drawtest3(fb)
-		#drawtest2(fb)
-		#sys.stdout.write('>>>'); sys.stdout.flush()
-		#sys.stdin.readline()
-
-	if 0:
-		s1 = Sprite(100, 100, -100, 0, fb=fb, on=0)
-		s1.fill((255,255,255))
-		s2 = Sprite(100, 100, 100, 0, fb=fb, on=0)
-		s2.fill((255,255,1))
-		dlist = DisplayList(fb, comedi=False)
-
-		ti = Timer(on=False)
-		fdur = int(round(1000/fb.calcfps()))
-		dlist.add(s1, ti, 1100, 's1_on', 1200, 's1_off')
-		dlist.add(s2, ti, 1150, 's2_on', 1250, 's2_off')
-
-		# start the timer going
-		dlist.update(flip=1)
-		ti.reset()
-		last = ti.ms()
-		print last
-		while ti.ms() < 5000:
-			fb.clear()
-			elist = dlist.update(flip=1)
-			if len(elist):
-				x = ti.ms()
-				print x, x-last, elist
-				last = x
+	drawtest4(fb)
+	sys.stdout.write('<hit return to continue>'); sys.stdin.readline()
+	drawtest3(fb)
+	sys.stdout.write('<hit return to continue>'); sys.stdin.readline()
+	drawtest2(fb)
+	sys.stdout.write('<hit return to continue>'); sys.stdin.readline()
 

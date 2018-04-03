@@ -8,61 +8,7 @@ envelopes etc. It extends the basic functionality provided
 by the sprite module and most functions work on existing
 Sprite objects by modding the underlying image data.
 
-Author -- James A. Mazer (james.mazer@yale.edu)
-
-"""
-
-"""Revision History
-
-Tue Aug 23 11:01:19 2005 mazer
-
-- changed ori in singrat,cosgrat etc, such that 0deg -> vertical; convention
-  is that motion to left is 0deg, motion up is 90deg, orientation follow
-  along orthogonally. Not sure alphaGaussian2() is correct now!!
-
-Tue Mar 7 09:28:03 2006 mazer
-
-- change noted above was not correct. I changed the arctan2() calls::
-
-	>> t = arctan2(s.yy, s.xx) - (pi * (90-ori_deg)) / 180.0
-
-  to::
-
-	>> t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
-
-  which should give the correct orientations now. Note that the
-  real problem is that these functions have been broken from the
-  very beginning, but handmap.py and spotmap.py (which uses the
-  sprite rotate method) have corrected for this.
-
-Tue Aug	 8 14:04:36 2006 mazer
-
-- added alphabar() function - generates a bar stimulus from a sprite
-  by filling the sprite with the specified color and then setting the
-  alpha channel to let the specified bar stimulus show through.
-
-Wed Aug	 9 13:15:34 2006 mazer
-
-- Added _unpack_rgb() to make all the stimulus generators use a common
-  color specification. And documented all the grating generators.
-
-Fri Jun 13 15:24:57 2008 mazer
-
-- added ppd=, meanlum=, moddepth= and color=  options to sin, cos,
-  polar, logpolar and hyper grating functions
-
-Wed Jun 18 13:54:46 2008 mazer
-
-- removed old grating generator functions: Make_2D_XXXX()
-
-Mon Jan	 5 14:49:56 2009 mazer
-
-- moved gen{axes,d,rad,theta} axes generator from sprite.py to this
-  file (spritetools.py) - gend() function is now officially obsolete..
-
-Fri May 22 15:27:42 2009 mazer
-
-- added simple_rdp() function for Random Dot Patterns
+Author -- James A. Mazer (mazerj@gmail.com)
 
 """
 

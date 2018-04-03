@@ -6,19 +6,9 @@
 Structure definitions generated from inspection of Plexon.h and .m
 files distributed on Plexon web site - no code in this module.
 
-Author -- James A. Mazer (james.mazer@yale.edu)
+Author -- James A. Mazer (mazerj@gmail.com)
 
 """
-
-"""Revision History
-
-- Thu Mar 26 15:10:32 2009 mazer
-
-  - removed c-structs from documentation - see the Plexon.h file
-	in this dir for complete structure definitions.
-
-"""
-
 
 class Plex(object):
 	"""

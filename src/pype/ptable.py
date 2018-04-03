@@ -20,47 +20,7 @@ the validator function should return the actual valid of
 the string -- ie, for is_int, return a validated integer
 (not a string, but an actual integer).
 
-Author -- James A. Mazer (james.mazer@yale.edu)
-
-"""
-
-"""Revision History
-
-Mon Aug 14 13:46:27 2006 mazer
-
-- Added field locking buttons ('X' to left of entry fields) to let
-  user lock individual entries to avoid accidental changes.. For
-  Jon Touryan... should work ok with runlock'ing, but I haven't
-  tested it. Is anybody using runlock??
-
-Fri Feb 13 11:15:35 2009 mazer
-
-- changed load/save format to a human-readable (non-pickled) version
-  change should be transparent - old pickle versions will get read
-  and new text versions written from now on..
-
-Wed Mar 11 11:08:19 2009 mazer
-
-- when parameter tables are evaluated, added storage of the raw
-  unevaluated string version of the var for future reference..
-
-Sun May 31 15:13:23 2009 mazer
-
-- changed load/save of param tables to use standard pythong ConfigParser
-  object -- this makes it easier to have external programs generate
-  params files..
-
-Tue Dec 14 16:54:50 2010 mazer
-
-- purged old pickle-based config file code
-
-Fri Apr 29 11:41:42 2011 mazer
-
-- added dictionary type (like tuple) to allow {'yes':1, 'no':0} type stuff..
-
-Thu Jun 27 09:51:48 2013 mazer
-
-- Merged pvalidators.py .. no need for separate module.
+Author -- James A. Mazer (mazerj@gmail.com)
 
 """
 

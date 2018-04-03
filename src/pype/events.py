@@ -5,17 +5,9 @@
 Event definitions, based on the encode tags used by the
 ORTEX program from Bob Desimone's lab at NIMH.
 
-Author -- James A. Mazer (james.mazer@yale.edu)
+Author -- James A. Mazer (mazerj@gmail.com)
 
 """
-
-"""Revision History
-
-Wed Nov 15 10:32:20 2006 mazer
-- added NA_RESPONSE
-
-"""
-
 
 ####################################################################
 # Result Codes -- Trial Outcome

@@ -3,14 +3,6 @@
 """TDT connection interface object
 """
 
-"""Revision History
-
-Tue Jan 25 13:45:18 2011 mazer
-
-- got rid of the hoop save/load stuff.. nobody uses it..
-
-"""
-
 import tdt
 
 class Controller(object):

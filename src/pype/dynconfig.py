@@ -4,11 +4,8 @@
 
 This isn't in use yet.
 
-Author -- James A. Mazer (james.mazer@yale.edu)
+Author -- James A. Mazer (mazerj@gmail.com)
 
-"""
-
-"""Revision History
 """
 
 import os

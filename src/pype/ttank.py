@@ -5,9 +5,6 @@
 TTank.X ONLY interface - see tdt.py for complete docs.
 """
 
-"""Revision History
-"""
-
 import sys
 import os
 import time

@@ -7,9 +7,6 @@ to print debugging information each time a module gets imported.
 
 """
 
-"""Revision History
-"""
-
 import __builtin__
 import sys
 import imp

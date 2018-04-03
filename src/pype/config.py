@@ -2,24 +2,9 @@
 
 """Simple 'config' file parser class
 
-Author -- James A. Mazer (james.mazer@yale.edu)
+Author -- James A. Mazer (mazerj@gmail.com)
 
 """
-
-"""Revision History
-
-Tue Aug 13 17:23:06 2002 mazer
-
-- removed save method from UserParams class
-
-- renamed UserParams to Config
-
-Tue Jun 26 14:20:10 2007 mazer
-
-- added show() method
-
-"""
-
 
 import sys
 import os

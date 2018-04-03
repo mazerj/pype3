@@ -19,9 +19,6 @@ Server listens on port 10000 (by default).
 
 # tdev_/ttank_invoke --> tdev/ttank
 
-"""Revision History
-"""
-
 """
 Think about something like this for the pype side. Would
 really simplify coding...

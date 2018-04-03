@@ -5,14 +5,7 @@
 Routines to generate nice pictures on the monkey display to
 entertain the animal during breaks etc.
 
-Author -- James A. Mazer (james.mazer@yale.edu)
-
-"""
-
-"""Revision History
-
-Fri Mar 27 13:42:32 2009 mazer
-- pulled out from pype.py as separate module
+Author -- James A. Mazer (mazerj@gmail.com)
 
 """
 

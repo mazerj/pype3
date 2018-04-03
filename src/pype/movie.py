@@ -13,17 +13,7 @@ anything you might be doing than using these classes unmodified.
 
 **I can't remember what the difference between Movie and Movie2 is..**
 
-Author -- James A. Mazer (james.mazer@yale.edu)
-
-"""
-
-"""Revision History
-
-Mon Jul 16 12:07:03 2001 mazer
-
-- extracted from imview4.py (task file) as a generally useful tool.
-
-- only change at this time was "app" replaced by "fb"
+Author -- James A. Mazer (mazerj@gmail.com)
 
 """
 

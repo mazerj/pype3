@@ -7,13 +7,6 @@ pype process. Not really for general use.
 
 """
 
-"""Revision History
-
-- Sat Jul  9 12:48:58 2005 mazer
-
- - separated from pype.py
-"""
-
 import pwd
 import os
 import sys

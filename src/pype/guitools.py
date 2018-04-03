@@ -7,46 +7,7 @@ nd running. Things that get repeated over and over again
 in the main pype code eventually end up here for
 onsolidation.
 
-Author -- James A. Mazer (james.mazer@yale.edu)
-
-"""
-
-"""Revision History
-
-Wed Apr	 8 21:42:18 1998 mazer
-
-- created
-
-Thu Jan 27 15:27:15 2000 mazer
-
-- added DockWindow class
-
-Mon Jun 25 12:21:40 2007 mazer
-
-- Container() class is obsolete... deleted it..
-
-- Added SimpleDialog() class to replace use of the Tk builtin Dialog
-  class (which is opaque and unchangable). This is much simpler..
-
-Thu Jun 28 10:41:43 2007 mazer
-
-- Switched use of ScrolledText to Pmw.ScrolledText - didn't realize
-  there was a Tkinter version (that doesn't properly resize!). Hmmm,
-  actually this is a problem - doesn't work for Tally window, so I
-  reverted back to Tkinter's version..
-
-Thu Mar 26 15:55:05 2009 mazer
-
-- Merged in pbar.py (progress bar) stuff - should have been here
-  all along.
-
-Fri Mar 27 13:39:49 2009 mazer
-
-- moved DancingBear and dance() (console versions) from pype.py to here
-
-Fri Jun	 3 12:41:07 2011 mazer
-
-- got rid of Simple in SimpleDialog etc.. replaced with trailing underscores
+Author -- James A. Mazer (mazerj@gmail.com)
 
 """
 

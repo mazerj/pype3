@@ -32,9 +32,6 @@ Author -- Matt Krause (matthew.krause@yale.edu)
 
 """
 
-"""Revision History
-"""
-
 class MTRandom(object):
 	def __init__(self, seed=None, state=None):
 		"""Uniform random number generator object.

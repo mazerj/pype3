@@ -2,31 +2,7 @@
 
 """Debugging tools for python and pype
 
-Author -- James A. Mazer (james.mazer@yale.edu)
-
-"""
-
-"""Revision History
-
-Sat Feb	 8 14:37:50 2003 mazer
-
-- created from scratch
-
-Fri May 13 14:53:47 2011 mazer
-
-- keyboard() now uses python's builtin pdb by default
-
-- added remotedebug (depends on winpdb package)
-
-Fri Oct 19 10:08:12 2012 mazer
-
-- Setup keyboard() to default to ipython shell if available. Note that
-  this is probably IPython 10.3-ish specific and will probably not work
-  with later versions..
-
-Fri Feb 26 10:42:07 2016 mazer
-
-- got rid of all ipython stuff -- never used it, not necessary..
+Author -- James A. Mazer (mazerj@gmail.com)
 
 """
 

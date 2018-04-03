@@ -7,16 +7,9 @@ existing data to interpolate z-values for a new set of (X,Y)
 coordinates using linear interpolation based on the 3 nearest neighbor
 points (from the orignal (x,y,z) set).
 
-Author -- James A. Mazer (james.mazer@yale.edu)
+Author -- James A. Mazer (mazerj@gmail.com)
 
 """
-
-"""Revision History
-
-Tue Mar 17 14:41:32 2009 mazer
-
-"""
-
 
 import numpy as np
 

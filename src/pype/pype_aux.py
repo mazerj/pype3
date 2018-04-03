@@ -5,34 +5,8 @@
 Supplemental frequently used function -- either in pype code directly
 or in user-tasks.
 
-Author -- James A. Mazer (james.mazer@yale.edu)
+Author -- James A. Mazer (mazerj@gmail.com)
 
-"""
-
-"""Revision History
-
-Wed Apr	 8 21:42:18 1998 mazer
-
-- created
-
-Mon Jan 24 23:15:29 2000 mazer
-
-- added tic/toc functions
-
-Sun Nov	 6 13:06:34 2005 mazer
-
-- added stat:stop:step slice syntax to param_expand
-
-Wed Jul	 5 16:16:19 2006 mazer
-
-- added =start:stop:step for inclusive ranges
-
-Thu Jan	 7 17:22:10 2010 mazer
-
-- hacked labeled_load to override the Numeric array constructor
-  function to allow loading 32bit data files on 64bit machines.
-
-- moved labeled_* to pypedata
 """
 
 import random

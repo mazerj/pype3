@@ -6,57 +6,7 @@ Functions and classes in this module implement the user display
 window. This includes all mouse & key inputs, display of shadow
 stimuli on the user display (to mirror what the subject sees), etc.
 
-Author -- James A. Mazer (james.mazer@yale.edu)
-
-"""
-
-"""Revision History
-
-Wed Aug 14 13:09:50 2002 mazer
-
-- removed scrollbar junk: no need, never used it.
-
-Wed Mar	 5 19:26:47 2003 mazer
-
-- added import points (from ascii file)
-
-Thu Jun 16 15:20:45 2005 mazer
-
-- added ben willmore's changes for mac-support
-
-Sun Jul 24 21:47:12 2005 mazer
-
-- made fx,fy automatically propagate back to pype.py via self.app.set_fxfy()
-
-Mon Jan 16 11:18:57 2006 mazer
-
-- added callback option to the UserDisplay class to support time
-  marking from pype.py (see notes in pype.py)
-
-Fri May 22 15:58:59 2009 mazer
-
-- changed button-1 function to button-3 to avoid problems with WM..
-
-Tue Jul	 7 10:25:19 2009 mazer
-
-- BLOCKED is gone -- computed automatically from syncinfo..
-
-Mon Jun 28 13:35:12 2010 mazer
-
-- Removed menubar at top in favor of dropdown menus (saves screen
-	space).	 One single dropdown menu off Button-1 now (Button-2 for
-	task-specific menu, if needed).
-
-- This means Pmw is no longer required here.. everything's simplified
-
-Fri Jul 16 10:58:31 2010 mazer
-
-- changed menu button to button-3 instead of button-1 to allow
-	clicking button-1 to raise the interface window!
-
-Tue Feb	 1 12:46:07 2011 mazer
-
-- got rid of the callback/MARK function (bound to = key)
+Author -- James A. Mazer (mazerj@gmail.com)
 
 """
 

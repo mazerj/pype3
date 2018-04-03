@@ -2,24 +2,8 @@
 
 """Default Configuration Variables
 
-Author -- James A. Mazer (james.mazer@yale.edu)
+Author -- James A. Mazer (mazerj@gmail.com)
 
-"""
-
-"""Revision History
-
-Tue Jun 26 14:21:36 2007 mazer
-
-- abstract out from pype.py to put all config vars in a single
-  file for documentation/code-clarity purposes.
-
-Tue Mar 31 13:59:22 2009 mazer
-
-- added TESTPAT
-
-Mon Oct	 1 13:02:25 2012 mazer
-
-- OPENGL flag removed -- this is no longer an option..
 """
 
 import sys

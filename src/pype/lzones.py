@@ -4,15 +4,7 @@
 
 Not really for public consumption.
 
-Author -- James A. Mazer (james.mazer@yale.edu)
-
-"""
-
-"""Revision History
-
-Tue Feb  1 12:24:17 2011 mazer
-
-- pulled out of pype.py
+Author -- James A. Mazer (mazerj@gmail.com)
 
 """
 

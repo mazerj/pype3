@@ -5,18 +5,9 @@
 Customized dialog boxes derrived from the standard Tkinter
 Dialog class.
 
-Author -- James A. Mazer (james.mazer@yale.edu)
+Author -- James A. Mazer (mazerj@gmail.com)
 
 """
-
-"""Revision History
-
-Wed Aug 14 13:05:27 2002 mazer
-
-- made set_selection() method place cursor at the end of the line
-
-"""
-
 
 from Tkinter import *
 from Dialog import Dialog

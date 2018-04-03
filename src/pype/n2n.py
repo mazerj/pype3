@@ -8,15 +8,6 @@ Import this instead of Numeric to aid migration to numpy.
 
 """
 
-"""Revision History
-
-Tue Jan  4 15:04:30 2011 mazer
-
-- This should only be used by old tasks -- not for use within
-  the main pype source code tree. As of today, the entire pype
-  source code tree has been converted to direct numpy access.
-
-"""
 
 # warning: there's also a uniform() in pype_aux.py -- this will be masked
 # warning: python has a native random module -- this will be masked

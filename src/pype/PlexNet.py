@@ -6,12 +6,8 @@
 The plexon network API is massively broken, but this will get
 you some of the data in a pure-python application.
 
-Author -- James A. Mazer (james.mazer@yale.edu)
+Author -- James A. Mazer (mazerj@gmail.com)
 """
-
-"""Revision History
-"""
-
 
 import sys
 import struct

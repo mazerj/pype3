@@ -5,11 +5,8 @@
 These are are the standard errors that pype and the pype libraries
 functions might throw during task execution.
 
-Author -- James A. Mazer (james.mazer@yale.edu)
+Author -- James A. Mazer (mazerj@gmail.com)
 
-"""
-
-"""Revision History
 """
 
 class FatalPypeError(Exception): pass

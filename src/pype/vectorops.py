@@ -6,19 +6,7 @@ Implements a bunch of common but useful vector operations using
 Numeric (if possible). If Numeric's not available, tries to fall
 back to (slower) raw-python.
 
-Author -- James A. Mazer (james.mazer@yale.edu)
-
-"""
-
-"""Revision History
-
-- Sun Jan 23 22:09:04 2000 mazer
-
- - created
-
-- Sat Apr 14 14:00:12 2001 mazer
-
- - added sparseness()
+Author -- James A. Mazer (mazerj@gmail.com)
 
 """
 

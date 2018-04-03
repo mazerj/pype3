@@ -376,7 +376,7 @@ class _Probe(object):
 				else:
 					self.s = ScaledSprite(width=self.length)
                     self.s.fill(color)
-                self.s.circmask(0, 0, self.length/2)
+                self.s.hard_aperturecircmask(self.length/2)
 			elif self.barmode == CIRCLE:
                 l = self.length
 				if color is None:
@@ -388,7 +388,7 @@ class _Probe(object):
                                           height=l+2*self.lw,
                                           fb=self.app.fb, depth=99)
 					self.s.fill(color)
-                self.s.circmask(0, 0, l/2+self.lw)
+                self.s.hard_aperture(l/2+self.lw)
                 self.s.circlefill((0,0,0,0), l/2)
 			elif self.barmode == CART:
 				l = self.length

@@ -203,10 +203,10 @@ class Movie2(object):
 
 	def blit(self, n):
 		if n is None:
-			self.bgframe.fastblit()
+			self.bgframe.blit()
 		elif n < self.length:
 			s = self.framelist[n]
-			s.fastblit()
+			s.blit()
 
 
 if __name__ == '__main__':

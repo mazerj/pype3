@@ -145,6 +145,7 @@ try:
 	from spritetools import *
 	from pypedebug import keyboard
 	from events import MARKFLIP
+	from pypeerrors import Obsolete
 except ImportError:
 	def Logger(s, *args):
 		sys.stderr.write(s)
@@ -1073,10 +1074,11 @@ class ScaledSprite(object):
 	_id = 0								  # unique id for each sprite
 
 	def __init__(self, width=None, height=None, rwidth=None, rheight=None,
-				 x=0, y=0, depth=0, dx=0, dy=0,
-				 fname=None, name=None, fb=None, on=1, image=None,
+				 x=0, y=0, depth=0,
+				 fname=None, name=None, fb=None, on=1,
+				 image=None,
 				 icolor='black', ifill='yellow',
-				 centerorigin=0, rotation=0.0, contrast=1.0):
+				 centerorigin=False, rotation=0.0, contrast=1.0):
 		"""ScaledSprite Object -- pype's main tool for graphics generation.
 
 		This is a basic sprite object. The improvement here is that the
@@ -1108,8 +1110,6 @@ class ScaledSprite(object):
 
 		:param image: (Sprite object) seed sprite to get data from
 
-		:param dx, dy: (int) xy velocity (shift/blit)
-
 		:param fname: (string) Filename of image to load sprite data from.
 
 		:param name: (string) Sprite name/info
@@ -1118,11 +1118,14 @@ class ScaledSprite(object):
 		
 		:param ifill: (string) icon fille (for UserDisplay)
 
-		:param centerorigin: (boolean; default=0) If 0, then the upper
-				left corner of the sprite is 0,0 and increasing y goes
-				DOWN, increase x goes RIGHT. If 1, then 0,0 is in the
-				center of the sprite and increasing y goes UP and
-				increase X goes RIGHT.
+		:param centerorigin: (boolean; default=0) This defines the
+				internal coordinate system used for the sprite (ie, if
+				you're doing math on the sprite axes with numpy).  If
+				False (default), then the upper left corner of the
+				sprite is (0,0) and increasing y-values go DOWN,
+				increasing x-values go RIGHT. If True, then (0,0) corresponds
+				to sprite's center increasing y-values go UP and
+				increasing y-values go RIGHT.
 
 		:param rotation: (float degrees) GL-pipeline rotation
 				factor. Very fast pre-blit rotation.
@@ -1135,8 +1138,6 @@ class ScaledSprite(object):
 
 		self.x = x
 		self.y = y
-		self.dx = dx
-		self.dy = dy
 		self.depth = depth
 		self.fb = fb
 		self._on = on
@@ -1271,37 +1272,41 @@ class ScaledSprite(object):
 				 self.w, self.h, self.dw, self.dh, self.depth, self._on,))
 
 	def XY(self, xy):
-		"""Correct for centerorigin flag"""
+		"""Respects `centerorigin` flag."""
 		return (self.X(xy[0]), self.Y(xy[1]))
 
 	def X(self, x):
-		"""Correct for centerorigin flag"""
+		"""Respects `centerorigin` flag."""
 		if self.centerorigin:
 			return (self.w / 2) + x
 		else:
 			return x
 
 	def Y(self, y):
-		"""Correct for centerorigin flag"""
+		"""Respects `centerorigin` flag.
+
+		"""
 		if self.centerorigin:
 			return (self.h / 2) - y
 		else:
 			return y
-	
 
 	def set_rotation(self, deg):
-		"""
-		Sets GL-pipeline rotation term (FAST!)
+		"""Sets GL-pipeline rotation term - fast rotation on video card.
 
 		"""
 		self.rotation = deg
 
-	def set_contrast(self, percent):
-		"""
-		Sets GL-pipeline rotation term (FAST!)
+	def set_contrast(self, c):
+		"""Sets GL-pipeline contrast term - uses video hardware for alpha.
 
+		:param c: contrast value - [0-1] or [0-100]
+		
 		"""
-		self.contrast = percent / 100.0
+		if c >= 0:
+			self.contrast = c / 100.0
+		else:
+			self.contrast = c
 
 	def asPhotoImage(self, alpha=None, xscale=None, yscale=None):
 		"""Convert sprite to a Tkinter displayable PhotoImage.
@@ -1327,7 +1332,9 @@ class ScaledSprite(object):
 			pil.putalpha(alpha)
 		self.pim = PIL.ImageTk.PhotoImage(pil)
 
-		# NOTE: hanging pim off sprite prevents garbage collection
+		# NOTE: hanging pim off sprite prevents garbage collection until
+		# the sprite is deleted (otherwise you can end up with a handle
+		# to a garbage-collected PIL image.
 		return self.pim
 
 	def asImage(self, xscale=None, yscale=None):
@@ -1466,11 +1473,12 @@ class ScaledSprite(object):
 			self.alpha[np.less_equal(abs(h-r), width)] = color[3]
 
 
-	def circle(self, color, r=None, x=0, y=0):
-		"""Draw circlular mask into sprite.
+	def circle(self, color, r=None, x=0, y=0, mask=True):
+		"""Draw filled circle into sprite.
 
-		Pixels inside the circle are filled, rest of the sprite
-		is make 100% transparent.
+		Pixels inside the specified circle are filled to specified
+		color. If mask is True (default), the rest of the sprite is
+		set to be 100% transparent (alpha=0).
 
 		:param color: C() parseable color spec
 
@@ -1479,13 +1487,16 @@ class ScaledSprite(object):
 		:param x, y: (pixels) center coords of circular mask (world
 				coordinates)
 
+		:param mask: (bool; def=True) mask off rest of sprite?
+
 		:return: nothing
 
 		"""
-		self.fill((0,0,0,0))
+		if mask:
+			self.fill((0,0,0,0))
 		self.circlefill(color, r=r, x=x, y=y)
 
-	def rect(self, x, y, w, h, color):
+	def rect(self, x, y, w, h, color, mask=False):
 		"""Draw a *filled* rectangle of the specifed color on a sprite.
 
 		*NB*
@@ -1497,9 +1508,14 @@ class ScaledSprite(object):
 
 		:param color: C() parseable color spec
 
+		:param mask: (bool; def=True) mask off rest of sprite?
+		
 		:return: nothing
 
 		"""
+		if mask:
+			self.fill((0,0,0,0))
+
 		color = C(color)
 		x = self.w/2 + x - w/2
 		y = self.h/2 - y - h/2
@@ -1510,29 +1526,33 @@ class ScaledSprite(object):
 		self.alpha[mx:(x+w),my:(y+h)] = color[3]
 
 	def rotateCCW(self, angle, preserve_size=1):
+		"""Counter clockwise (CCW) rotation.
+		
+		"""
 		self.rotate(-angle, preserve_size=preserve_size)
 
 	def rotateCW(self, angle, preserve_size=1):
+		"""Clockwise (CW) rotation.
+		
+		"""
 		self.rotate(angle, preserve_size=preserve_size)
 
-	def rotate(self, angle, preserve_size=1):
-		"""Lossy rotation of spite image data
+	def rotate(self, angle, preserve_size=True):
+		"""Lossy rotation of spite image data.
 
-		Rotate sprite image about the sprite's center.
-		Uses pygame.transform primitives.
+		CW rotation of sprite about the center using pygame.transform
+		primitives.  This is a *non-invertable* deformation --
+		multiple rotations will accumulate errors, so if you're doing
+		that, keep an original copy and rotate the copy each time.
 
-		- this is NOT invertable! Multiple rotations will accumulate
-		  errors, so keep an original and only rotate copies. Ideal
-		  only rotate things once!
+		:param angle: angle of rotation in degrees (CW)
 
-		- 03/07/2006: note rotation direction is CW!!
+		:param preserve_size: (boolean; def True) if true, the rotated
+				sprite is clipped back down to the size of the
+				original image. Otherwise, it'll end up whatever size
+				is necessary to preserve all the pixels.
 
-		:param angle: angle of rotation in degrees
-
-		:param preserve_size: (boolean) if true, the rotated sprite is
-				clipped back down to the size of the original image.
-
-		:return: nothing
+		:return: nothing - works on sprite in-place
 
 		"""
 		if self.xscale != 1.0 or self.yscale != 1.0:
@@ -1550,16 +1570,11 @@ class ScaledSprite(object):
 		
 		
 	def scale(self, new_width, new_height):
-		"""Resize this sprite (fast).
+		"""Fast resizing of  sprite using pygame.rotozoom.
 
-		Resize a sprite using pygame/rotozoom to a new size. Can
-		scale up or down equally well. Changes the data within
-		the sprite, so it's not really invertable. If you want
-		to save the original image data, first clone() and then
-		scale().
-
-		*NB* NOT invertable! Scaling down and unscaling will *not*
-		restore the original sprite!!
+		Can scale up or down equally well. Changes the data within the
+		sprite, so it's not really invertable. If you want to save the
+		original image data, first clone() and then scale().
 
 		:param new_width: (pixels) new width
 
@@ -1578,20 +1593,20 @@ class ScaledSprite(object):
 		self.refresh()
 		
 
-	def circmask(self, x, y, r):
-		"""hard vignette in place - was image_circmask"""
+	def hard_aperture(self, r, x=0, y=0):
+		"""Apply hard-edged circular vignette/mask in place.
+
+		This works by setting pixels outside the specified region to
+		(0,0,0,0). Formerly known as `image_circmask` and `circmask`.
+
+		"""
 		mask = np.where(np.less(np.hypot(self.ax-x,self.ay+y), r), 1, 0)
 		a = pygame.surfarray.pixels2d(self.im)
 		a[::] = mask * a
 
 	def alpha_aperture(self, r, x=0, y=0):
-		"""Add hard-edged aperture (vignette)
-
-		Vignette the sprite using a hard, circular aperture into the
-		alpha channel. This draws a hard circular mask of the
-		specified radius, at the specified offset ([0,0] is center)
-		into the sprite's alpha channel, so when it's blitted the
-		region outside the aperture is masked out.
+		"""Apply hard-edged circular vignette/mask in place using
+		alpha channel
 
 		:param r: (pixels) radius
 
@@ -1626,9 +1641,9 @@ class ScaledSprite(object):
 	def alpha_gradient2(self, r1, r2, bg, x=0, y=0):
 		"""Add soft-edged apperature (gradient vignette)
 
-		Like alpha_gradient() above, but mask is applied **directly to
-		the image data** (under the assumption that the background is a
-		solid fill of 'bg').
+		Like alpha_gradient() above, but mask is applied directly to
+		the image data by doing alpha blending in software, under the
+		assumption that the background is a solid fill of value 'bg'.
 
 		:param r1,r2: (pixels) inner,outer radii
 
@@ -1675,6 +1690,10 @@ class ScaledSprite(object):
 			   (pixs.astype(np.float)-float(meanval)))).astype(np.uint8)
 
 	def thresh(self, threshval):
+		Logger('Warning: Sprite.thresh --> Sprite.threshold\n')
+		return self.threshold(threshval)
+
+	def threshold(self, threshval):
 		"""Threshold sprite image data
 
 		Threshold (binarize) sprite's image data
@@ -1689,17 +1708,13 @@ class ScaledSprite(object):
 		pixs[::] = np.where(np.less(pixs, threshval), 1, 255).astype(np.uint8)
 
 	def on(self):
-		"""Turn sprite on
-
-		Sprite will get blitted.
+		"""Make sprite visible.
 
 		"""
 		self._on = 1
 
 	def off(self):
-		""" Turn sprite off.
-
-		Sprite won't be drawn, even when blit method is called.
+		"""Make sprite invisible.
 
 		"""
 		self._on = 0
@@ -1722,7 +1737,7 @@ class ScaledSprite(object):
 		return self._on
 
 	def moveto(self, x, y):
-		"""Move sprite to new location
+		"""Move sprite to new absolute location.
 
 		:param x,y: (pixels) framebuffer coords of new location
 
@@ -1764,55 +1779,38 @@ class ScaledSprite(object):
 		:param force: (boolean) override on/off flag?
 
 		"""
-		if not force and not self._on:
-			return
-
 		if fb is None:
 			fb = self.fb
+			
+		if not (fb is None or (not force and not self._on)):
+			if x is None:
+				x = self.x
+			else:
+				self.x = x
 
-		if fb is None:
-			# dummy sprite -- no associated frame buffer..
-			return 1
+			if y is None:
+				y = self.y
+			else:
+				self.y = y
 
-		# save position, if specified, else used saved position
-		if x is None:	x = self.x
-		else:			self.x = x
-
-		if y is None:	y = self.y
-		else:			self.y = y
-
-		if self.texture:
-			# pre-rendered texture -- just blit it
-			_texture_blit(self.fb, self.texture, x, y,
-						  rotation=self.rotation,
-						  contrast=self.contrast,
-						  xscale=self.xscale, yscale=self.yscale)
-		else:
-			rgba = pygame.image.tostring(self.im, 'RGBA', 1)
-			#im = self.array[:,::-1,:]
-			#alpha = self.alpha[:][:,:,np.newaxis]
-			#rgba = np.concatenate((im, alpha), axis=2)
-			#rgba = np.transpose(rgba, axes=[1,0,2]).tostring()	 <-- killer!
-			tex = _texture_create(rgba, self.w, self.h)
+			if self.texture:
+				# pre-rendered sprite...
+				tex = self.texture
+			else:
+				rgba = pygame.image.tostring(self.im, 'RGBA', 1)
+				tex = _texture_create(rgba, self.w, self.h)
 			_texture_blit(self.fb, tex, x, y,
 						  rotation=self.rotation,
 						  contrast=self.contrast,
 						  xscale=self.xscale, yscale=self.yscale)
-			_texture_del(tex)
+			if not self.texture:
+				_texture_del(tex)
 
-		if flip:
-			fb.flip()
-
-		# if moving sprite, move to next position..
-		self.x = self.x + self.dx
-		self.y = self.y + self.dy
-		return 1
+			if flip:
+				fb.flip()
 
 	def fastblit(self):
-		"""NOP -- passes through to blit() method with no args
-
-		"""
-		return self.blit()
+		raise Obsolete, 'Use blit method instead of fastblit.'
 
 	def render(self, clear=False):
 		"""Render image data into GL texture memory for speed.
@@ -1825,15 +1823,11 @@ class ScaledSprite(object):
 			self.texture = _texture_create(s, self.w, self.h)
 
 	def subimage(self, x, y, w, h, center=None):
-		"""Extract sub-region of sprite into new sprite
+		"""Extract sub-region of sprite into new sprite.
 
-		Generates a *new* sprite from the specified sub-region of
-		current sprite.
-
-		*NB* (Wed Apr 19 14:32:03 2006 mazer)
-		Despite what the pygame docs say about subsurface(), this
-		function COPIES the image data. Changes to the subimage will
-		*NOT* affect the parent!
+		Generates a new sprite containing image data from specified
+		sub-region of this sprite. Image data is copied, not shared
+		or referenced -- changes to result will not affet original.
 
 		:param x,y: (pixels) coordinates of subregion (0,0) is upper
 				left corner of parent/src sprite
@@ -1856,18 +1850,15 @@ class ScaledSprite(object):
 
 		return ScaledSprite(image=self.im.subsurface((x, y, w, h)),
 							rwidth=int(round(w)), rheight=int(round(h)),
-							x=self.x, y=self.y, dx=self.dx, dy=self.dy,
+							x=self.x, y=self.y,
 							depth=self.depth, fb=self.fb, on=self._on)
 
 	def clone(self):
-		"""Duplicate sprite
+		"""Duplicate sprite (aka deepcopy).
 
-		Clone this sprite by making a new instance with all
-		data, including image and alpha, duplicated.
-
-		*NB* Wed Apr 19 14:32:03 2006 mazer - Despite what the pygame
-		docs say about subsurface(), this function COPIES the image
-		data. Changes to the clone will *NOT* affect the parent!
+		Create no sprite with all the same data, including image and
+		alpha, duplicated. Like subimage, data are copied, not referenced,
+		so changes to clone will not affect parent.
 		
 		"""
 		import copy
@@ -1875,7 +1866,7 @@ class ScaledSprite(object):
 		s = ScaledSprite(width=self.dw, height=self.dh,
 						 rwidth=self.w, rheight=self.h,
 						 image=self,
-						 x=self.x, y=self.y, dx=self.dx, dy=self.dy,
+						 x=self.x, y=self.y,
 						 on=self._on, depth=self.depth,
 						 rotation=self.rotation, contrast=self.contrast,
 						 name='clone of '+self.name,
@@ -1885,77 +1876,40 @@ class ScaledSprite(object):
 		return s
 
 	def setdir(self, angle, vel):
-		"""Set direction of motion
-
-		:param angle: (deg)
-
-		:param vel: (pix/sec)
-
-		:return: nothing
-
-		"""
-		angle = np.pi * angle / 180.0
-		self.dx = vel * np.cos(angle)
-		self.dy = vel * np.sin(angle)
+		raise Obsolete, 'do not use setdir'
 
 	def displayim(self):
 		return pygame.transform.scale(self.im, (self.dw, self.dh))
 
 	def save(self, fname, mode='w'):
-		"""Save sprite using pygame builtins
+		"""Write sprite as image to file
 
-		Image is saved at the DISPLAYED size, not the memory/real size
+		Image is saved to file using pygame image tools. Filename
+		extension determines the output format (png and jpg ok). If
+		the sprite is scaled or anything like that, it will be saved
+		as displayed, which may not match the in-memory image data.
 
 		"""
 		# use pygame's save function to write image to file (PNG, JPG)
 		return pygame.image.save(self.displayim(), fname)
 
 	def save_ppm(self, fname, mode='w'):
-		"""Save sprite as PPM file (local implementation)
-
-		Alpha channel is not saved.
-		Saved WITHOUT rescaling
-
-		"""
-		try:
-			file = open(fname, mode)
-			file.write('P6\n# pype save_ppm\n%d %d\n255\n' % (self.w, self.h))
-			file.write(pygame.image.tostring(self.im, 'RGB'))
-			file.close()
-		except IOError:
-			Logger("Can't write %s.\n" % fname)
-			return None
+		raise Obsolete, 'save_ppm has been removed'
 
 	def save_alpha_pgm(self, fname, mode='w'):
-		"""Save sprite alpha channel as PGM file (local implementation)
-
-		Alpha only -- no RGB data.
-		Saved WITHOUT rescaling
-
-		"""
-		try:
-			file = open(fname, mode)
-			file.write('P5\n# pype save_ppm\n%d %d\n255\n' % (self.w, self.h))
-			a = self.alpha[::]
-			file.write(a.tostring())
-			file.close()
-		except IOError:
-			Logger("Can't write %s.\n" % fname)
-			return None
+		raise Obsolete, 'save_ppm has been removed'
 		
 class Sprite(ScaledSprite):
 	"""Sprite object (wrapper for pygame surface class).
 
-	Note about .centerorigin: If centerorigin is False (default condition),
-	the origin is the UPPER LEFT corner of the sprite, positive x values
-	to the right, positive y-values running down. If center origin is True,
-	then it's normal cartesian coords with (0,0) in the center of the sprite
-	postive x-values to the right, positive y-values up.
+	See ScaledSprite() class for info -- Sprite instances are just
+	ScaledSprites that with no scaling (ie, physical and virtual
+	sizes are the same).
 
 	"""
 
 	def __init__(self, width=100, height=100, x=0, y=0, depth=0,
-				 fb=None, on=1, image=None, dx=0, dy=0, fname=None,
+				 fb=None, on=1, image=None, fname=None,
 				 name=None, icolor='black', ifill='yellow',
 				 centerorigin=0, rotation=0.0, contrast=1.0, scale=1.0):
 		"""Sprite Object -- pype's main tool for graphics generation.
@@ -1973,8 +1927,6 @@ class Sprite(ScaledSprite):
 		:param on: (boolean) on/off (for DisplayList)
 
 		:param image: (Sprite object) seed sprite to get data from
-
-		:param dx, dy: (int) xy velocity (shift/blit)
 
 		:param fname: (string) Filename of image to load sprite data from.
 
@@ -2013,20 +1965,17 @@ class Sprite(ScaledSprite):
 							  rwidth=width, rheight=height,
 							  x=x, y=y, depth=depth,
 							  fb=fb, on=on, image=image,
-							  dx=dx, dy=dy,
 							  fname=fname, name=name,
 							  icolor=icolor, ifill=ifill,
 							  centerorigin=centerorigin,
 							  rotation=rotation, contrast=contrast)
 
 class PolySprite(object):
-	"""Polygon Sprite
+	"""`Sprite`-like Polygon.
 
-	This is a special sprite that doesn't have image data. Instead
-	it contains a bunch of points that define a polygon. I don't
-	think anybody's really using this, it's something I was playing
-	with.
-
+	This is a like a sprite, but instead of image data, has a vector
+	of points that define a polygon. Could be easily extended into a
+	SplineSprite() class etc.
 	"""
 
 	_id = 0
@@ -2854,7 +2803,7 @@ if __name__ == '__main__':
 			singrat(s2, 1, 0.0, n, WHITE)
 			s2.blit()
 			s2.moveto(100, 0)
-			s2.thresh(127)
+			s2.threshold(127)
 			s2.blit()
 			fb.flip()
 

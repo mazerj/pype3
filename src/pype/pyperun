@@ -1,48 +1,10 @@
-#!/usr/bin/env python
+#!%PYTHONEXE%
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
 """
 **Pype loader**
 
-Note that \%\%PYPEDIR\%\% gets expanded using sed (textually)
-by the Buildfile system during the compile/install procedure!
-
-
-Author -- James A. Mazer (james.mazer@yale.edu)
-
-**Revision History**
-
-Wed Dec 26 15:58:28 2001 mazer
-
-- Front end loader for "pype".  This is like the old pype shell
-  script, but it's pure python (execept that it needs root access
-  via pypeboot::
-
-    usage: pyperun [task]     -> run with gui & framebuffer
-           pyperun -s [args]  -> interactive shell (aka pypenv)
-
-Mon Sep 18 10:00:05 2006 mazer
-  Notes about variables::
-
-    PYPEDIR       This is the install directory for pype
-    PYPERC        User's configuration directory. This defaults to
-                  ~/.pyperc, unless overridden with an environment
-                  variable
-    PYPEPATH      colon-delimited search path
-    SUBJECT       subject id (for subject-specific config files)
-
-Fri Oct 22 09:34:47 2010 mazer
-  Added --config option
-
-Thu Dec  9 13:34:29 2010 mazer
-  Got rid of ~/.pyperc/Modules -- everything should go in the Task
-  directory and you need to use the !TASK! and !MODULE! flags in the
-  headers to tell pype which are tasks. Default is to assume MODULE
-  if there's no tag... so if you want it in the menu, you need to
-  have the !TASK! flag..
-
-Fri Oct 12 14:55:42 2012 mazer
-  run with 's=' prints out a list of available subjects.
+Author -- James A. Mazer (mazerj@gmail.com)
 
 """
 
@@ -67,12 +29,12 @@ if "--idebug" in sys.argv:
     
     __builtin__.__import__ = newimp
 
-
 __debug = 0
 __show_help = 0
 __show_pypeimports = 0
 __show_allimports = 0
 __show_config = 0
+__show_paths = 0
 __show_version = 0
 __psych_mode = None
 __training_mode = 0
@@ -99,7 +61,7 @@ def _run_script(fullname):
     trylist = ((name, None), (name+'.py', None),
                (name, modname), (name+'.py', modname))
 
-    # look for the modulate in standard locations, load it if you
+    # look for the module in standard locations, load it if you
     # find it, otherwise return 1
     for fname, path in trylist:
         try:
@@ -139,6 +101,8 @@ for a in sys.argv:
         __show_allimports = 1
     elif a == '--config':
         __show_config = 1
+    elif a == '--paths':
+        __show_paths = 1
     elif a == '--help':
         __show_help = 1
     elif a == '--version' or a == '-v':
@@ -195,6 +159,11 @@ if __show_config:
     configvars.defaults_show()
     sys.stdout.write('# end config file\n')
     sys.exit(0)
+if __show_paths:
+    sys.stdout.write('# env vars\n')
+    for v in os.environ.keys():
+        sys.stdout.write('%s=%s\n' % (v, os.environ[v],))
+    sys.exit(0)
 if __show_version:
     import pypeversion
 
@@ -208,6 +177,7 @@ if __show_version:
         
     sys.exit(0)
 
+from importer import importer
 try:
     from importer import importer
 except ImportError:

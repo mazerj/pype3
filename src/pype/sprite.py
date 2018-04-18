@@ -2546,6 +2546,7 @@ def drawtest(fb, s):
 	"""
 
 	import pypeversion
+	from spritetools import singrat
 
 	fb.clear((1,1,1))
 	if s: s.blit(force=1)

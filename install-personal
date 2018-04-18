@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+# Install personal copy of pype
+#
+
+./install-to ~/pype3 $*

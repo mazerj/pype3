@@ -19,7 +19,7 @@ mkpypeversion:
 	@sh mkpypeversion.sh >pypeversion.py
 
 mkpyperun:
-	@cp pyperun $(PYPEDIR)/bin
+	@sed 's^%PYTHONEXE%^$(PYTHONEXE)^g' <pyperun >$(PYPEDIR)/bin/pyperun
 	@chmod +x $(PYPEDIR)/bin/pyperun
 
 mklib:

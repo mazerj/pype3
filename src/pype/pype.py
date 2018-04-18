@@ -31,12 +31,18 @@ import math
 import numpy as np
 
 
-# THIS IS REALLY UGLY -- THERE ARE TWO ISSUES:
+# THIS IS UGLY! There are somethings you can't/shouldn't do suid-root:
+#
 #  1. matplotlib-0.9.9 uses some sort of cache file that's not compatible
 #     with later versions.
 #  2. you don't want to initialize matplotlib as root -- doesn't work, so
 #     we need to drop root access and restore after init
+#  3. FIXME With Anaconda2 (python2.7), you can't import numpy as root. You
+#     get an error about "_remove_dead_weakref" not found. This turns
+#     out to be be an issue only if the app is suid-root. But giving up
+#     root permissions doesn't fix the problem. Still broken!
 #
+
 euid = None
 try:
     euid = os.geteuid()
@@ -318,6 +324,8 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
         if not PypeApp._init:
             return
+
+        Logger("pype: '%s'\n" % (sys.version,))
 
         self.pypedir = pypedir
         self.psych = psych
@@ -1106,7 +1114,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             self.server.start()
         else:
             self.server = None
-            
 
     def _do_gamma_cal(self, validate):
         import gammacal

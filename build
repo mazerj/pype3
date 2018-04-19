@@ -7,10 +7,7 @@ fi
 
 export WHO=`/usr/bin/whoami`
 export PYTHONEXE=$(which python)
-export PYTHONEXE="/auto/home/mazer/anaconda2/bin/python"
-
-echo "PYTHONEXE=$PYTHONEXE"
-
+#export PYTHONEXE="/auto/home/mazer/anaconda2/bin/python"
 
 # NOTE: these aren't correct for anaconda -- anaconda lib/inc are
 #       .../{lib,include}/python2.7/ instead of .../{lib,include}/

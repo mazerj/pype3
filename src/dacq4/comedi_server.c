@@ -949,6 +949,9 @@ void mainloop(void)
   UNLOCK(semid);
   fprintf(stderr, "%s: ready\n", progname);
 
+
+  /* this is the sampling main loop */
+
   do {
 
     if (debugint) {
@@ -979,6 +982,8 @@ void mainloop(void)
     //fprintf(stderr, "test: ready=%d\n", dacq_data->das_ready);
     UNLOCK(semid);
 
+    // throttle sampling down to specificed sampling rate by
+    // waiting until the next sample period in a tight loop
     while (1) {
       usts = timestamp(0);
       if (last_usts < 0 || (usts - last_usts) > (1.0e6 / SAMP_RATE)) {
@@ -1274,8 +1279,9 @@ void mainloop(void)
 	  dacq_data->fixwin[i].state = OUTSIDE;
 	  if (dacq_data->fixwin[i].fcount) {
 	    dacq_data->fixwin[i].nout += 1;
-	    if (dacq_data->fixwin[i].nout > dacq_data->fixbreak_tau) {
-	      // # samps outside exceeds fixbreak_tau --> real fixbreak!
+	    if (dacq_data->fixwin[i].nout >
+		(dacq_data->fixbreak_tau_ms * SAMP_RATE / 1000)) {
+	      // # ms outside exceeds fixbreak_tau_ms --> real fixbreak!
 	      if (dacq_data->fixwin[i].broke == 0) {
 		// save break time
 		dacq_data->fixwin[i].break_time =  dacq_data->timestamp;

@@ -128,9 +128,8 @@ typedef struct {
   int		adbufs[NADC][ADBUFLEN];
 
   /* automatic fixation windows */
-  FIXWIN fixwin[NFIXWIN];
-  int		fixbreak_tau;		/* number of samples outside */
-					/* before it counts as a break */
+  FIXWIN	fixwin[NFIXWIN];
+  int		fixbreak_tau_ms;	/* ms before break counts as break */
 
   /* joystick button states (usb joystick) */
   int		js_enabled;

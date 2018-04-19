@@ -334,7 +334,7 @@ static void shm_init(void)
   
   dacq_data->dacq_pri = 0;
   
-  dacq_data->fixbreak_tau = 5;
+  dacq_data->fixbreak_tau_ms = 5;
   
   /* alarm timer (same units as timestamp); 0 for no alarm */
   dacq_data->alarm_time = 0;
@@ -641,14 +641,14 @@ int dacq_juice_drip(int ms)
   return(1);
 }
 
-void dacq_fixbreak_tau(int n)
+void dacq_fixbreak_tau_ms(int nms)
 {
   /*
-   * set time period (in ms/sampling ticks) the eye must be outside
-   * the fixation window before it counts as a break
+   * set time period (in ms) the eye must be outside the fixation
+   * window before it counts as a break
    */
   LOCK(semid);
-  dacq_data->fixbreak_tau = n;
+  dacq_data->fixbreak_tau_ms = nms;
   UNLOCK(semid);
 }
   

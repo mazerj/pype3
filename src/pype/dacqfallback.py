@@ -57,7 +57,7 @@ def dacq_juice(on):
 def dacq_juice_drip(ms):
     return 1
 
-def dacq_fixbreak_tau(n):
+def dacq_fixbreak_tau_ms(nms):
     return
 
 def dacq_fixwin(n, cx, cy, radius, vbias):

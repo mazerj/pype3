@@ -187,8 +187,8 @@ def _base_ptables():
 
     rig = (
         ptitle('DACQ Params'),
-        pslot('fixbreak_tau', '5', is_int,
-              '# samples before fixbreak counts;'
+        pslot('fixbreak_tau_ms', '5', is_int,
+              '# ms before fixbreak counts;'
               ' press EyeTracker:UPDATE to take effect'),
         pslot('eye_smooth', '3', is_int,
               'smoothing length (DACQ ticks aka ms);'
@@ -1836,7 +1836,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             self.ical.set('affinem_', a)
 
         dacq_eye_smooth(self.rig_common.queryv('eye_smooth'))
-        dacq_fixbreak_tau(self.rig_common.queryv('fixbreak_tau'))
+        dacq_fixbreak_tau_ms(self.rig_common.queryv('fixbreak_tau_ms'))
 
         self._xg = self.ical.queryv('xgain_')
         self._yg = self.ical.queryv('ygain_')

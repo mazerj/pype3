@@ -58,7 +58,6 @@ static char	*progname = NULL;
 static DACQINFO *dacq_data = NULL;
 static int	mem_locked = 0;
 static int	nodacq = 0;
-static int	semid;
 static double	arange;
 static int	das08 = 0;	/* board is das08? (was pci-das08)*/
 static char	*comedi_devname = "/dev/comedi0";

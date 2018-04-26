@@ -77,8 +77,6 @@ static int	usbjs_dev = -1;	/* usb joystick handle */
 static int	eyelink_camera = -1;  /* eyelink handle */
 static v24_port_t *iscan_port = NULL;	/* iscan handle */
 
-static int	debugint = 0;
-
 static pid_t	pypepid = 0;
 
 
@@ -583,11 +581,6 @@ void dig_out()
   }
 }
 
-static void sigusr2_handler(int signum)
-{
-  debugint = 1;
-}
-
 int mainloop_init()
 {
   int shmid;
@@ -645,8 +638,6 @@ int mainloop_init()
     }
   }
   UNLOCK(semid);
-
-  signal(SIGUSR2, sigusr2_handler); /* catch SIGUSR2's from pype (debugging) */
 
   return(1);
 }
@@ -794,22 +785,6 @@ void mainloop(void)
   /* this is the sampling main loop */
 
   do {
-
-    if (debugint) {
-      // this chunk of code can be used for one-shots triggered by SIGUSR2
-      int r, c;
-      for (r = 1; r < 4; r++) {
-	for (c = 1; c < 4; c++) {
-	  printf("%10f [%d%d] ", A(r,c), r, c);
-	}
-	printf("\n");
-      }
-      printf("xg=%10f\n", dacq_data->eye_xgain);
-      printf("yg=%10f\n", dacq_data->eye_ygain);
-      printf("xo=%10d\n", dacq_data->eye_xoff);
-      printf("yo=%10d\n", dacq_data->eye_yoff);
-      debugint = 0;
-    }
     LOCK(semid);
     if (dacq_data->clock_reset) {
       // this is basically a one-shot; client sets clock_reset to
@@ -1004,11 +979,6 @@ void mainloop(void)
     
     /* read digital input lines */
     if (usbjs_dev >= 0) {
-#ifdef EMERG_QUIT
-      if (dacq_data->js[0] && dacq_data->js[1]) {
-	kill(pypepid, SIGUSR2);
-      }
-#endif
       /*
        * Make joystick button 1 acts as bar (DIN#0); other buttons should
        * be read using dacq_jsbut() API function.

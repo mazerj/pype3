@@ -2,42 +2,6 @@
 ** author:  jamie mazer
 ** created: Wed Jan  6 23:14:57 1999 mazer 
 ** info:    generic dacq interface structure
-** history:
-**
-** Wed Jan  6 23:15:08 1999 mazer 
-**   This is a generalized version of the original das_server.h
-**   file.  The idea is to encapsulate a more general purpose
-**   driver abstraction, not so directly tied to the das1600's
-**   capabilities.  New devices will be able to use the same
-**   interface.
-**
-** Thu Jan  6 11:14:34 2000 mazer
-**   added adc_gain & adc_offset support
-**
-** Tue May 16 20:43:40 2000 mazer 
-**   added support for ISCAN via serial input
-**
-** Sun Mar  9 13:21:02 2003 mazer 
-**   Added din_changes[] to DACQINFO structure to act as latches
-**   on the digital input lines.
-**
-** Mon Jan 23 10:01:22 2006 mazer 
-**   Added FIXWIN.vbias for vertical elongation of the fixation window.
-**
-** Thu Apr 13 09:40:47 2006 mazer 
-**   eliminated iscan_server specific members from the main data
-**   structures.
-**
-** Tue Nov 28 16:58:07 2006 mazer 
-**   added support for a ms-resolution alarm that sends interupts
-**   the client/parent process
-**  
-** Wed Oct 20 15:40:02 2010 mazer 
-**   adbuf_t changed from unsigned long -> double
-**
-** Tue Apr 26 13:03:58 2011 mazer 
-**   added support for on-line affine transform matrix
-**
 */
 
 #define SHMKEY	0xDA01

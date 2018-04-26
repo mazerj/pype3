@@ -2,61 +2,6 @@
 ** author:  jamie mazer
 ** created: Tue Apr  9 15:02:46 2002 mazer 
 ** info:    this module implements a SINGLE shared semaphore..
-** history:
-**    this is sort of like the gallant-lab speaking stick...
-**
-** Tue Apr  9 15:12:13 2002 mazer 
-**   each call to sem_init() will return handle for a single
-**   system wide semaphore (created, if it doesn't already
-**   exist).  It's #0 in a set of 1.
-**
-**   the logic here is:
-**     - semaphore is initialized to value of 1
-**     - too take the semaphore, you DECREMENT (now it's zero),
-**	 and nobody can decrement it while it's zero.
-**     - when you're done, you INCREMENT, leaving the semaphore
-**       at 1, which will unblock someone waiting to decrement..
-**
-**   We can think of the semaphore as holding a resource, when the
-**   semaphore is 1, 1 unit of resource is available, you decrement
-**   the semaphore to take ther resource and increment it when you
-**   return the resource to the pool.  Trying to take from an empty
-**   semaphore, will block (it doesn't have to if you use IPC_NOWAIT).
-**
-**   -> NOTE: psem_free() removed semaphore from the kernel, anybody
-**      waiting for the semaphore will get an error...
-**
-**   -> NOTE: got to be careful about nested locks within a single
-**            process -- don't call LOCK() before calling some other
-**            function, if the second function calls LOCK() too, then
-**            it will block and never return!!!!
-**
-**   -> NOTE: using the 't' function in main below, I get about
-**            0.6us per pair of incr/decr operations, so this should
-**	      be fast enough to use all over the place..
-**
-** Sun Jan 25 14:34:38 2004 mazer 
-**   added: int psem_decr_mine(int semid)
-**   which decremements (UNLOCKS) the semaphore ONLY if it's owned by
-**   the processes calling the function..
-**
-** Thu Mar 23 11:45:54 2006 mazer 
-**   dummy_server under ubuntu 5.10 seems to die if the semaphore's are
-**   deleted and then decremented.. now a warning is printed and then it
-**   should exit normally.
-**
-** Thu Apr 13 09:42:44 2006 mazer 
-**   Modified the psem_incr/_decr() code to use a common underlying
-**   function and put the underlying function in a loop. I think stray
-**   interupts can cause semop() to exit before getting the semaphore,
-**   which gets things out of sync. With this change, the semaphore code
-**   loops UNTIL it takes or drops the semaphore, even if it gets
-**   interupted.
-**
-**   NOTE: This really only seemed to be a problem when the standalone
-**         iscan_server program was running. Now that the iscan_server
-**         functionality has been folded into das_common, I think this
-**         fix may be extraneous.. but I think it's still correct.
 */
 
 #include <stdio.h>

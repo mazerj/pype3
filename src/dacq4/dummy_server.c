@@ -3,7 +3,6 @@
 ** created: Wed Jan  8 17:21:15 2003 mazer 
 ** info:    shm interface to dummy COMEDI devices
 ** history:
-**
 */
 
 #include <sys/types.h>

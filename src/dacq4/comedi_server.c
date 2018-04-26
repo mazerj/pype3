@@ -39,7 +39,6 @@
 #include "sigs.h"
 #include "psems.h"
 #include "usbjs.h"
-#include "debug.h"
 
 #define ANALOG		0	/* eye tracker mode flags */
 #define ISCAN		1

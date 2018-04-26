@@ -16,9 +16,6 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <string.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/mman.h>
 #ifndef __APPLE__
 # include <sys/io.h>
 #endif
@@ -56,7 +53,6 @@
 
 static char	*progname = NULL;
 static DACQINFO *dacq_data = NULL;
-static int	mem_locked = 0;
 static int	nodacq = 0;
 static int	das08 = 0;	/* board is das08? (was pci-das08)*/
 static char	*comedi_devname = "/dev/comedi0";
@@ -606,24 +602,9 @@ int mainloop_init()
     fprintf(stderr, "%s: analog_in=subdev #%d\n", progname, analog_in);
   }
 
-  if ((shmid = shmget((key_t)SHMKEY,
-		      sizeof(DACQINFO), 0666 | IPC_CREAT)) < 0) {
-    ERROR("shmget");
+  if ((dacq_data = shm_init(&shmid)) == NULL ) {
     fprintf(stderr, "%s:init -- kernel compiled with SHM/IPC?\n", progname);
     exit(1);
-  }
-
-  if ((dacq_data = shmat(shmid, NULL, 0)) == NULL) {
-    ERROR("shmat");
-    fprintf(stderr, "%s:init -- kernel compiled with SHM/IPC?\n", progname);
-    exit(1);
-  }
-
-  if (mlockall(MCL_CURRENT) == 0) {
-    mem_locked = 1;
-  } else {
-    ERROR("mlockall");
-    fprintf(stderr, "%s:init -- failed to lock memory\n", progname);
   }
   LOCK(semid);
   dacq_data->elrestart = 0;
@@ -722,7 +703,7 @@ void mainloop(void)
 
   /* signal client we're ready */
   LOCK(semid);
-  dacq_data->das_ready = 1;
+  dacq_data->servers_avail += 1;
   pypeid = dacq_data->pype_pid;
   UNLOCK(semid);
   fprintf(stderr, "%s: ready\n", progname);
@@ -741,7 +722,6 @@ void mainloop(void)
       LOCK(semid);
       last_usts = -1.0;
     }
-    //fprintf(stderr, "test: ready=%d\n", dacq_data->das_ready);
     UNLOCK(semid);
 
     // throttle sampling down to specificed sampling rate by
@@ -1088,7 +1068,7 @@ void mainloop(void)
 
   /* no longer ready */
   LOCK(semid);
-  dacq_data->das_ready = 0;
+  dacq_data->servers_avail -= 1;
   UNLOCK(semid);
 }
 
@@ -1191,18 +1171,7 @@ int main(int ac, char **av)
 
   mainloop();
   comedi_close(comedi_dev);
-  if (dacq_data != NULL) {
-    shmdt(dacq_data);
-    fprintf(stderr, "%s: SHM released\n", progname);
-  }
-  if (mem_locked) {
-    if (munlockall() != 0) {
-      ERROR("munlockall");
-    } else {
-      mem_locked = 0;
-      fprintf(stderr, "%s: unlocked memory\n", progname);
-    }
-  }
+  shm_close(dacq_data);
   fprintf(stderr, "%s: bye bye\n", progname);
   exit(0);
 }

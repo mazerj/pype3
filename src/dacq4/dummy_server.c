@@ -481,7 +481,7 @@ void mainloop(void)
 
   /* signal client we're ready */
   LOCK(semid);
-  dacq_data->das_ready = 1;
+  dacq_data->servers_avail += 1;
   pypeid = dacq_data->pype_pid;
   UNLOCK(semid);
   fprintf(stderr, "%s: ready\n", progname);
@@ -513,7 +513,6 @@ void mainloop(void)
       LOCK(semid);
       last_usts = -1.0;
     }
-    //fprintf(stderr, "test: ready=%d\n", dacq_data->das_ready);
     UNLOCK(semid);
 
     while (1) {
@@ -863,7 +862,7 @@ void mainloop(void)
 
   /* no longer ready */
   LOCK(semid);
-  dacq_data->das_ready = 0;
+  dacq_data->servers_avail -= 1;
   UNLOCK(semid);
 }
 

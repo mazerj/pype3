@@ -71,7 +71,7 @@ typedef struct {
   /* housekeeping flags */
   unsigned long timestamp;	/* timestamp of last update (ms resolution) */
   int	terminate;		/* set flag to force termination */
-  int	das_ready;		/* sync flag -- when true, dacq proc ready */
+  int	servers_avail;		/* number servers (comedi) avail */
   int	clock_reset;		/* set to force reset of int. timestamp clock */
   double usts;			/* raw time stamp in us as double */
   double ts0;			/* time zero in secs */

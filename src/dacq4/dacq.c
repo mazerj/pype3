@@ -131,7 +131,7 @@ static void shm_init(void)
   
   dacq_data->timestamp = 0;
   dacq_data->terminate = 0;
-  dacq_data->das_ready = 0;
+  dacq_data->servers_avail = 0;
   
   dacq_data->eye_smooth = 0;
   dacq_data->eye_x = 0;
@@ -216,7 +216,7 @@ int dacq_start(char *server, char *tracker, char *port, char *elopt,
     /* parent waits for server to become ready */
     do {
       LOCK(semid);
-      i = dacq_data->das_ready;
+      i = dacq_data->servers_avail;
       UNLOCK(semid);
       usleep(1000);
     } while (i == 0);
@@ -757,7 +757,9 @@ int dacq_set_mypri(int pri)
     } else {
       result = 0;
     }
-    seteuid(old);		/* ok to ignore warning */
+    if (seteuid(old)) {
+      perror("should never happen!");
+    }
   } else {
     result = 0;
   }

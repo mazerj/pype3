@@ -36,6 +36,7 @@
 #include <core_expt.h>	/* my_... works with both 32bit & 64bit libs */
 
 #include "dacqinfo.h"
+#include "systemio.h"
 #include "sigs.h"
 #include "psems.h"
 #include "usbjs.h"
@@ -656,61 +657,6 @@ void iscan_init(char *dev)
   fprintf(stderr, "%s: opened iscan_port (%s)\n", progname, dev);
 }
 
-double timestamp(int init) /* return elapsed time in us */
-{
-  static struct timespec ti[2];	/* initial and current times */
-  static double ts;
-
-  if (init) {
-    clock_gettime(CLOCK_MONOTONIC, &ti[0]);
-    LOCK(semid);
-    dacq_data->ts0 = ti[0].tv_sec + ti[0].tv_nsec * 1e-9;
-    UNLOCK(semid);
-  }
-  clock_gettime(CLOCK_MONOTONIC, &ti[1]);
-  ts = (1.0e6 * (double)(ti[1].tv_sec - ti[0].tv_sec)) +
-    (1.0e-3 * (double)(ti[1].tv_nsec - ti[0].tv_nsec));
-  return(ts);
-}
-
-static int locktocore(int corenum) /* -1 for no lock; else corenum (0,1..) */
-{
-  /* 0 for first core etc.. -1 for no lock */
-  cpu_set_t mask;
-  int result = 1;
-
-  if (corenum >= 0) {
-    CPU_ZERO(&mask);
-    CPU_SET(corenum, &mask);
-    result = sched_setaffinity(0, sizeof(mask), &mask);
-    if (result < 0) {
-      return(-1);
-    } else {
-      return(corenum);
-    }
-  }
-  return(-1);
-}
-
-void resched(int rt)
-{
-#ifdef ALLOW_RESCHED
-  struct sched_param p;
-
-  /* change scheduler priority from OTHER to RealTime/RR or vice versa */
-
-  if (sched_getparam(0, &p) >= 0) {
-    if (rt) {
-      p.sched_priority = SCHED_RR;
-      sched_setscheduler(0, SCHED_RR, &p);
-    } else {
-      p.sched_priority = SCHED_OTHER;
-      sched_setscheduler(0, SCHED_OTHER, &p);
-    }
-  }
-#endif
-}
-
 #define A(r,c) (dacq_data->eye_affine[(r)-1][(c)-1])
 
 void mainloop(void)
@@ -760,7 +706,8 @@ void mainloop(void)
     fprintf(stderr, "%s: %d cores; locked to %d\n",
 	    progname, ncores, ncores - 1);
   }
-  timestamp(1);			/* initialize timestamp counter to 0 */
+  /* initialize timestamp counter to 0 */  
+  dacq_data->ts0 = timestamp() / 1.0e6; /* secs */
   last_usts = -1.0;
 
   // Mon May  2 14:40:11 2011 mazer 
@@ -788,8 +735,8 @@ void mainloop(void)
     if (dacq_data->clock_reset) {
       // this is basically a one-shot; client sets clock_reset to
       // force clock reset on next iteration through mainloop
-      timestamp(1);
       UNLOCK(semid);
+      dacq_data->ts0 = timestamp() / 1.0e6; /* secs */
       dacq_data->clock_reset = 0;
       LOCK(semid);
       last_usts = -1.0;
@@ -800,7 +747,7 @@ void mainloop(void)
     // throttle sampling down to specificed sampling rate by
     // waiting until the next sample period in a tight loop
     while (1) {
-      usts = timestamp(0);
+      usts = timestamp();
       if (last_usts < 0 || (usts - last_usts) > (1.0e6 / SAMP_RATE)) {
 	last_usts = usts;
 	break;

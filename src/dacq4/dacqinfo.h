@@ -74,7 +74,7 @@ typedef struct {
   int	das_ready;		/* sync flag -- when true, dacq proc ready */
   int	clock_reset;		/* set to force reset of int. timestamp clock */
   double usts;			/* raw time stamp in us as double */
-  double ts0;			/* raw time zero set by timestamp(1) */
+  double ts0;			/* time zero in secs */
 
   /* used only once.. */
   int	dacq_pri;

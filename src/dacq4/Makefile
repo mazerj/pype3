@@ -4,12 +4,15 @@ COMEDI_SERVER = comedi_server
 
 CC = gcc
 CFLAGS = -O6 -g -Wall $(GLOBAL_CFLAGS) -I$(PYTHONINC) -fPIC
-COMEDI_SERVER_OBJS = sigs.o psems.o usbjs.o
+COMEDI_SERVER_OBJS = sigs.o psems.o usbjs.o systemio.o
 
 
 all: build install
 
 build: _dacq.so $(COMEDI_SERVER)
+
+systemio.o: systemio.c systemio.h
+	$(CC) $(CFLAGS) -c systemio.c
 
 sigs.o: sigs.c sigs.h
 	$(CC) $(CFLAGS) -c sigs.c
@@ -56,7 +59,7 @@ iscandump: iscandump.c
 
 
 clean:
-	@rm -f dacq.py comedi_server dummy_server _dacq.so \
+	@rm -f dacq.py comedi_server dummy_server _dacq*.so \
 		*.o *.i *.pyc *_wrap.* .*~ 
 	@rm -rf build
 

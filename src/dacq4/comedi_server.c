@@ -547,6 +547,7 @@ void dig_in()
 	if (dacq_data->din_intmask[i]) {
 	  dacq_data->int_class = INT_DIN;
 	  dacq_data->int_arg = i;
+	  dacq_data->din_intmask[i] = 0; /* ints must be re-enabled */
 	  kill(pypepid, SIGUSR1);
 	}
       }
@@ -917,6 +918,7 @@ void mainloop(void)
 	if (dacq_data->din_intmask[0]) {
 	  dacq_data->int_class = INT_DIN;
 	  dacq_data->int_arg = 0;
+	  dacq_data->din_intmask[0] = 0; /* ints must be re-enabled */
 	  kill(pypepid, SIGUSR1);
 	}
       }
@@ -928,6 +930,7 @@ void mainloop(void)
 	  dacq_data->joyint = 0;		/* force manual reset! */
 	  dacq_data->int_class = INT_JOYBUT;
 	  dacq_data->int_arg = button;
+	  dacq_data->joyint = 0;	      /* ints must be re-enabled */
 	  kill(pypepid, SIGUSR1);
 	}
       }
@@ -1028,7 +1031,7 @@ void mainloop(void)
 		// alert parent process
 		dacq_data->int_class = INT_FIXWIN;
 		dacq_data->int_arg = 0;
-		dacq_data->fixwin[i].genint = 0;
+		dacq_data->fixwin[i].genint = 0; /* must be re-enabled */
 		kill(pypepid, SIGUSR1);
 		//fprintf(stderr,"das: sent int, disabled\n");
 	      }

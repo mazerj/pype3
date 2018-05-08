@@ -381,6 +381,7 @@ int dacq_bar(void)
   }
 }
 
+// dacq_bar_genint(0/1): disable/enable bar-generated interupts
 int dacq_bar_genint(int b)
 {
   int i;
@@ -392,6 +393,7 @@ int dacq_bar_genint(int b)
   return(i);
 }
 
+// dacq_joy_genint(0/1): disable/enable joystick-generated interupts
 int dacq_joy_genint(int b)
 {
   int i;

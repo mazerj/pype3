@@ -2903,7 +2903,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         if iarg is None:
             iarg = dacq_int_arg()
 
-        # print 'INT', iclass, iarg
+        #print 'INT iclass=%d arg=%d' % (iclass, iarg,)
 
         if iclass == 666:
             self.running = 0

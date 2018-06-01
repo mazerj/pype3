@@ -503,12 +503,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                        command=self.warn_trial_incorrect)
         mb.addmenuitem('Misc', 'command', label='where am i?',
                        command=self._whereami)
-        mb.addmenuitem('Misc', 'command', label='run gamma calibration',
-                       command=lambda: self._do_gamma_cal(validate=False))
-        mb.addmenuitem('Misc', 'command', label='check gamma calibration',
-                       command=lambda: self._do_gamma_cal(validate=True))
-        mb.addmenuitem('Misc', 'command', label='plot gamma calibration',
-                       command=lambda: self._plot_gamma_cal())
 
         mb.addmenu('Set', '', '')
         mb.addmenuitem('Set', 'checkbutton', label='show trace window',
@@ -1115,16 +1109,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         else:
             self.server = None
 
-    def _do_gamma_cal(self, validate):
-        import gammacal
-        gammacal.calibrate(self, validate=validate)
-
-    def _plot_gamma_cal(self):
-        import gammacal, filebox
-        file, mode = filebox.Open(initialdir=os.getcwd(),
-                                  pattern='*.gammacal', initialfile='')
-        gammacal.estimateGamma(calfile=file, plot=True)
-    
     def open_elog(self):
         # open elog for this animal, today w/o asking for confirmation
         animal = self.sub_common.queryv('full_subject')

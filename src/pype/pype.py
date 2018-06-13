@@ -4094,9 +4094,10 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                    transform=a.transAxes)
 
             x = np.linspace(bins[0], bins[-1], 25)
-            g = pylab.normpdf(x, np.mean(h), np.std(h));
-            g = g * np.sum(n) / np.sum(g)
-            a.plot(x, g, 'r-', linewidth=2)
+            if len(x) > 1:
+                g = pylab.normpdf(x, np.mean(h), np.std(h));
+                g = g * np.sum(n) / np.sum(g)
+                a.plot(x, g, 'r-', linewidth=2)
             a.axvspan(self.sub_common.queryv('minrt'),
                       self.sub_common.queryv('maxrt'),
                       color='b', alpha=0.25)

@@ -293,6 +293,8 @@ class Dialog_(Toplevel):
 			self.destroy()
 
 class TextWin(Toplevel):
+	"""Transient (aka popup) text window.
+	"""
 	def __init__(self, title=None, iconname=None, **kw):
 		apply(Toplevel.__init__, (self,), {})
 		if title:

@@ -30,6 +30,7 @@ import cPickle
 import math
 import numpy as np
 
+import Tkinter
 
 # THIS IS UGLY! There are somethings you can't/shouldn't do suid-root:
 #
@@ -1334,12 +1335,10 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             try:
                 if barstate:
                     self.udpy.barstate.config(text='DOWN',
-                                              font=('Andale Mono', 10),
-                                              fg='blue')
+                                              font=('Andale Mono', 10))
                 else:
                     self.udpy.barstate.config(text=' UP ',
-                                              font=('Andale Mono', 10),
-                                              fg='red')
+                                              font=('Andale Mono', 10))
                 self._last_stateinfo = t
             except AttributeError:
                 pass

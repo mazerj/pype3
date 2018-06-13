@@ -524,7 +524,9 @@ class _Probe(object):
 		else:
 			s = "  h: show info"
         if 1:
-            self.app.hmapstate.infobox.set(s)
+			self.app.udpy.canvas.itemconfig(self.app.hmapstate.infobox2,
+											text=s)
+            #self.app.hmapstate.infobox.set(s)
         else:
             for i in self.text:
                 self.app.udpy.canvas.itemconfig(i, text=s)
@@ -711,12 +713,18 @@ def hmap_install(app):
                                         )
     app.udpy.set_taskcallback(lambda ev, app=app: _key_handler(app, 'z', ev))
 
-    app.hmapstate.infobox = TextWin('handmap', fg='blue',
-                                        font=('Andale Mono', 8))
-    app.setgeo(app.hmapstate.infobox, default='-0-0')
-    
-    app.hmapstate.infobox.set('a\n\b\n\c')
-    
+    app.hmapstate.infobox2 = app.udpy.canvas.create_text(20, 15, text="",
+														 font=('Andale Mono',
+															   8),
+														 fill="orange",
+														 anchor=Tkinter.NW)
+    #app.hmapstate.infobox = TextWin('handmap', fg='blue',
+    #                                    font=('Andale Mono', 8))
+    #app.setgeo(app.hmapstate.infobox, default='-0-0')
+
+	app.udpy.canvas.itemconfig(app.hmapstate.infobox2,
+							   text='a\n\b\n\c')
+    #app.hmapstate.infobox.set('a\n\b\n\c')
 
 
 def hmap_uninstall(app):
@@ -730,7 +738,8 @@ def hmap_uninstall(app):
         app.udpy.canvas.delete(i)
     app.udpy.set_taskcallback(None)
 
-    app.hmapstate.infobox.destroy()
+	app.udpy.canvas.delete(app.hmapstate.infobox2)
+    #app.hmapstate.infobox.destroy()
 	del app.hmapstate
 
 

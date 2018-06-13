@@ -144,35 +144,33 @@ class UserDisplay(object):
 		(cwidth, cheight) = fbsize
 
 		self.background_nofocus = 'red'
-		self.background_focus = 'green'
+		self.background_focus = 'grey50'
 
-		self.frame = Frame(self.master, relief=FLAT,
-						   bd=2, bg=self.background_nofocus)
+		self.frame = Frame(self.master,
+						   borderwidth=3, bg=self.background_nofocus)
 
 		f = Frame(self.frame)
 		f.pack(expand=1, fill=X)
-		self.barstate = Label(f, fg='green', bg='black', relief=FLAT)
-		self.barstate.pack(expand=0, side=LEFT, padx=2)
+		self.barstate = Label(f, fg='black', relief=SUNKEN)
+		self.barstate.pack(expand=0, side=LEFT)
 		self._mouseinfo_x = Label(f, font=(MONOFONT, 10),
-								  fg='green', bg='black', relief=FLAT)
-		self._mouseinfo_x.pack(expand=0, side=LEFT, padx=2)
+								  fg='black', relief=SUNKEN)
+		self._mouseinfo_x.pack(expand=0, side=LEFT)
 		self._mouseinfo_y = Label(f, font=(MONOFONT, 10), \
-								  fg='green', bg='black', relief=FLAT)
-		self._mouseinfo_y.pack(expand=0, side=LEFT, padx=2)
+								  fg='black', relief=SUNKEN)
+		self._mouseinfo_y.pack(expand=0, side=LEFT)
 
-		self._info = Label(f, font=(MONOFONT, 10),
-								  fg='green', bg='black', relief=FLAT)
+		self._info = Label(f, font=(MONOFONT, 10), \
+						   fg='black', relief=SUNKEN)
 		self._info.pack(expand=1, fill=X, side=LEFT)
         
 		Label(f, font=(MONOFONT, 10), \
 			  text='%dppd' % (pix_per_dva,), \
-              fg='green', bg='black',
-			  relief=FLAT).pack(expand=0, side=LEFT, padx=2)
+              fg='black', relief=SUNKEN).pack(expand=0, side=LEFT)
 		if xscale != 1.0 or yscale != 1.0:
 			Label(f, font=(MONOFONT, 10), \
 				  text='%.1fx%.1f' % (xscale, yscale), \
-                  fg='green', bg='black',
-				  relief=FLAT).pack(expand=0, side=LEFT, padx=2)
+                  fg='black', relief=SUNKEN).pack(expand=0, side=LEFT)
 
 		# tkinter vars for linking GUI to python vars:
 		self._photomode_tvar = IntVar()
@@ -192,16 +190,16 @@ class UserDisplay(object):
 
 		self.canvas.bind("<FocusIn>",
 						 lambda ev,s=self:
-								 s.frame.configure(bg=s.background_focus))
+						 s.frame.configure(bg=s.background_focus))
 		self.canvas.bind("<FocusOut>",
 						 lambda ev,s=self:
-								s.frame.configure(bg=s.background_nofocus))
-
+						 s.frame.configure(bg=s.background_nofocus))
 		self.frame.pack(expand=1, fill=BOTH)
 
 		self._htrace = []
 		self._vtrace = []
-		self._tracecursor = self.canvas.create_line(1, 50-20, 1, 50+20, fill='white')
+		self._tracecursor = self.canvas.create_line(1, 50-20, 1, 50+20,
+													fill='white')
 		for x in range(1,cwidth):
 			self._htrace.append(self.canvas.create_line(x-1, 50, x, 50,
                                                         fill='red', width=3))
@@ -380,7 +378,7 @@ class UserDisplay(object):
 														  anchor=NW)
 				self.msg_label = Label(f, text=msg, justify=LEFT,
                                         font=(MONOFONT, 10),
-                                        borderwidth=3, relief=RIDGE,
+                                        borderwidth=2, relief=RIDGE,
                                         bg='white', fg='black')
 				self.msg_label.pack(ipadx=3, ipady=3)
 				self._placenote()
@@ -510,17 +508,19 @@ class UserDisplay(object):
 			# draw cardinal axis (0,0)
 			(x, y) = self.cart2canv(0, 0)
 			self.canvas.create_line(x, 0, x, self.h, width=1,
-									 fill='white', dash=(7,2))
+									 fill='grey50', dash=(5,7))
 			self.canvas.create_line(0, y, self.w, y, width=1,
-									 fill='white', dash=(7,2))
+									 fill='grey50', dash=(5,7))
 
 		if sync and self.app.fb.syncinfo:
 			(sx, sy, ss) = self.app.fb.syncinfo
 			(a, b) = self.cart2canv(sx - ss/2, sy - ss/2)
 			(c, d) = self.cart2canv(sx + ss/2, sy + ss/2)
+			#self.canvas.create_rectangle(a, b, c, d,
+            #                                 stipple='gray12',
+            #                                 fill='white')
 			self.canvas.create_rectangle(a, b, c, d,
-                                             stipple='gray12',
-                                             fill='white')
+										 fill="", outline="white")
 
 		# gridinterval is pix/deg
 		d = int(round(self.gridinterval))

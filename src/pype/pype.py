@@ -2612,14 +2612,13 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
     def warn_run_start(self):
         if self.sub_common.queryv('warningbeeps'):
-            for n in range(3):
-                beep(1000, 100)
-                beep(0, 10)
+            beep(500, 50, wait=0)
+            beep(1000, 50, wait=0)
 
     def warn_run_stop(self):
         if self.sub_common.queryv('warningbeeps'):
-            beep(1000, 100)
-            beep(500, 100)
+            beep(1000, 50, wait=0)
+            beep(500, 50, wait=0)
 
     def warn_trial_correct(self, flash=None):
         """Give positive (auditory+visual) feedback for correct response.
@@ -2703,14 +2702,14 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 if (t > minreward) and (t < maxreward):
                     break
             if dobeep and self.reward_beep:
-                beep(1000, 40)
+                beep(1000, 40, wait=0)
             thread.start_new_thread(self._reward_finisher, (t,))
             if self.tk:
                 self.con("[ran-reward=%dms]" % t, color='black')
             actual_reward_size = t
         else:
             if dobeep and self.reward_beep:
-                beep(1000, 100)
+                beep(1000, 100, wait=0)
             self._juice_drip(ms)
             if self.tk:
                 self.con("[reward=%dms]" % ms, color='black')

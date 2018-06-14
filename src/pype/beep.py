@@ -37,8 +37,6 @@ class _Beeper(object):
 				pygame.sndarray.use_arraytype('numpy')
 			(_Beeper._dafreq,
 			 _Beeper._bits, _Beeper._chans) = pygame.mixer.get_init()
-			#Logger('_Beeper: %d hz, %d bits, chans=%d\n' %
-			#	   (_Beeper._dafreq, _Beeper._bits, _Beeper._chans))
 			_Beeper.cache = {}
 			_Beeper._doinit = 0
 
@@ -52,9 +50,10 @@ class _Beeper(object):
 			_Beeper.cache[freq, msdur, vol, risefall] = s
 
 		if play:
-			# wait for free mixer...
-			while pygame.mixer.get_busy():
-				pass
+			# wait for free mixer -- this doesn't appear to be necessary.
+			# looks like things queue up..
+			#while pygame.mixer.get_busy():
+			#	pass
 			s.play()
 			while wait and pygame.mixer.get_busy():
 				pass
@@ -142,10 +141,9 @@ def warble(base, t, volume=1, fmper=25, driver=None):
 
 if	__name__ == '__main__':
 	print "start"
-	beep()
-	#beep(1000, 100, 1, 1)
-	warble(1000, 100)
-	warble(500, 100)
+	beep(1000, 50)
+	beep(500, 50)
 	print "quitting"
-	pygame.mixer.quit()
+	while pygame.mixer.get_busy():
+		pygame.mixer.quit()
 	print "done."

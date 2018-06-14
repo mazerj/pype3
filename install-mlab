@@ -7,7 +7,7 @@ DEST=/auto/share/pype3/`uname -m`
 
 if [ "$*" = "" ]; then
   sudo -p"sudo [mlab install]: " ./install-to $DEST clobber install docs
-elif [ "$1" = "-nodocs" ]; then
+elif [ "$1" = "-nodocs" -o "$1" = "-nodox" ]; then
   sudo -p"sudo [mlab install]: " ./install-to $DEST clobber install
 else
   sudo -p"mlab [mlab install]: " ./install-to $DEST $*

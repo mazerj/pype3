@@ -4073,32 +4073,28 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         self.rthist.fig.clf()
 
         a = self.rthist.fig.add_subplot(1,1,1)
-
-        if len(self.rtdata) == 0:
-            a.text(0.5, 0.5, 'NO RT DATA',
+        h = np.array(self.rtdata)
+        if len(h) == 0 or np.std(h) <= 0:
+            a.text(0.5, 0.5, 'SPACE INTENTIONALLY BLANK',
                    transform=a.transAxes, color='red',
                    horizontalalignment='center', verticalalignment='center')
         else:
-            h = np.array(self.rtdata)
             n, bins, patches = a.hist(h, facecolor='grey')
             a.text(0.02, 1-0.02,
-                   '$\\mu=%.0fms$\n$\\sigma=%.0fms$\n$n=%d$' % \
-                   (np.mean(h), np.std(h), len(h)),
-                   color='red',
-                   horizontalalignment='left',
-                   verticalalignment='top',
-                   transform=a.transAxes)
+                   '$\\mu=%.0fms$\n$\\sigma=%.0fms$' % (np.mean(h), np.std(h),),
+                   horizontalalignment='left', verticalalignment='top',
+                   color='red', transform=a.transAxes)
 
             x = np.linspace(bins[0], bins[-1], 25)
-            if len(x) > 1:
-                g = pylab.normpdf(x, np.mean(h), np.std(h));
-                g = g * np.sum(n) / np.sum(g)
-                a.plot(x, g, 'r-', linewidth=2)
+            g = pylab.normpdf(x, np.mean(h), np.std(h))
+            g = g * np.sum(n) / np.sum(g)
+            a.plot(x, g, 'r-', linewidth=2)
             a.axvspan(self.sub_common.queryv('minrt'),
                       self.sub_common.queryv('maxrt'),
                       color='b', alpha=0.25)
             a.axis([-10, 1.25*self.sub_common.queryv('maxrt'), None, None])
-            a.set_ylabel('n=%d' % len(h))
+            
+        a.set_ylabel('n=%d' % len(h))
         a.set_xlabel('Reaction Time (ms)')
 
         try:

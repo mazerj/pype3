@@ -3664,10 +3664,8 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                                 ((self.eyebuf_t, s0), (ut, a0), ),
                                 self.spike_times)
 
-        self.udpy.info("%3dspk | %3dsync | %3ddup" %
-                       (len(self.spike_times),
-                        len(self.photo_times),
-                        ndups,))
+        self.udpy.info("|spikes:%3d|syncs:%3d|dups:%3d|" %
+                       (len(self.spike_times), len(self.photo_times), ndups,))
 
         # Completely wipe the buffers -- don't let them accidently
         # get read TWICE!!  They're saved as self/app.eyebuf_[xyt]

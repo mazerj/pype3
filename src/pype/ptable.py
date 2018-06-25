@@ -156,6 +156,10 @@ class ParamTable(object):
 									labelpos = 'w',
 									label_text = name + ':',
 									pady=0, padx=2)
+				if descr:
+					self.balloon.bind(e, '%d: %s' % (nrow, descr))
+				else:
+					self.balloon.bind(e, '%d: %s' % (nrow, '???'))
 				e.pack(anchor=W)
 				for v in validate:
 					e.add(v)

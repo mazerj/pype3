@@ -146,7 +146,7 @@ class Logger(object):					# !SINGLETON CLASS!
 
 class ConsoleWindow(Toplevel):
 	def __init__(self, title='ConsoleWindow', iconname='Console',
-				 font=('Andale Mono',), bg='gray75', **kw):
+				 font=('Courier',), bg='gray75', **kw):
 
 		apply(Toplevel.__init__, (self,), kw)
 		if title:
@@ -303,7 +303,7 @@ class TextWin(Toplevel):
 			self.iconname(iconname)
 		self.parent = self._nametowidget(self.winfo_parent())
 		self.transient(self.parent)
-		self.m = Text(self, font=('Andale Mono', 10))
+		self.m = Text(self, font=('Courier', 10))
 		self.m.pack(expand=0)
 		apply(self.m.configure, (self.m,), kw)
 		self.lastmsg_ = None
@@ -319,7 +319,7 @@ class TextWin(Toplevel):
 
 class LogWindow(object):
 	def __init__(self, parent, height=20, width=70, bg='white',
-				 font=('Andale Mono', 8)):
+				 font=('Courier', 8)):
 
 		t = Pmw.ScrolledText(parent)
 		t.pack(expand=1, side=TOP, fill=BOTH)

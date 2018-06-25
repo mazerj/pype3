@@ -2534,6 +2534,8 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                     self.eyeshift(zero=1)
                 elif c == 'f7' and self.running:
                     self.dotrialtag()
+                elif c == 'f1':
+                    self._findparam()
 
             # process keys from the framebuffer window
             if 'f8' in self.fb.checkkeys():

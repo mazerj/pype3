@@ -94,6 +94,11 @@ class FileDialog(object):
 		self.top = Toplevel(master)
 		self.top.title(title)
 		self.top.iconname(title)
+		
+		# place filedialog under mouse..
+		self.top.geometry("+%d+%d" % \
+						  (self.top.winfo_toplevel().winfo_pointerx(), \
+						   self.top.winfo_toplevel().winfo_pointery(),))
 
 		self.botframe = Frame(self.top)
 		self.botframe.pack(side=BOTTOM, fill=X)
@@ -285,7 +290,7 @@ class LoadFileDialog(FileDialog):
 			self.quit(file)
 
 
-class SaveFileDialog_noapp(FileDialog):
+class SaveFileDialog_noappend(FileDialog):
 
 	"""File selection dialog which checks that the file may be created."""
 
@@ -371,10 +376,10 @@ def SaveAs(initialdir=os.curdir, initialfile='', pattern='*',
 											initialfile=initialfile,
 											pattern=pattern)
 	else:
-		return SaveFileDialog_noapp(sortfn=sortfn,
-									text=text).go(initialdir=initialdir,
-												  initialfile=initialfile,
-												  pattern=pattern)
+		return SaveFileDialog_noappend(sortfn=sortfn,
+									   text=text).go(initialdir=initialdir,
+													 initialfile=initialfile,
+													 pattern=pattern)
 
 
 if __name__ == '__main__':

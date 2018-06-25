@@ -1666,6 +1666,10 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         """
         import imp
 
+        if self.isrunning():
+            # don't allow loading of task while running!
+            return
+
         if taskname is None:
             if self.task_name is None:
                 return None

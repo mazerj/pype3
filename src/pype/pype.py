@@ -1253,12 +1253,13 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             if not len(results):
                 self.con('%s: not found.' % s)
             else:
+                self.con('found "%s":' % s)
                 for (pt, slot, n) in results:
                     d = pt._get(evaluate=0)
                     try:
-                        self.con('%s(row %d): %s=''%s''' %
+                        self.con(' %s (row %d): %s=''%s'' %s' %
                                  (posixpath.basename(pt._file),
-                                  n, slot, d[1][slot]))
+                                  n, slot, d[1][slot], type(d[1][slot]),))
                     except KeyError:
                         # skip title slots..
                         pass

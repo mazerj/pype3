@@ -174,7 +174,7 @@ class UserDisplay(object):
 
 		# tkinter vars for linking GUI to python vars:
 		self._photomode_tvar = IntVar()
-		self._photomode_tvar.set(0)		# photo mode starts up OFF!!
+		self._photomode_tvar.set(1)
 		self._photomode = self._photomode_tvar.get()
 		self.gridinterval = pix_per_dva
 
@@ -345,7 +345,6 @@ class UserDisplay(object):
 		else:
 			self._taskcallbackfn = lambda ev: None
 
-
 	def showhide(self):
 		if self.visible:
 			try:
@@ -359,6 +358,9 @@ class UserDisplay(object):
 			except:
 				self.master.pack(**self._forgot)
 		self.visible = not self.visible
+
+	def isvisible(self):
+		return self.visible
 
 	def info(self, msg=''):
 		self._info.configure(text=msg)
@@ -915,10 +917,11 @@ class UserDisplay(object):
 						if hasattr(s, 'forcephoto'):
 							forcephoto = s.forcephoto
 
-						if forcephoto or (self._photomode and
-										  s.w < 300 and s.h < 300):
+						if forcephoto or self._photomode:
 							(x, y) = self.cart2canv(s.x-(s.w/2), s.y+(s.h/2))
 							im = s.asPhotoImage()
+							(x, y) = self.cart2canv(s.x-(im.width()/2),
+													s.y+(im.height()/2))
 							ii.append(self.canvas.create_image(x, y, anchor=NW,
 																image=im))
 						else:

@@ -468,9 +468,9 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                        command=self._savestate)
         mb.addmenuitem('File', 'separator')
         if not self.config.iget('FULLSCREEN'):
-            mb.addmenuitem('File', 'command', label='show display',
+            mb.addmenuitem('File', 'command', label='show framebuffer',
                            command=lambda s=self: s.fb.screen_open())
-            mb.addmenuitem('File', 'command', label='hide display',
+            mb.addmenuitem('File', 'command', label='hide framebuffer',
                            command=lambda s=self: s.fb.screen_close())
             mb.addmenuitem('File', 'separator')
         mb.addmenuitem('File', 'command', label='Show/hide log',
@@ -592,9 +592,9 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         self.balloon.bind(b, "load previous task")
         self.disable_on_start.append(b)
 
-        udpy_ = Button(c1pane, text='show disp')
+        udpy_ = Button(c1pane, text='show udpy')
         udpy_.pack(expand=0, fill=X, side=TOP)
-        self.balloon.bind(udpy_, "show/hide user display window/pane")
+        self.balloon.bind(udpy_, "show/hide USER display window")
 
         # reaction time plot window
         b = Checkbutton(c2pane, text='RT hist', relief=RAISED, anchor=W,
@@ -1310,11 +1310,15 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             s = self.itribe.status + ' '
         else:
             s = ''
-            
-        if barstate:
-            t = s+'BAR:DN '
+
+        if not self.udpy.isvisible():
+            # only show bar state if udpy not visible
+            if barstate:
+                t = s+'BAR:DN '
+            else:
+                t = s+'BAR:UP '
         else:
-            t = s+'BAR:UP '
+            t = ''
         if dacq_jsbut(-1):
             t = t + " "
             for n in range(10):

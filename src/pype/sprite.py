@@ -1022,6 +1022,7 @@ class ScaledSprite(object):
 		self.rotation = rotation
 		self.contrast = contrast
 		self.texture = None
+		self.pim = None
 
 		# for backward compatibilty
 		dwidth, dheight = width, height

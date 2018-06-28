@@ -919,18 +919,25 @@ class UserDisplay(object):
 															   width=s.width,
 															   fill='white'))
 					else:
-						forcephoto = 0
-						if hasattr(s, 'forcephoto'):
-							forcephoto = s.forcephoto
-
-						if (forcephoto or self._photomode) and \
-						   s.w < 200 and s.h < 200:
-							(x, y) = self.cart2canv(s.x-(s.w/2), s.y+(s.h/2))
-							im = s.asPhotoImage()
+						if s.pim is not None:
+							# image already exists, just draw it.. this
+							# allows tasks to pre-stack photo images
+							# during load by calling asPhotoImage() method,
+							# which will cache the image in sprite.pim
+							im = s.pim
 							(x, y) = self.cart2canv(s.x-(im.width()/2),
 													s.y+(im.height()/2))
 							ii.append(self.canvas.create_image(x, y, anchor=NW,
-																image=im))
+															   image=im))
+						elif self._photomode and (s.w * s.h) < 100**2:
+							# in photomode, make an image, but only if the
+							# sprite's less than 100^2 pixels area
+							s.asPhotoImage()
+							im = s.pim
+							(x, y) = self.cart2canv(s.x-(im.width()/2),
+													s.y+(im.height()/2))
+							ii.append(self.canvas.create_image(x, y, anchor=NW,
+															   image=im))
 						else:
 							# square bounding box for sprite
 							if s.rotation:

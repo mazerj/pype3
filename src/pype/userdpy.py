@@ -345,19 +345,25 @@ class UserDisplay(object):
 		else:
 			self._taskcallbackfn = lambda ev: None
 
-	def showhide(self):
-		if self.visible:
-			try:
-				self.master.withdraw()
-			except:
-				self._forgot = self.master.pack_info()
-				self.master.forget()
-		else:
-			try:
-				self.master.deiconify()
-			except:
-				self.master.pack(**self._forgot)
-		self.visible = not self.visible
+	def showhide(self, button=None, toggle=True):
+		if toggle:
+			if self.visible:
+				try:
+					self.master.withdraw()
+				except:
+					self._forgot = self.master.pack_info()
+					self.master.forget()
+			else:
+				try:
+					self.master.deiconify()
+				except:
+					self.master.pack(**self._forgot)
+			self.visible = not self.visible
+		if button:
+			if self.visible:
+				button.select()
+			else:
+				button.deselect()
 
 	def isvisible(self):
 		return self.visible

@@ -211,12 +211,11 @@ def _base_ptables():
         pyesno('save_ain0', 0, 'save raw AIN 0'),
         pyesno('save_ain1', 0, 'save raw AIN 1'),
         #pyesno('save_ain2', 0, 'save raw AIN 2 (photodiode) -- no effect'),
-        #pyesno('save_ain3', 0, 'save raw AIN 3 (spike detection) -- no effect'),
+        #pyesno('save_ain3', 0, 'save raw AIN 3 (spk detection) -- no effect'),
         pyesno('save_ain4', 0, 'save raw AIN 4'),
         pyesno('save_ain5', 0, 'save raw AIN 5'),
         pyesno('save_ain6', 0, 'save raw AIN 6'),
         pyesno('save_ain7', 0, 'save raw AIN 7'),
-
 
         ptitle('Monitor (read-only: set in Config file)'),
         pslot_ro('mon_id', '', is_any,
@@ -463,16 +462,10 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         mb = Pmw.MenuBar(f1)
         mb.pack(side=LEFT, expand=0)
 
+        M = 'File'
         mb.addmenu('File', '', '')
         mb.addmenuitem('File', 'command', label='Save state',
                        command=self._savestate)
-        mb.addmenuitem('File', 'separator')
-        if not self.config.iget('FULLSCREEN'):
-            mb.addmenuitem('File', 'command', label='show framebuffer',
-                           command=lambda s=self: s.fb.screen_open())
-            mb.addmenuitem('File', 'command', label='hide framebuffer',
-                           command=lambda s=self: s.fb.screen_close())
-            mb.addmenuitem('File', 'separator')
         mb.addmenuitem('File', 'command', label='Show/hide log',
                        command=self.conwin.showhide)
         mb.addmenuitem('File', 'command', label='Keyboard',
@@ -481,19 +474,24 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                        command=remotedebug)
         mb.addmenuitem('File', 'command', label='Record Movie',
                        command=lambda s=self: s.fb.recordtog())
-        mb.addmenuitem('File', 'command', label='benchmark',
+        mb.addmenuitem('File', 'command', label='sprite benchmark',
                        command=lambda s=self: benchmark(s.fb))
 
-
         mb.addmenu('Misc', '', '')
-        mb.addmenuitem('Misc', 'command', label='show params from pypefile',
-                       command=self._getparams_frompypefile)
         mb.addmenuitem('Misc', 'command', label='Find param',
                        command=self._findparam)
+        mb.addmenuitem('Misc', 'command', label='show pypefile params',
+                       command=self._getparams_frompypefile)
         mb.addmenuitem('Misc', 'separator')
-        mb.addmenuitem('Misc', 'command', label='Drain juice',
-                       command=self._drain)
+        mb.addmenuitem('Misc', 'command', label='show framebuffer',
+                       command=lambda s=self: s.fb.screen_open())
+        mb.addmenuitem('Misc', 'command', label='hide framebuffer',
+                       command=lambda s=self: s.fb.screen_close())
         mb.addmenuitem('Misc', 'separator')
+        if 0:
+            mb.addmenuitem('Misc', 'command', label='Drain juice',
+                           command=self._drain)
+            mb.addmenuitem('Misc', 'separator')
         mb.addmenuitem('Misc', 'command', label='start beep',
                        command=self.warn_run_start)
         mb.addmenuitem('Misc', 'command', label='stop beep',
@@ -502,8 +500,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                        command=self.warn_trial_correct)
         mb.addmenuitem('Misc', 'command', label='error beep',
                        command=self.warn_trial_incorrect)
-        mb.addmenuitem('Misc', 'command', label='where am i?',
-                       command=self._whereami)
 
         mb.addmenu('Set', '', '')
         mb.addmenuitem('Set', 'checkbutton', label='show trace window',
@@ -592,12 +588,15 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         self.balloon.bind(b, "load previous task")
         self.disable_on_start.append(b)
 
-        udpy_ = Button(c1pane, text='show udpy')
-        udpy_.pack(expand=0, fill=X, side=TOP)
-        self.balloon.bind(udpy_, "show/hide USER display window")
+        tog_udpy = Checkbutton(c2pane, text='udpy',
+                               relief=RAISED, anchor=W,
+                               background='lightblue')
+        tog_udpy.pack(expand=0, fill=X, side=TOP)
+        self.balloon.bind(tog_udpy, "show/hide USER display window")
 
         # reaction time plot window
-        b = Checkbutton(c2pane, text='RT hist', relief=RAISED, anchor=W,
+        b = Checkbutton(c2pane, text='RT hist',
+                        relief=RAISED, anchor=W,
                         background='lightblue')
         b.pack(expand=0, fill=X, side=TOP, pady=2)
         pw = DockWindow(checkbutton=b, title='Reaction Times')
@@ -823,7 +822,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                             font=('Andale Mono', 10))
         self.statsw.pack(expand=0, fill=BOTH, side=TOP)
 
-
         Button(tallyf, text="clear all",
                    command=lambda s=self: s._tally(clear=1)).pack(side=LEFT)
         b = Button(tallyf, text="clear task",
@@ -946,7 +944,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         self.rig_common.set('mon_fps', '%g' % fps)
         Logger('pype: estimated fps = %g\n' % fps)
 
-
         # userdisplay: shadow of framebuffer window
         # xscale=1./self.config.fget('XSCALE'),
         # yscale=1./self.config.fget('YSCALE'),
@@ -956,9 +953,12 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                                         eyemouse=self.eyemouse,
                                         app=self)
 
-        udpy_.config(command=self.udpy.showhide)
+        tog_udpy.config(command=lambda b=tog_udpy: \
+                        self.udpy.showhide(button=b, toggle=True))
         if self.config.iget('USERDISPLAY_HIDE'):
-            self.udpy.showhide()
+            self.udpy.showhide(button=tog_udpy, toggle=True)
+        else:
+            self.udpy.showhide(button=tog_udpy, toggle=False)
         if not rightpane:
             self.udpy.master.protocol("WM_DELETE_WINDOW", self._shutdown)
 
@@ -1331,7 +1331,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         except AttributeError:
             last = ""
 
-
         if self.mldown is not None:
             t = text='%dml %s' % (self.mldown, t)
 
@@ -1587,7 +1586,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 Logger('+tasks from: %s\n' % dirname)
                 for t in tasks:
                     Logger('  %s\n' % t)
-
 
         # this is needed for pype to find non-task files in the dir
         _addpath(dirname, atend=1)
@@ -2176,7 +2174,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 if self.psych:
                     self.fb.screen_open()
 
-
                 # call task-specific start function.
                 self.set_state(running=1)
                 self.warn_run_start()
@@ -2210,7 +2207,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             elif self.xdacq == 'tdt':
                 # recording's done -- direct output back to TempBlk
                 self.tdt.newblock(record=0)
-
 
     def query_ncorrect(self):
         """Get number of correct (C) trials since run start
@@ -2333,7 +2329,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
         """
         return dacq_ts()
-
 
     def dotrialtag(self, reset=None):
         try:
@@ -3118,7 +3113,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         """
         return self._taskname()
 
-
     def _taskname(self, taskname=[], path=[]):
         """Query or set name of task.
 
@@ -3667,7 +3661,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             self._updatefn((resultcode, rt, params, taskinfo),
                            (self.spike_times, self.record_buffer))
 
-
         if self._show_eyetrace.get():
             self._plotEyetraces(self.eyebuf_t,
                                 self.eyebuf_x, self.eyebuf_y,
@@ -3815,7 +3808,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
         return r
 
-
     def record_note(self, tag, note):
         """Insert note into current datafile.
 
@@ -3905,13 +3897,11 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
         return "%s.%s.%03d" % (exper, self.task_name, next)
 
-
     def _guess(self):
         if self.use_elog:
             return self._guess_elog()
         else:
             return self._guess_fallback()
-
 
     def record_done(self):
         """Let pype know run (*not* trial) is over.
@@ -3995,7 +3985,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                                          width=self.fb.w, height=self.fb.h)
         drawtest(self.fb, self._testpat)
 
-
     def plotEyetracesRange(self, start=None, stop=None):
         """Set time range for useful portion of the eye trace.
 
@@ -4051,7 +4040,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         pylab.xlim(start - t0, stop - t0)
         pylab.ylabel('photo')
 
-
         pylab.subplot(4, 1, 3)
         n = 0
         for (tt, s) in s0:
@@ -4069,7 +4057,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         pylab.xlim(start - t0, stop - t0)
         pylab.ylabel('raster')
         pylab.draw()
-
 
     def update_rt(self, infotuple=None):
         import pylab
@@ -4377,7 +4364,6 @@ class FixWin(object):
         if not size is None: self.size = size
         dacq_fixwin_move(self.fwnum, x, y, size)
 
-
     def reset(self):
         dacq_fixwin_reset(self.fwnum)
 
@@ -4616,7 +4602,6 @@ class SimplePlotWindow(Toplevel):
 
     def drawnow(self):
         self._canvas.show()
-
 
 class EyeTribeThreadRunner(object):
     def __init__(self, host='127.0.0.1'):

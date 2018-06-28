@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Install for mazer lab
 #
@@ -6,9 +6,10 @@
 DEST=/auto/share/pype3/`uname -m`
 
 if [ "$*" = "" ]; then
-  sudo -p"sudo [mlab install]: " ./install-to $DEST clobber install docs
-elif [ "$1" = "-nodocs" -o "$1" = "-nodox" ]; then
-  sudo -p"sudo [mlab install]: " ./install-to $DEST clobber install
+    sudo -p"sudo [mlab install]: " ./install-to $DEST clobber install docs
+elif [[ "$1" =~ (.*nd.*|.*nodo.*) ]]; then
+    #anything like -nodocs, -nd, nd etc will install WITHOUT docs
+    sudo -p"sudo [mlab install]: " ./install-to $DEST clobber install
 else
-  sudo -p"mlab [mlab install]: " ./install-to $DEST $*
+    sudo -p"mlab [mlab install]: " ./install-to $DEST $*
 fi

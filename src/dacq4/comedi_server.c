@@ -780,6 +780,13 @@ void mainloop(void)
       }
     }
 
+#ifdef DEBUG_DIN
+    for (int kk=0; kk < NDIGIN; kk++) {
+      fprintf(stderr, "%d", dacq_data->din[kk]);
+    }
+    fprintf(stderr, "\n");
+#endif
+    
     switch (itracker)
       {
       case ISCAN:

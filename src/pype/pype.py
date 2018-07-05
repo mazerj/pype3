@@ -1307,18 +1307,24 @@ class PypeApp(object):                  # !SINGLETON CLASS!
     def _show_stateinfo(self):
         barstate = self.bardown()           # this will handle BAR_FLIP setting
         if self.itribe:
-            s = self.itribe.status + ' '
+            t = self.itribe.status + ' '
         else:
-            s = ''
-
+            t = ''
+            
         if not self.udpy.isvisible():
             # only show bar state if udpy not visible
             if barstate:
-                t = s+'BAR:DN '
+                t = t+'BAR:DN '
             else:
-                t = s+'BAR:UP '
+                t = t+'BAR:UP '
         else:
-            t = ''
+            if barstate:
+                self.udpy.barstate.config(text='DOWN',
+                                          font=('Andale Mono', 10))
+            else:
+                self.udpy.barstate.config(text=' UP ',
+                                          font=('Andale Mono', 10))
+                
         if dacq_jsbut(-1):
             t = t + " "
             for n in range(10):
@@ -1326,26 +1332,18 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                     t = t+('%d'%n)
                 else:
                     t = t+'.'
+
         try:
             last = self._last_stateinfo
         except AttributeError:
-            last = ""
-
+            last = None
+            
         if self.mldown is not None:
-            t = text='%dml %s' % (self.mldown, t)
+            t = t + '%dml %s' % (self.mldown, t)
 
         if not last == t:
             self._stateinfo.configure(text=t)
-            try:
-                if barstate:
-                    self.udpy.barstate.config(text='DOWN',
-                                              font=('Andale Mono', 10))
-                else:
-                    self.udpy.barstate.config(text=' UP ',
-                                              font=('Andale Mono', 10))
-                self._last_stateinfo = t
-            except AttributeError:
-                pass
+            self._last_stateinfo = last 
 
     def isrunning(self):
         """Query to see if a task is running.

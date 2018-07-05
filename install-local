@@ -3,4 +3,9 @@
 # Install pype to /usr/local
 #
 
-./install-to /usr/local/pype3 $*
+
+if [ "$1" = "rm" -o "$1" = "-rm" ]; then
+    sudo /bin/rm -rf /usr/local/pype3
+else
+    sudo ./install-to /usr/local/pype3 $*
+fi

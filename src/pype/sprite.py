@@ -437,7 +437,19 @@ class FrameBuffer(object):
 		pygame.mouse.set_visible(on);
 
 	def cursorpos(self):
-		return pygame.mouse.get_pos()
+		"""Query current mouse position and bar state (any button) in
+		framebuffer window.
+
+		:return: (x, y, bardown, lshift, rshift)
+		
+		"""
+		(x, y) = pygame.mouse.get_pos()
+		(b1, b2, b3) = pygame.mouse.get_pressed()
+		k = pygame.key.get_mods()
+		return (x, y, b1, b2, b3, \
+				k and pygame.KMOD_LSHIFT,
+				k and pygame.KMOD_RSHIFT,)
+				
 
 	def togglefs(self, wait=0):
 		pygame.event.clear()

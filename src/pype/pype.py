@@ -906,7 +906,11 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         self.dacq_going = 1
         self.eyeset()
         if self.eyemouse:
-            self.eyeset(xgain=1.0, ygain=1.0, xoff=0, yoff=0)
+            # this sets the gain/offset exactly for the current
+            # display parameters.. no f8 should be required!
+            self.eyeset(xgain=1.0 * self.fb.w / self.fb.physicalw,
+                        ygain=-1.0 * self.fb.h / self.fb.physicalh,
+                        xoff=self.fb.w/2.0, yoff=-self.fb.h/2.0)
 
         # stash info on port states
         # this is a hack -- some buttons are down/true others are
@@ -1319,11 +1323,9 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 t = t+'BAR:UP '
         else:
             if barstate:
-                self.udpy.barstate.config(text='DOWN',
-                                          font=('Andale Mono', 10))
+                self.udpy.set_bar_indic('DOWN')
             else:
-                self.udpy.barstate.config(text=' UP ',
-                                          font=('Andale Mono', 10))
+                self.udpy.set_bar_indic(' UP ')
                 
         if dacq_jsbut(-1):
             t = t + " "
@@ -2551,11 +2553,32 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                     raise UserAbort
 
             if self.eyemouse:
-                # use framebuffer mouse position as eye position
-                dacq_set_xtracker(pev.pos[0] - (self.fb.w/2),
-                                  (self.fb.h/2) - pev.pos[1], 0)
+                # Use framebuffer mouse position as eye position
+                # and button1 for bar state. Note that if you hold
+                # down both left and right shift keys, this aborts
+                # current trial and stops run immediately.
+                #
+                # mx,my are in physical coords (0-DPYW, 0-DPYH)
+                (mx, my, b1, b2, b3, lshift, rshift) = self.fb.cursorpos()
+                if self._allowabort and lshift and rshift:
+                    self.con("stopping run", color='red')
+                    self.running = 0
+                    raise UserAbort
 
-            while 1:
+                # inject mouse position into 
+                dacq_set_xtracker(mx, my, 0)
+                try:
+                    # check to see if bar state has changed..
+                    if not b1 == self._lastb1:
+                        self.eyebar = b1        # stash for bardown() method
+                        self._lastb1 = b1       # maybe generate interupt
+                        self._int_handler(None, None, iclass=1, iarg=b1)
+                except AttributeError:
+                    # first time through -- initialize
+                    self._lastb1 = b1
+                    self.eyebar = b1
+                
+            while 0:
                 key = self.fb.getkey()
                 if key == 0:
                     break

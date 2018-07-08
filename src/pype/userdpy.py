@@ -151,8 +151,9 @@ class UserDisplay(object):
 
 		f = Frame(self.frame)
 		f.pack(expand=1, fill=X)
-		self.barstate = Label(f, fg='black', relief=SUNKEN)
-		self.barstate.pack(expand=0, side=LEFT)
+		self._bar_indic = Label(f, fg='black', font=(MONOFONT, 10),
+								relief=SUNKEN,)
+		self._bar_indic.pack(expand=0, side=LEFT)
 		self._mouseinfo_x = Label(f, font=(MONOFONT, 10),
 								  fg='black', relief=SUNKEN)
 		self._mouseinfo_x.pack(expand=0, side=LEFT)
@@ -338,6 +339,9 @@ class UserDisplay(object):
 
 		self.canvas.config(scrollregion=self.canvas.bbox(ALL))
 		self.set_taskcallback(None)
+
+	def set_bar_indic(self, state=''):
+		self._bar_indic.config(text=state)
 		
 	def set_taskcallback(self, callbackfn=None):
 		if callbackfn:
@@ -876,8 +880,9 @@ class UserDisplay(object):
 			x, y = self.canvas.window2scaled(ev.x, ev.y)
 			(self.mousex, self.mousey) = self.canv2cart(x, y)
 			rx, ry = (self.mousex-self.fix_x, self.mousey-self.fix_y,)
-			if self.eyemouse:
-				dacq_set_xtracker(int(round(rx)), int(round(ry)), 0)
+			#7/6/18: this is now in framebuffer window only..
+			#if self.eyemouse:
+			#	dacq_set_xtracker(int(round(rx)), int(round(ry)), 0)
 		else:
 			rx, ry = 0, 0
 		self._mouseinfo_x.configure(text='X:%5d' % rx)

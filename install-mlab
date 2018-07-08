@@ -6,10 +6,13 @@
 DEST=/auto/share/pype3/`uname -m`
 
 if [ "$*" = "" ]; then
-    sudo -p"sudo [mlab install]: " ./install-to $DEST clobber install docs
-elif [[ "$1" =~ (.*nd.*|.*nodo.*) ]]; then
-    #anything like -nodocs, -nd, nd etc will install WITHOUT docs
+    # default: no args
     sudo -p"sudo [mlab install]: " ./install-to $DEST clobber install
+elif [[ "$1" =~ -do.* ]]; then
+    #anything like -docs, -dox etc will install with doc update
+    sudo -p"sudo [mlab install]: " ./install-to $DEST clobber install docs
 else
     sudo -p"mlab [mlab install]: " ./install-to $DEST $*
 fi
+
+

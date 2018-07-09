@@ -199,7 +199,9 @@ class ParamTable(object):
 				entries.append(e)
 				self.names.append(e)
 				e.pack(expand=1, anchor=W, fill=X, side=RIGHT)
-
+			if descr and descr[0] == '*':
+				# self-proclaimed override param (ie, hides another)
+				e.component('label').config(fg='blue')
 		Pmw.alignlabels(entries)
 
 		if self._file:

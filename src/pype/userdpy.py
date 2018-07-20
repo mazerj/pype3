@@ -187,14 +187,14 @@ class UserDisplay(object):
 								   width=round(xscale*cwidth),
 								   height=round(yscale*cheight))
 		self.canvas.pack()
-		self.canvas.configure(cursor='tcross', bg='grey10')
+		self.canvas.configure(cursor='tcross', bg='grey30')
 
 		self.canvas.bind("<FocusIn>",
 						 lambda ev,s=self:
-						 s.frame.configure(bg=s.background_focus))
+						 s.frame.configure(bg='green'))
 		self.canvas.bind("<FocusOut>",
 						 lambda ev,s=self:
-						 s.frame.configure(bg=s.background_nofocus))
+						 s.frame.configure(bg='red'))
 		self.frame.pack(expand=1, fill=BOTH)
 
 		self._htrace = []
@@ -309,7 +309,7 @@ class UserDisplay(object):
 										   fill="black", outline="")
 		del bug
 
-		self._eye_at = None			   # current eye position marker
+		self._gazeind = None			   # current eye position marker
 		self._eye_trace = []		   # trace history sample markers
 		self._eye_trace_lines = []	   # trace history lines
 		self._eye_trace_maxlen = 20	   # length of history buffer
@@ -438,7 +438,7 @@ class UserDisplay(object):
 				self.canvas.delete(tag)
 		return []
 
-	def eye_at(self, rx, ry, xt=False):
+	def eye_at(self, rx, ry, barup=None, xt=False):
 		# throttle eye trace update to 60hz max:
 		now = time.time()
 		if (now - self._lastEyeUpdate) < 0.008:
@@ -471,13 +471,16 @@ class UserDisplay(object):
 			C.delete(self._eye_trace[0])
 			del self._eye_trace[0]
 
-		if self._eye_at is None:
-			self._eye_at = (C.create_text(x+1, y+1, text='o',
-										  font=(MONOFONT, 10),
-										  fill='white', justify=CENTER),)
-		for i in self._eye_at:
-			C.coords(i, x, y)
-			C.tag_raise(i)
+		if self._gazeind is None:
+			self._gazeind = C.create_text(0, 0, fill='white',
+										  font=(MONOFONT, 12),
+										  justify=CENTER)
+		C.coords(self._gazeind, x, y)
+		if barup is True:
+			C.itemconfig(self._gazeind, text='^')
+		else:
+			C.itemconfig(self._gazeind, text='v')
+		C.tag_raise(self._gazeind)
 
 		if xt:
 			# update X-T display
@@ -1273,16 +1276,19 @@ class UserDisplay(object):
 		if y is None:
 			y = self.mousey
 		try:
-			self.canvas.delete(self._fixtag)
+			for item in self._fixtag: self.canvas.delete(item)
 		except AttributeError:
 			pass
 		self.fix_x = x
 		self.fix_y = y
 		if (not x is None) and (not y is None):
 			(x, y) = self.cart2canv(x, y)
-			self._fixtag = self.canvas.create_rectangle(x-5, y-5, x+5, y+5,
-														 fill='',
-														 outline='red')
+			self._fixtag = (
+				self.canvas.create_line(x-20, y, x-3, y, fill='yellow'),
+				self.canvas.create_line(x+20, y, x+3, y, fill='yellow'),
+				self.canvas.create_line(x, y-20, x, y-3, fill='yellow'),
+				self.canvas.create_line(x, y+20, x, y+3, fill='yellow'),
+				)
 		self._redrawfidmarks()
 		self.drawbox()
 

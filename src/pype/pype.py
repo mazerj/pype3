@@ -2595,7 +2595,9 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
             x, y = self.eyepos()
             if (x is not None) and (y is not None):
-                self.udpy.eye_at(x, y, xt=self._show_xt_traces.get())
+                self.udpy.eye_at(x, y,
+                                 barup=self.barup(),
+                                 xt=self._show_xt_traces.get())
 
             if update:
                 self.tk.update()

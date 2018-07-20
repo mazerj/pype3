@@ -231,20 +231,22 @@ class UserDisplay(object):
 		p.add_cascade(label='Fixspot', menu=m)
 
 		m = Menu(p, tearoff=0)
+		m.add_command(label="Set a box corner (/)", command=self.setbox)
+		m.add_command(label="Clear box", command=self.clearbox)
+		m.add_command(label='Enter box position', command=self.exactbox)
+		m.add_command(label='Save box to file', command=self.savebox)
+		m.add_command(label='Load box from file', command=self.loadbox)
+		p.add_cascade(label='RF Box', menu=m)
+
+		
+
+		m = Menu(p, tearoff=0)
 		m.add_command(label='Clear all marks (C)', command=self._clearfidmarks)
 		m.add_command(label='Save (s)', command=self.savefidmarks)
 		m.add_command(label='Load (l)', command=self.loadfidmarks)
 		m.add_command(label='View (v)', command=self._showfidmarks)
 		m.add_command(label='clear closest (c)')
-		p.add_cascade(label='Fiduciary Marks', background='blue', menu=m)
-
-		m = Menu(p, tearoff=0)
-		m.add_command(label="Set a box corner (/)", command=self.setbox)
-		m.add_command(label="Clear box", command=self.clearbox)
-		m.add_command(label='Enter box position', command=self.manualbox)
-		m.add_command(label='Save box to file', command=self.savebox)
-		m.add_command(label='Load box from file', command=self.loadbox)
-		p.add_cascade(label='Box', menu=m)
+		p.add_cascade(label='Fiduciary Marks', menu=m)
 
 		m = Menu(p, tearoff=0)
 		m.add_command(label='Clear all points', command=self.clearpoints)
@@ -259,7 +261,7 @@ class UserDisplay(object):
 					  command=lambda s=self: s.loadpoints_ascii(merge=1))
 		m.add_command(label='set (.)', state=DISABLED)
 		m.add_command(label='clear closest (,)', state=DISABLED)
-		p.add_cascade(label='Tracker calibration', background='yellow', menu=m)
+		p.add_cascade(label='Eyecal Marks', menu=m)
 
 		m = Menu(p, tearoff=0)
 		m.add_checkbutton(label='Photo mode', command=self._phototoggle,
@@ -289,7 +291,6 @@ class UserDisplay(object):
 		self._displaylist_icons = []
 		self._fid_list = []
 		self._fidstuff = []
-		self._axis = []
 		self.markstack = []
 		self.markbox = None
 
@@ -297,8 +298,6 @@ class UserDisplay(object):
 		self.h = cheight					 # full height
 		self.hw = int(round(self.w / 2.0))	 # half width
 		self.hh = int(round(self.h / 2.0))	 # half height
-
-		self._axis = []
 
 		# Wed Oct 16 17:01:56 2013 mazer
 		# big mystery: if you do this coords are correct, otherwise,
@@ -518,46 +517,43 @@ class UserDisplay(object):
 			(x, y) = x
 		return (self.hw + x, self.hh - y)
 
-	def drawaxis(self, axis=1, sync=1):
-		if axis:
-			# draw cardinal axis (0,0)
-			(x, y) = self.cart2canv(0, 0)
-			self.canvas.create_line(x, 0, x, self.h, width=1,
-									 fill='grey50', dash=(5,7))
-			self.canvas.create_line(0, y, self.w, y, width=1,
-									 fill='grey50', dash=(5,7))
+	def drawaxis(self):
+		tags = []
+		# draw cardinal axis (0,0)
+		(x, y) = self.cart2canv(0, 0)
+		tags.append(self.canvas.create_line(x, 0, x, self.h, width=1,
+											fill='grey50', dash=(2,2)))
+		tags.append(self.canvas.create_line(0, y, self.w, y, width=1,
+											fill='grey50', dash=(2,2)))
 
-		if sync and self.app.fb.syncinfo:
+		if self.app.fb.syncinfo:
 			(sx, sy, ss) = self.app.fb.syncinfo
 			(a, b) = self.cart2canv(sx - ss/2, sy - ss/2)
 			(c, d) = self.cart2canv(sx + ss/2, sy + ss/2)
-			#self.canvas.create_rectangle(a, b, c, d,
-            #                                 stipple='gray12',
-            #                                 fill='white')
-			self.canvas.create_rectangle(a, b, c, d,
-										 fill="", outline="white")
+			tags.append(self.canvas.create_rectangle(a, b, c, d,
+													 fill="", outline="white"))
 
-		# gridinterval is pix/deg
-		d = int(round(self.gridinterval))
+		
+		d = int(round(self.gridinterval)) # gridinterval: pix/deg
 		if d > 0:
 			(xo, yo) = self.cart2canv(0,0)
 			for x in range(0, int(round(self.w/2)), d):
 				for y in range(0, int(round(self.h/2)), d):
 					for (sx, sy) in ((1,1),(-1,1),(-1,-1),(1,-1)):
-						if x != 0 and y != 0:
+						if x and y:
 							if ((round(x/d)%5) == 0 or (round(y/d)%5) == 0):
-								color = '#008000'
+								color = 'lightgreen'
 							else:
-								color = '#003000'
-							self._axis.append(
-								self.canvas.create_rectangle(xo+(sx*x),
-															 yo+(sy*y),
-															 xo+(sx*x),
-															 yo+(sy*y),
-															 outline=color,
-															 fill=color))
+								color = 'green'
+							tags.append(
+								self.canvas.create_rectangle(xo+(sx*x), yo+(sy*y),
+															 xo+(sx*x), yo+(sy*y),
+															 outline=color, fill=color)
+								)
+		for tag in tags:
+			self.canvas.tag_lower(tag)
 
-	def manualbox(self):
+	def exactbox(self):
 		x1 = float(min(self.markstack[0][0], self.markstack[1][0]))
 		x2 = float(max(self.markstack[0][0], self.markstack[1][0]))
 		y1 = float(min(self.markstack[0][1], self.markstack[1][1]))
@@ -1283,11 +1279,13 @@ class UserDisplay(object):
 		self.fix_y = y
 		if (not x is None) and (not y is None):
 			(x, y) = self.cart2canv(x, y)
+			(A, B) = (20, 5)
+			# these are 0, 90, 180, 270 deg:
 			self._fixtag = (
-				self.canvas.create_line(x-20, y, x-3, y, fill='yellow'),
-				self.canvas.create_line(x+20, y, x+3, y, fill='yellow'),
-				self.canvas.create_line(x, y-20, x, y-3, fill='yellow'),
-				self.canvas.create_line(x, y+20, x, y+3, fill='yellow'),
+				self.canvas.create_line(x+A+1, y, x+B+1, y, width=1, fill='yellow'),
+				self.canvas.create_line(x, y-A, x, y-B, width=1, fill='yellow'),
+				self.canvas.create_line(x-A, y, x-B, y, width=1, fill='yellow'),
+				self.canvas.create_line(x, y+A+1, x, y+B+1, width=1, fill='yellow'),
 				)
 		self._redrawfidmarks()
 		self.drawbox()

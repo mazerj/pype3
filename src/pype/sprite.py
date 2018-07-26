@@ -1927,6 +1927,7 @@ class PolySprite(object):
 		self.x0 = x
 		self.y0 = y
 		self.points = np.array(points)
+		self.pim = None
 
 	def __repr__(self):
 		return ('<PolySprite "%s"@(%d,%d) #%d depth=%d on=%d>' %
@@ -1990,6 +1991,124 @@ class PolySprite(object):
 		"""
 		self._on = not self._on
 		return self._on
+
+class TextSprite(object):
+	"""`Sprite`-like Text object.
+
+	This is a like a sprite, but instead of image data, has text.
+	
+	"""
+
+	_id = 0
+
+	def __init__(self, x, y, s, fb=None,
+				 fg=(255,1,1), bg=None, rotation=0, size=30,
+				 on=1, depth=0, name=None):
+		"""TextSprite instantiation method
+
+		:param x,y: (pixels) center position
+
+		:param s: (string) text to display
+
+		:param fb: framebuffer
+
+		:param bg,bg: fg/bg color (bg=None for no background/transparent)
+
+		:param rotation: (deg)
+
+		:param size: (pix height)
+
+		:param on: (boolean) just like regular Sprite class
+
+		:param depth: depth of sprite (for DisplayList below). The
+				DisplayList class draws sprites in depth order, with
+				large depths being draw first (ie, 0 is the top-most
+				layer of sprites)
+
+		:param name: debugging name (string) of the sprite; if not
+				set, then either the filename or a unique random name
+				is used instead.
+
+		"""
+
+		if name:
+			self.name = name
+		else:
+			self.name = "TextSprite%d" % PolySprite._id
+
+		self._id = TextSprite._id
+		TextSprite._id = TextSprite._id + 1
+
+		self.fb = fb
+		self.x = x
+		self.y = y
+		self.s = s
+		self.fg = fg
+		self.bg = bg
+		self.rotation = rotation
+		self.size = size
+		self._on = on
+		self.depth = depth
+		self.pim = None
+
+	def __repr__(self):
+		return ('<TextSprite "%s"@(%d,%d) #%d depth=%d on=%d>' %
+				(self.name, self.x, self.y, self._id, self.depth, self._on))
+
+	def clone(self):
+		return TextSprite(self.x, self.y, self.s,
+						  fb=self.fb, fg=self.fg, bg=self.bg,
+						  rotation=self.rotation, size=self.size,
+						  on=self.on, depth=self.depth,
+						  name='clone of '+self.name)
+
+	def moveto(self, x, y):
+		"""Absolute move.
+
+		"""
+		self.x = x
+		self.y = y
+
+	def rmove(self, dx, dy):
+		"""Relative move.
+
+		"""
+		self.x = self.x + dx
+		self.y = self.y + dy
+
+	def blit(self, flip=None, force=None):
+		"""Draw TextSprite.
+
+		"""
+		if not self._on and not force:
+			return
+
+		self.fb.string(self.x, self.y, self.s, self.fg,
+					   flip=flip, bg=self.bg,
+					   rotation=self.rotation, size=self.size)
+
+	def on(self):
+		"""Turn TextSprite on.
+
+		"""
+		self._on = 1
+
+	def off(self):
+		"""Turn TextSprite off.
+
+		"""
+		self._on = 0
+
+	def toggle(self):
+		"""Toggle TextSprite (off->on or on->off)
+
+		"""
+		self._on = not self._on
+		return self._on
+
+	def set(self, text):
+		self.s = text
+	
 
 class MovieDecoder(object):
 	def __init__(self, filename):

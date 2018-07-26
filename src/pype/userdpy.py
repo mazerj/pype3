@@ -943,15 +943,19 @@ class UserDisplay(object):
 							ii.append(self.canvas.create_image(x, y, anchor=NW,
 															   image=im))
 						else:
-							# square bounding box for sprite
-							if s.rotation:
-								for i in self.rrect(s):
-									ii.append(i)
-							else:
-								ii.append(self.icon(s.x, s.y, s.dw, s.dh,
-													type='box',
-													color=s.icolor,
-													fill=s.ifill))
+							# not all sprites can make icons...
+							try:
+								# square bounding box for sprite
+								if s.rotation:
+									for i in self.rrect(s):
+										ii.append(i)
+								else:
+									ii.append(self.icon(s.x, s.y, s.dw, s.dh,
+														type='box',
+														color=s.icolor,
+														fill=s.ifill))
+							except:
+								pass
 					for i in ii: self._displaylist_icons.append(i)
 
 	def rrect(self, s):

@@ -20,6 +20,7 @@ class NoProblem(Exception): pass
 class UserAbort(Exception): pass
 class UserExit(Exception): pass
 class TaskAbort(Exception): pass
+class RunTimeError(Exception): pass
 
 class BarTransition(Exception): pass
 class JoyTransition(Exception): pass

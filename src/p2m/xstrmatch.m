@@ -26,5 +26,5 @@ if strcmp(exact, 'exact'))
   ix = find(strcmp(str, strs));
 else
   % equiv to: strmatch(str, strs)
-  ix = find(strncmp(evname, pf.rec(n).ev_e), length(evname));
+  ix = find(strncmp(evname, pf.rec(n).ev_e, length(evname)));
 end

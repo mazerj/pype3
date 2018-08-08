@@ -29,6 +29,6 @@ if exact
   ix = find(strcmp(evname, pf.rec(n).ev_e));
 else
   %ix = strmatch(evname, pf.rec(n).ev_e);
-  ix = find(strncmp(evname, pf.rec(n).ev_e), length(evname));
+  ix = find(strncmp(evname, pf.rec(n).ev_e, length(evname)));
 end
 ts = pf.rec(n).ev_t(ix);

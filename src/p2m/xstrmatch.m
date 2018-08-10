@@ -21,10 +21,10 @@ function ix = xstrmatch(str, strs, exact)
 
 if nargin == 2, exact = 'prefix'; end
 
-if strcmp(exact, 'exact'))
+if strcmp(exact, 'exact')
   % equiv to: strmatch(str, strs, 'exact')
   ix = find(strcmp(str, strs));
 else
   % equiv to: strmatch(str, strs)
-  ix = find(strncmp(evname, pf.rec(n).ev_e, length(evname)));
+  ix = find(strncmp(str, strs, length(str)));
 end

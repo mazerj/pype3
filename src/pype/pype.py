@@ -2427,7 +2427,13 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 self._allowabort = 0
                 self.idlefn()
             except UserAbort:
-                Logger('pype: mainloop caught abort\n');
+                Logger('pype: mainloop caught abort\n')
+                pass
+            except FixBreak:
+                #FIXME: this is some sort of race condition -- interupt
+                # can be generated after task stops running.. just ignore
+                # it for now..
+                Logger('pype: stray fixbreak caught\n')
                 pass
         
 

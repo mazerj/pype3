@@ -996,11 +996,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         # possible time. Therefore, you must continue to call idlefn
         # (although you can now use fast=1 to minimize CPU usage) if
         # you can FixBreak and BarTransition to work..
-        self._post_fixbreak = 0
-        self._post_bartransition = 0
-        self._post_joytransition = 0    # joypad but > 1
-        self._joypad_intbut = None
-        self._post_alarm = 0
+        self.clear_pending_ints()
         self.lastint_ts = None          # exact time of last interupt
         self.idle_queue = []
 
@@ -2892,8 +2888,19 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         elif clear:
             dacq_set_alarm(0)
 
+    def clear_pending_ints(self):
+        self._post_fixbreak = 0
+        self._post_bartransition = 0
+        self._post_joytransition = 0
+        self._post_alarm = 0
+        self._joypad_intbut = None
+
     def interupts(self, enable=None, queue=None):
         """Enable or disable interupts from comedi_server.
+
+        If queue'ing is enabled, then interupts are cued to be handled
+        the next time idlefn() is called instead of raised. By default,
+        when pype is started, interupts are set to queue!
 
         :param enable: (boolean) Enable or disable interupts. Use None to
                 leave current setting alone
@@ -2907,11 +2914,13 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
         """
 
-        if not (enable is None):
+        if enable is not None:
             self.allow_ints = enable
-        if not (queue is None):
+            if not self.allow_ints:
+                self.clear_pending_ints()
+        if queue is not None:
             self._queue_ints = queue
-
+            
         return (self.allow_ints, self._queue_ints)
 
     def _int_handler(self, signal, frame, iclass=None, iarg=None):

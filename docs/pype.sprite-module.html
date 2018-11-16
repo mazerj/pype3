@@ -1,0 +1,860 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>pype.sprite</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="pype-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://kernel.montana.edu">pype3</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="pype-module.html">Package&nbsp;pype</a> ::
+        Module&nbsp;sprite
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="pype.sprite-module.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== MODULE DESCRIPTION ==================== -->
+<h1 class="epydoc">Module sprite</h1><p class="nomargin-top"><span class="codelink"><a href="pype.sprite-pysrc.html">source&nbsp;code</a></span></p>
+<p>Pygame/SDL/OpenGL based sprite engine.</p>
+<p>Pygame-based sprite engine for doing real-time graphics
+during behavioral/neurophysiological experiments.</p>
+<p>Author -- James A. Mazer (<a class="rst-reference external" href="mailto:mazerj&#64;gmail.com" target="_top">mazerj&#64;gmail.com</a>)</p>
+
+<!-- ==================== CLASSES ==================== -->
+<a name="section-Classes"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Classes</span></td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pype.sprite.FrameBuffer-class.html" class="summary-name">FrameBuffer</a>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pype.sprite.ScaledSprite-class.html" class="summary-name">ScaledSprite</a>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pype.sprite.Sprite-class.html" class="summary-name">Sprite</a><br />
+      Sprite object (wrapper for pygame surface class).
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pype.sprite.PolySprite-class.html" class="summary-name">PolySprite</a><br />
+      <a href="pype.sprite.Sprite-class.html" class="link">Sprite</a>-like Polygon.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pype.sprite.TextSprite-class.html" class="summary-name">TextSprite</a><br />
+      <a href="pype.sprite.Sprite-class.html" class="link">Sprite</a>-like Text object.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pype.sprite.MovieDecoder-class.html" class="summary-name">MovieDecoder</a>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pype.sprite.DisplayList-class.html" class="summary-name">DisplayList</a><br />
+      Sprite-list manager.
+    </td>
+  </tr>
+</table>
+<!-- ==================== FUNCTIONS ==================== -->
+<a name="section-Functions"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Functions</span></td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="Logger"></a><span class="summary-sig-name">Logger</span>(<span class="summary-sig-arg">s</span>,
+        <span class="summary-sig-arg">*args</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pype.sprite-pysrc.html#Logger">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="image2pil"></a><span class="summary-sig-name">image2pil</span>(<span class="summary-sig-arg">image</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pype.sprite-pysrc.html#image2pil">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pype.sprite-module.html#genaxes" class="summary-sig-name">genaxes</a>(<span class="summary-sig-arg">w</span>,
+        <span class="summary-sig-arg">h</span>,
+        <span class="summary-sig-arg">rw</span>,
+        <span class="summary-sig-arg">rh</span>,
+        <span class="summary-sig-arg">typecode</span>=<span class="summary-sig-default">np.float64</span>,
+        <span class="summary-sig-arg">inverty</span>=<span class="summary-sig-default">0</span>)</span><br />
+      Generate two arrays descripting sprite x- and y-coordinate axes
+(like Matlab MESHGRID).</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pype.sprite-pysrc.html#genaxes">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="is_sequence"></a><span class="summary-sig-name">is_sequence</span>(<span class="summary-sig-arg">x</span>)</span><br />
+      Is arg a sequence-type?</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pype.sprite-pysrc.html#is_sequence">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pype.sprite-module.html#colr" class="summary-sig-name">colr</a>(<span class="summary-sig-arg">*args</span>,
+        <span class="summary-sig-arg">**kwargs</span>)</span><br />
+      Improved C() -- converts argument to RGBA color in useful way.
+By default generates values 0-255, but normal keyword is True,
+colors are assumed to be specified/generated on the range [0-1].</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pype.sprite-pysrc.html#colr">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pype.sprite-module.html#C" class="summary-sig-name">C</a>(<span class="summary-sig-arg">color</span>,
+        <span class="summary-sig-arg">gl</span>=<span class="summary-sig-default">0</span>)</span><br />
+      Color specification/normalization</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pype.sprite-pysrc.html#C">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pype.sprite-module.html#barsprite" class="summary-sig-name">barsprite</a>(<span class="summary-sig-arg">w</span>,
+        <span class="summary-sig-arg">h</span>,
+        <span class="summary-sig-arg">angle</span>,
+        <span class="summary-sig-arg">color</span>,
+        <span class="summary-sig-arg">**kw</span>)</span><br />
+      Make a bar (creates new sprite).</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pype.sprite-pysrc.html#barsprite">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="barspriteCW"></a><span class="summary-sig-name">barspriteCW</span>(<span class="summary-sig-arg">w</span>,
+        <span class="summary-sig-arg">h</span>,
+        <span class="summary-sig-arg">angle</span>,
+        <span class="summary-sig-arg">color</span>,
+        <span class="summary-sig-arg">**kw</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pype.sprite-pysrc.html#barspriteCW">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="barspriteCCW"></a><span class="summary-sig-name">barspriteCCW</span>(<span class="summary-sig-arg">w</span>,
+        <span class="summary-sig-arg">h</span>,
+        <span class="summary-sig-arg">angle</span>,
+        <span class="summary-sig-arg">color</span>,
+        <span class="summary-sig-arg">**kw</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pype.sprite-pysrc.html#barspriteCCW">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pype.sprite-module.html#fixsprite" class="summary-sig-name">fixsprite</a>(<span class="summary-sig-arg">x</span>,
+        <span class="summary-sig-arg">y</span>,
+        <span class="summary-sig-arg">fb</span>,
+        <span class="summary-sig-arg">fix_size</span>,
+        <span class="summary-sig-arg">color</span>,
+        <span class="summary-sig-arg">bg</span>)</span><br />
+      Fixation target sprite generator.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pype.sprite-pysrc.html#fixsprite">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pype.sprite-module.html#fixsprite2" class="summary-sig-name">fixsprite2</a>(<span class="summary-sig-arg">x</span>,
+        <span class="summary-sig-arg">y</span>,
+        <span class="summary-sig-arg">fb</span>,
+        <span class="summary-sig-arg">fix_size</span>,
+        <span class="summary-sig-arg">fix_ring</span>,
+        <span class="summary-sig-arg">color</span>,
+        <span class="summary-sig-arg">bg</span>)</span><br />
+      fancy fixation target sprite generator</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pype.sprite-pysrc.html#fixsprite2">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pype.sprite-module.html#quickinit" class="summary-sig-name">quickinit</a>(<span class="summary-sig-arg">dpy</span>=<span class="summary-sig-default">&quot;:0.0&quot;</span>,
+        <span class="summary-sig-arg">w</span>=<span class="summary-sig-default">100</span>,
+        <span class="summary-sig-arg">h</span>=<span class="summary-sig-default">100</span>,
+        <span class="summary-sig-arg">fullscreen</span>=<span class="summary-sig-default">0</span>,
+        <span class="summary-sig-arg">mouse</span>=<span class="summary-sig-default">0</span>)</span><br />
+      Quickly setup and initialize framebuffer</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pype.sprite-pysrc.html#quickinit">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pype.sprite-module.html#quickfb" class="summary-sig-name">quickfb</a>(<span class="summary-sig-arg">w</span>,
+        <span class="summary-sig-arg">h</span>,
+        <span class="summary-sig-arg">fullscreen</span>=<span class="summary-sig-default">0</span>)</span><br />
+      Get a quick (windowed) FrameBuffer for scripts and testing.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pype.sprite-pysrc.html#quickfb">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="ppflag"></a><span class="summary-sig-name">ppflag</span>(<span class="summary-sig-arg">flags</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pype.sprite-pysrc.html#ppflag">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="drawtest"></a><span class="summary-sig-name">drawtest</span>(<span class="summary-sig-arg">fb</span>,
+        <span class="summary-sig-arg">s</span>)</span><br />
+      Draw standard test pattern.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pype.sprite-pysrc.html#drawtest">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="tickbox"></a><span class="summary-sig-name">tickbox</span>(<span class="summary-sig-arg">x</span>,
+        <span class="summary-sig-arg">y</span>,
+        <span class="summary-sig-arg">width</span>,
+        <span class="summary-sig-arg">height</span>,
+        <span class="summary-sig-arg">lwidth</span>,
+        <span class="summary-sig-arg">color</span>,
+        <span class="summary-sig-arg">fb</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pype.sprite-pysrc.html#tickbox">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
+<!-- ==================== VARIABLES ==================== -->
+<a name="section-Variables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Variables</span></td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="GLASS"></a><span class="summary-name">GLASS</span> = <code title="0, 0, 0, 0">0, 0, 0, 0</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="WHITE"></a><span class="summary-name">WHITE</span> = <code title="255, 255, 255">255, 255, 255</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="BLACK"></a><span class="summary-name">BLACK</span> = <code title="1, 1, 1">1, 1, 1</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="RED"></a><span class="summary-name">RED</span> = <code title="255, 1, 1">255, 1, 1</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="GREEN"></a><span class="summary-name">GREEN</span> = <code title="1, 255, 1">1, 255, 1</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="BLUE"></a><span class="summary-name">BLUE</span> = <code title="1, 1, 255, 1">1, 1, 255, 1</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="YELLOW"></a><span class="summary-name">YELLOW</span> = <code title="255, 255, 1">255, 255, 1</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="MAGENTA"></a><span class="summary-name">MAGENTA</span> = <code title="255, 1, 255">255, 1, 255</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="CYAN"></a><span class="summary-name">CYAN</span> = <code title="1, 255, 255">1, 255, 255</code>
+    </td>
+  </tr>
+</table>
+<!-- ==================== FUNCTION DETAILS ==================== -->
+<a name="section-FunctionDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td align="left" colspan="2" class="table-header">
+    <span class="table-header">Function Details</span></td>
+</tr>
+</table>
+<a name="genaxes"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">genaxes</span>(<span class="sig-arg">w</span>,
+        <span class="sig-arg">h</span>,
+        <span class="sig-arg">rw</span>,
+        <span class="sig-arg">rh</span>,
+        <span class="sig-arg">typecode</span>=<span class="sig-default">np.float64</span>,
+        <span class="sig-arg">inverty</span>=<span class="sig-default">0</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pype.sprite-pysrc.html#genaxes">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Generate two arrays descripting sprite x- and y-coordinate axes
+(like Matlab MESHGRID).</p>
+<p><em>NB</em> By default the coordinate system is matrix/matlab, which
+means that negative values are at the top of the sprite and
+increase going down the screen. This is fine if all you use the
+function for is to compute eccentricity to shaping envelopes, but
+wrong for most math. Use inverty=1 to get proper world coords..</p>
+<p>Mon Mar  3 13:24:10 2014 mazer
+NOTE: there was a small fencpost error here (I think) -- linspace
+is right, arange is likely wrong:
+&gt;&gt; x = np.arange(0, w) - ((w - 1) / 2.0)
+&gt;&gt; y = np.arange(0, h) - ((h - 1) / 2.0)</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>w</code></strong>, <strong class="pname"><code>h</code></strong> - scalar values indicating the display width and
+height of the sprite in needing axes in pixels</li>
+        <li><strong class="pname"><code>rw</code></strong>, <strong class="pname"><code>rh</code></strong> - scalar values indicating the &quot;real&quot; width and
+height of the sprite (specifies actually array size)</li>
+        <li><strong class="pname"><code>typecode</code></strong> - numpy-style typecode for the output array</li>
+        <li><strong class="pname"><code>inverty</code></strong> - (boolean) if true, then axes are matlab-style with
+0th row at the top, y increasing in the downward direction</li>
+    </ul></dd>
+    <dt>Returns:</dt>
+        <dd>pair of vectors (xaxis, yaxis) where the dimensions of
+each vector are (w, 1) and (1, h) respectively.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="colr"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">colr</span>(<span class="sig-arg">*args</span>,
+        <span class="sig-arg">**kwargs</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pype.sprite-pysrc.html#colr">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Improved C() -- converts argument to RGBA color in useful way.
+By default generates values 0-255, but normal keyword is True,
+colors are assumed to be specified/generated on the range [0-1].</p>
+<dl class="rst-docutils">
+<dt>Handled cases:</dt>
+<dd>colr() -&gt; transparent color key (0,0,0,0)
+colr(r,g,b)
+colr((r,g,b))
+colr(lum) --&gt; (lum,lum,lum)
+colr(r,g,b,a)
+colr((r,g,b,a))
+colr(lum) --&gt; (lum,lum,lum, 255)
+colr('name') --&gt; simple named color
+colr('r,g,b') --&gt; color as string
+colr('r,g,b,a') --&gt; color with alpha as string</dd>
+</dl>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="C"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">C</span>(<span class="sig-arg">color</span>,
+        <span class="sig-arg">gl</span>=<span class="sig-default">0</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pype.sprite-pysrc.html#C">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Color specification/normalization</p>
+<p>Takes number of similar color specifications and tries to convert
+them all into a common format compatible with pygame, that is a
+length 4 tuple: (red, green, blue, alpha) where the values vary
+[0-255], where: 0=off/transparent and 255=on/opaque.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>gl</code></strong> - (boolean) if true, then values range [0-1], else [0-255]</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="barsprite"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">barsprite</span>(<span class="sig-arg">w</span>,
+        <span class="sig-arg">h</span>,
+        <span class="sig-arg">angle</span>,
+        <span class="sig-arg">color</span>,
+        <span class="sig-arg">**kw</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pype.sprite-pysrc.html#barsprite">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Make a bar (creates new sprite).</p>
+<p>Front end for the Sprite instantiation method. This makes a sprite
+of the specificed width and hight, fills with the specified color
+(or noise) and rotates the sprite to the specified angle.</p>
+<p>This <em>really</em> should be a class that inherits from Sprite().</p>
+  <dl class="fields">
+    <dt>Returns:</dt>
+        <dd>(sprite) requested bar</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="fixsprite"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">fixsprite</span>(<span class="sig-arg">x</span>,
+        <span class="sig-arg">y</span>,
+        <span class="sig-arg">fb</span>,
+        <span class="sig-arg">fix_size</span>,
+        <span class="sig-arg">color</span>,
+        <span class="sig-arg">bg</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pype.sprite-pysrc.html#fixsprite">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Fixation target sprite generator.</p>
+<p>Generates a simple sprite containing an &quot;industry standard&quot;
+fixation target :-) Target is a solid filled circle of the
+specified color.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>x</code></strong>, <strong class="pname"><code>y</code></strong> - (pixels) location of target (center)</li>
+        <li><strong class="pname"><code>fb</code></strong> - frame buffer</li>
+        <li><strong class="pname"><code>fix_size</code></strong> - (pixels) radius of target (use _ZERO_ for single
+pixel target)</li>
+        <li><strong class="pname"><code>color</code></strong> - fill color</li>
+        <li><strong class="pname"><code>bg</code></strong> - background color</li>
+    </ul></dd>
+    <dt>Returns:</dt>
+        <dd>new sprite containing the target</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="fixsprite2"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">fixsprite2</span>(<span class="sig-arg">x</span>,
+        <span class="sig-arg">y</span>,
+        <span class="sig-arg">fb</span>,
+        <span class="sig-arg">fix_size</span>,
+        <span class="sig-arg">fix_ring</span>,
+        <span class="sig-arg">color</span>,
+        <span class="sig-arg">bg</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pype.sprite-pysrc.html#fixsprite2">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>fancy fixation target sprite generator</p>
+<p>Generates a sprite containing a circular fixation target
+surrounded by an annulus of black (to increase detectability).</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>x</code></strong>, <strong class="pname"><code>y</code></strong> - (pixels) location of target (center)</li>
+        <li><strong class="pname"><code>fb</code></strong> - frame buffer</li>
+        <li><strong class="pname"><code>fix_size</code></strong> - (pixels) radius of target (use _ZERO_ for single
+pixel target)</li>
+        <li><strong class="pname"><code>fix_ring</code></strong> - (pixels) radius of annulus</li>
+        <li><strong class="pname"><code>color</code></strong> - fill color</li>
+        <li><strong class="pname"><code>bg</code></strong> - background color</li>
+    </ul></dd>
+    <dt>Returns:</dt>
+        <dd>new sprite containing the target</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="quickinit"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">quickinit</span>(<span class="sig-arg">dpy</span>=<span class="sig-default">&quot;:0.0&quot;</span>,
+        <span class="sig-arg">w</span>=<span class="sig-default">100</span>,
+        <span class="sig-arg">h</span>=<span class="sig-default">100</span>,
+        <span class="sig-arg">fullscreen</span>=<span class="sig-default">0</span>,
+        <span class="sig-arg">mouse</span>=<span class="sig-default">0</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pype.sprite-pysrc.html#quickinit">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  Quickly setup and initialize framebuffer
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>dpy</code></strong> - (string) display string</li>
+        <li><strong class="pname"><code>w</code></strong>, <strong class="pname"><code>h</code></strong> - (pixels) width and height of display</li>
+        <li><strong class="pname"><code>fullscreen</code></strong> - (boolean) full screen mode (default is no)</li>
+        <li><strong class="pname"><code>mouse</code></strong> - (boolean) now mouse cursor? (default is no)</li>
+    </ul></dd>
+    <dt>Returns:</dt>
+        <dd>live frame buffer</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="quickfb"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">quickfb</span>(<span class="sig-arg">w</span>,
+        <span class="sig-arg">h</span>,
+        <span class="sig-arg">fullscreen</span>=<span class="sig-default">0</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pype.sprite-pysrc.html#quickfb">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  Get a quick (windowed) FrameBuffer for scripts and testing.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>w</code></strong>, <strong class="pname"><code>h</code></strong> - (pixels) width and height of display</li>
+    </ul></dd>
+    <dt>Returns:</dt>
+        <dd>live frame buffer</dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="pype-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://kernel.montana.edu">pype3</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1
+    on Fri Nov 16 23:45:04 2018
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

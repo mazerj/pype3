@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>pype.beep</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="pype-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://kernel.montana.edu">pype3</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="pype-module.html">Package&nbsp;pype</a> ::
+        Module&nbsp;beep
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="pype.beep-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="pype.beep-module.html">Module pype.beep</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-comment">#!/usr/bin/env pypenv</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-comment"># -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring">"""Interface to audio card via pygame</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">sys</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">pygame</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">numpy</tt> <tt class="py-keyword">as</tt> <tt class="py-name">np</tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line">        <tt class="py-keyword">from</tt> <tt class="py-name">guitools</tt> <tt class="py-keyword">import</tt> <tt id="link-0" class="py-name" targets="Function pype.beep.Logger()=pype.beep-module.html#Logger,Function pype.sprite.Logger()=pype.sprite-module.html#Logger"><a title="pype.beep.Logger
+pype.sprite.Logger" class="py-name" href="#" onclick="return doclink('link-0', 'Logger', 'link-0');">Logger</a></tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-keyword">except</tt> <tt class="py-name">ImportError</tt><tt class="py-op">:</tt> </tt>
+<a name="Logger"></a><div id="Logger-def"><a name="L15"></a><tt class="py-lineno"> 15</tt> <a class="py-toggle" href="#" id="Logger-toggle" onclick="return toggle('Logger');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="pype.beep-module.html#Logger">Logger</a><tt class="py-op">(</tt><tt class="py-param">s</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Logger-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="Logger-expanded"><a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line">                <tt class="py-name">sys</tt><tt class="py-op">.</tt><tt class="py-name">stderr</tt><tt class="py-op">.</tt><tt id="link-1" class="py-name" targets="Method pype.pype_aux.Logfile.write()=pype.pype_aux.Logfile-class.html#write"><a title="pype.pype_aux.Logfile.write" class="py-name" href="#" onclick="return doclink('link-1', 'write', 'link-1');">write</a></tt><tt class="py-op">(</tt><tt class="py-name">s</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"> </tt>
+<a name="_Beeper"></a><div id="_Beeper-def"><a name="L18"></a><tt class="py-lineno"> 18</tt> <a class="py-toggle" href="#" id="_Beeper-toggle" onclick="return toggle('_Beeper');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="pype.beep._Beeper-class.html">_Beeper</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="_Beeper-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="_Beeper-expanded"><a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line">        <tt class="py-name">_doinit</tt> <tt class="py-op">=</tt> <tt class="py-number">1</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line">        <tt class="py-name">_disabled</tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line">        <tt class="py-name">_dafreq</tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line">        <tt class="py-name">_bits</tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line">        <tt class="py-name">_chans</tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"> </tt>
+<a name="_Beeper.__init__"></a><div id="_Beeper.__init__-def"><a name="L25"></a><tt class="py-lineno"> 25</tt> <a class="py-toggle" href="#" id="_Beeper.__init__-toggle" onclick="return toggle('_Beeper.__init__');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="pype.beep._Beeper-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="_Beeper.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="_Beeper.__init__-expanded"><a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">_Beeper</tt><tt class="py-op">.</tt><tt class="py-name">_disabled</tt><tt class="py-op">:</tt> <tt class="py-keyword">return</tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line"> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">_Beeper</tt><tt class="py-op">.</tt><tt class="py-name">_doinit</tt><tt class="py-op">:</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line">                        <tt class="py-keyword">if</tt> <tt class="py-name">pygame</tt><tt class="py-op">.</tt><tt class="py-name">mixer</tt><tt class="py-op">.</tt><tt class="py-name">get_init</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-keyword">is</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line">                                <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line">                                        <tt class="py-name">pygame</tt><tt class="py-op">.</tt><tt class="py-name">mixer</tt><tt class="py-op">.</tt><tt class="py-name">init</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line">                                <tt class="py-keyword">except</tt> <tt class="py-name">pygame</tt><tt class="py-op">.</tt><tt class="py-name">error</tt><tt class="py-op">:</tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line">                                        <tt id="link-2" class="py-name"><a title="pype.beep.Logger
+pype.sprite.Logger" class="py-name" href="#" onclick="return doclink('link-2', 'Logger', 'link-0');">Logger</a></tt><tt class="py-op">(</tt><tt class="py-string">'beep: no audio device available -- check perms\n'</tt><tt class="py-op">)</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line">                                        <tt class="py-name">_Beeper</tt><tt class="py-op">.</tt><tt class="py-name">_doinit</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line">                                        <tt class="py-name">_Beeper</tt><tt class="py-op">.</tt><tt class="py-name">_disabled</tt> <tt class="py-op">=</tt> <tt class="py-number">1</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">                                        <tt class="py-keyword">return</tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line">                                <tt class="py-name">pygame</tt><tt class="py-op">.</tt><tt class="py-name">sndarray</tt><tt class="py-op">.</tt><tt class="py-name">use_arraytype</tt><tt class="py-op">(</tt><tt class="py-string">'numpy'</tt><tt class="py-op">)</tt> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line">                        <tt class="py-op">(</tt><tt class="py-name">_Beeper</tt><tt class="py-op">.</tt><tt class="py-name">_dafreq</tt><tt class="py-op">,</tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line">                         <tt class="py-name">_Beeper</tt><tt class="py-op">.</tt><tt class="py-name">_bits</tt><tt class="py-op">,</tt> <tt class="py-name">_Beeper</tt><tt class="py-op">.</tt><tt class="py-name">_chans</tt><tt class="py-op">)</tt> <tt class="py-op">=</tt> <tt class="py-name">pygame</tt><tt class="py-op">.</tt><tt class="py-name">mixer</tt><tt class="py-op">.</tt><tt class="py-name">get_init</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line">                        <tt class="py-name">_Beeper</tt><tt class="py-op">.</tt><tt class="py-name">cache</tt> <tt class="py-op">=</tt> <tt class="py-op">{</tt><tt class="py-op">}</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line">                        <tt class="py-name">_Beeper</tt><tt class="py-op">.</tt><tt class="py-name">_doinit</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+</div><a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line"> </tt>
+<a name="_Beeper._beep"></a><div id="_Beeper._beep-def"><a name="L43"></a><tt class="py-lineno"> 43</tt> <a class="py-toggle" href="#" id="_Beeper._beep-toggle" onclick="return toggle('_Beeper._beep');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="pype.beep._Beeper-class.html#_beep">_beep</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">freq</tt><tt class="py-op">,</tt> <tt class="py-param">msdur</tt><tt class="py-op">,</tt> <tt class="py-param">vol</tt><tt class="py-op">,</tt> <tt class="py-param">risefall</tt><tt class="py-op">,</tt> <tt class="py-param">wait</tt><tt class="py-op">,</tt> <tt class="py-param">play</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="_Beeper._beep-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="_Beeper._beep-expanded"><a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">_Beeper</tt><tt class="py-op">.</tt><tt class="py-name">_disabled</tt><tt class="py-op">:</tt> <tt class="py-keyword">return</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line"> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">                <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">                        <tt class="py-name">s</tt> <tt class="py-op">=</tt> <tt class="py-name">_Beeper</tt><tt class="py-op">.</tt><tt class="py-name">cache</tt><tt class="py-op">[</tt><tt class="py-name">freq</tt><tt class="py-op">,</tt> <tt class="py-name">msdur</tt><tt class="py-op">,</tt> <tt class="py-name">vol</tt><tt class="py-op">,</tt> <tt class="py-name">risefall</tt><tt class="py-op">]</tt> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">                <tt class="py-keyword">except</tt> <tt class="py-name">KeyError</tt><tt class="py-op">:</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">                        <tt class="py-name">s</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_synth</tt><tt class="py-op">(</tt><tt class="py-name">freq</tt><tt class="py-op">,</tt> <tt class="py-name">msdur</tt><tt class="py-op">,</tt> <tt class="py-name">vol</tt><tt class="py-op">,</tt> <tt class="py-name">risefall</tt><tt class="py-op">)</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line">                        <tt class="py-name">_Beeper</tt><tt class="py-op">.</tt><tt class="py-name">cache</tt><tt class="py-op">[</tt><tt class="py-name">freq</tt><tt class="py-op">,</tt> <tt class="py-name">msdur</tt><tt class="py-op">,</tt> <tt class="py-name">vol</tt><tt class="py-op">,</tt> <tt class="py-name">risefall</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">s</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line"> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">play</tt><tt class="py-op">:</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">                        <tt class="py-comment"># wait for free mixer -- this doesn't appear to be necessary.</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">                        <tt class="py-comment"># looks like things queue up..</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">                        <tt class="py-comment">#while pygame.mixer.get_busy():</tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line">                        <tt class="py-comment">#       pass</tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line">                        <tt class="py-name">s</tt><tt class="py-op">.</tt><tt class="py-name">play</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">                        <tt class="py-keyword">while</tt> <tt class="py-name">wait</tt> <tt class="py-keyword">and</tt> <tt class="py-name">pygame</tt><tt class="py-op">.</tt><tt class="py-name">mixer</tt><tt class="py-op">.</tt><tt class="py-name">get_busy</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line">                                <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line"> </tt>
+<a name="_Beeper._synth"></a><div id="_Beeper._synth-def"><a name="L61"></a><tt class="py-lineno"> 61</tt> <a class="py-toggle" href="#" id="_Beeper._synth-toggle" onclick="return toggle('_Beeper._synth');">-</a><tt class="py-line">        <tt class="py-keyword">def</tt> <a class="py-def-name" href="pype.beep._Beeper-class.html#_synth">_synth</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">freq</tt><tt class="py-op">,</tt> <tt class="py-param">msdur</tt><tt class="py-op">,</tt> <tt class="py-param">vol</tt><tt class="py-op">,</tt> <tt class="py-param">risefall</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="_Beeper._synth-collapsed" style="display:none;" pad="+++" indent="++++++++++++"></div><div id="_Beeper._synth-expanded"><a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">                <tt class="py-name">t</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">arange</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt> <tt class="py-name">msdur</tt> <tt class="py-op">/</tt> <tt class="py-number">1000.0</tt><tt class="py-op">,</tt> <tt class="py-number">1.0</tt> <tt class="py-op">/</tt> <tt class="py-name">_Beeper</tt><tt class="py-op">.</tt><tt class="py-name">_dafreq</tt><tt class="py-op">)</tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line">                <tt class="py-name">s</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt id="link-3" class="py-name" targets="Function pype.vectorops.zeros()=pype.vectorops-module.html#zeros"><a title="pype.vectorops.zeros" class="py-name" href="#" onclick="return doclink('link-3', 'zeros', 'link-3');">zeros</a></tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">t</tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-number">2</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">                <tt class="py-comment"># use trapezoidal envelope with risefall (below) time</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">msdur</tt> <tt class="py-op">&lt;</tt> <tt class="py-number">40</tt><tt class="py-op">:</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line">                        <tt class="py-name">risefall</tt> <tt class="py-op">=</tt> <tt class="py-name">msdur</tt> <tt class="py-op">/</tt> <tt class="py-number">2.0</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line">                <tt class="py-name">env</tt> <tt class="py-op">=</tt> <tt class="py-op">-</tt><tt class="py-name">abs</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">t</tt> <tt class="py-op">-</tt> <tt class="py-op">(</tt><tt class="py-name">t</tt><tt class="py-op">[</tt><tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">]</tt> <tt class="py-op">/</tt> <tt class="py-number">2</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-op">(</tt><tt class="py-name">risefall</tt><tt class="py-op">/</tt><tt class="py-number">1000.0</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line">                <tt class="py-name">env</tt> <tt class="py-op">=</tt> <tt class="py-name">env</tt> <tt class="py-op">-</tt> <tt class="py-name">min</tt><tt class="py-op">(</tt><tt class="py-name">env</tt><tt class="py-op">)</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">                <tt class="py-name">env</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">where</tt><tt class="py-op">(</tt><tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">less</tt><tt class="py-op">(</tt><tt class="py-name">env</tt><tt class="py-op">,</tt> <tt class="py-number">1.0</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">env</tt><tt class="py-op">,</tt> <tt class="py-number">1.0</tt><tt class="py-op">)</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line"> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">                <tt class="py-name">bits</tt> <tt class="py-op">=</tt> <tt class="py-name">_Beeper</tt><tt class="py-op">.</tt><tt class="py-name">_bits</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">bits</tt> <tt class="py-op">&lt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">                        <tt class="py-name">bits</tt> <tt class="py-op">=</tt> <tt class="py-op">-</tt><tt class="py-name">bits</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">                        <tt class="py-name">signed</tt> <tt class="py-op">=</tt> <tt class="py-number">1</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">                <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">                        <tt class="py-name">signed</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line"> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">                <tt class="py-name">fullrange</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">power</tt><tt class="py-op">(</tt><tt class="py-number">2</tt><tt class="py-op">,</tt> <tt class="py-name">bits</tt><tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line"> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">freq</tt> <tt class="py-keyword">is</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line">                        <tt class="py-name">y</tt> <tt class="py-op">=</tt> <tt class="py-name">env</tt> <tt class="py-op">*</tt> <tt class="py-name">vol</tt> <tt class="py-op">*</tt> <tt class="py-name">fullrange</tt> <tt class="py-op">*</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">random</tt><tt class="py-op">.</tt><tt class="py-name">random</tt><tt class="py-op">(</tt><tt class="py-name">t</tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">)</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line">                <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line">                        <tt class="py-name">y</tt> <tt class="py-op">=</tt> <tt class="py-name">env</tt> <tt class="py-op">*</tt> <tt class="py-name">vol</tt> <tt class="py-op">*</tt> <tt class="py-name">fullrange</tt> <tt class="py-op">*</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">sin</tt><tt class="py-op">(</tt><tt class="py-number">2.0</tt> <tt class="py-op">*</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">pi</tt> <tt class="py-op">*</tt> <tt class="py-name">t</tt> <tt class="py-op">*</tt> <tt class="py-name">freq</tt><tt class="py-op">)</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line">                <tt class="py-name">y</tt> <tt class="py-op">=</tt> <tt class="py-name">y</tt><tt class="py-op">.</tt><tt class="py-name">astype</tt><tt class="py-op">(</tt><tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">int16</tt><tt class="py-op">)</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line"> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">_Beeper</tt><tt class="py-op">.</tt><tt class="py-name">_chans</tt> <tt class="py-op">==</tt> <tt class="py-number">2</tt><tt class="py-op">:</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line">                        <tt class="py-name">y</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">transpose</tt><tt class="py-op">(</tt><tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">array</tt><tt class="py-op">(</tt><tt class="py-op">[</tt><tt class="py-name">y</tt><tt class="py-op">,</tt><tt class="py-name">y</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">                <tt class="py-name">s</tt> <tt class="py-op">=</tt> <tt class="py-name">pygame</tt><tt class="py-op">.</tt><tt class="py-name">sndarray</tt><tt class="py-op">.</tt><tt class="py-name">make_sound</tt><tt class="py-op">(</tt><tt class="py-name">y</tt><tt class="py-op">)</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> <tt class="py-name">s</tt> </tt>
+</div></div><a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line"> </tt>
+<a name="beep"></a><div id="beep-def"><a name="L91"></a><tt class="py-lineno"> 91</tt> <a class="py-toggle" href="#" id="beep-toggle" onclick="return toggle('beep');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="pype.beep-module.html#beep">beep</a><tt class="py-op">(</tt><tt class="py-param">freq</tt><tt class="py-op">=</tt><tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">,</tt> <tt class="py-param">msdur</tt><tt class="py-op">=</tt><tt class="py-op">-</tt><tt class="py-number">1</tt><tt class="py-op">,</tt> <tt class="py-param">vol</tt><tt class="py-op">=</tt><tt class="py-number">0.5</tt><tt class="py-op">,</tt> <tt class="py-param">risefall</tt><tt class="py-op">=</tt><tt class="py-number">20</tt><tt class="py-op">,</tt> <tt class="py-param">wait</tt><tt class="py-op">=</tt><tt class="py-number">1</tt><tt class="py-op">,</tt> <tt class="py-param">play</tt><tt class="py-op">=</tt><tt class="py-number">1</tt><tt class="py-op">,</tt> <tt class="py-param">disable</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="beep-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="beep-expanded"><a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line">        <tt class="py-docstring">"""Beep the speaker using sound card.</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line"><tt class="py-docstring">        :param freq: (Hz/None) tone frequency (None for noise)</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line"><tt class="py-docstring">        :param msdur: (ms) tone duration</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line"><tt class="py-docstring">        :param vol: (0-1) volume</tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line"><tt class="py-docstring">        :param risefall: (ms) envelope rise and fall</tt> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line"><tt class="py-docstring">        :param wait: (bool) block until sound has been played</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line"><tt class="py-docstring">        :param play: (bool) true: play now; false: synthesize and cache for later</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line"><tt class="py-docstring">    :return: nothing    </tt> </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line"> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt id="link-4" class="py-name" targets="Method pype.pype.Timer.disable()=pype.pype.Timer-class.html#disable"><a title="pype.pype.Timer.disable" class="py-name" href="#" onclick="return doclink('link-4', 'disable', 'link-4');">disable</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line">                <tt class="py-comment"># just disable sound subsystem</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line">                <tt class="py-name">_Beeper</tt><tt class="py-op">.</tt><tt class="py-name">_disabled</tt> <tt class="py-op">=</tt> <tt class="py-number">1</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line">        <tt class="py-keyword">elif</tt> <tt class="py-name">freq</tt> <tt class="py-keyword">and</tt> <tt class="py-name">freq</tt> <tt class="py-op">&lt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line">                <tt class="py-name">_Beeper</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line">                <tt class="py-name">_Beeper</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt class="py-name">_beep</tt><tt class="py-op">(</tt><tt class="py-name">freq</tt><tt class="py-op">,</tt> <tt class="py-name">msdur</tt><tt class="py-op">,</tt> <tt class="py-name">vol</tt><tt class="py-op">=</tt><tt class="py-name">vol</tt><tt class="py-op">,</tt> <tt class="py-name">risefall</tt><tt class="py-op">=</tt><tt class="py-name">risefall</tt><tt class="py-op">,</tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line">                                                <tt class="py-name">wait</tt><tt class="py-op">=</tt><tt class="py-name">wait</tt><tt class="py-op">,</tt> <tt class="py-name">play</tt><tt class="py-op">=</tt><tt class="py-name">play</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line"> </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line"> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line"> </tt>
+<a name="warble"></a><div id="warble-def"><a name="L120"></a><tt class="py-lineno">120</tt> <a class="py-toggle" href="#" id="warble-toggle" onclick="return toggle('warble');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="pype.beep-module.html#warble">warble</a><tt class="py-op">(</tt><tt class="py-param">base</tt><tt class="py-op">,</tt> <tt class="py-param">t</tt><tt class="py-op">,</tt> <tt class="py-param">volume</tt><tt class="py-op">=</tt><tt class="py-number">1</tt><tt class="py-op">,</tt> <tt class="py-param">fmper</tt><tt class="py-op">=</tt><tt class="py-number">25</tt><tt class="py-op">,</tt> <tt class="py-param">driver</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="warble-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="warble-expanded"><a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line">        <tt class="py-docstring">"""Make a nice warbling sound - cheapo FM</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line"><tt class="py-docstring">        :param base: (Hz) base frequency</tt> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line"><tt class="py-docstring">        :param t: (ms) duration</tt> </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line"><tt class="py-docstring">        :param volume: (0-1) volume</tt> </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line"><tt class="py-docstring">        :param fmper: (ms) period of modulation frequency</tt> </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line"><tt class="py-docstring">    :return: nothing</tt> </tt>
+<a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line"> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line">        <tt class="py-name">et</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line">        <tt class="py-keyword">while</tt> <tt class="py-name">et</tt> <tt class="py-op">&lt;</tt> <tt class="py-name">t</tt><tt class="py-op">:</tt> </tt>
+<a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line">                <tt id="link-5" class="py-name" targets="Module pype.beep=pype.beep-module.html,Function pype.beep.beep()=pype.beep-module.html#beep"><a title="pype.beep
+pype.beep.beep" class="py-name" href="#" onclick="return doclink('link-5', 'beep', 'link-5');">beep</a></tt><tt class="py-op">(</tt><tt class="py-name">base</tt><tt class="py-op">,</tt> <tt class="py-name">fmper</tt><tt class="py-op">,</tt> <tt class="py-name">volume</tt><tt class="py-op">,</tt> <tt class="py-name">wait</tt><tt class="py-op">=</tt><tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line">                <tt id="link-6" class="py-name"><a title="pype.beep
+pype.beep.beep" class="py-name" href="#" onclick="return doclink('link-6', 'beep', 'link-5');">beep</a></tt><tt class="py-op">(</tt><tt class="py-number">1.10</tt><tt class="py-op">*</tt><tt class="py-name">base</tt><tt class="py-op">,</tt> <tt class="py-name">fmper</tt><tt class="py-op">,</tt> <tt class="py-name">volume</tt><tt class="py-op">,</tt> <tt class="py-name">wait</tt><tt class="py-op">=</tt><tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line">                <tt class="py-name">et</tt> <tt class="py-op">=</tt> <tt class="py-name">et</tt> <tt class="py-op">+</tt> <tt class="py-op">(</tt><tt class="py-number">2</tt> <tt class="py-op">*</tt> <tt class="py-name">fmper</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line"> </tt>
+<a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line"> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line"><tt class="py-keyword">if</tt>      <tt class="py-name">__name__</tt> <tt class="py-op">==</tt> <tt class="py-string">'__main__'</tt><tt class="py-op">:</tt> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt class="py-string">"start"</tt> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line">        <tt id="link-7" class="py-name"><a title="pype.beep
+pype.beep.beep" class="py-name" href="#" onclick="return doclink('link-7', 'beep', 'link-5');">beep</a></tt><tt class="py-op">(</tt><tt class="py-number">1000</tt><tt class="py-op">,</tt> <tt class="py-number">50</tt><tt class="py-op">)</tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line">        <tt id="link-8" class="py-name"><a title="pype.beep
+pype.beep.beep" class="py-name" href="#" onclick="return doclink('link-8', 'beep', 'link-5');">beep</a></tt><tt class="py-op">(</tt><tt class="py-number">500</tt><tt class="py-op">,</tt> <tt class="py-number">50</tt><tt class="py-op">)</tt> </tt>
+<a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt class="py-string">"quitting"</tt> </tt>
+<a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line">        <tt class="py-keyword">while</tt> <tt class="py-name">pygame</tt><tt class="py-op">.</tt><tt class="py-name">mixer</tt><tt class="py-op">.</tt><tt class="py-name">get_busy</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line">                <tt class="py-name">pygame</tt><tt class="py-op">.</tt><tt class="py-name">mixer</tt><tt class="py-op">.</tt><tt id="link-9" class="py-name" targets="Method pype.filebox.FileDialog.quit()=pype.filebox.FileDialog-class.html#quit"><a title="pype.filebox.FileDialog.quit" class="py-name" href="#" onclick="return doclink('link-9', 'quit', 'link-9');">quit</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt class="py-string">"done."</tt> </tt>
+<a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="pype-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://kernel.montana.edu">pype3</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1
+    on Fri Nov 16 23:45:04 2018
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

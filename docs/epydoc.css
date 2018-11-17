@@ -16,13 +16,15 @@
  *     either class='epydoc' or class='toc' (CSS styles for both
  *     defined below).
  */
-body                        { background: #ffffff; color: #000000; }
+body                        { background: #ffffff; color: #000000;
+			      font-family: Arial, Helvetica, sans-serif; }
+			    }
 p                           { margin-top: 0.5em; margin-bottom: 0.5em; }
 a:link                      { color: #0000ff; }
 a:visited                   { color: #204080; }
 dt                          { font-weight: bold; }
 h1                          { font-size: +140%; font-style: italic;
-                              font-weight: bold; }
+                              font-weight: bold; color: #000000;}
 h2                          { font-size: +125%; font-style: italic;
                               font-weight: bold; }
 h3                          { font-size: +110%; font-style: italic;

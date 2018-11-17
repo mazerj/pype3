@@ -52,8 +52,12 @@ clobber:
 		done
 
 # makedocs requires epydoc (should probably switch to sphinx...)
-docs:
+
+docs: FORCE
 	@sh ./makedocs.sh
+
+pushdocs: docs
+	git commit ./docs -m"regenerated docs" && git push
 
 ################################################################
 # push to github ('origin')
@@ -61,3 +65,5 @@ docs:
 push:
 	git push
 
+
+FORCE:

@@ -2,8 +2,6 @@
 
 sed "s^%%PYPEDIR%%^$PYPEDIR^g" <epydoc.conf >/tmp/$$.conf
 
-rm -rf $PYPEDIR/docs
-
 epydoc -v --no-private --simple-term --config=/tmp/$$.conf \
 	       --exclude=Pmw \
 	       --exclude=pype.stats \
@@ -48,12 +46,6 @@ epydoc -v --no-private --simple-term --config=/tmp/$$.conf \
 	       --exclude=pype.userdpy \
 	       --exclude=pype.simpletimer
 
-if [ `domainname` = mlab ]; then
-    # this is mazer-lab specific...
-    d=/auto/www/pypedocs
-    sudo /bin/rm -rf $d
-    sudo cp -r $PYPEDIR/docs $d
-    sudo chmod a+rw $d
-fi
-   
 /bin/rm -f /tmp/$$.conf
+
+echo "do \`build pushdocs\` to publish on github."

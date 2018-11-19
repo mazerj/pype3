@@ -13,6 +13,6 @@ Migrated from googlecode to github 11/24/2014.
 
 See [documentation](https://mazerj.github.io/pype3) for installation
 instructions and details about the
-[api](https://mazerj.github.io/pyppe3/docs).
+[api](https://mazerj.github.io/pype3/docs).
 
 

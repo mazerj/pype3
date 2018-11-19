@@ -11,8 +11,8 @@ Designed for Linux -- all mandatory dependencies are open source.
 
 Migrated from googlecode to github 11/24/2014.
 
-See [documentation](https://mazerj.github.io) for installation
+See [documentation](https://mazerj.github.io/pype3) for installation
 instructions and details about the
-[api](https://mazerj.github.io.docs).
+[api](https://mazerj.github.io/pyppe3/docs).
 
 

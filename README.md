@@ -72,10 +72,6 @@ The first one to try is the basic `fixation` task -- if you're not actually runn
 - *pypeconfig* - edit your config file (host specific!)
 - *pypedocs* - open a browser to the on-line docs
 
-# On-line documentation
-
-Automatically generated documentation is available from the [Mazer lab web site](http://mazerj.github.io/pype3/docs). These docs can be generated automatically from the python code using epydoc (provided as build target).
-
 # Subversion
 
 For existing users, the file [svn-to-git.txt](https://github.com/mazerj/pype3/blob/master/svn-to-git.txt) contains a table for mappings from Subversion revision numbers (stored in pype files etc) to git hashes. You can use this to retrieve old versions of pype that match the data collection period.

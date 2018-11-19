@@ -1,7 +1,0 @@
-General tools for deal with pype datafiles from matlab.
-
-To use these tools, you need to have this directory on
-your shell search path (so the shell can locate the
-pype_expander.py program).  And also on your matlab
-path.
-

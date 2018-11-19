@@ -1,4 +1,0 @@
-# add to .bashrc
-export PYPEDIR=/usr/local/pype3
-export PATH=$PYPEDIR/bin:$PYPEDIR/p2m:$PATH
-export MATLABPATH=$PYPEDIR/p2m:$MATLABPATH

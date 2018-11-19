@@ -1,5 +1,4 @@
-## Pype3
-
+# Source[pype3](http://mazerj.github.io/pype3)
 Visual psychophysics and neurophysiology control system in
 Python. Uses OpenGL+pygame for framebuffer control, numpy for
 dynamic image synthesis and comedi to interface with data
@@ -9,7 +8,9 @@ in a single open source package.
 
 Designed for Linux -- all mandatory dependencies are open source.
 
-Migrated from googlecode to github 11/24/2014.
+## [github project](http://mazerj.github.com/pype3)
+## [documentation](http://mazerj.github.io/pype3/docs)
+
 
 # 1st time installation instructions
 
@@ -72,7 +73,7 @@ The first one to try is the basic `fixation` task -- if you're not actually runn
 
 # On-line documentation
 
-Automatically generated documentation is available from the [Mazer lab web site](http://jackknife.med.yale.edu/docs). These docs can be generated automatically from the python code using epydoc (provided as build target).
+Automatically generated documentation is available from the [Mazer lab web site](http://mazerj.github.io/pype3/docs). These docs can be generated automatically from the python code using epydoc (provided as build target).
 
 # Subversion
 

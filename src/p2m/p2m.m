@@ -56,6 +56,7 @@
 % p2m_getpid.m          -
 % p2m_lreg.m            -
 % p2mpp.m               - pretty print p2m record
+% p2mev.m               - pretty print just event list from p2m record
 % p2mset.m              - NOT DONE
 % p2mStrsplit.m         - split string based on specified delimeter char
 % xdacq_lfp.m           - obsolete?

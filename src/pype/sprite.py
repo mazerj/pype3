@@ -447,8 +447,8 @@ class FrameBuffer(object):
 		(b1, b2, b3) = pygame.mouse.get_pressed()
 		k = pygame.key.get_mods()
 		return (x, y, b1, b2, b3, \
-				k and pygame.KMOD_LSHIFT,
-				k and pygame.KMOD_RSHIFT,)
+				k & pygame.KMOD_LSHIFT,
+				k & pygame.KMOD_RSHIFT,)
 				
 
 	def togglefs(self, wait=0):

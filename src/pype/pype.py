@@ -2534,25 +2534,57 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                         self.con("[esc]", color='red')
                         raise UserAbort
                 elif c == 'f4':
+                    self.con("[f4]", color='red')
                     self.reward()
-                elif c == 'f8':
-                    self.eyeshift(zero=1)
+                elif c == 'f5':
+                    self.con("[f5]", color='red')
+                    if self.running:
+                        self.running = 0
+                elif c == 'f6':
+                    self.con("[f6]", color='red')
+                    if self.running:
+                        self.running = 0
+                    raise UserAbort
                 elif c == 'f7' and self.running:
+                    self.con("[f7]", color='red')
                     self.dotrialtag()
+                elif c == 'f8':
+                    self.con("[f8]", color='red')
+                    self.eyeshift(zero=1)
                 elif c == 'f1':
+                    self.con("[f1]", color='red')
                     self._findparam()
 
             # process keys from the framebuffer window
-            if 'f8' in self.fb.checkkeys():
+            if 'f5' in self.fb.checkkeys():
+                self.con("{f5}", color='red')
+                if self.running:
+                    self.running = 0
+                while not self.fb.checkkeys() == []:
+                    pass
+            elif 'f6' in self.fb.checkkeys():
+                self.con("{f6}", color='red')
+                if self.running:
+                    self.running = 0
+                    raise UserAbort                
+                while not self.fb.checkkeys() == []:
+                    pass
+            elif 'f7' in self.fb.checkkeys():
+                self.con("{f7}", color='red')
+                if self.running:
+                    self.dotrialtag()
+                while not self.fb.checkkeys() == []:
+                    pass
+            elif 'f8' in self.fb.checkkeys():
+                self.con("{f8}", color='red')
                 self.eyeshift(zero=1)
-                self.con('[f8]', color='red')
                 # debounce: wait for keys to be released..
                 while not self.fb.checkkeys() == []:
                     pass
             elif 'escape' in self.fb.checkkeys():
                 if self._allowabort:
                     self.encode(ABORT)
-                    self.con("[esc]", color='red')
+                    self.con("{esc}", color='red')
                     # debounce: wait for keys to be released..
                     while not self.fb.checkkeys() == []:
                         pass

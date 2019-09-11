@@ -369,13 +369,16 @@ int mainloop_init()
   LOCK(semid);
   dacq_data->elrestart = 0;
   dacq_data->server_pid = getpid();
-  if (dacq_data->dacq_pri != 0) {
-    if (nice(dacq_data->dacq_pri) == 0) {
-      fprintf(stderr, "%s:init -- bumped priority %d\n",
-	      progname, dacq_data->dacq_pri);
-    } else {
-      ERROR("nice");
-      fprintf(stderr, "%s:init -- failed to change priority\n", progname);
+  // only adjust priority if running as root
+  if (geteuid() == 0) {
+    if (dacq_data->dacq_pri != 0) {
+      if (nice(dacq_data->dacq_pri) == 0) {
+	fprintf(stderr, "%s:init -- bumped priority %d\n",
+		progname, dacq_data->dacq_pri);
+      } else {
+	ERROR("nice");
+	fprintf(stderr, "%s:init -- failed to change priority\n", progname);
+      }
     }
   }
   UNLOCK(semid);

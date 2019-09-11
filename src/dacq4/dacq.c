@@ -193,6 +193,15 @@ int dacq_start(char *server, char *tracker, char *port, char *elopt,
     }
   }
 
+  // NOTE: pype (ie, dacq.c) initializes all the shared memory
+  // and semaphores before starting the comedi_server process.
+  // As part of this initialization, the locking semaphore is
+  // initialized to 1. In order to take the lock, you have to
+  // then decrement the semaphore. This means that comedi_server
+  // will block at the first LOCK() if pype is not running.
+  //
+  // That's correct/fine -- unless you're trying to debug...
+
   if ((semid = psem_init(SEMKEY)) < 0) {
     perror("psem_init");
     fprintf(stderr, "dacq_start: can't init semaphore\n");

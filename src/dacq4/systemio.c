@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -69,15 +70,19 @@ void *shm_init(int *shmid)
   
   if ((*shmid = shmget((key_t)SHMKEY,
 		       sizeof(DACQINFO), 0666 | IPC_CREAT)) < 0) {
-    perror("shm_init");
+    perror("shm_init:shmget");
     return(NULL);
   }
   if ((datablock = shmat(*shmid, NULL, 0)) == NULL) {
-    perror("shm_init");
+    perror("shm_init:shmat");
     return(NULL);
   }
-  if (mlockall(MCL_CURRENT)) {
-    perror("shm_init");
+  if (geteuid() == 0) {
+    if (mlockall(MCL_CURRENT)) {
+      perror("shm_init:mlockall");
+    }
+  } else {
+    fprintf(stderr, "warning: mlockall() requires root access\n");
   }
   return(datablock);
 }

@@ -84,6 +84,11 @@ static char *port = NULL;
 static char *tracker = "none";
 static char *usbjs = NULL;
 
+// run w/o pype process
+static int standalone = 0;
+
+// debug mode
+static int debug = 0;
 
 #define ERROR(s) perror2(s, __FILE__, __LINE__)
 
@@ -395,7 +400,12 @@ int comedi_init()
   int n;
 
   if (!(comedi_dev = comedi_open(comedi_devname))) {
-    fprintf(stderr, "%s: can't find comedi board.\n", progname);
+    if (errno == EACCES) {
+      fprintf(stderr, "%s: can't access %s - check perms.\n", \
+	      progname, comedi_devname);
+    }else {
+      fprintf(stderr, "%s: can't find comedi board.\n", progname);
+    }
     return(0);
   }
   devname = comedi_get_driver_name(comedi_dev);
@@ -607,16 +617,33 @@ int mainloop_init()
     fprintf(stderr, "%s:init -- kernel compiled with SHM/IPC?\n", progname);
     exit(1);
   }
-  LOCK(semid);
+
+  // In order to LOCK(), the semaphore has to be initialized to 1, which
+  // happens in pype, before comedi_server gets started. If running
+  // stand alone, the LOCK() call below will block:
+
+  if (standalone) {
+    if (psem_set(semid, 1) < 0) {
+      perror("psem_init");
+      return(-1);
+    }
+  } else {
+    fprintf(stderr, "%s:init -- waiting for initial LOCK\n", progname);
+    LOCK(semid);
+    fprintf(stderr, "%s:init -- LOCKed\n", progname);
+  }
   dacq_data->elrestart = 0;
   dacq_data->server_pid = getpid();
-  if (dacq_data->dacq_pri != 0) {
-    if (nice(dacq_data->dacq_pri) == 0) {
-      fprintf(stderr, "%s:init -- bumped priority %d\n",
-	      progname, dacq_data->dacq_pri);
+  // only adjust priority if running as root
+  if (geteuid() == 0) {
+    if (dacq_data->dacq_pri != 0) {
+      if (nice(dacq_data->dacq_pri) == 0) {
+	fprintf(stderr, "%s:init -- bumped priority %d\n",
+		progname, dacq_data->dacq_pri);
     } else {
-      ERROR("nice");
-      fprintf(stderr, "%s:init -- failed to change priority\n", progname);
+	ERROR("nice");
+	fprintf(stderr, "%s:init -- failed to change priority\n", progname);
+      }
     }
   }
   UNLOCK(semid);
@@ -685,7 +712,7 @@ void mainloop(void)
 
   ncores = sysconf(_SC_NPROCESSORS_ONLN);
   if (ncores > 1 && locktocore(ncores - 1) >= 0) { 
-    fprintf(stderr, "%s: %d cores; locked to %d\n",
+    fprintf(stderr, "%s: %d cores; locked to core #%d\n",
 	    progname, ncores, ncores - 1);
   }
   /* initialize timestamp counter to 0 */  
@@ -1097,6 +1124,8 @@ int main(int ac, char **av)
       {"usbjs",   optional_argument, 0, 'j'}, /* dev file for usbjs */
       {"swapxy",  optional_argument, 0, 's'}, /* swap xy channels? */
       {"arange",  optional_argument, 0, 'a'}, /* set dacq analog range */
+      {"standalone",  no_argument,   0, 'x'}, /* standalone mode */
+      {"debug",   no_argument,       0, 'd'}, /* debug mode */
       {0, 0, 0, 0}
     };
 
@@ -1110,10 +1139,22 @@ int main(int ac, char **av)
 	  progname);
   fprintf(stderr, "%s: pid=%d\n", progname, getpid());
 
-  while ((c = getopt_long(ac, av, "t:p:e:c:j:s:a:",
+  while ((c = getopt_long(ac, av, "t:p:e:c:j:s:a:d:",
 			  long_options, &option_index)) != -1) {
     switch (c)
       {
+      case 'd':
+	for (char **arg = av; *arg != NULL; arg++) {
+	  if (arg != av) {
+	    fprintf(stderr, " ");
+	  }
+	  fprintf(stderr, "%s", *arg);
+	}
+	fprintf(stderr, "\n");
+	break;
+      case 'x':
+	standalone = 1;
+	break;
       case 't':
 	tracker = strcpy((char*)malloc(strlen(optarg)+1), optarg);
 	break;

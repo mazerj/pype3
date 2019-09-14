@@ -2584,7 +2584,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 # inject mouse position into 
                 dacq_set_xtracker(mx, my, 0)
 
-            # empty keybuffer in pygame window looking for
+            # check keyboard status in pygame window looking for
             # spacebar as proxy for bar up/down
             while 1:
                 key = self.fb.getkey(down=False)

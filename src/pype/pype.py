@@ -704,7 +704,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         trackertype = self.config.get('EYETRACKER', 'NONE')
         self.itribe = None
         self.eyemouse = None
-        self.spacebar = 0
+        self.proxybar = 0
         
         if trackertype == 'ISCAN':
             self.rig_common.set('eyetracker', trackertype)
@@ -2568,34 +2568,24 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                     while not self.fb.checkkeys() == []:
                         pass
 
+            (mx, my, b1, b2, b3, lshift, rshift) = self.fb.cursorpos()
             if self.eyemouse:
-                # Use framebuffer mouse position as eye position
-                # and button1 for bar state. Note that if you hold
-                # down both left and right shift keys, this aborts
-                # current trial and stops run immediately.
-                #
                 # mx,my are in physical coords (0-DPYW, 0-DPYH)
-                (mx, my, b1, b2, b3, lshift, rshift) = self.fb.cursorpos()
-                if self._allowabort and lshift and rshift:
-                    self.con("stopping run", color='red')
-                    self.running = 0
-                    raise UserAbort
-
-                # inject mouse position into 
+                # inject mouse position into dacq
                 dacq_set_xtracker(mx, my, 0)
 
-            # check keyboard status in pygame window looking for
-            # spacebar as proxy for bar up/down
-            while 1:
-                key = self.fb.getkey(down=False)
-                if key == 0:
-                    break
-                elif key == 32:
-                    self.spacebar = 1
+            # check to see if shift-key state (ss) has changed as 
+            # proxy for bar up/down
+            try:
+                ss = lshift or rshift
+                if not ss == self._lastss:
+                    self.proxybar = ss
+                    self._lastss = ss
                     self._int_handler(None, None, iclass=1, iarg=0)
-                elif key == -32:
-                    self.spacebar = 0
-                    self._int_handler(None, None, iclass=1, iarg=0)
+            except AttributeError:
+                # first time through...
+                self._lastss = ss
+                self.proxybar = ss
 
             x, y = self.eyepos()
             if (x is not None) and (y is not None):
@@ -2992,11 +2982,11 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
         """
 
-        # either physical bar or spacebar/mount-button should work
+        # either physical bar or proxybar/mount-button should work
         if self.flip_bar:
-            return (not self.spacebar or not dacq_bar())
+            return (not self.proxybar or not dacq_bar())
         else:
-            return (self.spacebar or dacq_bar())
+            return (self.proxybar or dacq_bar())
 
     def barup(self):
         """Query to see if touchbar is touched (aka 'down').

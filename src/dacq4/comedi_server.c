@@ -614,13 +614,14 @@ int mainloop_init()
   }
 
   if ((dacq_data = shm_init(&shmid)) == NULL ) {
-    fprintf(stderr, "%s:init -- kernel compiled with SHM/IPC?\n", progname);
+    fprintf(stderr, "%s_init: kernel compiled with SHM/IPC?\n", progname);
     exit(1);
   }
 
-  // In order to LOCK(), the semaphore has to be initialized to 1, which
-  // happens in pype, before comedi_server gets started. If running
-  // stand alone, the LOCK() call below will block:
+  // For LOCK()/UNLOCK() to work, semaphore has to be initialized to 1.
+  // This is usually done by pype, so the first LOCK() call will succeed
+  // once pype initializes the semaphore. In standalone mode, we need
+  // to do that here.
 
   if (standalone) {
     if (psem_set(semid, 1) < 0) {
@@ -628,29 +629,17 @@ int mainloop_init()
       return(-1);
     }
   } else {
-    fprintf(stderr, "%s:init -- waiting for initial LOCK\n", progname);
+    fprintf(stderr, "%s_init: waiting for initial LOCK()\n", progname);
     LOCK(semid);
-    fprintf(stderr, "%s:init -- LOCKed\n", progname);
+    fprintf(stderr, "%s_init: LOCK() success\n", progname);
   }
   dacq_data->elrestart = 0;
   dacq_data->server_pid = getpid();
-  // only adjust priority if running as root
-  if (geteuid() == 0) {
-    if (dacq_data->dacq_pri != 0) {
-      if (nice(dacq_data->dacq_pri) == 0) {
-	fprintf(stderr, "%s:init -- bumped priority %d\n",
-		progname, dacq_data->dacq_pri);
-    } else {
-	ERROR("nice");
-	fprintf(stderr, "%s:init -- failed to change priority\n", progname);
-      }
-    }
-  }
+  // UNLOCK here matches the LOCK() above -OR- the psem_set() call...
   UNLOCK(semid);
 
   return(1);
 }
-
 
 /* from das_common.c */
 
@@ -670,7 +659,7 @@ void iscan_init(char *dev)
 
 void mainloop(void)
 {
-  int i, ii, k, lastpri, setpri, last, eyenew, button;
+  int i, ii, k, lastpri, dosetpri, last, eyenew, button;
   int firstadc_chan, lastadc_chan;
   float rx, ry, lsx, lsy, x, y, z, pa, tx, ty, tp;
   unsigned int eyelink_t;
@@ -696,19 +685,21 @@ void mainloop(void)
   k = dacq_data->dacq_pri;
   UNLOCK(semid);
 
-  errno = 0;
-  if (setpriority(PRIO_PROCESS, 0, k) == 0 && errno == 0) {
-    fprintf(stderr, "%s: bumped priority %d\n", progname, k);
-    lastpri = k;
-    if (lastpri < 0) {
-      resched(1);
+  lastpri = dosetpri = 0;
+  if (geteuid() == 0) {
+    errno = 0;
+    if (setpriority(PRIO_PROCESS, 0, k) == 0 && errno == 0) {
+      fprintf(stderr, "%s: set priority %d\n", progname, k);
+      if (k < 0) {
+	resched(1);
+      }
+      lastpri = k;
+      dosetpri = 1;
+    } else {
+      fprintf(stderr, "%s: failed to change priority\n", progname);
     }
-    setpri = 1;
-  } else {
-    fprintf(stderr, "%s: failed to change priority\n", progname);
-    setpri = 0;
-    lastpri = 0;
   }
+
 
   ncores = sysconf(_SC_NPROCESSORS_ONLN);
   if (ncores > 1 && locktocore(ncores - 1) >= 0) { 
@@ -1076,19 +1067,23 @@ void mainloop(void)
       }
     }
 
-    /* possibly bump up or down priority on the fly */
-    LOCK(semid);
-    k = dacq_data->dacq_pri;
-    UNLOCK(semid);
-    if (setpri && lastpri != k) {
-      lastpri = k;
-      errno = 0;
-      if (setpriority(PRIO_PROCESS, 0, k) == -1 && errno) {
-	/* disable future priority changes */
-	setpri = 0;
-      }
-      if (lastpri < 0) {
-	resched(1);
+    /* if doing priority changes (root access etc)..*/
+    if (dosetpri) {
+      LOCK(semid);
+      k = dacq_data->dacq_pri;
+      UNLOCK(semid);
+      /* and requested dacq_pri has changed.... */
+      if (lastpri != k) {
+	errno = 0;
+	if (setpriority(PRIO_PROCESS, 0, k) == -1 && errno) {
+	  /* disable future priority changes */
+	  dosetpri = 0;
+	} else {
+	  if (k < 0) {
+	    resched(1);
+	  }
+	  lastpri = k;
+	}
       }
     }
     LOCK(semid);

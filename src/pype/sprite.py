@@ -674,7 +674,7 @@ class FrameBuffer(object):
 				keystroke to occur.
 
 		:param down: (boolean) boolean flag indicating whether to only
-				accept downstrokes (default is true)
+				accept downstrokes (default is true) - really down ONLY!
 
 		:return: keystroke value; negative for key-up, positive for
 				key-down, 0 if no keystrokes are available in the
@@ -692,8 +692,8 @@ class FrameBuffer(object):
 						events = pygame.event.get([KEYUP,KEYDOWN])
 					else:
 						events = pygame.event.get([KEYDOWN])
-					if len(events) > 0:
-						if events[0] == KEYUP:
+					if len(events):
+						if events[0].type == KEYUP:
 							c =	 -(events[0].key)
 						else:
 							c = events[0].key

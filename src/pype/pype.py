@@ -704,7 +704,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         trackertype = self.config.get('EYETRACKER', 'NONE')
         self.itribe = None
         self.eyemouse = None
-        self.eyebar = 0
+        self.spacebar = 0
         
         if trackertype == 'ISCAN':
             self.rig_common.set('eyetracker', trackertype)
@@ -2524,71 +2524,49 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 self._doabort = 0
                 raise UserAbort
 
-            # process keys from the TkInter GUI (user display etc)
+            # process keys from the TkInter GUI (user display etc) and
+            # from the framebuffer window (after executing, wait for
+            # key release for framebuffer keys -- sloppy, but works)
+            keys = self.fb.checkkeys()
             (c, ev) = self.tkkeyque.pop()
-            if c:
+            if c: keys.append(c)
+            for c in keys:
                 c = string.lower(c)
                 if c == 'escape':
                     if self._allowabort:
                         self.encode(ABORT)
                         self.con("[esc]", color='red')
+                        while not self.fb.checkkeys() == []:
+                            pass
                         raise UserAbort
                 elif c == 'f4':
                     self.con("[f4]", color='red')
                     self.reward()
+                    while not self.fb.checkkeys() == []:
+                        pass
                 elif c == 'f5':
                     self.con("[f5]", color='red')
                     if self.running:
                         self.running = 0
+                    while not self.fb.checkkeys() == []:
+                        pass
                 elif c == 'f6':
                     self.con("[f6]", color='red')
                     if self.running:
                         self.running = 0
+                    while not self.fb.checkkeys() == []:
+                        pass
                     raise UserAbort
                 elif c == 'f7' and self.running:
                     self.con("[f7]", color='red')
                     self.dotrialtag()
+                    while not self.fb.checkkeys() == []:
+                        pass
                 elif c == 'f8':
                     self.con("[f8]", color='red')
                     self.eyeshift(zero=1)
-                elif c == 'f1':
-                    self.con("[f1]", color='red')
-                    self._findparam()
-
-            # process keys from the framebuffer window
-            if 'f5' in self.fb.checkkeys():
-                self.con("{f5}", color='red')
-                if self.running:
-                    self.running = 0
-                while not self.fb.checkkeys() == []:
-                    pass
-            elif 'f6' in self.fb.checkkeys():
-                self.con("{f6}", color='red')
-                if self.running:
-                    self.running = 0
-                    raise UserAbort                
-                while not self.fb.checkkeys() == []:
-                    pass
-            elif 'f7' in self.fb.checkkeys():
-                self.con("{f7}", color='red')
-                if self.running:
-                    self.dotrialtag()
-                while not self.fb.checkkeys() == []:
-                    pass
-            elif 'f8' in self.fb.checkkeys():
-                self.con("{f8}", color='red')
-                self.eyeshift(zero=1)
-                # debounce: wait for keys to be released..
-                while not self.fb.checkkeys() == []:
-                    pass
-            elif 'escape' in self.fb.checkkeys():
-                if self._allowabort:
-                    self.encode(ABORT)
-                    self.con("{esc}", color='red')
-                    # debounce: wait for keys to be released..
                     while not self.fb.checkkeys() == []:
                         pass
-                    raise UserAbort
 
             if self.eyemouse:
                 # Use framebuffer mouse position as eye position
@@ -2605,30 +2583,18 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
                 # inject mouse position into 
                 dacq_set_xtracker(mx, my, 0)
-                try:
-                    # check to see if bar state has changed..
-                    if not b1 == self._lastb1:
-                        self.eyebar = b1        # stash for bardown() method
-                        self._lastb1 = b1       # maybe generate interupt
-                        self._int_handler(None, None, iclass=1, iarg=b1)
-                except AttributeError:
-                    # first time through -- initialize
-                    self._lastb1 = b1
-                    self.eyebar = b1
-                
-            while 0:
-                key = self.fb.getkey()
+
+            # empty keybuffer in pygame window looking for
+            # spacebar as proxy for bar up/down
+            while 1:
+                key = self.fb.getkey(down=False)
                 if key == 0:
                     break
-                elif key == 27 and self._allowabort:
-                    self.con("stopping run", color='red')
-                    self.running = 0
-                    raise UserAbort
-                elif self.eyemouse and key == 32:
-                    self.eyebar = 1
+                elif key == 32:
+                    self.spacebar = 1
                     self._int_handler(None, None, iclass=1, iarg=0)
-                elif self.eyemouse and key == -32:
-                    self.eyebar = 0
+                elif key == -32:
+                    self.spacebar = 0
                     self._int_handler(None, None, iclass=1, iarg=0)
 
             x, y = self.eyepos()
@@ -3025,16 +2991,12 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         """Query to see if touchbar is touched (aka 'down').
 
         """
+
+        # either physical bar or spacebar/mount-button should work
         if self.flip_bar:
-            if self.eyemouse:
-                return not self.eyebar
-            else:
-                return not dacq_bar()
+            return (not self.spacebar or not dacq_bar())
         else:
-            if self.eyemouse:
-                return self.eyebar
-            else:
-                return dacq_bar()
+            return (self.spacebar or dacq_bar())
 
     def barup(self):
         """Query to see if touchbar is touched (aka 'down').

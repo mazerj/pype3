@@ -2172,7 +2172,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
                 # make sure graphic display is visible
                 if self.psych:
-                    self.fb.screen_open()
+                    self.fb.screen_open(getfocus=1)
 
                 # call task-specific start function.
                 self.set_state(running=1)
@@ -2567,7 +2567,10 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                     self.eyeshift(zero=1)
                     while not self.fb.checkkeys() == []:
                         pass
-
+                elif c == 'f12':
+                    sys.stderr.write('\n[F12 PARACHUTE DEPLOYED]\n')
+                    sys.exit(0)
+                    
             (mx, my, b1, b2, b3, lshift, rshift) = self.fb.cursorpos()
             if self.eyemouse:
                 # mx,my are in physical coords (0-DPYW, 0-DPYH)

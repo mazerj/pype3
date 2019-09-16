@@ -302,7 +302,7 @@ class FrameBuffer(object):
 		# From here on out, use 'fullscreen' to track full screen mode
 		self.fullscreen =  self.flags & FULLSCREEN
 
-	def screen_open(self, init=0):
+	def screen_open(self, init=0, getfocus=0):
 		self.screen = pygame.display.set_mode((self.physicalw, self.physicalh),
 											  self.flags)
 		pygame.display.set_caption('framebuf')
@@ -322,6 +322,15 @@ class FrameBuffer(object):
 			ogl.glEnable(ogl.GL_TEXTURE_2D)
 			ogl.glEnable(ogl.GL_COLOR_MATERIAL)
 			bpp = pygame.display.gl_get_attribute(GL_DEPTH_SIZE)
+
+		if getfocus:
+			if not pygame.mouse.get_focused():
+				self.string(0, 0, 'position mouse in window to start', (1,255,1))
+				self.flip()
+				while not pygame.mouse.get_focused():
+					pygame.event.pump()
+					
+			
 
 	def screen_close(self):
 		# hide screen by making it tiny (homebrew iconify)

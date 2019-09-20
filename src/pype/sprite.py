@@ -330,11 +330,28 @@ class FrameBuffer(object):
 				while not pygame.mouse.get_focused():
 					pygame.event.pump()
 					
+		self._screen_visible = 1
+					
 			
 
 	def screen_close(self):
 		# hide screen by making it tiny (homebrew iconify)
-		self.screen = pygame.display.set_mode((1,1), self.flags)
+		# - if in fullscreen mode, then we need to switch to windowed
+		#   mode at the same time. screen_open() will restore back
+		#   to fullscreen mode automatically
+		if self.flags & FULLSCREEN:
+			f = self.flags & ~FULLSCREEN
+		else:
+			f = self.flags
+		self.screen = pygame.display.set_mode((1,1), f)
+		self._screen_visible = 0
+
+	def screen_toggle(self):
+		if self._screen_visible:
+			self.screen_close()
+		else:
+			self.screen_open()
+		
 
 	def __del__(self):
 		"""FrameBuffer cleanup.
@@ -459,30 +476,6 @@ class FrameBuffer(object):
 				k & pygame.KMOD_LSHIFT,
 				k & pygame.KMOD_RSHIFT,)
 				
-
-	def togglefs(self, wait=0):
-		pygame.event.clear()
-		pygame.display.toggle_fullscreen()
-		while 1:
-			# wait for an expose event to indicate the switch has
-			# completed (resync/redraw/etc)
-			e = pygame.event.poll()
-			if e.type == pygame.VIDEOEXPOSE:
-				break
-
-		self.fullscreen = not self.fullscreen
-
-		if wait and self.fullscreen:
-			self.clear()
-			self.string(0, 0, '[hit key/button to clear]', (255,255,255))
-			self.flip()
-			while len(self.checkkeys()) == 0:
-				if self.app and self.app.joybut(0):
-					break
-			self.clear()
-			self.flip()
-			pygame.event.clear()
-
 	def sync(self, state, flip=None):
 		"""Draw/set sync pulse sprite.
 

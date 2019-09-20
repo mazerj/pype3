@@ -365,15 +365,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         if self.psych:
             Logger("pype: psych mode")
 
-        # FULLSCREEN's really shouldn't be used for anything except
-        # dedicated xserver's for physiology. The following tried
-        # to prevent you from locking up a single-headed machine
-        # by starting in fullscreen mode:
-        if (self.config.iget('FULLSCREEN') and
-               self.config.get('SDLDPY') == os.environ['DISPLAY']):
-            self.config.set('FULLSCREEN', '0', override=1)
-            Logger("pype: FULLSCREEN ignored -- single display mode")
-
         # you can set debug mode by:
         #   - running with --debug argument
         #   - setenv PYPEDEBUG=1
@@ -2567,9 +2558,14 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                     self.eyeshift(zero=1)
                     while not self.fb.checkkeys() == []:
                         pass
+                elif c == 'f9':
+                    self.fb.screen_toggle()
+                    while not self.fb.checkkeys() == []:
+                        pass
                 elif c == 'f12':
                     sys.stderr.write('\n[F12 PARACHUTE DEPLOYED]\n')
                     sys.exit(0)
+                    
                     
             (mx, my, b1, b2, b3, lshift, rshift) = self.fb.cursorpos()
             if self.eyemouse:

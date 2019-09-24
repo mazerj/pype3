@@ -303,9 +303,17 @@ class FrameBuffer(object):
 		self.fullscreen =  self.flags & FULLSCREEN
 
 	def screen_open(self, init=0, getfocus=0):
+		"""Initialize the pygame framebuffer.
+
+		
+		- This should be called exactly once with init=1.
+		- If `getfocus`, then wait for user to move mouse into window
+		  before returning. This is for psychophysics/eyemouse mode.
+		
+		"""
+		
 		self.screen = pygame.display.set_mode((self.physicalw, self.physicalh),
 											  self.flags)
-		pygame.display.set_caption('framebuf')
 
 		if init:
 			# initialize OpenGL subsystem
@@ -323,35 +331,36 @@ class FrameBuffer(object):
 			ogl.glEnable(ogl.GL_COLOR_MATERIAL)
 			bpp = pygame.display.gl_get_attribute(GL_DEPTH_SIZE)
 
+			pygame.display.set_caption('framebuf')
+			
+
 		if getfocus:
 			if not pygame.mouse.get_focused():
-				self.string(0, 0, 'position mouse in window to start', (1,255,1))
+				self.clear((1,100,1))
+				self.string(0, 0, 'move mouse into window to start',
+							(255,255,255))
 				self.flip()
 				while not pygame.mouse.get_focused():
 					pygame.event.pump()
-					
+			
 		self._screen_visible = 1
 					
-			
 
-	def screen_close(self):
-		# hide screen by making it tiny (homebrew iconify)
-		# - if in fullscreen mode, then we need to switch to windowed
-		#   mode at the same time. screen_open() will restore back
-		#   to fullscreen mode automatically
+	def screen_minimize(self):
+		# homebrew iconify: hide screen by making it small and
+		# non-fullscreen
 		if self.flags & FULLSCREEN:
 			f = self.flags & ~FULLSCREEN
 		else:
 			f = self.flags
-		self.screen = pygame.display.set_mode((1,1), f)
+		self.screen = pygame.display.set_mode((100,100), f)
 		self._screen_visible = 0
 
 	def screen_toggle(self):
 		if self._screen_visible:
-			self.screen_close()
+			self.screen_minimize()
 		else:
 			self.screen_open()
-		
 
 	def __del__(self):
 		"""FrameBuffer cleanup.
@@ -788,7 +797,7 @@ class FrameBuffer(object):
 
 		s = self._font[size].render(s, 0, color)
 		if not bg is None:
-			self.rectangle(x, y, s.get_width()*1.1, s.get_height*1.1,
+			self.rectangle(x, y, s.get_width()*1.1, s.get_height()*1.1,
 						   bg, width=0)
 
 		tex = _texture_create(pygame.image.tostring(s, 'RGBA', 1),

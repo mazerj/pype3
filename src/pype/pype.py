@@ -481,7 +481,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         mb.addmenuitem('Misc', 'command', label='show framebuffer',
                        command=lambda s=self: s.fb.screen_open())
         mb.addmenuitem('Misc', 'command', label='hide framebuffer',
-                       command=lambda s=self: s.fb.screen_close())
+                       command=lambda s=self: s.fb.screen_minimize())
         mb.addmenuitem('Misc', 'separator')
         if 0:
             mb.addmenuitem('Misc', 'command', label='Drain juice',
@@ -1092,7 +1092,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         self._show_stateinfo()
 
         if self.psych:
-            self.fb.screen_close()
+            self.fb.screen_minimize()
 
         if self.itribe:
             self.itribe.start()
@@ -2176,7 +2176,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 self.set_state(running=0)
                 self.warn_run_stop()
                 if self.psych:
-                    self.fb.screen_close()
+                    self.fb.screen_minimize()
 
                 # either there was an error OR the task
                 # completed normally, ensure proper cleanup

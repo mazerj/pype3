@@ -24,15 +24,15 @@ Author -- James A. Mazer (mazerj@gmail.com)
 
 """
 
-from Tkinter import *
+from tkinter import *
 import Pmw
 import string
 import types
 import re
 import os
 import posixpath
-import cPickle
-import ConfigParser
+import pickle
+import configparser
 import numpy as np
 
 import pype
@@ -53,7 +53,7 @@ _KEEPLOCKED = -1
 def _unpack_slot(slot):
 	(name, default, validate, descr, runlock) = [None] * 5
 	if len(slot) < 1:
-		raise FatalPypeError, 'ptable:_unpack_slot bad worksheet slot'
+		raise FatalPypeError('ptable:_unpack_slot bad worksheet slot')
 	name = slot[0]
 	if len(slot) > 1: default = slot[1]
 	if len(slot) > 2: validate = slot[2]
@@ -134,7 +134,7 @@ class ParamTable(object):
 			if default is None and validate is None:
 				e = Label(lf, text=name, bg='yellow', anchor=W)
 				e.pack(expand=1, fill=X)
-			elif isinstance(validate, types.TupleType):
+			elif isinstance(validate, tuple):
 				tmpf = Frame(lf, height=12, width=12)
 				tmpf.pack(side=LEFT)
 				e = Pmw.RadioSelect(lf,
@@ -148,7 +148,7 @@ class ParamTable(object):
 				e.invoke(default)
 				self._entries[name] = e
 				entries.append(e)
-			elif isinstance(validate, types.DictType):
+			elif isinstance(validate, dict):
 				tmpf = Frame(lf, height=12, width=12)
 				tmpf.pack(side=LEFT)
 				e = Pmw.RadioSelect(lf,
@@ -285,9 +285,9 @@ class ParamTable(object):
 				# to the evaluated version for future reference..  only do
 				# this if evaluating
 				d[name+'_raw_'] = v
-				if validate and not (isinstance(validate, types.TupleType) or
-									 isinstance(validate, types.DictType)):
-					(r, v) = apply(validate, (v,), {"evaluate": 1})
+				if validate and not (isinstance(validate, tuple) or
+									 isinstance(validate, dict)):
+					(r, v) = validate(*(v,), **{"evaluate": 1})
 					if (runlock == _KEEPLOCKED) and not readonly:
 						continue
 					elif r != VALID:
@@ -319,7 +319,7 @@ class ParamTable(object):
 		"""Get list of keys (ie, row names) for this table/
 
 		"""
-		return self._entries.keys()
+		return list(self._entries.keys())
 
 	def query(self, qname):
 		"""Retrieve single value from the parameter table by name
@@ -355,11 +355,11 @@ class ParamTable(object):
 				continue
 			if name is qname:
 				v = self.query(name)
-				if validate and not (isinstance(validate, types.TupleType) or
-									 isinstance(validate, types.DictType)):
-					(r, v) = apply(validate, (v,), {"evaluate": 1})
+				if validate and not (isinstance(validate, tuple) or
+									 isinstance(validate, dict)):
+					(r, v) = validate(*(v,), **{"evaluate": 1})
 					if r != VALID:
-						(r, v) = apply(validate, (default,), {"evaluate": 1})
+						(r, v) = validate(*(default,), **{"evaluate": 1})
 				return v
 		warn('ptable:queryv',
 			 'No value associated with "%s".' % qname)
@@ -396,10 +396,10 @@ class ParamTable(object):
 
 		(ok, x) = self._get(evaluate=0)
 
-		c = ConfigParser.ConfigParser()
+		c = configparser.ConfigParser()
 		c.add_section('params')
 		c.add_section('locks')
-		for k in x.keys():
+		for k in list(x.keys()):
 			c.set('params', k, x[k])
 			if k in self._locks:
 				if self._locks[k] == DISABLED:
@@ -467,7 +467,7 @@ class ParamTable(object):
 		except IOError:
 			return 0
 
-		c = ConfigParser.ConfigParser()
+		c = configparser.ConfigParser()
 		try:
 			c.readfp(f)
 		except:
@@ -487,11 +487,11 @@ class ParamTable(object):
 								 (os.path.basename(file), name))
 				val = default
 
-			if isinstance(validate, types.TupleType):
+			if isinstance(validate, tuple):
 				try: self._entries[name].invoke(val)
 				except ValueError: pass
-			elif isinstance(validate, types.DictType):
-				for k in validate.keys():
+			elif isinstance(validate, dict):
+				for k in list(validate.keys()):
 					if '%s'%validate[k] == val:
 						try: self._entries[name].invoke(k)
 						except ValueError: pass
@@ -511,9 +511,9 @@ class ParamTable(object):
 		"""
 		try:
 			f = open(file, 'r')
-			x = cPickle.load(f)
+			x = pickle.load(f)
 			try:
-				locks = cPickle.load(f)
+				locks = pickle.load(f)
 			except EOFError:
 				locks = {}
 			f.close()
@@ -521,8 +521,8 @@ class ParamTable(object):
 				(name, default, validate, descr, runlock) = _unpack_slot(slot)
 				if default is None:
 					continue
-				if (isinstance(validate, types.TupleType) or
-					isinstance(validate, types.DictType)):
+				if (isinstance(validate, tuple) or
+					isinstance(validate, dict)):
 					self._entries[name].invoke(x[name])
 				else:
 					try:
@@ -530,7 +530,7 @@ class ParamTable(object):
 					except KeyError:
 						pass
 
-			for k in locks.keys():
+			for k in list(locks.keys()):
 				self.lockfield(k, state=locks[k])
 
 			return 1
@@ -559,15 +559,15 @@ class ParamTable(object):
 				(name, default, validate, descr, runlock) = _unpack_slot(slot)
 				if default is None:
 					continue
-				if (isinstance(validate, types.TupleType) or
-					isinstance(validate, types.DictType)):
+				if (isinstance(validate, tuple) or
+					isinstance(validate, dict)):
 					self._entries[name].invoke(x[name])
 				else:
 					try:
 						self._entries[name].setentry(x[name])
 					except KeyError:
 						pass
-			for k in locks.keys():
+			for k in list(locks.keys()):
 				if len(locks[k]) > 0:
 					self.lockfield(k, state=locks[k])
 			return 1
@@ -587,8 +587,8 @@ class ParamTable(object):
 			rec = pf.nth(0)
 			if rec:
 				s = ''
-				keys = rec.params.keys()
-				for k in self.keys():
+				keys = list(rec.params.keys())
+				for k in list(self.keys()):
 					kraw = k + '_raw_'
 					if kraw in keys:
 						s = s + '%s = %s --> %s\n' % (k, self.query(k),
@@ -968,15 +968,14 @@ def is_rgba2(s, evaluate=None, meanlum=(128,128,128)):
 	l, r = None, INVALID
 	try:
 		l = tuple(eval(s))
-		if all(map(lambda x: x>=0 and x<=1, l)):
+		if all([x>=0 and x<=1 for x in l]):
 			r = VALID
 			if len(l) == 3:
 				l = l + (1.0,)
 	except SyntaxError:
 		pass
 
-	l = map(lambda x: int(x[0] + (255 * (x[1] - 0.5))),
-			zip(meanlum, x)) + (l[3],)
+	l = [int(x[0] + (255 * (x[1] - 0.5))) for x in zip(meanlum, x)] + (l[3],)
 	if evaluate:
 		return (r, l)
 	return r
@@ -1097,7 +1096,7 @@ def is_cdf(s, evaluate=None):
 		try:
 			i = eval(s)
 			val = []
-			if isinstance(i, types.ListType):
+			if isinstance(i, list):
 				sum = 0.0
 				for f in i:
 					sum = sum + float(f)
@@ -1146,7 +1145,7 @@ def is_pdf(s, evaluate=None):
 			try:
 				i = eval(s)
 				val = []
-				if isinstance(i, types.ListType):
+				if isinstance(i, list):
 					sum = 0.0
 					for f in i:
 						sum = sum + float(f)
@@ -1176,9 +1175,9 @@ def is_list(s, evaluate=None):
 		if len(v) > 1:
 			if s[0] == '=':
 				inc = 1
-				v = map(int, s[1:].split(':'))
+				v = list(map(int, s[1:].split(':')))
 			else:
-				v = map(int, s.split(':'))
+				v = list(map(int, s.split(':')))
 				inc = 0
 			if len(v) < 3:
 				stride = 1
@@ -1186,9 +1185,9 @@ def is_list(s, evaluate=None):
 				stride = v[2]
 			r = VALID
 			if inc:
-				val = range(v[0], v[1]+1, stride);
+				val = list(range(v[0], v[1]+1, stride));
 			else:
-				val = range(v[0], v[1], stride);
+				val = list(range(v[0], v[1], stride));
 			if evaluate:
 				return (r, val)
 			return r
@@ -1197,7 +1196,7 @@ def is_list(s, evaluate=None):
 
 	try:
 		val = eval(s)
-		if isinstance(val, types.ListType):
+		if isinstance(val, list):
 			r = VALID
 		else:
 			r = INVALID

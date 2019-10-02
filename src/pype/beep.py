@@ -140,10 +140,10 @@ def warble(base, t, volume=1, fmper=25, driver=None):
 
 
 if	__name__ == '__main__':
-	print "start"
+	print("start")
 	beep(1000, 50)
 	beep(500, 50)
-	print "quitting"
+	print("quitting")
 	while pygame.mixer.get_busy():
 		pygame.mixer.quit()
-	print "done."
+	print("done.")

@@ -61,15 +61,15 @@ class Config(object):
 			self.docdict[key] = doc
 
 	def keys(self):
-		return self.dict.keys()
+		return list(self.dict.keys())
 
 	def show(self, f):
-		keys = self.dict.keys()
+		keys = list(self.dict.keys())
 		keys.sort()
 		for k in keys:
 			v = self.dict[k]
 			vt = type(v)
-			if (vt is types.StringType) and len(v) == 0:
+			if (vt is bytes) and len(v) == 0:
 				f.write('\t%s=<empty string>\n' % k)
 			else:
 				f.write('\t%s=%s %s\n' % (k, v, vt))

@@ -55,18 +55,18 @@ class Optix():
 
     def readstr(self, cmd):
         # is is a string of form ..results...\r<NN>, where NN is result code..
-        s = string.join(map(chr, self.read(cmd)), '')
+        s = string.join(list(map(chr, self.read(cmd))), '')
         return s
         
     def XYZ(self):
         s = self.readstr('0201RM')
         s = string.strip(string.split(s, '\r')[0])
-        return map(float,string.split(s)[1::2])
+        return list(map(float,string.split(s)[1::2]))
     
     def Yxy(self):
         s = self.readstr('0301RM')
         s = string.strip(string.split(s, '\r')[0])
-        return map(float,string.split(s)[1::2])
+        return list(map(float,string.split(s)[1::2]))
 
     def set_mode(self, lcd=1):
         if lcd:
@@ -85,6 +85,6 @@ class Optix():
 if __name__ == '__main__':
     o = Optix()
     o.clear()
-    print o.id()
-    print 'Yxy', o.Yxy()
-    print 'XYZ', o.XYZ()
+    print(o.id())
+    print('Yxy', o.Yxy())
+    print('XYZ', o.XYZ())

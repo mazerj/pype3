@@ -43,7 +43,7 @@ DEBUG = False
 import sys, errno
 
 if sys.version_info[0] == 2:
-    import Queue as q
+    import queue as q
 else:
     import queue as q
 
@@ -512,7 +512,7 @@ class EyeTribe():
                         try:
                             r = self._sock.recv(EyeTribe.etm_buffer_size)
                             break
-                        except socket.error, e:
+                        except socket.error as e:
                             if e.errno != errno.EINTR:
                                 raise
 
@@ -772,13 +772,13 @@ if __name__ == "__main__":
     tracker.connect()
 
     tracker.pullmode()
-    n = tracker.next()
+    n = next(tracker)
     t0 = n.time
     et0 = n.etime
     
     while 1:
-        n = tracker.next()
-        print '%s %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f' % \
+        n = next(tracker)
+        print('%s %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f' % \
           (n.statestr(), n.time-t0, n.etime-et0,
-           n.lefteye.raw.x, n.lefteye.raw.y, n.righteye.raw.x, n.righteye.raw.y)
+           n.lefteye.raw.x, n.lefteye.raw.y, n.righteye.raw.x, n.righteye.raw.y))
 

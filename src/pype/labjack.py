@@ -313,18 +313,18 @@ if __name__ == "__main__":
 
 		(rawts, ts, rect, a0, a1, a2, a3,) = s.get()
 
-		print 'rects,u3clk,hostclk,a0,a1,a2,a3'
+		print('rects,u3clk,hostclk,a0,a1,a2,a3')
 		for n in range(len(rawts)):
-			print '%.2f,%.2f,%.2f,%f,%f,%f,%f' % \
+			print('%.2f,%.2f,%.2f,%f,%f,%f,%f' % \
 				  (1000*rect[n], 1000*rawts[n], 1000*ts[n], \
-				   a0[n], a1[n], a2[n], a3[n],)
+				   a0[n], a1[n], a2[n], a3[n],))
 
 		if s.errorcount:
 			sys.stderr.write('%d errors!\n' % s.errorcount)
 
 
 	except KeyboardInterrupt:
-		print 'shutting down'
+		print('shutting down')
 		k = s.d.getFeedback(u3.BitStateWrite(4, 0),
 							u3.BitStateWrite(5, 1),)
 		s.stop(wait=1)

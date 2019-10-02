@@ -10,7 +10,7 @@ import os
 import time
 import traceback
 import socket
-import cPickle
+import pickle
 import struct
 import types
 
@@ -42,7 +42,7 @@ class _Socket(object):
 	def Receive(self, size=8192):
 		buf = self.conn.recv(struct.calcsize('!I'))
 		if not len(buf):
-			raise EOFError, '_Socket.Receive()'
+			raise EOFError('_Socket.Receive()')
 		else:
 			N = struct.unpack('!I', buf)[0]
 			data = ''
@@ -133,13 +133,13 @@ class TTankServer(object):
 			self.log('Received connection from %s' % server.remoteHost)
 
 			if not self.connect():
-				raise TDTError, 'TTank.X ActiveX control not installed'
+				raise TDTError('TTank.X ActiveX control not installed')
 
 
 			self.log('Recieving commands')
 			while 1:
 				try:
-					x = cPickle.loads(server.Receive())
+					x = pickle.loads(server.Receive())
 				except EOFError:
 					# client closed connection
 					break
@@ -149,7 +149,7 @@ class TTankServer(object):
 					ok = 1
 					(obj, method, args) = x
 					fn = eval('%s.%s' % (obj, method))
-					result = apply(fn, args)
+					result = fn(*args)
 				except:
 					# send error info back to client for debugging..
 					ok = None
@@ -157,14 +157,14 @@ class TTankServer(object):
 					##???: traceback.print_tb(tb)
 				ete = time.time() - tic
 				tic = time.time()
-				server.Send(cPickle.dumps((ok, result)))
+				server.Send(pickle.dumps((ok, result)))
 				ett = time.time() - tic
 				self.log('[%.0f/%.0f ms eval/xmit]' % (1000*ete, 1000*ett,))
 				if DEBUG:
 					self.log('(%s,??) <- ..%s..' % (ok, x[1]))
 
 				if ok is None:
-					self.log(sys.exc_value)
+					self.log(sys.exc_info()[1])
 
 			self.log('Client closed connection.')
 			self.disconnect()
@@ -178,7 +178,7 @@ class TTank(object):
 		try:
 			self.client.Connect(self.server)
 		except socket.error:
-			raise TDTError, 'TTank server @ %s not available' % self.server
+			raise TDTError('TTank server @ %s not available' % self.server)
 
 	def __repr__(self):
 		return '<TTank server=%s>' % (self.server,)
@@ -207,9 +207,9 @@ class TTank(object):
 		data typing should be correctly preserved and propagated.
 		"""
 		try:
-			self.client.Send(cPickle.dumps(cmdtuple))
+			self.client.Send(pickle.dumps(cmdtuple))
 			p = self.client.Receive()
-			(ok, result) = cPickle.loads(p)
+			(ok, result) = pickle.loads(p)
 		finally:
 			pass
 		return (ok, result)
@@ -219,7 +219,7 @@ class TTank(object):
 		if ok:
 			return result
 		else:
-			raise TDTError, 'TTank Error; cmd=<%s>; err=<%s>' % (method, result)
+			raise TDTError('TTank Error; cmd=<%s>; err=<%s>' % (method, result))
 
 def loopforever():
 	try:
@@ -236,7 +236,7 @@ def loopforever():
 		except:
 			s.log('-----------------------------')
 			s.log('Server-side near fatal error in loopforever:')
-			s.log(sys.exc_value)
+			s.log(sys.exc_info()[1])
 			s.log('-----------------------------')
 			s.disconnect()
 			sys.stdout.write('<hit enter>')

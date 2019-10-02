@@ -13,7 +13,7 @@ Author -- James A. Mazer (mazerj@gmail.com)
 
 import time
 import string
-from Tkinter import *
+from tkinter import *
 import Pmw
 
 _viewed_warnings = {}
@@ -29,7 +29,7 @@ class DockWindow(Toplevel):
 	def __init__(self, checkbutton=None, title=None, iconname=None, **kw):
 		import pype
 
-		apply(Toplevel.__init__, (self,), kw)
+		Toplevel.__init__(*(self,), **kw)
 
 		if title:
 			self.title(title)
@@ -75,7 +75,7 @@ class DockWindow(Toplevel):
 
 class TaskNotebook(DockWindow):
 	def __init__(self, **options):
-		apply(DockWindow.__init__, (self,), options)
+		DockWindow.__init__(*(self,), **options)
 
 		notebook = Pmw.NoteBook(self)
 		notebook.pack(expand=1, fill=BOTH)
@@ -148,7 +148,7 @@ class ConsoleWindow(Toplevel):
 	def __init__(self, title='ConsoleWindow', iconname='Console',
 				 font=('Courier',), bg='gray75', **kw):
 
-		apply(Toplevel.__init__, (self,), kw)
+		Toplevel.__init__(*(self,), **kw)
 		if title:
 			self.title(title)
 		if iconname:
@@ -230,7 +230,7 @@ class Dialog_(Toplevel):
 				 astext=None, title=None, iconname=None, grab=1,
 				 **kw):
 
-		apply(Toplevel.__init__, (self,), kw)
+		Toplevel.__init__(*(self,), **kw)
 
 		if title:
 			self.title(title)
@@ -296,7 +296,7 @@ class TextWin(Toplevel):
 	"""Transient (aka popup) text window.
 	"""
 	def __init__(self, title=None, iconname=None, **kw):
-		apply(Toplevel.__init__, (self,), {})
+		Toplevel.__init__(*(self,), **{})
 		if title:
 			self.title(title)
 		if iconname:
@@ -305,7 +305,7 @@ class TextWin(Toplevel):
 		self.transient(self.parent)
 		self.m = Text(self, font=('Courier', 10))
 		self.m.pack(expand=0)
-		apply(self.m.configure, (self.m,), kw)
+		self.m.configure(*(self.m,), **kw)
 		self.lastmsg_ = None
 		
 		self.protocol("WM_DELETE_WINDOW", lambda s=self: s.withdraw())
@@ -480,7 +480,7 @@ class ProgressBar(object):
 
 	def __init__(self, width=200, height=22, doLabel=None, labelText="",
 				 value=0, title='Working', min=0, max=100):
-		from Tkinter import _default_root
+		from tkinter import _default_root
 
 		if _default_root is None:
 			root = Tk()

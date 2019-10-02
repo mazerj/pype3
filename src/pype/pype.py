@@ -19,18 +19,18 @@ import os
 import posixpath
 import posix
 import time
-import thread
+import _thread
 import string
 import re
 import socket
 import asyncore
 import threading
 import glob
-import cPickle
+import pickle
 import math
 import numpy as np
 
-import Tkinter
+import tkinter
 
 # THIS IS UGLY! There are somethings you can't/shouldn't do suid-root:
 #
@@ -67,7 +67,7 @@ finally:
     del euid
 
 from types import *
-from Tkinter import *
+from tkinter import *
 import Pmw
 
 #####################################################################
@@ -401,7 +401,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         self.record_file = None
         self._last_eyepos = 0
         self._allowabort = 0
-        self._rewardlock = thread.allocate_lock()
+        self._rewardlock = _thread.allocate_lock()
         self._eye_x = 0
         self._eye_y = 0
         self._eyetarg_x = 0
@@ -1146,7 +1146,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             ask('migrate_pypestate', 'Automigrate %s?' %
                 fname, ['yes', 'no']) == 0):
             try:
-                d = cPickle.load(open(fname, 'r'))
+                d = pickle.load(open(fname, 'r'))
                 self.tallycount = d['tallycount']
                 self._tally()
                 # ppd's here are because previously this was set in the
@@ -1230,9 +1230,9 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             rec = pf.nth(0)
             if rec:
                 s = 'from: %s\n\n' % file
-                avoid = self.sub_common.keys() + \
-                  self.rig_common.keys() + self.ical.keys()
-                keys = rec.params.keys()
+                avoid = list(self.sub_common.keys()) + \
+                  list(self.rig_common.keys()) + list(self.ical.keys())
+                keys = list(rec.params.keys())
                 keys.sort()
                 for p in keys:
                     if p.endswith('_raw_'):
@@ -1385,7 +1385,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             self.tallycount = {}
         elif not cleartask is None:
             # just clear current task data
-            for (task,type) in self.tallycount.keys():
+            for (task,type) in list(self.tallycount.keys()):
                 if ctask == task:
                     del self.tallycount[(task,type)]
         elif not type is None:
@@ -1407,11 +1407,11 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 self.tallycount['reward_n'] = 1
                 self.tallycount['reward_ms'] = reward
 
-        ks = self.tallycount.keys()
+        ks = list(self.tallycount.keys())
         ks.sort()
 
         (ntot, ncorr, s) = (0, 0, '')
-        keys = self.tallycount.keys()
+        keys = list(self.tallycount.keys())
         keys.sort()
         for k in keys:
             if not len(k) == 2: continue
@@ -1813,7 +1813,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         if not rot is None: self.ical.set('rot_', '%f' % rot)
         if not affine is None:
             # convert 3x3 matrix into CSV string for param table storage
-            a = string.join(map(lambda f: '%g'%f, affine.flatten()), ',')
+            a = string.join(['%g'%f for f in affine.flatten()], ',')
             self.ical.set('affinem_', a)
 
         dacq_eye_smooth(self.rig_common.queryv('eye_smooth'))
@@ -1835,7 +1835,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         # and need to be in ETUs.. so forget it for now..
 
         try:
-            A = map(float, self.ical.query('affinem_').split(','))
+            A = list(map(float, self.ical.query('affinem_').split(',')))
             A = np.array(A).reshape(3,3)
             for r in range(3):
                 for c in range(3):
@@ -1947,7 +1947,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
         self.fb.app = self
         gstr = self.config.get('GAMMA')
-        g = map(float, gstr.split(','))
+        g = list(map(float, gstr.split(',')))
         if len(g) == 1:
             g = [g[0], g[0], g[0]]
         if self.fb.set_gamma(g[0], g[1], g[2]):
@@ -1999,11 +1999,11 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 age = -1
         try:
             if save:
-                cPickle.dump(self.tallycount, open(fname, 'w'))
+                pickle.dump(self.tallycount, open(fname, 'w'))
             else:
                 if age < 0.5 or ask('loadstate', 'Clear old tally data?',
                                     ['yes', 'no']) == 1:
-                    self.tallycount = cPickle.load(open(fname, 'r'))
+                    self.tallycount = pickle.load(open(fname, 'r'))
         except IOError:
             Logger("Can't read/write tally file.\n")
 
@@ -2090,7 +2090,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 w.config(state=DISABLED)
             self.running = 0
         else:
-            if (os.stat(self._task_pathname).st_mtime <> self._task_mtime and
+            if (os.stat(self._task_pathname).st_mtime != self._task_mtime and
                 ask('run task', 'Task has changed\nRun anyway?',
                     ['yes', 'no']) == 1):
                 return
@@ -2725,7 +2725,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                     break
             if dobeep and self.reward_beep:
                 beep(1000, 40, wait=0)
-            thread.start_new_thread(self._reward_finisher, (t,))
+            _thread.start_new_thread(self._reward_finisher, (t,))
             if self.tk:
                 self.con("[ran-reward=%dms]" % t, color='black')
             actual_reward_size = t
@@ -3043,7 +3043,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 self._winpos = {}
         elif load:
             try:
-                self._winpos = cPickle.load(open(filename, 'r'))
+                self._winpos = pickle.load(open(filename, 'r'))
             except IOError:
                 self._winpos = {}
                 pass
@@ -3053,7 +3053,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         elif save:
             wlist = []
             wlist.append(self.tk)
-            for k in self.tk.children.keys():
+            for k in list(self.tk.children.keys()):
                 wlist.append(self.tk.children[k])
 
             for w in wlist:
@@ -3064,7 +3064,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 except AttributeError:
                     pass
 
-                cPickle.dump(self._winpos, open(filename, 'w'))
+                pickle.dump(self._winpos, open(filename, 'w'))
         else:
             try:
                 geo = self._winpos[w.title()]
@@ -4610,7 +4610,7 @@ class SimplePlotWindow(Toplevel):
         from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
         from matplotlib.figure import Figure
 
-        apply(Toplevel.__init__, (self,), kw)
+        Toplevel.__init__(*(self,), **kw)
 
         self.title(name)
         self.fig = Figure()
@@ -4638,7 +4638,7 @@ class EyeTribeThreadRunner(object):
         self.poll()
 
     def poll(self):
-        self.e = self.h.next()
+        self.e = next(self.h)
         self.status = self.e.statestr()
         self.x = int(round(self.e.raw.x))
         self.y = -int(round(self.e.raw.y))
@@ -4651,7 +4651,7 @@ class EyeTribeThreadRunner(object):
 
     def start(self):
         Logger('pype: starting itribe thread\b');
-        thread.start_new_thread(self.run, ())
+        _thread.start_new_thread(self.run, ())
             
 
 def show_about(file, timeout=None):

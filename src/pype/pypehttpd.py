@@ -5,7 +5,7 @@ import threading
 import socket
 import string
 import time
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pype import getapp
 #from guitools import Logger
 

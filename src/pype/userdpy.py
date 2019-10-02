@@ -14,10 +14,10 @@ import os
 import sys
 import time
 import string
-import cPickle
+import pickle
 import math
-from Tkinter import *
-from tkSimpleDialog import askstring
+from tkinter import *
+from tkinter.simpledialog import askstring
 
 import Pmw
 
@@ -567,7 +567,7 @@ class UserDisplay(object):
 					  initialvalue='%d,%d,%d,%d' % (cx, cy, w, h))
 		if s is None: return
 		try:
-			s = map(int, s.split(','))
+			s = list(map(int, s.split(',')))
 		except ValueError:
 			return
 		if len(s) == 3:
@@ -584,7 +584,7 @@ class UserDisplay(object):
 		self.drawbox()
 
 	def savebox(self):
-		import cPickle
+		import pickle
 
 		(file, mode) = SaveAs(initialdir=os.getcwd(),
 							  pattern='*.box',
@@ -593,10 +593,10 @@ class UserDisplay(object):
 
 		if not (file is None):
 			with open(file, 'w') as f:
-				cPickle.dump(self.markstack, f)
+				pickle.dump(self.markstack, f)
 		
 	def loadbox(self):
-		import cPickle
+		import pickle
 		
 		(file, mode) = filebox.Open(initialdir=os.getcwd(),
 										pattern="*.box",
@@ -604,7 +604,7 @@ class UserDisplay(object):
 
 		if not (file is None):
 			with open(file, 'r') as f:
-				ms = cPickle.load(f)
+				ms = pickle.load(f)
 				self.clearbox()
 				self.markstack = ms
 				self.drawbox()
@@ -782,7 +782,7 @@ class UserDisplay(object):
 											  text='Save points to file')
 		if filename:
 			file = open(filename, 'w')
-			cPickle.dump(self.points, file)
+			pickle.dump(self.points, file)
 			file.close()
 
 	def loadpoints(self, filename=None, merge=None):
@@ -796,7 +796,7 @@ class UserDisplay(object):
 				return
 		try:
 			file = open(filename, 'r')
-			newpoints = cPickle.load(file)
+			newpoints = pickle.load(file)
 			file.close()
 		except IOError:
 			return
@@ -1355,7 +1355,7 @@ class FID(object):
 		f.close()
 
 if __name__ == '__main__':
-	from Tkinter import *
+	from tkinter import *
 	tk = Tk()
 	bb = BlackBoard(tk, 100, 100)
 	bb.frame.pack()

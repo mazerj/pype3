@@ -43,7 +43,7 @@ really simplify coding...
 import sys
 import time
 import socket
-import cPickle
+import pickle
 import struct
 import traceback
 import types
@@ -158,19 +158,19 @@ if _WINDOWS:
 
 			# these guys must be called in RUN, but not INIT..
 			if self.TDevAcc.ConnectServer('Local'):
-				self.s.send(cPickle.dumps(1))
+				self.s.send(pickle.dumps(1))
 				_Log('thread connected to TDevAcc.X\n')
 			else:
 				self.TDevAcc = None
-				self.s.send(cPickle.dumps(0))
+				self.s.send(pickle.dumps(0))
 				_Log('thread failed to connect to TDevAcc.X');
 
 			if self.TTank.ConnectServer('Local', 'Me'):
-				self.s.send(cPickle.dumps(1))
+				self.s.send(pickle.dumps(1))
 				_Log('thread connected to TTank.X\n')
 			else:
 				self.TTank = None
-				self.s.send(cPickle.dumps(0))
+				self.s.send(pickle.dumps(0))
 				_Log('thread failed to connect to TTank.X\n')
 
 			errcode, descr = None, None
@@ -179,7 +179,7 @@ if _WINDOWS:
 					buff = self.s.recv()
 					if buff is None:
 						break
-					cmd = cPickle.loads(buff)
+					cmd = pickle.loads(buff)
 					result = None
 					(obj, method, args) = cmd
 					_Log('Recieved command: %s\n' % ((obj,method,args),))
@@ -196,7 +196,7 @@ if _WINDOWS:
 						try:
 							fn = getattr(iobj, method)
 							try:
-								result = (1, apply(fn, args))
+								result = (1, fn(*args))
 							except:
 								errinfo = sys.exc_info()
 								_Log('Eval/Apply Exception:\n')
@@ -206,9 +206,9 @@ if _WINDOWS:
 							result = (-1, 'invalid method: %s.%s' % (obj,
 																	 method,))
 					_Log('result: %s\n' % (result,))
-					self.s.send(cPickle.dumps(result))
+					self.s.send(pickle.dumps(result))
 
-			except socket.error, value:
+			except socket.error as value:
 				(errorcode, descr) = value
 			finally:
 				if self.TTank:
@@ -230,7 +230,7 @@ if _WINDOWS:
 		serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		try:
 			serversocket.bind(('',port))
-		except ValueError,e:
+		except ValueError as e:
 			_Log(e)
 			return
 		serversocket.listen(5)
@@ -261,8 +261,8 @@ else: ## not _WINDOWS (ie, linux) ###########################################
 				# tdt's not available -- reraise the exception for now..
 				raise
 
-			self.gotTDevAcc = cPickle.loads(self.s.recv())
-			self.gotTTank = cPickle.loads(self.s.recv())
+			self.gotTDevAcc = pickle.loads(self.s.recv())
+			self.gotTTank = pickle.loads(self.s.recv())
 			if _DEBUG:
 				sys.stderr.write('tdtstatus: circuit=%d tank=%d\n' %
 								 (self.gotTDevAcc, self.gotTTank, ))
@@ -293,9 +293,9 @@ else: ## not _WINDOWS (ie, linux) ###########################################
 				preserved and propagated.
 			"""
 			try:
-				self.s.send(cPickle.dumps(cmdtuple))
+				self.s.send(pickle.dumps(cmdtuple))
 				p = self.s.recv()
-				(ok, result) = cPickle.loads(p)
+				(ok, result) = pickle.loads(p)
 			finally:
 				pass
 			return (ok, result)

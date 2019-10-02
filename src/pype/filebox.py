@@ -9,8 +9,8 @@ Author -- James A. Mazer (mazerj@gmail.com)
 
 """
 
-from Tkinter import *
-from Dialog import Dialog
+from tkinter import *
+from tkinter.dialog import Dialog
 
 import os
 import fnmatch
@@ -304,7 +304,7 @@ class SaveFileDialog_noappend(FileDialog):
 				return
 			d = Dialog(self.top,
 					   title="File Exists",
-					   text="Overwrite existing file %s?" % `file`,
+					   text="Overwrite existing file %s?" % repr(file),
 					   bitmap='questhead',
 					   default=1,
 					   strings=("Yes", "Cancel"))
@@ -333,7 +333,7 @@ class SaveFileDialog(FileDialog):
 				return
 			d = Dialog(self.top,
 					   title="File Exists",
-					   text="Overwrite existing file %s?" % `file`,
+					   text="Overwrite existing file %s?" % repr(file),
 					   bitmap='questhead',
 					   default=1,
 					   strings=("Overwrite", "Append", "Cancel"))
@@ -383,4 +383,4 @@ def SaveAs(initialdir=os.curdir, initialfile='', pattern='*',
 
 
 if __name__ == '__main__':
-	print Open(initialdir=sys.argv[1], pattern='*')
+	print(Open(initialdir=sys.argv[1], pattern='*'))

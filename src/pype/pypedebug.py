@@ -17,10 +17,10 @@ from guitools import warn
 def trace():
 	# useful little tool: prints current file & lineno
 	import inspect
-	print 'TRACE %s:%d' % (
+	print('TRACE %s:%d' % (
 		inspect.getfile(inspect.currentframe().f_back),
 		inspect.currentframe().f_back.f_lineno,
-		)
+		))
 
 def remotedebug():
 	# see: http://code.google.com/p/winpdb/
@@ -47,7 +47,7 @@ def keyboard(banner='Type EOF/^D to continue', builtin=0):
 
     if builtin:
         import pdb
-        print '[->pdb]', banner
+        print('[->pdb]', banner)
         pdb.set_trace()
     else:
         # use exception trick to pick up the current frame
@@ -86,7 +86,7 @@ def get_traceback(show=None):
 	exc_type, exc_value, tb = sys.exc_info()
 
 	# Give basic information about the callback exception.
-	if type(exc_type) == types.ClassType:
+	if type(exc_type) == type:
 		# Handle python 1.5 class exceptions.
 		exc_type = exc_type.__name__
 
@@ -128,10 +128,10 @@ def reporterror(gui=True, dbug=False):
 def ppDict(d):
 	"""Pretty print a dictionary
 	"""
-	ks = d.keys()
+	ks = list(d.keys())
 	ks.sort()
 	for k in ks:
-		print '%-20s %15s=<%s>' % (type(d[k]), k, d[k])
+		print('%-20s %15s=<%s>' % (type(d[k]), k, d[k]))
 
 def debug(set=None):
 	global _DEBUGFLAG

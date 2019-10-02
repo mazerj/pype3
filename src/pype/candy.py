@@ -10,7 +10,7 @@ Author -- James A. Mazer (mazerj@gmail.com)
 """
 
 import posixpath
-from Tkinter import *
+from tkinter import *
 
 import pype
 import pype_aux
@@ -137,7 +137,7 @@ def _slideshow(app):
 				if s.w > 10 and s.h > 10:
 					break
 			except:
-				print 'dud file: %s\n' % fname
+				print('dud file: %s\n' % fname)
 		maxd = 512.0
 		if s.w > maxd:
 			m = maxd / s.w
@@ -186,7 +186,7 @@ def _lines(app):
 			v = 250*(2*np.random.random(4)-1)
 		n = (n + 1) % 100
 		v += 15*(2*np.random.random(4)-1.0)
-		vv = map(int, map(round, np.clip(v, -250.0, 250.0)))
+		vv = list(map(int, list(map(round, np.clip(v, -250.0, 250.0)))))
 		c = tuple(map(int, 1+254*np.random.random(3)))
 		app.fb.line(vv[:2], vv[2:], c, width=3)
 		app.fb.flip()

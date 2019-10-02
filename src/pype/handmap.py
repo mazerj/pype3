@@ -51,7 +51,7 @@ import math
 #import cPickle
 
 from pype import *
-from Tkinter import *
+from tkinter import *
 from events import *
 import pypedebug
 
@@ -137,7 +137,7 @@ class _Probe(object):
 		self.clear()
 
 	def save(self):
-		import cPickle
+		import pickle
 		x = Holder()
 
 		x.lock = self.lock
@@ -161,14 +161,14 @@ class _Probe(object):
 		x.lw = self.lw
 
 		file = open(pyperc('hmapstim'), 'w')
-		cPickle.dump(x, file)
+		pickle.dump(x, file)
 		file.close()
 
 	def load(self):
-		import cPickle
+		import pickle
 		try:
 			file = open(pyperc('hmapstim'), 'r')
-			x = cPickle.load(file)
+			x = pickle.load(file)
 			file.close()
 		except IOError:
 			return None
@@ -205,7 +205,7 @@ class _Probe(object):
 	def infostr(self):
 		angle = ((self.a % 180), (self.a % 180)+180)
 		try:
-			color = string.join(map(lambda x:"%d"%x, self.colorshow),',')
+			color = string.join(["%d"%x for x in self.colorshow],',')
 		except TypeError:
 			color = 'noise'
 
@@ -547,7 +547,7 @@ def _key_handler(app, c, ev):
 	elif c == 'h':
 		p.showinfo = not p.showinfo
 	elif c == 'm' or c == 'M':
-		p.barmode = (p.barmode + 1) % len(BARMODES.keys())
+		p.barmode = (p.barmode + 1) % len(list(BARMODES.keys()))
 		app.udpy.canvas.delete(p.major_ax)
 		app.udpy.canvas.delete(p.minor_ax)
 		app.udpy.canvas.delete(p.onoff)

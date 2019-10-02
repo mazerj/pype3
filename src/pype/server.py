@@ -15,7 +15,7 @@ class Server(asyncore.dispatcher):
 		# when we get a client connection start a dispatcher for that
 		# client
 		socket, address = self.accept()
-		print 'Connection by', address
+		print('Connection by', address)
 		EchoHandler(socket)
 
 class EchoHandler(asyncore.dispatcher_with_send):

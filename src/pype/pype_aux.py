@@ -236,7 +236,7 @@ def permute(v):
 	:return: randomly permuted version of v
 
 	"""
-	l = range(0,len(v))
+	l = list(range(0,len(v)))
 	out = []
 	while len(l) > 0:
 		ix = random.randint(0, len(l)-1)
@@ -302,7 +302,7 @@ def pick_n(v, n):
 
 	"""
 	if n > len(v):
-		raise ValueError, 'pick_n from short v'
+		raise ValueError('pick_n from short v')
 	v = permute(v)
 	return v[0:n]
 
@@ -469,7 +469,7 @@ def param_expand(s, integer=None):
 
 	if s[0] == '[' and s[-1] == ']':
 		# list syntax: pick one from [#,#,#,#]
-		l = map(float, s[1:-1].split(','))
+		l = list(map(float, s[1:-1].split(',')))
 		return l[pick_one(l)]
 
 	# if 'slice' syntax is used, generate the slice using range
@@ -483,9 +483,9 @@ def param_expand(s, integer=None):
 		l = s.split(':')
 	if len(l) > 1:
 		if len(l) == 3:
-			start, stop, step = map(float, l)
+			start, stop, step = list(map(float, l))
 		elif len(l) == 2:
-			start, stop = map(float, l)
+			start, stop = list(map(float, l))
 			step = 1.0
 		if inc:
 			l = np.arange(start, stop+step, step)
@@ -519,7 +519,7 @@ def showparams(app, P, clearfirst=1):
 	"""
 	if clearfirst:
 		info(app)
-	keys = P.keys()
+	keys = list(P.keys())
 	keys.sort()
 	n = 0
 	while n < len(keys):
@@ -575,7 +575,7 @@ class ConditionBucket(object):
 
 		"""
 
-		self.sequence = range(len(self.conditions))
+		self.sequence = list(range(len(self.conditions)))
 		if self.randomize:
 			if self.frozen_seq is None:
 				self.sequence = permute(self.sequence)

@@ -536,7 +536,7 @@ class FrameBuffer(object):
 		ogl.glPushMatrix()
 		ogl.glPushAttrib(ogl.GL_COLOR_BUFFER_BIT)
 
-		apply(ogl.glClearColor, C(color, gl=1))
+		ogl.glClearColor(*C(color, gl=1))
 		ogl.glClear(ogl.GL_COLOR_BUFFER_BIT)
 
 		ogl.glPopAttrib(ogl.GL_COLOR_BUFFER_BIT)
@@ -646,7 +646,7 @@ class FrameBuffer(object):
 	def checkkeys(self):
 		"""Get list of pressed keys."""
 		pygame.event.pump()
-		return map(pygame.key.name, np.where(pygame.key.get_pressed())[0])
+		return list(map(pygame.key.name, np.where(pygame.key.get_pressed())[0]))
 
 	def checkmouse(self):
 		"""Get list of pressed mouse buttons."""
@@ -868,7 +868,7 @@ class FrameBuffer(object):
 				ogl.glBegin(ogl.GL_LINE_STRIP)
 			else:
 				ogl.glBegin(ogl.GL_LINES)
-		apply(ogl.glColor4f, C(color, gl=1))
+		ogl.glColor4f(*C(color, gl=1))
 		for (x, y) in pts:
 			x = x + self.hw
 			y = y + self.hh
@@ -927,7 +927,7 @@ class FrameBuffer(object):
 		t = np.linspace(0, 2*np.pi, num=100, endpoint=False)
 		x = r * np.cos(t) + cx
 		y = r * np.sin(t) + cy
-		self.lines(zip(x,y), color, width=width, closed=1, flip=flip)
+		self.lines(list(zip(x,y)), color, width=width, closed=1, flip=flip)
 
 def genaxes(w, h, rw, rh, typecode=np.float64, inverty=0):
 	"""Generate two arrays descripting sprite x- and y-coordinate axes
@@ -1709,7 +1709,7 @@ class ScaledSprite(object):
 				fb.flip()
 
 	def fastblit(self):
-		raise Obsolete, 'Use blit method instead of fastblit.'
+		raise Obsolete('Use blit method instead of fastblit.')
 
 	def render(self, clear=False):
 		"""Render image data into GL texture memory for speed.
@@ -1775,7 +1775,7 @@ class ScaledSprite(object):
 		return s
 
 	def setdir(self, angle, vel):
-		raise Obsolete, 'do not use setdir'
+		raise Obsolete('do not use setdir')
 
 	def displayim(self):
 		return pygame.transform.scale(self.im, (self.dw, self.dh))
@@ -1793,10 +1793,10 @@ class ScaledSprite(object):
 		return pygame.image.save(self.displayim(), fname)
 
 	def save_ppm(self, fname, mode='w'):
-		raise Obsolete, 'save_ppm has been removed'
+		raise Obsolete('save_ppm has been removed')
 
 	def save_alpha_pgm(self, fname, mode='w'):
-		raise Obsolete, 'save_ppm has been removed'
+		raise Obsolete('save_ppm has been removed')
 		
 class Sprite(ScaledSprite):
 	"""Sprite object (wrapper for pygame surface class).
@@ -2450,7 +2450,7 @@ def is_sequence(x):
 	"""Is arg a sequence-type?
 
 	"""
-	return (type(x) is types.ListType) or (type(x) is types.TupleType)
+	return (type(x) is list) or (type(x) is tuple)
 
 def colr(*args, **kwargs):
 	"""Improved C() -- converts argument to RGBA color in useful way.
@@ -2470,7 +2470,7 @@ def colr(*args, **kwargs):
 		  colr('r,g,b,a') --> color with alpha as string
 	
 	"""
-	normal = kwargs.has_key('normal') and kwargs['normal']
+	normal = 'normal' in kwargs and kwargs['normal']
 	if normal:
 		max = 1.0
 	else:
@@ -2479,7 +2479,7 @@ def colr(*args, **kwargs):
 	if len(args) == 0:
 		c = np.array((0,0,0,0))			  # transparent
 	elif len(args) == 1:
-		if type(args[0]) is types.StringType:
+		if type(args[0]) is bytes:
 			if args[0].lower() == 'black' or args[0].lower() == 'k':
 				c = np.array((1,1,1,max))
 			elif args[0].lower() == 'white' or args[0].lower() == 'w':
@@ -2491,7 +2491,7 @@ def colr(*args, **kwargs):
 			elif args[0].lower() == 'blue' or args[0].lower() == 'b':
 				c = np.array((0,0,max,max))
 			else:
-				c = np.array(map(float, string.split(args[0], ',')))
+				c = np.array(list(map(float, string.split(args[0], ','))))
 		else:
 			try:
 				l = len(args[0])
@@ -2554,7 +2554,7 @@ def barsprite(w, h, angle, color, **kw):
 	:return: (sprite) requested bar
 
 	"""
-	s = apply(Sprite, (w, h), kw)
+	s = Sprite(*(w, h), **kw)
 	if color == (0,0,0):
 		s.noise(0.50)
 	else:
@@ -2563,10 +2563,10 @@ def barsprite(w, h, angle, color, **kw):
 	return s
 
 def barspriteCW(w, h, angle, color, **kw):
-	return apply(barsprite, (w, h, angle, color), kw)
+	return barsprite(*(w, h, angle, color), **kw)
 
 def barspriteCCW(w, h, angle, color, **kw):
-	return apply(barsprite, (w, h, -angle, color), kw)
+	return barsprite(*(w, h, -angle, color), **kw)
 
 def fixsprite(x, y, fb, fix_size, color, bg):
 	"""Fixation target sprite generator.
@@ -2678,7 +2678,7 @@ def ppflag(flags):
 		}
 
 	s = None
-	for k in flagd.keys():
+	for k in list(flagd.keys()):
 		if flags & flagd[k]:
 			if s: s = s + '|' + k
 			else: s = k
@@ -2851,7 +2851,7 @@ if __name__ == '__main__':
 			fb.string(0, 0, 'test3', (255, 0, 0))
 			fb.flip()
 			if 0:
-				print '%d deg waiting>>' % n
+				print('%d deg waiting>>' % n)
 				sys.stdin.readline()
 	
 	def drawtest4(fb):

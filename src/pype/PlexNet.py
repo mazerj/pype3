@@ -60,7 +60,7 @@ class PlexNet(object):
 
 	def _put(self, format, packet):
 		# pack data into binary format for transfer
-		bin = apply(struct.pack, [format,] + packet)
+		bin = struct.pack(*[format,] + packet)
 
 		# pad packet to full length with zeros
 		bin = bin + "\0" * (Plex.PACKETSIZE-len(bin))
@@ -105,7 +105,7 @@ class PlexNet(object):
 							   data[pos:pos+self._db_size])
 
 			if db[0] == 0:			# db[1] Type // empty block
-				print "?empty?"
+				print("?empty?")
 				break
 
 			if db[0] == -1:
@@ -117,7 +117,7 @@ class PlexNet(object):
 			 Unit, nWaveforms, nWordsInWaveform) = db
 
 			# compute 5 byte timestamp as L type (long int)
-			ts = (1L<<24)+TimeStamp
+			ts = (1<<24)+TimeStamp
 
 			if nWaveforms > 0:
 				# waveform samples/words are 2-bytes each
@@ -174,7 +174,7 @@ class PlexNet(object):
 	def neuronlist(self, clear=0):
 		"""Get list of recently seen neurons"""
 		self._lock.acquire()
-		n = self._neurons.keys()
+		n = list(self._neurons.keys())
 		if clear:
 			self._neurons = {}
 		self._lock.release()
@@ -193,6 +193,6 @@ if __name__ == '__main__':
 	for i in range(3):
 		time.sleep(1)
 		events, ndrops = p.drain()
-		print "%d events (%d)" % (len(events), ndrops)
+		print("%d events (%d)" % (len(events), ndrops))
 	p.drain(terminate=1)
-	print "drained."
+	print("drained.")

@@ -157,7 +157,7 @@ def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 	"""
 
 	if s.w != s.h:
-		raise SpritetoolsError, 'sprite must be square'
+		raise SpritetoolsError('sprite must be square')
 
 	if not ppd is None:
 		# c/deg -> c/sprite
@@ -228,7 +228,7 @@ def singrat2(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 	"""
 
 	if s.w != s.h:
-		raise SpritetoolsError, 'sprite must be square'
+		raise SpritetoolsError('sprite must be square')
 
 	if not ppd is None:
 		# c/deg -> c/sprite
@@ -312,7 +312,7 @@ def polargrat(s, cfreq, rfreq, phase_deg, polarity,
 	"""
 
 	if s.w != s.h:
-		raise SpritetoolsError, 'sprite must be square'
+		raise SpritetoolsError('sprite must be square')
 
 	if not ppd is None:
 		# c/deg -> c/sprite
@@ -407,7 +407,7 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 	"""
 
 	if s.w != s.h:
-		raise SpritetoolsError, 'sprite must be square'
+		raise SpritetoolsError('sprite must be square')
 
 	if not ppd is None:
 		# c/deg -> c/sprite
@@ -448,7 +448,7 @@ def hartley(s, kx, ky, R=1.0, G=1.0, B=1.0,
 	"""
 
 	if s.w != s.h:
-		raise SpritetoolsError, 'sprite must be square'
+		raise SpritetoolsError('sprite must be square')
 
 	meanlum = 256.0 * meanlum
 	moddepth = 127.0 * moddepth
@@ -497,7 +497,7 @@ def gabor(s, frequency, phase_deg, ori_deg, sigma,
 	"""
 
 	if s.w != s.h:
-		raise SpritetoolsError, 'sprite must be square'
+		raise SpritetoolsError('sprite must be square')
 
 	if not ppd is None:
 		# c/deg -> c/sprite
@@ -653,14 +653,14 @@ def benchmark(fb):
 				meanlum=0.5, moddepth=1.0)
 		s.blit(flip=1)
 	time.time()
-	print 'all', float(nmax) / (time.time() - t0), 'fps'
+	print('all', float(nmax) / (time.time() - t0), 'fps')
 
 	t0 = time.time()
 	for n in range(nmax):
 		singrat(s, 10, 0.0, n, R=1.0, G=1.0, B=1.0,
 				meanlum=0.5, moddepth=1.0)
 	time.time()
-	print 'compute only', float(nmax) / (time.time() - t0), 'fps'
+	print('compute only', float(nmax) / (time.time() - t0), 'fps')
 
 	s2 = Sprite(250, 250, 0, 0, fb=fb, on=1)
 	singrat(s2, 10, 0.0, 0, R=1.0, G=1.0, B=1.0,
@@ -672,13 +672,13 @@ def benchmark(fb):
 		foo[::] = bar[::]
 		s.blit(flip=1)
 	time.time()
-	print 'copy+blit', float(nmax) / (time.time() - t0), 'fps'
+	print('copy+blit', float(nmax) / (time.time() - t0), 'fps')
 
 	t0 = time.time()
 	for n in range(nmax):
 		s.blit(flip=1)
 	time.time()
-	print 'blit only', float(nmax) / (time.time() - t0), 'fps'
+	print('blit only', float(nmax) / (time.time() - t0), 'fps')
 
 
 

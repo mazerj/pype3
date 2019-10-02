@@ -74,7 +74,7 @@ def decimate(v, n):
 	"""
 	if not isinstance(v, np.ndarray):
 		v = np.array(v, np.float)
-	return np.take(v, range(0,len(v),n))
+	return np.take(v, list(range(0,len(v),n)))
 
 def sparseness(v):
 	"""Compute (Tove & Rolls) sparseness of vector.

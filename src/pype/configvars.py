@@ -16,9 +16,9 @@ def mkconfig(file):
 	try:
 		f = open(file, 'w')
 		f.write('# pype default host-specific config file\n')
-		keys = c.keys()
+		keys = list(c.keys())
 		keys.sort()
-		for k in c.keys():
+		for k in list(c.keys()):
 			f.write("# %s\n" % (c.getdoc(k),))
 			if c.get(k):
 				f.write("%s: %s\n" % (k, c.get(k)))
@@ -188,11 +188,11 @@ def defaults(srcfile=None):
 
 def defaults_show():
 	c = defaults()
-	for k in c.keys():
+	for k in list(c.keys()):
 		d = c.getdoc(k)
 		if not d is None:
-			print "# %s" % d
-		print '%s: %s' % (k, c.get(k),)
+			print("# %s" % d)
+		print('%s: %s' % (k, c.get(k),))
 
 def defaults_info():
 	return """

@@ -16,7 +16,7 @@ import numpy as np
 def _crossproduct(a, b):
 	"""Compute cross product of two 3-d vectors (x,y,z)"""
 	if len(a) != 3 or len(b) != 3:
-		raise TypeError, "Cross product only for vectors of length 3"
+		raise TypeError("Cross product only for vectors of length 3")
 	v = [a[1]*b[2] - a[2]*b[1],
 		 a[2]*b[0] - a[0]*b[2],
 		 a[0]*b[1] - a[1]*b[0]]
@@ -64,7 +64,7 @@ def griddata(xd, yd, zd, nx, ny):
 	"""
 
 	if len(xd) != len(yd) or len(xd) != len(zd):
-		raise TypeError, "xd,yd,zd must all be same length"
+		raise TypeError("xd,yd,zd must all be same length")
 
 	nz = np.zeros((len(nx), len(ny)), 'f')
 	for i in range(len(nx)):
@@ -111,7 +111,7 @@ def griddata2(xd, yd, zd, nx, ny):
 	"""
 
 	if len(xd) != len(yd) or len(xd) != len(zd):
-		raise TypeError, "xd,yd,zd must all be same length"
+		raise TypeError("xd,yd,zd must all be same length")
 
 	nz = np.zeros((len(nx), len(ny)), 'f')
 	nxx = np.zeros((len(nx), len(ny)), 'f')
@@ -155,9 +155,9 @@ def surfinterp(xd, yd, zd, new_xd, new_yd):
 
 	"""
 	if len(xd) != len(yd) or len(xd) != len(zd):
-		raise TypeError, "xd,yd,zd must all be same length"
+		raise TypeError("xd,yd,zd must all be same length")
 	if len(new_xd) != len(new_yd):
-		raise TypeError, "new_xd and new_yd must be same length"
+		raise TypeError("new_xd and new_yd must be same length")
 
 	new_z = np.zeros((len(new_xd),), 'f')
 	for i in range(len(new_z)):

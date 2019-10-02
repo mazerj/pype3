@@ -108,7 +108,7 @@ class MTRandom(object):
 		"""
 
 		if count:
-			return map(lambda x,s=self: s.mt.random(), [0] * int(count))
+			return list(map(lambda x,s=self: s.mt.random(), [0] * int(count)))
 		else:
 			return self.mt.random()
 

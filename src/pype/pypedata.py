@@ -13,7 +13,7 @@ import os
 import posix
 import math
 import time
-import cPickle
+import pickle
 
 from vectorops import *
 from pype import *
@@ -33,7 +33,7 @@ def labeled_dump(label, obj, f, bin=0):
 	version of the object.
 	"""
 	f.write('<<<%s>>>\n' % label)
-	cPickle.dump(obj, f, bin)
+	pickle.dump(obj, f, bin)
 
 if Numeric is None:
 	def labeled_load(f):
@@ -48,7 +48,7 @@ if Numeric is None:
 			if not l:
 				return None, None
 			if l.startswith('<<<') and l.endswith('>>>\n'):
-				return l[3:-4], cPickle.load(f)
+				return l[3:-4], pickle.load(f)
 else:
 	def labeled_load(f):
 		"""Wrapper for cPickle.load.
@@ -93,7 +93,7 @@ else:
 				if not l:
 					return None, None
 				if l.startswith('<<<') and l.endswith('>>>\n'):
-					return l[3:-4], cPickle.load(f)
+					return l[3:-4], pickle.load(f)
 		finally:
 			Numeric.array_constructor = ac
 
@@ -195,7 +195,7 @@ class PypeRecord(object):
 		self.result = self.info[0]
 		self.rt = self.info[1]
 		self.params = self.info[2]
-		if not 'eyetracker' in self.params.keys():
+		if not 'eyetracker' in list(self.params.keys()):
 			self.params['eyetracker'] = tracker_guess[0]
 			self.params['eyefreq'] = tracker_guess[1]
 			self.params['eyelag'] = tracker_guess[2]
@@ -232,13 +232,13 @@ class PypeRecord(object):
 
 		if params:
 			file.write("--------------------------------\n")
-			klist = self.userparams.keys()
+			klist = list(self.userparams.keys())
 			klist.sort()
 			for k in klist:
 				file.write("userparams['%s']=<%s>\n	 %s\n" %
 						   (k, self.userparams[k], type(self.userparams[k])))
 			file.write("--------------------------------\n")
-			klist = self.params.keys()
+			klist = list(self.params.keys())
 			klist.sort()
 			for k in klist:
 				file.write("params['%s']=<%s>\n	 %s\n" %
@@ -308,14 +308,14 @@ class PypeRecord(object):
 			times = []
 			events = []
 			for (t, e) in self.rec[2]:
-				if type(e) is types.StringType:
+				if type(e) is bytes:
 					times.append(t)
 					events.append(e)
 				else:
 					for ee in e:
 						times.append(t)
 						events.append(ee)
-			self.events = zip(times, events)
+			self.events = list(zip(times, events))
 
 
 			self.eyet = np.array(self.rec[3], np.float) # ms
@@ -332,8 +332,8 @@ class PypeRecord(object):
 				#	one frame for sample&hold camera, one frame for
 				#	framegrabber and one more frame because it seems
 				#	correct (check with Rikki Razdan again??)
-				dxy=(np.diff(self.eyex)<>0)&(np.diff(self.eyey)<>0)
-				si = np.median(diff(np.array(self.realt)[dxy <> 0]))
+				dxy=(np.diff(self.eyex)!=0)&(np.diff(self.eyey)!=0)
+				si = np.median(diff(np.array(self.realt)[dxy != 0]))
 				si = 1000.0 / (60.0 * np.round((1000.0 / si) / 60.0))
 				lag = 3.0 * round(si)
 				self.params['eyelag_user'] = lag
@@ -774,7 +774,7 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 
 	"""
 
-	if type(d) is types.TupleType:
+	if type(d) is tuple:
 		# set eyevalid to None if you're not using calibration info..
 		(eyet, eyex, eyey, eyevalid) = d
 	else:

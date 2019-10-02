@@ -18,16 +18,16 @@ import code
 import imp
 
 if "--idebug" in sys.argv:
-    import inspect
-    import __builtin__
-    savimp = __builtin__.__import__
-    
-    def newimp(name, *x):
-        caller = inspect.currentframe().f_back
-        print 'IMPORTING', name, 'in', caller.f_globals.get('__name__')
-        return savimp(name, *x)
-    
-    __builtin__.__import__ = newimp
+	import inspect
+	import __builtin__
+	savimp = __builtin__.__import__
+	
+	def newimp(name, *x):
+		caller = inspect.currentframe().f_back
+		print 'IMPORTING', name, 'in', caller.f_globals.get('__name__')
+		return savimp(name, *x)
+	
+	__builtin__.__import__ = newimp
 
 __debug = 0
 __show_help = 0
@@ -44,98 +44,98 @@ __nogeo = 0
 pypedir = posixpath.dirname(posixpath.dirname(sys.argv[0]))
 
 def _addpath(d, atend=None):
-    """Add directory to the HEAD (or TAIL) of the python search path."""
-    if atend:
-        sys.path = sys.path + [d]
-    else:
-        sys.path = [d] + sys.path
+	"""Add directory to the HEAD (or TAIL) of the python search path."""
+	if atend:
+		sys.path = sys.path + [d]
+	else:
+		sys.path = [d] + sys.path
 
 def _run_script(fullname):
 
-    """Run module as script -- script name include .py extension."""
-    name = posixpath.basename(fullname)
-    if name[-3:] == '.py':
-        name = name[:-3]                # strip .py extension
+	"""Run module as script -- script name include .py extension."""
+	name = posixpath.basename(fullname)
+	if name[-3:] == '.py':
+		name = name[:-3]				# strip .py extension
 
-    modname = [string.join(fullname.split('/')[0:-1],'/')]
-    trylist = ((name, None), (name+'.py', None),
-               (name, modname), (name+'.py', modname))
+	modname = [string.join(fullname.split('/')[0:-1],'/')]
+	trylist = ((name, None), (name+'.py', None),
+			   (name, modname), (name+'.py', modname))
 
-    # look for the module in standard locations, load it if you
-    # find it, otherwise return 1
-    for fname, path in trylist:
-        try:
-            if path:
-                fp, pathname, description = imp.find_module(fname, path)
-            else:
-                fp, pathname, description = imp.find_module(fname)
-        except ImportError:
-            fp = None
-        if fp:
-            sys.argv[0] = pathname
-            try:
-                mod = imp.load_module('__main__', fp, pathname, description)
-            finally:
-                fp.close()
-            return 1
-    return 0
+	# look for the module in standard locations, load it if you
+	# find it, otherwise return 1
+	for fname, path in trylist:
+		try:
+			if path:
+				fp, pathname, description = imp.find_module(fname, path)
+			else:
+				fp, pathname, description = imp.find_module(fname)
+		except ImportError:
+			fp = None
+		if fp:
+			sys.argv[0] = pathname
+			try:
+				mod = imp.load_module('__main__', fp, pathname, description)
+			finally:
+				fp.close()
+			return 1
+	return 0
 
 av = []
 subj = None
 training = None
 for a in sys.argv:
-    if a[:2] == 's=':
-        subj = a[2:]
-    elif a[:5] == '--id=':
-        subj = a[5:]
-    elif a == '--nogeo':
-        __nogeo = 1
-    elif a == '--dir':
-        print pypedir
-        sys.exit(1)
-    elif a == '--debug':
-        __debug = 1
-        __show_pypeimports = 1
-        os.environ['PYPEDEBUG'] = "1"
-    elif a == '--idebug':
-        __show_allimports = 1
-    elif a == '--config':
-        __show_config = 1
-    elif a == '--paths':
-        __show_paths = 1
-    elif a == '--help':
-        __show_help = 1
-    elif a == '--version' or a == '-v':
-        __show_version = 1
-    elif a == '--vversion' or a == '-vv':
-        __show_version = 2
-    elif a == '--psych' or a == '-p':
-        __psych_mode = 1
-    elif a == '-t':
-        __training_mode = 1
-    else:
-        av.append(a)
+	if a[:2] == 's=':
+		subj = a[2:]
+	elif a[:5] == '--id=':
+		subj = a[5:]
+	elif a == '--nogeo':
+		__nogeo = 1
+	elif a == '--dir':
+		print pypedir
+		sys.exit(1)
+	elif a == '--debug':
+		__debug = 1
+		__show_pypeimports = 1
+		os.environ['PYPEDEBUG'] = "1"
+	elif a == '--idebug':
+		__show_allimports = 1
+	elif a == '--config':
+		__show_config = 1
+	elif a == '--paths':
+		__show_paths = 1
+	elif a == '--help':
+		__show_help = 1
+	elif a == '--version' or a == '-v':
+		__show_version = 1
+	elif a == '--vversion' or a == '-vv':
+		__show_version = 2
+	elif a == '--psych' or a == '-p':
+		__psych_mode = 1
+	elif a == '-t':
+		__training_mode = 1
+	else:
+		av.append(a)
 sys.argv = av
 
 if __show_help:
-    sys.stderr.write("""\
+	sys.stderr.write("""\
 pypenv/pype options:
   s=<subject-id> set subject-id as indicated
-  --id=<subjid>  set subject id (same as s=)
-  --version|-v   show version numbers
+  --id=<subjid>	 set subject id (same as s=)
+  --version|-v	 show version numbers
   --vversion|-vv verbose show version numbers (libs, etc)
-  --config       show list of available config vars
-  --debug        set DEBUG mode (or use env var DEBUG)
-  --idebug       import debugger -- track all imports
-  --help         this message
-  --psych|-p     psychophysics mode (start with framebuffer hidden)
-  --nogeo        clear all window geometry (for lost windows!)
-  -s             start in interactive mode (ie, run pypenv -- experts only!)
-  -s <script>    run specified script (ie, pypenv -- experts only!)
-  -t             run in training mode
-  <task>         load task on start
+  --config		 show list of available config vars
+  --debug		 set DEBUG mode (or use env var DEBUG)
+  --idebug		 import debugger -- track all imports
+  --help		 this message
+  --psych|-p	 psychophysics mode (start with framebuffer hidden)
+  --nogeo		 clear all window geometry (for lost windows!)
+  -s			 start in interactive mode (ie, run pypenv -- experts only!)
+  -s <script>	 run specified script (ie, pypenv -- experts only!)
+  -t			 run in training mode
+  <task>		 load task on start
 """)
-    sys.exit(0)
+	sys.exit(0)
 
 if not os.environ.has_key('HOME'):
 	sys.stderr.write('%s: please set $HOME and restart\n' % sys.argv[0])
@@ -144,141 +144,148 @@ if not os.environ.has_key('HOME'):
 _original_path = sys.path[::]
 _addpath(pypedir+ '/pype', atend=0)
 if os.environ.has_key('LD_LIBRARY_PATH'):
-    # ensures pickup of Eyelink shared libraries
-    os.environ['LD_LIBRARY_PATH'] = pypedir + '/lib:' + \
-                                    os.environ['LD_LIBRARY_PATH']
+	# ensures pickup of Eyelink shared libraries
+	os.environ['LD_LIBRARY_PATH'] = pypedir + '/lib:' + \
+									os.environ['LD_LIBRARY_PATH']
 
 ##############################################################
 # From here on out pype modules are importable!
 ##############################################################
 
 if __show_config:
-    import configvars
-    sys.stdout.write('%s\n' % configvars.defaults_info())
-    sys.stdout.write('# start config file\n')
-    configvars.defaults_show()
-    sys.stdout.write('# end config file\n')
-    sys.exit(0)
+	import configvars
+	sys.stdout.write('%s\n' % configvars.defaults_info())
+	sys.stdout.write('# start config file\n')
+	configvars.defaults_show()
+	sys.stdout.write('# end config file\n')
+	sys.exit(0)
 if __show_paths:
-    sys.stdout.write('# env vars\n')
-    for v in os.environ.keys():
-        sys.stdout.write('%s=%s\n' % (v, os.environ[v],))
-    sys.exit(0)
+	sys.stdout.write('# env vars\n')
+	for v in os.environ.keys():
+		sys.stdout.write('%s=%s\n' % (v, os.environ[v],))
+	sys.exit(0)
 if __show_version:
-    import pypeversion
+	import pypeversion
 
-    sys.stderr.write("        pype: %s\n" % pypeversion.PypeVersion)
-    sys.stderr.write("       verid: %s\n" % pypeversion.PypeVersionID)
-    if __show_version > 1:
-        sys.stderr.write("  build from: %s\n" % pypeversion.PypeBuildDir)
-        sys.stderr.write("    build by: %s@%s\n" % (pypeversion.PypeBuildBy,
-                                                pypeversion.PypeBuildHost))
-        sys.stderr.write("    build on: %s\n" % pypeversion.PypeBuildDate)
-        
-    sys.exit(0)
+	sys.stderr.write("		  pype: %s\n" % pypeversion.PypeVersion)
+	sys.stderr.write("		 verid: %s\n" % pypeversion.PypeVersionID)
+	if __show_version > 1:
+		sys.stderr.write("	build from: %s\n" % pypeversion.PypeBuildDir)
+		sys.stderr.write("	  build by: %s@%s\n" % (pypeversion.PypeBuildBy,
+												pypeversion.PypeBuildHost))
+		sys.stderr.write("	  build on: %s\n" % pypeversion.PypeBuildDate)
+		
+	sys.exit(0)
 
+sys.stderr.write('foo!\n')
+print(sys.path)
+import configparser
+sys.stderr.write('bar!\n')
+
+"""
 from importer import importer
 try:
-    from importer import importer
+	from importer import importer
 except ImportError:
-    # warning: this can also happen because tkinter's not installed!
-    sys.stderr.write('Failed to import <importer> module -- check PATH?\n')
-    sys.exit(1)
+	# warning: this can also happen because tkinter's not installed!
+	sys.stderr.write('Failed to import <importer> module -- check PATH?\n')
+	sys.exit(1)
 
 if __show_pypeimports:
-    importer(report=1)
-    sys.stderr.write('reporting imports\n')
+	importer(report=1)
+	sys.stderr.write('reporting imports\n')
+"""
 
 try:
-    from pype import *
+	from pype import *
 except ImportError:
 	(etype, evalue, tb) = sys.exc_info()
 	stack = traceback.extract_tb(tb)
 	(fname, line, fn, text) = stack[-1]
-    sys.stderr.write("""Error when importing 'pype':\n""")
-    sys.stderr.write("file:%s line:%d --> %s\n" % (fname, line, evalue))
+	sys.stderr.write("""Error when importing 'pype':\n""")
+	sys.stderr.write("file:%s line:%d --> %s\n" % (fname, line, evalue))
 	sys.exit(1)
 
 if not subj is None:
-    if len(subj) > 0:
-        os.environ['SUBJECT'] = subj
-    else:
-        sys.stdout.write('Available subjects:\n')
-        os.system('find %s/_* -prune -type d -printf %%5f\t | tr -d _' % \
-                  pyperc())
-        sys.stdout.write('\nDefault is s=none.\n')
-        sys.exit(0)
+	if len(subj) > 0:
+		os.environ['SUBJECT'] = subj
+	else:
+		sys.stdout.write('Available subjects:\n')
+		os.system('find %s/_* -prune -type d -printf %%5f\t | tr -d _' % \
+				  pyperc())
+		sys.stdout.write('\nDefault is s=none.\n')
+		sys.exit(0)
 
 
 # prefix user-specified PYPEPATH directories -- colon deliminated
 if os.environ.has_key('PYPEPATH'):
-    for d in string.split(os.environ['PYPEPATH'], ':')[::-1]:
-        _addpath(d, atend=0)
+	for d in string.split(os.environ['PYPEPATH'], ':')[::-1]:
+		_addpath(d, atend=0)
 
 # prefix ~/.pyperc directories to the python search path
 _addpath(pyperc('Tasks'), atend=0)
 
 for d in glob.glob(pyperc('Tasks/*')):
-    if os.path.isdir(d):
-        _addpath(d, atend=0)
+	if os.path.isdir(d):
+		_addpath(d, atend=0)
 
 # lastly, add current directory to allow local overrides!
 _addpath('.', atend=0)
 
 if __debug:
-    sys.stderr.write('-- Search Path -------------\n')
-    for d in sys.path:
-        if len(d) and (not d in _original_path):
-            sys.stderr.write(' + %s\n' % d)
-    sys.stderr.write('----------------------------\n')
+	sys.stderr.write('-- Search Path -------------\n')
+	for d in sys.path:
+		if len(d) and (not d in _original_path):
+			sys.stderr.write(' + %s\n' % d)
+	sys.stderr.write('----------------------------\n')
 
 if len(sys.argv) > 1 and sys.argv[1] == '-s':
-    # Invoked with -s argument (ie, pypenv):
-    #   -s script  --> run script non-interactively
-    #   -s         --> drop into interactive shell
-    if len(sys.argv) == 2:
-        sys.stdout.write('[pype3 interactive shell (python %d.%d.%d)]\n' % \
-                         sys.version_info[0:3])
-        code.interact(banner='')
-    else:
-        # run specified script with remaining command line args
-        sys.argv = sys.argv[2:]
-        if _run_script(sys.argv[0]) == 0:
-            sys.stderr.write("pyperun: can't find module '%s'\n" % sys.argv[0])
-            sys.exit(1)
+	# Invoked with -s argument (ie, pypenv):
+	#	-s script  --> run script non-interactively
+	#	-s		   --> drop into interactive shell
+	if len(sys.argv) == 2:
+		sys.stdout.write('[pype3 interactive shell (python %d.%d.%d)]\n' % \
+						 sys.version_info[0:3])
+		code.interact(banner='')
+	else:
+		# run specified script with remaining command line args
+		sys.argv = sys.argv[2:]
+		if _run_script(sys.argv[0]) == 0:
+			sys.stderr.write("pyperun: can't find module '%s'\n" % sys.argv[0])
+			sys.exit(1)
 else:
-    # Invoked as plain old 'pype'; make sure subj dir exists and start gui
-    if not posixpath.exists(subjectrc()):
-        try:
-            os.mkdir(subjectrc())
-            os.chown(subjectrc(), os.getuid(), os.getgid())
-            sys.stderr.write("pype: did 'mkdir %s'\n" % subjectrc())
-        except OSError:
-            sys.stderr.write("pype: can't 'mkdir %s'\n" % subjectrc())
-            sys.exit(1)
+	# Invoked as plain old 'pype'; make sure subj dir exists and start gui
+	if not posixpath.exists(subjectrc()):
+		try:
+			os.mkdir(subjectrc())
+			os.chown(subjectrc(), os.getuid(), os.getgid())
+			sys.stderr.write("pype: did 'mkdir %s'\n" % subjectrc())
+		except OSError:
+			sys.stderr.write("pype: can't 'mkdir %s'\n" % subjectrc())
+			sys.exit(1)
 
-    if sys.platform.startswith('linux'):
-        if os.system('chmod -R a+rw /dev/snd 2>/dev/null') > 0:
-            sys.stderr.write("pyperun: warning -- can't access /dev/snd\n")
+	if sys.platform.startswith('linux'):
+		if os.system('chmod -R a+rw /dev/snd 2>/dev/null') > 0:
+			sys.stderr.write("pyperun: warning -- can't access /dev/snd\n")
 
-    args = sys.argv[1:]
+	args = sys.argv[1:]
 	try:
 		app = PypeApp(pypedir, \
-                      psych=__psych_mode, training=__training_mode, \
-                      nogeo=__nogeo)
+					  psych=__psych_mode, training=__training_mode, \
+					  nogeo=__nogeo)
 	except PypeStartupError:
-        sys.stderr.write("Fatal error starting pype.\n")
+		sys.stderr.write("Fatal error starting pype.\n")
 		sys.exit(1)
 
-    if len(args) > 0:
-        task = posixpath.splitext(args[0])[0]
+	if len(args) > 0:
+		task = posixpath.splitext(args[0])[0]
 		try:
 			app.loadtask(task)
 		except ImportError:
 			sys.stderr.write("%s: can't load task '%s'\n" % (sys.argv[0], task))
 			sys.exit(1)
 
-    app.mainloop()
+	app.mainloop()
 	app.close()
-    sys.exit(0)
+	sys.exit(0)
 

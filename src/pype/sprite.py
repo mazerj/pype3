@@ -2851,7 +2851,7 @@ if __name__ == '__main__':
 			fb.string(0, 0, 'test3', (255, 0, 0))
 			fb.flip()
 			if 0:
-				print '%d deg, <return>' % (n,),
+				print '%d deg waiting>>' % n
 				sys.stdin.readline()
 	
 	def drawtest4(fb):

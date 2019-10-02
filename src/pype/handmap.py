@@ -42,7 +42,7 @@ To use in your own task:
    hmap_hide(app)
    hmap_set_dlist(app, None)
 
-See  http://www.mlab.yale.edu/lab/index.php/Handmap for more info.
+See	 http://www.mlab.yale.edu/lab/index.php/Handmap for more info.
 
 """
 
@@ -78,14 +78,14 @@ DISK=_n ; _n += 1
 CIRCLE=_n ; _n += 1
 
 BARMODES = {
-    BAR:'bar',
-    CART:'cart',
-    HYPER:'hyper',
-    POLAR:'polar',
-    RECT:'rect',
-    CIRCLE:'circle',
-    DISK:'disk',
-    }
+	BAR:'bar',
+	CART:'cart',
+	HYPER:'hyper',
+	POLAR:'polar',
+	RECT:'rect',
+	CIRCLE:'circle',
+	DISK:'disk',
+	}
 
 class _Probe(object):
 	def __init__(self, app):
@@ -137,7 +137,7 @@ class _Probe(object):
 		self.clear()
 
 	def save(self):
-        import cPickle
+		import cPickle
 		x = Holder()
 
 		x.lock = self.lock
@@ -165,7 +165,7 @@ class _Probe(object):
 		file.close()
 
 	def load(self):
-        import cPickle
+		import cPickle
 		try:
 			file = open(pyperc('hmapstim'), 'r')
 			x = cPickle.load(file)
@@ -216,30 +216,30 @@ class _Probe(object):
 		s = s + "  o:%s " % B(self.xoff, 'OFFST', 'MOUSE')
 		s = s + "  z:%s (mb2) " % B(self.lock, 'LOCK', 'FREE')
 		s = s + "\n"
-		s = s + "  j:%s " % B(self.jitter, 'ON  ', 'OFF ')
-		s = s + "   d:%s " % B(self.drift, 'ON  ', 'OFF ')
+		s = s + "  j:%s " % B(self.jitter, 'ON	', 'OFF ')
+		s = s + "	d:%s " % B(self.drift, 'ON	', 'OFF ')
 		s = s + "  b:%s " % BLINK_STATES[self.blink_state]
 		s = s + "\n"
 		s = s + "\n"
-		s = s +		" qw  length     %d\n" % self.length
-		s = s +		" er  width      %d\n" % self.width
-		s = s +		" 89  dir/ori    %d:%d deg\n" % angle
+		s = s +		" qw  length	 %d\n" % self.length
+		s = s +		" er  width		 %d\n" % self.width
+		s = s +		" 89  dir/ori	 %d:%d deg\n" % angle
 		s = s + "\n"
-		s = s +		"  m  stim type  %s\n" % BARMODES[self.barmode]
-		s = s +     " nN  rgb        %s\n" % color
-		s = s +		"1-6  color      %s\n" % self.colorname
-		s = s +		" iI  inten      %d\n" % self.inten
-		s = s +		" -=  linewidth  %d\n" % self.lw
-		s = s +		" tT  drift amp  %d px\n" % self.drift_amp
+		s = s +		"  m  stim type	 %s\n" % BARMODES[self.barmode]
+		s = s +		" nN  rgb		 %s\n" % color
+		s = s +		"1-6  color		 %s\n" % self.colorname
+		s = s +		" iI  inten		 %d\n" % self.inten
+		s = s +		" -=  linewidth	 %d\n" % self.lw
+		s = s +		" tT  drift amp	 %d px\n" % self.drift_amp
 		s = s +		" yY  drift freq %.1f Hz\n" % self.drift_freq
 		s = s +		" kK  blink freq %.1f Hz\n" % self.blink_freq
 		s = s + "\n"
 
-        ppc = self.length / self.sfreq
-        cpd = self.sfreq / self.length * self.ppd
-		s = s +     " []  sp-freq    %.1f c/rf\n" % (self.sfreq,)
-		s = s +     "     (%.1f px/c,%.1f c/d)\n" % (ppc, cpd)
-		s = s +     " {}  rad-freq   %.1f c/rf\n" % self.rfreq
+		ppc = self.length / self.sfreq
+		cpd = self.sfreq / self.length * self.ppd
+		s = s +		" []  sp-freq	 %.1f c/rf\n" % (self.sfreq,)
+		s = s +		"	  (%.1f px/c,%.1f c/d)\n" % (ppc, cpd)
+		s = s +		" {}  rad-freq	 %.1f c/rf\n" % self.rfreq
 
 		if s[:-1] == '\n':
 			s = s[:-1]
@@ -304,16 +304,16 @@ class _Probe(object):
 		return (col, colornames[self.colorn])
 
 	def showprobe(self, x=0, y=0, redraw=1):
-        import PIL.ImageTk
+		import PIL.ImageTk
 
 		if self.probeid is None or redraw:
-            self.im = self.s.asImage(xscale=self.app.udpy.canvas.xscale,
-                                     yscale=self.app.udpy.canvas.yscale)
-            self.photoim = PIL.ImageTk.PhotoImage(self.im)
+			self.im = self.s.asImage(xscale=self.app.udpy.canvas.xscale,
+									 yscale=self.app.udpy.canvas.yscale)
+			self.photoim = PIL.ImageTk.PhotoImage(self.im)
 			self.probeid = self.app.udpy.canvas.create_image(0, 0, anchor=NW,
 															 image=self.photoim)
-        x = x - (self.im.size[0]/2)
-        y = y - (self.im.size[1]/2)
+		x = x - (self.im.size[0]/2)
+		y = y - (self.im.size[1]/2)
 		self.app.udpy.canvas.coords(self.probeid, x, y)
 		self.app.udpy.canvas.lower(self.probeid)
 
@@ -324,8 +324,8 @@ class _Probe(object):
 		if self.blink_state == 0:
 			self.contrast = 0.0
 		if self.blink_state == 1:
-            self.contrast = 1.0
-        else:
+			self.contrast = 1.0
+		else:
 			self.contrast = float(math.sin(self.blink_freq * 2.0 * \
 										   math.pi * t / 1000.) > 0)
 
@@ -342,76 +342,76 @@ class _Probe(object):
 		self.colorname = name
 		olds = self.s
 		if (self.s is None) or self.drift:
-            if not self.drift or self.barmode in [BAR, RECT, CIRCLE, DISK]:
-                phase = 0.0
-            elif self.drift:
+			if not self.drift or self.barmode in [BAR, RECT, CIRCLE, DISK]:
+				phase = 0.0
+			elif self.drift:
 				phase = (t/1000.0) * self.drift_freq * 360.0
 
 			if self.barmode == BAR:
 				if color is None:
-                    self.s = ScaledSprite(width=max(1,self.width/self.lw),
-                                          height=max(1,self.length/self.lw))
-                    gaussiannoise(self.s)
-                    self.s.scale(self.width, self.length)
+					self.s = ScaledSprite(width=max(1,self.width/self.lw),
+										  height=max(1,self.length/self.lw))
+					gaussiannoise(self.s)
+					self.s.scale(self.width, self.length)
 				else:
-                    self.s = ScaledSprite(width=self.width, height=self.length)
+					self.s = ScaledSprite(width=self.width, height=self.length)
 					self.s.fill(color)
-                self.s.set_rotation(self.a)
+				self.s.set_rotation(self.a)
 			elif self.barmode == RECT:
 				if color is None:
-                    self.s = ScaledSprite(width=max(1,(self.width+2*self.lw)/self.lw),
-                                          height=max(1, (self.length+2*self.lw)/self.lw))
-                    gaussiannoise(self.s)
-                    self.s.scale(self.width+2*self.lw, self.length+2*self.lw)
+					self.s = ScaledSprite(width=max(1,(self.width+2*self.lw)/self.lw),
+										  height=max(1, (self.length+2*self.lw)/self.lw))
+					gaussiannoise(self.s)
+					self.s.scale(self.width+2*self.lw, self.length+2*self.lw)
 				else:
-                    self.s = ScaledSprite(width=self.width+2*self.lw, height=self.length+2*self.lw)
+					self.s = ScaledSprite(width=self.width+2*self.lw, height=self.length+2*self.lw)
 					self.s.fill(color)
-                self.s.rect(0, 0, self.width, self.length, (0,0,0,0))
+				self.s.rect(0, 0, self.width, self.length, (0,0,0,0))
 				self.s.set_rotation(self.a)
 			elif self.barmode == DISK:
 				if color is None:
-                    self.s = ScaledSprite(width=max(1,self.length/self.lw))
-                    gaussiannoise(self.s)
-                    self.s.scale(self.length, self.length)
+					self.s = ScaledSprite(width=max(1,self.length/self.lw))
+					gaussiannoise(self.s)
+					self.s.scale(self.length, self.length)
 				else:
 					self.s = ScaledSprite(width=self.length)
-                    self.s.fill(color)
-                self.s.hard_aperture(self.length/2)
-			elif self.barmode == CIRCLE:
-                l = self.length
-				if color is None:
-                    self.s = ScaledSprite(width=max(1,(l+2*self.lw)/self.lw))
-                    gaussiannoise(self.s)
-                    self.s.scale(l+2*self.lw, l+2*self.lw)
-				else:
-                    self.s = ScaledSprite(width=l+2*self.lw,
-                                          height=l+2*self.lw,
-                                          fb=self.app.fb, depth=99)
 					self.s.fill(color)
-                self.s.hard_aperture(l/2+self.lw)
-                self.s.circlefill((0,0,0,0), l/2)
+				self.s.hard_aperture(self.length/2)
+			elif self.barmode == CIRCLE:
+				l = self.length
+				if color is None:
+					self.s = ScaledSprite(width=max(1,(l+2*self.lw)/self.lw))
+					gaussiannoise(self.s)
+					self.s.scale(l+2*self.lw, l+2*self.lw)
+				else:
+					self.s = ScaledSprite(width=l+2*self.lw,
+										  height=l+2*self.lw,
+										  fb=self.app.fb, depth=99)
+					self.s.fill(color)
+				self.s.hard_aperture(l/2+self.lw)
+				self.s.circlefill((0,0,0,0), l/2)
 			elif self.barmode == CART:
 				l = self.length
 				self.s = ScaledSprite(width=l, height=l,
-                                      rwidth=100, rheight=100)
+									  rwidth=100, rheight=100)
 				if color is None or sum(color) < 3:
 					rc,gc,bc = -1.0,-1.0,-1.0
 				singrat(self.s, abs(self.sfreq)/2, phase, self.a,
-                        (255*rc, 255*gc, 255*bc))
+						(255*rc, 255*gc, 255*bc))
 				self.s.alpha_aperture(l/2)
 			elif self.barmode == HYPER:
 				l = self.length
 				self.s = ScaledSprite(width=l, height=l,
-                                      rwidth=100, rheight=100)
+									  rwidth=100, rheight=100)
 				if color is None or sum(color) < 3:
 					rc,gc,bc = -1.0,-1.0,-1.0
 				hypergrat(self.s, abs(self.sfreq)/2, phase, self.a,
-                          (255*rc, 255*gc, 255*bc))
+						  (255*rc, 255*gc, 255*bc))
 				self.s.alpha_aperture(l/2)
 			elif self.barmode == POLAR:
 				l = self.length
 				self.s = ScaledSprite(width=l, height=l,
-                                      rwidth=100, rheight=100)
+									  rwidth=100, rheight=100)
 				if self.rfreq < 0:
 					pol = -1
 				else:
@@ -419,11 +419,11 @@ class _Probe(object):
 				if color is None or sum(color) < 3:
 					rc,gc,bc = -1.0,-1.0,-1.0
 				polargrat(self.s, abs(self.sfreq)/2, abs(self.rfreq), phase, pol,
-                          (255*rc, 255*gc, 255*bc))
+						  (255*rc, 255*gc, 255*bc))
 				self.s.alpha_aperture(l/2)
-            self.s.fb = self.app.fb
-            self.s.depth = 99
-            
+			self.s.fb = self.app.fb
+			self.s.depth = 99
+			
 			self.lastx = None
 			self.lasty = None
 
@@ -446,7 +446,7 @@ class _Probe(object):
 				# only actually blit if new sprite or it moved
 				self.s.on()
 				self.s.moveto(x, y)
-                self.s.contrast = self.contrast
+				self.s.contrast = self.contrast
 				self.s.blit()
 				self.lastx = x
 				self.lastx = y
@@ -487,49 +487,49 @@ class _Probe(object):
 											text=BTAG[self.blink_state])
 		else:
 			self.major_ax = \
-              self.app.udpy.canvas.create_line(x1, y1, x2, y2,
-                                               fill='magenta',
-                                               width=4)
+			  self.app.udpy.canvas.create_line(x1, y1, x2, y2,
+											   fill='magenta',
+											   width=4)
 			self.minor_ax = \
-              self.app.udpy.canvas.create_line(x, y, x+dx, y+dy,
-                                               arrow=LAST,
-                                               fill='magenta',
-                                               width=4)
+			  self.app.udpy.canvas.create_line(x, y, x+dx, y+dy,
+											   arrow=LAST,
+											   fill='magenta',
+											   width=4)
 
 			self.onoff = \
-              self.app.udpy.canvas.create_text(x, y,
-                                               text=BTAG[self.blink_state],
-                                               anchor=CENTER,
-                                               font=('Andale Mono', 30),
-                                               fill='green')
+			  self.app.udpy.canvas.create_text(x, y,
+											   text=BTAG[self.blink_state],
+											   anchor=CENTER,
+											   font=('Andale Mono', 30),
+											   fill='green')
 			for l in (self.minor_ax, self.major_ax):
 				self.app.udpy.canvas.lower(l)
 
-        if self.blink_state > 0:
-            c = self.contrast > 0
-        else:
-            c = 0
+		if self.blink_state > 0:
+			c = self.contrast > 0
+		else:
+			c = 0
 
 		if self.app.hmapstate.probe.live:
-            for i in (self.major_ax, self.minor_ax):
-                self.app.udpy.canvas.itemconfigure(i, dash=(200,1),
-                                                   width=1+(4*c))
-        else:
-            for i in (self.major_ax, self.minor_ax):
-                self.app.udpy.canvas.itemconfigure(i, dash=(4,4),
-                                                   width=1+(4*c))
+			for i in (self.major_ax, self.minor_ax):
+				self.app.udpy.canvas.itemconfigure(i, dash=(200,1),
+												   width=1+(4*c))
+		else:
+			for i in (self.major_ax, self.minor_ax):
+				self.app.udpy.canvas.itemconfigure(i, dash=(4,4),
+												   width=1+(4*c))
 
 		if self.showinfo:
 			s = self.infostr()
 		else:
 			s = "  h: show info"
-        if 1:
+		if 1:
 			self.app.udpy.canvas.itemconfig(self.app.hmapstate.infobox2,
 											text=s)
-            #self.app.hmapstate.infobox.set(s)
-        else:
-            for i in self.text:
-                self.app.udpy.canvas.itemconfig(i, text=s)
+			#self.app.hmapstate.infobox.set(s)
+		else:
+			for i in self.text:
+				self.app.udpy.canvas.itemconfig(i, text=s)
 
 def _step(val, by=1, minval=None, maxval=None):
 	val = val + by
@@ -623,10 +623,10 @@ def _key_handler(app, c, ev):
 		p.width = _step(p.width, by=-10, minval=1)
 		p.force_redraw()
 	elif c == 'minus':
-        p.lw = max(1, p.lw - 1)
+		p.lw = max(1, p.lw - 1)
 		p.force_redraw()
 	elif c == 'equal':
-        p.lw = min(20, p.lw + 1)
+		p.lw = min(20, p.lw + 1)
 		p.force_redraw()
 	elif c == 'd':
 		if p.drift:
@@ -686,15 +686,15 @@ def hmap_hide(app, update=None):
 		_hmap_idlefn(app)
 
 def hmap_state(app, enable=None):
-    if enable is None:
-        return (app.taskidle is _hmap_idlefn)
-    elif enable:
-        app.taskidle = _hmap_idlefn
-    else:
-        app.taskidle = None
+	if enable is None:
+		return (app.taskidle is _hmap_idlefn)
+	elif enable:
+		app.taskidle = _hmap_idlefn
+	else:
+		app.taskidle = None
 
 def hmap_enable(app):
-    app.taskidle = _hmap_idlefn
+	app.taskidle = _hmap_idlefn
 
 def hmap_install(app):
 	app.hmapstate = Holder()
@@ -702,29 +702,29 @@ def hmap_install(app):
 	app.hmapstate.probe = _Probe(app)
 	app.hmapstate.hookdata = app.set_canvashook(_key_handler, app)
 	app.taskidle = _hmap_idlefn
-    app.hmapstate.probe.text = []
-    for n in [0, 1]:
-        app.hmapstate.probe.text.append(
-            app.udpy.canvas.create_text(11, 36+n,
-                                        font=('Andale Mono', 8),
-                                        anchor=NW,
-                                        justify=LEFT,
-                                        fill=['black', 'red'][n])
-                                        )
-    app.udpy.set_taskcallback(lambda ev, app=app: _key_handler(app, 'z', ev))
+	app.hmapstate.probe.text = []
+	for n in [0, 1]:
+		app.hmapstate.probe.text.append(
+			app.udpy.canvas.create_text(11, 36+n,
+										font=('Andale Mono', 8),
+										anchor=NW,
+										justify=LEFT,
+										fill=['black', 'red'][n])
+										)
+	app.udpy.set_taskcallback(lambda ev, app=app: _key_handler(app, 'z', ev))
 
-    app.hmapstate.infobox2 = app.udpy.canvas.create_text(20, 15, text="",
+	app.hmapstate.infobox2 = app.udpy.canvas.create_text(20, 15, text="",
 														 font=('Andale Mono',
 															   8),
 														 fill="orange",
 														 anchor=Tkinter.NW)
-    #app.hmapstate.infobox = TextWin('handmap', fg='blue',
-    #                                    font=('Andale Mono', 8))
-    #app.setgeo(app.hmapstate.infobox, default='-0-0')
+	#app.hmapstate.infobox = TextWin('handmap', fg='blue',
+	#									 font=('Andale Mono', 8))
+	#app.setgeo(app.hmapstate.infobox, default='-0-0')
 
 	app.udpy.canvas.itemconfig(app.hmapstate.infobox2,
 							   text='a\n\b\n\c')
-    #app.hmapstate.infobox.set('a\n\b\n\c')
+	#app.hmapstate.infobox.set('a\n\b\n\c')
 
 
 def hmap_uninstall(app):
@@ -734,12 +734,12 @@ def hmap_uninstall(app):
 	app.hmapstate.probe.save()
 	app.hmapstate.probe.clear()
 	app.set_canvashook(app.hmapstate.hookdata[0], app.hmapstate.hookdata[1])
-    for i in app.hmapstate.probe.text:
-        app.udpy.canvas.delete(i)
-    app.udpy.set_taskcallback(None)
+	for i in app.hmapstate.probe.text:
+		app.udpy.canvas.delete(i)
+	app.udpy.set_taskcallback(None)
 
 	app.udpy.canvas.delete(app.hmapstate.infobox2)
-    #app.hmapstate.infobox.destroy()
+	#app.hmapstate.infobox.destroy()
 	del app.hmapstate
 
 

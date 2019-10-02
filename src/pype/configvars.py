@@ -12,20 +12,20 @@ import os
 import config
 
 def mkconfig(file):
-    c = defaults(None)
-    try:
-        f = open(file, 'w')
-        f.write('# pype default host-specific config file\n')
-        keys = c.keys()
-        keys.sort()
-        for k in c.keys():
-            f.write("# %s\n" % (c.getdoc(k),))
-            if c.get(k):
-                f.write("%s: %s\n" % (k, c.get(k)))
-            else:
-                f.write("#%s: %s\n" % (k, '....'))
-    finally:
-        f.close()
+	c = defaults(None)
+	try:
+		f = open(file, 'w')
+		f.write('# pype default host-specific config file\n')
+		keys = c.keys()
+		keys.sort()
+		for k in c.keys():
+			f.write("# %s\n" % (c.getdoc(k),))
+			if c.get(k):
+				f.write("%s: %s\n" % (k, c.get(k)))
+			else:
+				f.write("#%s: %s\n" % (k, '....'))
+	finally:
+		f.close()
 
 def defaults(srcfile=None):
 
@@ -43,7 +43,7 @@ def defaults(srcfile=None):
 
 	c.set('DEBUG', '0',
 		  doc='debug mode')
-    c.set('DBERRS', 0,
+	c.set('DBERRS', 0,
 		  doc='drop into debugger after reporting errors')
 	c.set('SPLASH', '1',
 		  doc='show splash screen on startup')
@@ -67,8 +67,8 @@ def defaults(srcfile=None):
 		  doc='beep when giving rewards?')
 	c.set('SOUND', '1',
 		  doc='access to sound card?')
-    c.set('AUDIODRIVER', '',
-          doc='name of sound card driver -- typially alsa')
+	c.set('AUDIODRIVER', '',
+		  doc='name of sound card driver -- typially alsa')
 
 	c.set('USB_JS_DEV',	'',
 		  doc='enable USB joystick -- device file')
@@ -142,7 +142,7 @@ def defaults(srcfile=None):
 	c.set('SWAP_XY', '0',
 		  doc='swap X & Y on eye tracker')
 
-    # EYELINK SPECIFIC OPTIONS
+	# EYELINK SPECIFIC OPTIONS
 	c.set('EYELINK_XTALK', '0,-0.001',
 		  doc='crosstalk adj: pupil pos/size')
 	c.set('EYELINK_OPTS', '',
@@ -178,11 +178,11 @@ def defaults(srcfile=None):
 		  doc='enable/disable use of elog api/interface')
 
 	#####################################################
-    # experimental options
-    c.set('HTTP_SERVER', 1,
-          doc='enable integrated HTTP server?')
-    c.set('HTTP_PORT', 8080,
-          doc='port number for built in HTTP server')
+	# experimental options
+	c.set('HTTP_SERVER', 1,
+		  doc='enable integrated HTTP server?')
+	c.set('HTTP_PORT', 8080,
+		  doc='port number for built in HTTP server')
 
 	return c
 
@@ -247,10 +247,10 @@ PSYCH			(0|1)	psychophysics mode (also -p option on command line)
 USERDISPLAY_HIDE (0|1)	hide usder display window on startup
 TICKS_MAJOR		(0|1)	show major (5deg) tickmarks on userdisplay
 TICKS_MINOR		(0|1)	show minor (1deg) tickmarks on userdisplay
-ELOG            (0|1)   link to 'elog' electronic log/notebook system
-TASKPATH        (str)   colon-delimited search path for tasks
-TOOLS           (str)   semicolon-delimited individual tasks for quick-load
-STATS           (0|1)   turn remote monitoring (~/pyperc/monitor.html) on/off
+ELOG			(0|1)	link to 'elog' electronic log/notebook system
+TASKPATH		(str)	colon-delimited search path for tasks
+TOOLS			(str)	semicolon-delimited individual tasks for quick-load
+STATS			(0|1)	turn remote monitoring (~/pyperc/monitor.html) on/off
 
 Environment Vars (use setenv, not config file!)
 -----------------------------------------------

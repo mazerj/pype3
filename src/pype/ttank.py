@@ -161,7 +161,7 @@ class TTankServer(object):
 				ett = time.time() - tic
 				self.log('[%.0f/%.0f ms eval/xmit]' % (1000*ete, 1000*ett,))
 				if DEBUG:
-                    self.log('(%s,??) <- ..%s..' % (ok, x[1]))
+					self.log('(%s,??) <- ..%s..' % (ok, x[1]))
 
 				if ok is None:
 					self.log(sys.exc_value)

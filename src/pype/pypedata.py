@@ -178,7 +178,7 @@ class PypeRecord(object):
 
 		self.file = file
 		self.recnum = recnum
-        self.rec = rec
+		self.rec = rec
 		self.taskname = taskname
 		self.trialtime = trialtime
 		self.parsed_trialtime = parsed_trialtime
@@ -299,22 +299,22 @@ class PypeRecord(object):
 
 			# all pype files should have these (may be [] if not collected)
 
-            #Tue Aug 20 16:08:29 2013 mazer
-            # if an event 'name' is not a string, then assume it's a list
-            # or tuple and expand on the fly into multiple events with
-            # a shared timestamp -- this was originally done in by
-            # p2m/pype_expander.py when generating matlab files, but this
-            # is actually the correct place to do it..
-            times = []
-            events = []
-            for (t, e) in self.rec[2]:
-                if type(e) is types.StringType:
-                    times.append(t)
-                    events.append(e)
-                else:
-                    for ee in e:
-                        times.append(t)
-                        events.append(ee)
+			#Tue Aug 20 16:08:29 2013 mazer
+			# if an event 'name' is not a string, then assume it's a list
+			# or tuple and expand on the fly into multiple events with
+			# a shared timestamp -- this was originally done in by
+			# p2m/pype_expander.py when generating matlab files, but this
+			# is actually the correct place to do it..
+			times = []
+			events = []
+			for (t, e) in self.rec[2]:
+				if type(e) is types.StringType:
+					times.append(t)
+					events.append(e)
+				else:
+					for ee in e:
+						times.append(t)
+						events.append(ee)
 			self.events = zip(times, events)
 
 
@@ -522,22 +522,22 @@ class PypeFile(object):
 	def __repr__(self):
 		return '<PypeFile:%s (%d recs)>' % (self.fname, len(self.cache))
 
-    def _fatal_unpickle_error(self):
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        sys.stderr.write('Missing module <%s> during unpickling.\n' % exc_value)
-        sys.stderr.write("""
-    Find the original module and add it to your PYTHONPATH to access
-    datafile. This usually means the missing module imported Numeric, so
-    if you can't find the original, try making a dummmy file of the same
-    name, on your path, containing the line:
+	def _fatal_unpickle_error(self):
+		exc_type, exc_value, exc_traceback = sys.exc_info()
+		sys.stderr.write('Missing module <%s> during unpickling.\n' % exc_value)
+		sys.stderr.write("""
+	Find the original module and add it to your PYTHONPATH to access
+	datafile. This usually means the missing module imported Numeric, so
+	if you can't find the original, try making a dummmy file of the same
+	name, on your path, containing the line:
 
-    from Numeric import *
+	from Numeric import *
 
-    """)
+	""")
 
-        sys.stderr.write('PYTHONPATH=%s\n' % os.environ['PYTHONPATH'])
-        sys.stderr.write(get_traceback())
-        sys.exit(1)
+		sys.stderr.write('PYTHONPATH=%s\n' % os.environ['PYTHONPATH'])
+		sys.stderr.write(get_traceback())
+		sys.exit(1)
 
 
 

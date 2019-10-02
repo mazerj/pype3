@@ -88,8 +88,8 @@ class _Socket(object):
 
 	def recv(self, packetsize=1024):
 		# returns None when connection is closed..
-        nbytes = struct.calcsize(_Socket.fmt)
-        # this is where the timeout error is occuring:
+		nbytes = struct.calcsize(_Socket.fmt)
+		# this is where the timeout error is occuring:
 		buf = self.sockfd.recv(nbytes)
 		if len(buf) == 0:
 			return None

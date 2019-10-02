@@ -69,15 +69,15 @@ CYAN	= (1,255,255)
 import PIL.Image
 
 if PIL.Image.VERSION >= '1.1.7':
-    # newer versions of PIL use .frombytes() instead of .fromstring()
+	# newer versions of PIL use .frombytes() instead of .fromstring()
 	def image2pil(image):
 		return PIL.Image.frombytes('RGBA', image.get_size(),
 								   pygame.image.tostring(image, 'RGBA'))
 else:
-    # old version
+	# old version
 	def image2pil(image):
 		return PIL.Image.fromstring('RGBA', image.get_size(),
-								    pygame.image.tostring(image, 'RGBA'))
+									pygame.image.tostring(image, 'RGBA'))
 
 class FrameBuffer(object):
 	_instance = None
@@ -1440,7 +1440,7 @@ class ScaledSprite(object):
 		"""Lossy rotation of spite image data.
 
 		CW rotation of sprite about the center using pygame.transform
-		primitives.  This is a *non-invertable* deformation --
+		primitives.	 This is a *non-invertable* deformation --
 		multiple rotations will accumulate errors, so if you're doing
 		that, keep an original copy and rotate the copy each time.
 
@@ -1469,7 +1469,7 @@ class ScaledSprite(object):
 		
 		
 	def scale(self, new_width, new_height):
-		"""Fast resizing of  sprite using pygame.rotozoom.
+		"""Fast resizing of	 sprite using pygame.rotozoom.
 
 		Can scale up or down equally well. Changes the data within the
 		sprite, so it's not really invertable. If you want to save the
@@ -2375,10 +2375,10 @@ def _texture_del(texture):
 		else:
 			ogl.glDeleteTextures(texture[0])
 	ogl.glDeleteTextures(texture[0])
-    
-    
+	
+	
 def _texture_create(rgbastr, w, h):
-    """Create GL texture on video card.
+	"""Create GL texture on video card.
 
 	:note: INTERNAL USE ONLY
 

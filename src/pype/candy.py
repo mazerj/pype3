@@ -37,9 +37,9 @@ def _startstop(app, start):
 		app.info('')
 		app.info(' Select again to stop! ', color='black')
 	else:
-        if app.taskmodule:
-            for w in app.disable_on_start:
-                w.config(state=NORMAL)
+		if app.taskmodule:
+			for w in app.disable_on_start:
+				w.config(state=NORMAL)
 		app.info()
 		if app.psych:
 			app.fb.screen_close()

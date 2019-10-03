@@ -136,7 +136,7 @@ def _slideshow(app):
 				s = Sprite(fname=fname, fb=app.fb, x=x, y=x)
 				if s.w > 10 and s.h > 10:
 					break
-			except:
+			except FileNotFoundError:
 				print('dud file: %s\n' % fname)
 		maxd = 512.0
 		if s.w > maxd:

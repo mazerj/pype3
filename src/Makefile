@@ -26,7 +26,7 @@ install-subdirs:
 		do (cd $$i ; $(MAKE) install);\
 		done
 	@rm -rf $(PYPEDIR)/pype/Pmw*
-	@sh Pmw/pmw.sh $(PYPEDIR)/pype $(PYTHONEXE)
+	@sh Pmw2/pmw.sh $(PYPEDIR)/pype $(PYTHONEXE)
 
 install-p2m:
 	(cd p2m ; $(MAKE) install)

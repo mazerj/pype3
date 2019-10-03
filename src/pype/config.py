@@ -83,14 +83,14 @@ class Config(object):
 				if not l: break
 				l = l[:-1]
 				try:
-					ix = string.index(l, '#')
+					ix = l.index('#')
 					l = l[0:ix]
 				except ValueError:
 					pass
 				try:
-					ix = string.index(l, ':')
-					name = string.strip(l[0:ix])
-					value = string.strip(l[(ix+1):])
+					ix = l.index(':')
+					name = l[0:ix].strip()
+					value = l[(ix+1):].strip()
 					d[name] = value
 				except ValueError:
 					pass

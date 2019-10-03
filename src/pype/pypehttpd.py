@@ -20,7 +20,7 @@ class PypeHandler(BaseHTTPRequestHandler):
 		
 		if cmd == '/':
 			h = socket.gethostname().split('.')[0]
-			s = string.replace(getapp().last_tally, '\n', '<br>\n')
+			s = getapp().last_tally.replace('\n', '<br>\n')
 			self.wfile.write("""<META HTTP-EQUIV="refresh" CONTENT="5">\n""")
 			self.wfile.write("""<style>h1,h2 { font-family: sans-serif; }</style>\n""")
 			self.wfile.write("""<h1>pype on %s</h1>\n""" % (h,))

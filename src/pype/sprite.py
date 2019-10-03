@@ -68,7 +68,7 @@ CYAN	= (1,255,255)
 
 import PIL.Image
 
-if PIL.Image.VERSION >= '1.1.7':
+if not 'VERSION' in dir(PIL.Image) or PIL.Image.VERSION >= '1.1.7':
 	# newer versions of PIL use .frombytes() instead of .fromstring()
 	def image2pil(image):
 		return PIL.Image.frombytes('RGBA', image.get_size(),
@@ -1416,8 +1416,8 @@ class ScaledSprite(object):
 			self.fill((0,0,0,0))
 
 		color = C(color)
-		x = self.w/2 + x - w/2
-		y = self.h/2 - y - h/2
+		x = round(self.w/2 + x - w/2)
+		y = round(self.h/2 - y - h/2)
 		mx = max(0,x)
 		my = max(0,y)
 
@@ -2374,7 +2374,10 @@ def _texture_del(texture):
 			ogl.glDeleteTextures(np.array([textureid]))
 		else:
 			ogl.glDeleteTextures(texture[0])
-	ogl.glDeleteTextures(texture[0])
+	#ogl.glDeleteTextures(texture[0])
+	(textureid, w, h) = texture
+	ogl.glDeleteTextures(np.array([textureid]))
+
 	
 	
 def _texture_create(rgbastr, w, h):
@@ -2491,7 +2494,7 @@ def colr(*args, **kwargs):
 			elif args[0].lower() == 'blue' or args[0].lower() == 'b':
 				c = np.array((0,0,max,max))
 			else:
-				c = np.array(list(map(float, string.split(args[0], ','))))
+				c = np.array(list(map(float, args[0].split(','))))
 		else:
 			try:
 				l = len(args[0])

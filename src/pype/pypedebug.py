@@ -68,7 +68,7 @@ def get_exception(show=None):
 	type, value, tb = sys.exc_info()
 	if show:
 		traceback.print_exception(type, value, tb)
-	return string.join(traceback.format_exception(type, value, tb))
+	return ''.join(traceback.format_exception(type, value, tb))
 
 def get_traceback(show=None):
 	"""Stack dump to stdout.
@@ -104,7 +104,7 @@ def get_traceback(show=None):
 		msg.append('%s File "%s", line %s, in %s:\n' % (prefix, file, line, fn))
 		msg.append('%s	 %s\n' % (prefix, text))
 		depth = depth + 1
-	msg = string.join(msg)
+	msg = ''.join(msg)
 	if show:
 		sys.stderr.write(msg)
 	return msg

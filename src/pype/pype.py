@@ -1146,7 +1146,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             ask('migrate_pypestate', 'Automigrate %s?' %
                 fname, ['yes', 'no']) == 0):
             try:
-                d = pickle.load(open(fname, 'r'))
+                d = pickle.load(open(fname, 'rb'))
                 self.tallycount = d['tallycount']
                 self._tally()
                 # ppd's here are because previously this was set in the
@@ -1419,7 +1419,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             (task, type) = k
             d = type.split()
             if len(d) > 1:
-                d = "%s (%s)" % (d[0], string.join(d[1:]))
+                d = "%s (%s)" % (d[0], ''.join(d[1:]))
             else:
                 d = d[0]
             s = s + '%s %s: %d\n' % (task, d, self.tallycount[(task,type)])
@@ -1535,9 +1535,9 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 for w in l.split(';')[1:]:
                     if ':' in w:
                         (tag, val) = w.split(':')
-                        d[string.strip(tag)] = string.strip(val)
+                        d[tag.strip()] = val.strip()
                     else:
-                        d[string.strip(w)] = 1
+                        d[w.strip()] = 1
         return d
 
     def make_recent(self):
@@ -1617,7 +1617,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             try:
                 t = os.path.basename(tool).replace('.py','')
                 file, fullpath, descr = imp.find_module(t)
-                d = string.join(fullpath.split('/')[:-1],'/')
+                d = '/'.join(fullpath.split('/')[:-1])
                 if toolbar is None:
                     toolbar = Frame(parent, borderwidth=2)
                     toolbar.pack(anchor=CENTER, padx=10, pady=10)
@@ -1813,7 +1813,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         if not rot is None: self.ical.set('rot_', '%f' % rot)
         if not affine is None:
             # convert 3x3 matrix into CSV string for param table storage
-            a = string.join(['%g'%f for f in affine.flatten()], ',')
+            a = ','.join(['%g'%f for f in affine.flatten()])
             self.ical.set('affinem_', a)
 
         dacq_eye_smooth(self.rig_common.queryv('eye_smooth'))
@@ -1999,11 +1999,11 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 age = -1
         try:
             if save:
-                pickle.dump(self.tallycount, open(fname, 'w'))
+                pickle.dump(self.tallycount, open(fname, 'wb'))
             else:
                 if age < 0.5 or ask('loadstate', 'Clear old tally data?',
                                     ['yes', 'no']) == 1:
-                    self.tallycount = pickle.load(open(fname, 'r'))
+                    self.tallycount = pickle.load(open(fname, 'rb'))
         except IOError:
             Logger("Can't read/write tally file.\n")
 
@@ -2063,14 +2063,14 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         nc = self._runstats['ncorrect']
         nu = self._runstats['nui']
         nt = nc + ne
-        s = string.join((
+        s = '\n'.join((
             ' running = %d'    % (self.isrunning(),),
             '----------------------------------',
             'Corrects = %d [%d]' % (nc, self.sub_common.queryv('max_correct'),),
             '  Errors = %d'      % (ne,),
             '     UIs = %d [%d]' % (nu, self.sub_common.queryv('max_ui'),),
             '  Trials = %d [%d]' % (nt, self.sub_common.queryv('max_trials'),),
-            '----------------------------------'), '\n')
+            '----------------------------------'))
         self.statsw.configure(text=s)
         return s
         
@@ -2522,7 +2522,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             (c, ev) = self.tkkeyque.pop()
             if c: keys.append(c)
             for c in keys:
-                c = string.lower(c)
+                c = c.lower()
                 if c == 'escape':
                     if self._allowabort:
                         self.encode(ABORT)
@@ -3043,13 +3043,16 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 self._winpos = {}
         elif load:
             try:
-                self._winpos = pickle.load(open(filename, 'r'))
+                self._winpos = pickle.load(open(filename, 'rb'))
             except IOError:
                 self._winpos = {}
                 pass
             except EOFError:
                 self._winpos = {}
                 pass
+            except ValueError:
+                self._winpos = {}
+                pass            
         elif save:
             wlist = []
             wlist.append(self.tk)
@@ -3064,7 +3067,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 except AttributeError:
                     pass
 
-                pickle.dump(self._winpos, open(filename, 'w'))
+                pickle.dump(self._winpos, open(filename, 'wb'))
         else:
             try:
                 geo = self._winpos[w.title()]
@@ -3380,7 +3383,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             ts = dacq_ts()
 
         if code is not None:
-            if (type(code) is TupleType) or (type(code) is ListType):
+            if isinstance(code, (tuple, list,)):
                 # Mon Aug 19 12:27:30 2013 mazer
                 # this worked only for tuples, should also work for lists now.
                 for acode in code:
@@ -3555,7 +3558,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             fast_tmp = 0
 
         # force taskinfo to be a tuple..
-        if type(taskinfo) != TupleType:
+        if not isinstance(taskinfo, (tuple,)):
             taskinfo = (taskinfo,)
 
         # stop eye recording, just in case user forgot.

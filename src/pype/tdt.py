@@ -113,7 +113,7 @@ if _WINDOWS:
 		fp = None
 		def __init__(self, msg=None):
 			if msg:
-				for ln in string.strip(msg).split('\n'):
+				for ln in msg.strip().split('\n'):
 					s = '%02d:%02d:%02d ' % time.localtime(time.time())[3:6]
 					s = s + '%s\n' % (ln,)
 					if _DEBUG:

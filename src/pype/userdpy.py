@@ -592,7 +592,7 @@ class UserDisplay(object):
 							  text='Save box file')
 
 		if not (file is None):
-			with open(file, 'w') as f:
+			with open(file, 'wb') as f:
 				pickle.dump(self.markstack, f)
 		
 	def loadbox(self):
@@ -603,7 +603,7 @@ class UserDisplay(object):
 										text='Load box from file')
 
 		if not (file is None):
-			with open(file, 'r') as f:
+			with open(file, 'rb') as f:
 				ms = pickle.load(f)
 				self.clearbox()
 				self.markstack = ms
@@ -781,7 +781,7 @@ class UserDisplay(object):
 											  pattern="*.pts", append=None,
 											  text='Save points to file')
 		if filename:
-			file = open(filename, 'w')
+			file = open(filename, 'wb')
 			pickle.dump(self.points, file)
 			file.close()
 
@@ -795,7 +795,7 @@ class UserDisplay(object):
 			if filename is None:
 				return
 		try:
-			file = open(filename, 'r')
+			file = open(filename, 'rb')
 			newpoints = pickle.load(file)
 			file.close()
 		except IOError:
@@ -840,7 +840,7 @@ class UserDisplay(object):
 			l = fp.readline()
 			if not l:
 				break
-			if string.find(l, ',') >= 0:
+			if l.find(',') >= 0:
 				l = l.split(',')
 			else:
 				l = l.split()

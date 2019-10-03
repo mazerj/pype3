@@ -457,8 +457,8 @@ class PypeRecord(object):
 
 		if pattern is None:
 			try:
-				pattern = string.strip(open(pype.pyperc('spikepattern'),
-											'r').readline())
+				pattern = open(pype.pyperc('spikepattern'),
+											'r').readline().strip()
 			except IOError:
 				pattern = None
 
@@ -483,9 +483,9 @@ class PypeFile(object):
 		flist = fname.split('+')
 		if len(flist) > 1:
 			if flist[0][-3:] == '.gz':
-				cmd = 'gunzip --quiet -c %s ' % string.join(flist,' ')
+				cmd = 'gunzip --quiet -c %s ' % ' '.join(flist)
 			else:
-				cmd = 'cat %s ' % string.join(flist,' ')
+				cmd = 'cat %s ' % ' '.join(flist)
 			self.fp = posix.popen(cmd, 'r')
 			if not quiet:
 				sys.stderr.write('compositing: %s\n' % fname)

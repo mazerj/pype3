@@ -160,14 +160,14 @@ class _Probe(object):
 		x.rfreq = self.rfreq
 		x.lw = self.lw
 
-		file = open(pyperc('hmapstim'), 'w')
+		file = open(pyperc('hmapstim'), 'wb')
 		pickle.dump(x, file)
 		file.close()
 
 	def load(self):
 		import pickle
 		try:
-			file = open(pyperc('hmapstim'), 'r')
+			file = open(pyperc('hmapstim'), 'rb')
 			x = pickle.load(file)
 			file.close()
 		except IOError:
@@ -205,7 +205,7 @@ class _Probe(object):
 	def infostr(self):
 		angle = ((self.a % 180), (self.a % 180)+180)
 		try:
-			color = string.join(["%d"%x for x in self.colorshow],',')
+			color = ','.join(["%d"%x for x in self.colorshow])
 		except TypeError:
 			color = 'noise'
 

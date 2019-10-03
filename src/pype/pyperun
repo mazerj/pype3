@@ -15,19 +15,19 @@ import glob
 import string
 import traceback
 import code
-import imp
+import imp								# decrecated!!!
 
 if "--idebug" in sys.argv:
 	import inspect
-	import __builtin__
-	savimp = __builtin__.__import__
+	import builtins
+	savimp = builtins.__import__
 	
 	def newimp(name, *x):
 		caller = inspect.currentframe().f_back
-		print 'IMPORTING', name, 'in', caller.f_globals.get('__name__')
+		print('IMPORTING', name, 'in', caller.f_globals.get('__name__'))
 		return savimp(name, *x)
 	
-	__builtin__.__import__ = newimp
+	builtins.__import__ = newimp
 
 __debug = 0
 __show_help = 0
@@ -91,7 +91,7 @@ for a in sys.argv:
 	elif a == '--nogeo':
 		__nogeo = 1
 	elif a == '--dir':
-		print pypedir
+		print(pypedir)
 		sys.exit(1)
 	elif a == '--debug':
 		__debug = 1
@@ -137,13 +137,13 @@ pypenv/pype options:
 """)
 	sys.exit(0)
 
-if not os.environ.has_key('HOME'):
+if 'HOME' not in os.environ:
 	sys.stderr.write('%s: please set $HOME and restart\n' % sys.argv[0])
 	sys.exit(1)
 
 _original_path = sys.path[::]
 _addpath(pypedir+ '/pype', atend=0)
-if os.environ.has_key('LD_LIBRARY_PATH'):
+if 'LD_LIBRARY_PATH' in os.environ:
 	# ensures pickup of Eyelink shared libraries
 	os.environ['LD_LIBRARY_PATH'] = pypedir + '/lib:' + \
 									os.environ['LD_LIBRARY_PATH']
@@ -161,7 +161,7 @@ if __show_config:
 	sys.exit(0)
 if __show_paths:
 	sys.stdout.write('# env vars\n')
-	for v in os.environ.keys():
+	for v in list(os.environ.keys()):
 		sys.stdout.write('%s=%s\n' % (v, os.environ[v],))
 	sys.exit(0)
 if __show_version:
@@ -176,11 +176,6 @@ if __show_version:
 		sys.stderr.write("	  build on: %s\n" % pypeversion.PypeBuildDate)
 		
 	sys.exit(0)
-
-sys.stderr.write('foo!\n')
-print(sys.path)
-import configparser
-sys.stderr.write('bar!\n')
 
 """
 from importer import importer
@@ -218,7 +213,7 @@ if not subj is None:
 
 
 # prefix user-specified PYPEPATH directories -- colon deliminated
-if os.environ.has_key('PYPEPATH'):
+if 'PYPEPATH' in os.environ:
 	for d in string.split(os.environ['PYPEPATH'], ':')[::-1]:
 		_addpath(d, atend=0)
 

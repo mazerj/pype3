@@ -377,7 +377,7 @@ def param_expand(s, integer=None):
 	if integer:
 		return int(round(param_expand(s, integer=None)))
 
-	s = string.strip(s)
+	s = s.strip()
 	if len(s) < 1:
 		return None
 

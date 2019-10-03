@@ -241,7 +241,7 @@ class ParamTable(object):
 			n = 0
 			for slot in pt._table:
 				n = n + 1
-				if string.find(slot[0], name) >= 0:
+				if slot[0].find(name) >= 0:
 					intabs.append((pt, slot[0], n,))
 					if show:
 						pt._parent._show()
@@ -396,11 +396,11 @@ class ParamTable(object):
 
 		(ok, x) = self._get(evaluate=0)
 
-		c = configparser.ConfigParser()
+		c = configparser.ConfigParser(interpolation=None)
 		c.add_section('params')
 		c.add_section('locks')
 		for k in list(x.keys()):
-			c.set('params', k, x[k])
+			c.set('params', k, str(x[k]))
 			if k in self._locks:
 				if self._locks[k] == DISABLED:
 					c.set('locks', k, 1)
@@ -421,6 +421,7 @@ class ParamTable(object):
 		This way you can safely inherit from previous modules w/o
 		accumulating excess garbage.
 		"""
+		print('in load')
 		if file is None:
 			file = self._file
 
@@ -450,6 +451,8 @@ class ParamTable(object):
 	def _load(self, file=None):
 		# try all the load methods in order until one works..
 		# or if none work, return 0..
+		print('in _load')
+
 		for method in (self._load_cfg, self._load_txt, self._load_pickle):
 			if method(file=file):
 				if not method  == self._load_cfg:
@@ -462,12 +465,13 @@ class ParamTable(object):
 
 		"""
 
+		print('in _load_cfg')
 		try:
 			f = open(file, 'r')
 		except IOError:
 			return 0
 
-		c = configparser.ConfigParser()
+		c = configparser.ConfigParser(interpolation=None)
 		try:
 			c.readfp(f)
 		except:
@@ -509,10 +513,11 @@ class ParamTable(object):
 		"""Backward compatibility only.
 
 		"""
+		print('in _load_pickle')
 		try:
-			f = open(file, 'r')
-			x = pickle.load(f)
+			f = open(file, 'rb')
 			try:
+				x = pickle.load(f)
 				locks = pickle.load(f)
 			except EOFError:
 				locks = {}
@@ -541,6 +546,7 @@ class ParamTable(object):
 		"""Backward compatibility only.
 
 		"""
+		print('in _load_txt')
 		try:
 			x = {}
 			locks = {}
@@ -779,7 +785,7 @@ def is_boolean(s, evaluate=None):
 
 	"""
 	try:
-		x = string.lower(s)
+		x = s.lower()
 		if (x == 'yes') or (x == 'on') or (x == 'true'):
 			r = VALID
 			i = 1

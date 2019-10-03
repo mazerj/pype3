@@ -1067,9 +1067,9 @@ class ScaledSprite(object):
 		if not image and not fname and rheight < 1.0:
 			rheight = int(round(dheight * rheight))
 			
-		if rwidth > dwidth:
+		if rwidth and rwidth > dwidth:
 			rwidth = dwidth
-		if rheight > dheight:
+		if rheight and rheight > dheight:
 			rheight = dheight
 			
 		if fname:

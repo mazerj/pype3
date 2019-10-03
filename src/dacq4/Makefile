@@ -7,7 +7,7 @@ CFLAGS = -O6 -g -Wall $(GLOBAL_CFLAGS) -I$(PYTHONINC) -fPIC
 COMEDI_SERVER_OBJS = sigs.o psems.o usbjs.o systemio.o
 
 
-all: build install
+fall: build install
 
 build: _dacq.so $(COMEDI_SERVER)
 
@@ -38,12 +38,15 @@ dacq.c: dacq.h
 
 dacq.i: dacq.c dacq.h dacq.i.pre
 	@cat dacq.i.pre dacq.h >dacq.i
-	@echo "Made dacq.i"
+	@echo "[Made dacq.i]"
 
 # build extension module using disttools -- the recommended way!
 _dacq.so: dacq.i
 	@swig -python dacq.i
 	@python setup.py build_ext --inplace
+	@mv _dacq*.so _dacq.so
+	@echo "[Compiled dacq.i]"
+
 
 install: _dacq.so $(COMEDI_SERVER)
 	@cp dacq.py $(PYPEDIR)/pype

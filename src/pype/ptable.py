@@ -421,7 +421,6 @@ class ParamTable(object):
 		This way you can safely inherit from previous modules w/o
 		accumulating excess garbage.
 		"""
-		print('in load')
 		if file is None:
 			file = self._file
 
@@ -451,8 +450,7 @@ class ParamTable(object):
 	def _load(self, file=None):
 		# try all the load methods in order until one works..
 		# or if none work, return 0..
-		print('in _load')
-
+		
 		for method in (self._load_cfg, self._load_txt, self._load_pickle):
 			if method(file=file):
 				if not method  == self._load_cfg:
@@ -465,7 +463,6 @@ class ParamTable(object):
 
 		"""
 
-		print('in _load_cfg')
 		try:
 			f = open(file, 'r')
 		except IOError:
@@ -513,7 +510,7 @@ class ParamTable(object):
 		"""Backward compatibility only.
 
 		"""
-		print('in _load_pickle')
+		
 		try:
 			f = open(file, 'rb')
 			try:

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ "${PYPEDIR-0}" = "0" ]; then
   echo "`basename $0`: set \$PYPEDIR first."

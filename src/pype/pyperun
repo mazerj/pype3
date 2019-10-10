@@ -15,7 +15,11 @@ import glob
 import string
 import traceback
 import code
-import imp								# decrecated!!!
+# warning: this is decprecated... but need to eat error..
+import warnings
+with warnings.catch_warnings():
+	warnings.simplefilter("ignore")
+	import imp
 
 if "--idebug" in sys.argv:
 	import inspect
@@ -57,7 +61,7 @@ def _run_script(fullname):
 	if name[-3:] == '.py':
 		name = name[:-3]				# strip .py extension
 
-	modname = [string.join(fullname.split('/')[0:-1],'/')]
+	modname = ['/'.join(fullname.split('/')[0:-1])]
 	trylist = ((name, None), (name+'.py', None),
 			   (name, modname), (name+'.py', modname))
 
@@ -214,7 +218,7 @@ if not subj is None:
 
 # prefix user-specified PYPEPATH directories -- colon deliminated
 if 'PYPEPATH' in os.environ:
-	for d in string.split(os.environ['PYPEPATH'], ':')[::-1]:
+	for d in os.environ['PYPEPATH'].split(':')[::-1]:
 		_addpath(d, atend=0)
 
 # prefix ~/.pyperc directories to the python search path

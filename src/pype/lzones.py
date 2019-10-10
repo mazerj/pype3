@@ -9,7 +9,6 @@ Author -- James A. Mazer (mazerj@gmail.com)
 """
 
 import sys
-import imp
 import math
 
 from pype import *

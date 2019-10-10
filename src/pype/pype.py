@@ -28,9 +28,13 @@ import threading
 import glob
 import pickle
 import math
+import importlib
 import numpy as np
 
 import tkinter
+
+# this is needed for tasks that rely on reload() existing:
+from importlib import reload
 
 # THIS IS UGLY! There are somethings you can't/shouldn't do suid-root:
 #
@@ -573,7 +577,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         c3pane.pack(expand=0, fill=X, side=TOP, pady=10)
         self._userbuttonframe = c3pane
 
-        b = Button(c1pane, text='reload', command=self.loadtask)
+        b = Button(c1pane, text='reload', command=self.reloadtask)
         b.pack(expand=0, fill=X, side=TOP)
         self.balloon.bind(b, "reload current task")
         self.disable_on_start.append(b)
@@ -1407,12 +1411,10 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 self.tallycount['reward_n'] = 1
                 self.tallycount['reward_ms'] = reward
 
-        ks = list(self.tallycount.keys())
-        ks.sort()
-
         (ntot, ncorr, s) = (0, 0, '')
         keys = list(self.tallycount.keys())
-        keys.sort()
+        sorted(keys, key=lambda o: o[0] if isinstance(o, tuple) else o)
+
         for k in keys:
             if not len(k) == 2: continue
 
@@ -1607,24 +1609,26 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                             command=self.loadtask)
 
     def make_toolbar(self, parent):
-        import imp
-        
         if self.config.get('TOOLS', None) is None:
             return
 
         toolbar = None
         for tool in self.config.get('TOOLS').split(':'):
             try:
-                t = os.path.basename(tool).replace('.py','')
-                file, fullpath, descr = imp.find_module(t)
+                modname = os.path.basename(tool).replace('.py','')
+                
+                # this: file, fullpath, descr = imp.find_module(t)
+                # is replaced by this:
+                spec = importlib.util.find_spec(modname)
+                fullpath = spec.origin
                 d = '/'.join(fullpath.split('/')[:-1])
                 if toolbar is None:
                     toolbar = Frame(parent, borderwidth=2)
                     toolbar.pack(anchor=CENTER, padx=10, pady=10)
-                b = Button(toolbar, text=t[:3],
+                b = Button(toolbar, text=tool[:3],
                            background='white',
                            font=('Andale Mono', 8),
-                           command=lambda s=self, t=t, d=d: s.loadtask(t, d))
+                           command=lambda s=self, t=tool, d=d: s.loadtask(t, d))
                 b.pack(side=LEFT)
                 self.balloon.bind(b, fullpath)
             except ImportError:
@@ -1645,51 +1649,44 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         for w in self.disable_on_start:
             w.config(state=DISABLED)
 
-    def loadtask(self, taskname=None, path=None):
+    def reloadtask(self):
+        """Reload currently loaded task.
+        
+        """
+        if not self.task_name is None:
+            self.loadtask(self.task_name, self.task_dir)
+
+    def loadtask(self, taskname, srcdir=None):
         """(Re)load task from file.
 
         Load a task, if no task is specified, try to reload
         current task.
 
-        :param taskname: (string) task name without .py suffice
+        :param taskname: (string) task name WITHOUT .py suffix
 
-        :param path: (string) directory where task is stored
+        :param srcdir: (string) DIRECTORY where task is stored
 
         :return: None for error, task module on success
 
         """
-        import imp
 
+        # never allow loading while running!
         if self.isrunning():
-            # don't allow loading of task while running!
             return
 
-        if taskname is None:
-            if self.task_name is None:
-                return None
-            taskname = self.task_name
-            path = self.task_dir
+        if srcdir:
+            spec = importlib.util.spec_from_file_location(taskname, dir)
+        else:
+            spec = importlib.util.find_spec(taskname)
+            if spec:
+                srcdir = '/'.join(spec.origin.split('/')[:-1])
+                print('found:', spec.origin)
 
-        try:
-            if path:
-                (file, pathname, descr) = imp.find_module(taskname, [path])
-            else:
-                path = posixpath.dirname(taskname)
-                if len(path) == 0:
-                    path = None
-                    (file, pathname, descr) = imp.find_module(taskname)
-                else:
-                    taskname = posixpath.basename(taskname)
-                    if taskname[-3:] == '.py':
-                        taskname = taskname[:-3]
-                    (file, pathname, descr) = imp.find_module(taskname, [path])
-        except ImportError:
-            warn(MYNAME(),
-                 "Can't find task '%s' on search path.\n" % \
-                 taskname + "Try specifying a full path!")
+        if spec is None:
+            warn(MYNAME(), "Can't find task '%s'" % (taskname,))
             return None
 
-        key = (taskname, path,)
+        key = (taskname, srcdir,)
         if key in self.recent:
             self.recent.remove(key)
         self.recent = [key] + self.recent
@@ -1698,32 +1695,23 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         self.unloadtask()               # unload current, if it exists..
 
         try:
-            try:
-                Logger("pype: loaded '%s' (%s)\n" % (taskname, pathname))
-                taskmod = imp.load_module(taskname, file, pathname, descr)
-                mtime = os.stat(pathname).st_mtime
-            except:
-                err = ('Error loading ''%s'' -- \n' % taskname) + get_exception()
-                sys.stderr.write(err)
-                warn(MYNAME(), err, wait=0, astext=1)
-                return None
-
-        finally:
-            # in case loading throws an exception:
-            if file:
-                file.close()
-
-        if path is None:
-            path, base = os.path.split(pathname)
+            taskmod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(taskmod)
+            Logger("pype: loaded '%s' (%s)\n" % (taskname, spec.origin))
+        except:
+            err = ('Error loading ''%s'' -- \n' % taskname) + get_exception()
+            sys.stderr.write(err)
+            warn(MYNAME(), err, wait=0, astext=1)
+            return None
 
         if taskmod:
             self._task_taskname = taskname
-            self._task_dir = path
+            self._task_dir = srcdir
 
             self.taskmodule = taskmod
-            self._taskname(taskname, path)
-            self._task_pathname = pathname
-            self._task_mtime = mtime
+            self._taskname(taskname, srcdir)
+            self._task_origin = spec.origin
+            self._task_mtime = os.stat(self._task_origin).st_mtime
 
             if hasattr(self.taskmodule, 'main'):
                 # module must provide a 'main' function that is:
@@ -1999,7 +1987,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 age = -1
         try:
             if save:
-                pickle.dump(self.tallycount, open(fname, 'wb'))
+                pickle.dump(self.tallycount, open(fname, 'wb'), protocol=2)
             else:
                 if age < 0.5 or ask('loadstate', 'Clear old tally data?',
                                     ['yes', 'no']) == 1:
@@ -2090,7 +2078,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 w.config(state=DISABLED)
             self.running = 0
         else:
-            if (os.stat(self._task_pathname).st_mtime != self._task_mtime and
+            if (os.stat(self._task_origin).st_mtime != self._task_mtime and
                 ask('run task', 'Task has changed\nRun anyway?',
                     ['yes', 'no']) == 1):
                 return
@@ -3067,7 +3055,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 except AttributeError:
                     pass
 
-                pickle.dump(self._winpos, open(filename, 'wb'))
+                pickle.dump(self._winpos, open(filename, 'wb'), protocol=2)
         else:
             try:
                 geo = self._winpos[w.title()]
@@ -3801,7 +3789,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 _tolist(self.eyebuf_new),
                 ]
 
-            f = open(self.record_file, 'a')
+            f = open(self.record_file, 'ab')
             labeled_dump('encode', rec, f, 1)
             f.close()
 
@@ -3844,7 +3832,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         """
         if self.record_file:
             rec = [NOTE, tag, note]
-            f = open(self.record_file, 'a')
+            f = open(self.record_file, 'ab')
             labeled_dump('note', rec, f, 1)
             f.close()
 
@@ -4589,7 +4577,8 @@ class EmbeddedFigure:
 
     def drawnow(self):
         if matplotlib:
-            self._canvas.show()
+            # [2019-10-10] NOTE: .show() has been replaced with .draw()
+            self._canvas.draw()
 
 class SimplePlotWindow(Toplevel):
     """Toplevel plot window for use with matplotlib.

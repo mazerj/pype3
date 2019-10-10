@@ -26,8 +26,6 @@ from guitools import *
 import pype_aux
 import filebox
 
-from pypedebug import keyboard
-
 MONOFONT = 'Andale Mono'
 
 class ScaledCanvas(Canvas):
@@ -584,8 +582,6 @@ class UserDisplay(object):
 		self.drawbox()
 
 	def savebox(self):
-		import pickle
-
 		(file, mode) = SaveAs(initialdir=os.getcwd(),
 							  pattern='*.box',
 							  append=None,
@@ -593,11 +589,9 @@ class UserDisplay(object):
 
 		if not (file is None):
 			with open(file, 'wb') as f:
-				pickle.dump(self.markstack, f)
+				pickle.dump(self.markstack, f, protocol=2)
 		
 	def loadbox(self):
-		import pickle
-		
 		(file, mode) = filebox.Open(initialdir=os.getcwd(),
 										pattern="*.box",
 										text='Load box from file')
@@ -782,7 +776,7 @@ class UserDisplay(object):
 											  text='Save points to file')
 		if filename:
 			file = open(filename, 'wb')
-			pickle.dump(self.points, file)
+			pickle.dump(self.points, file, protocol=2)
 			file.close()
 
 	def loadpoints(self, filename=None, merge=None):

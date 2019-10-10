@@ -43,6 +43,7 @@ except ImportError:
 
 
 try:
+	os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "1"
 	import pygame
 	from pygame.constants import *
 	if pygame.version.vernum[0] <= 1 and pygame.version.vernum[1] < 9:

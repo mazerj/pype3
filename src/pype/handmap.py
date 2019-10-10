@@ -48,7 +48,7 @@ See	 http://www.mlab.yale.edu/lab/index.php/Handmap for more info.
 
 import sys
 import math
-#import cPickle
+import pickle
 
 from pype import *
 from tkinter import *
@@ -137,7 +137,6 @@ class _Probe(object):
 		self.clear()
 
 	def save(self):
-		import pickle
 		x = Holder()
 
 		x.lock = self.lock
@@ -161,11 +160,10 @@ class _Probe(object):
 		x.lw = self.lw
 
 		file = open(pyperc('hmapstim'), 'wb')
-		pickle.dump(x, file)
+		pickle.dump(x, file, protocol=2)
 		file.close()
 
 	def load(self):
-		import pickle
 		try:
 			file = open(pyperc('hmapstim'), 'rb')
 			x = pickle.load(file)

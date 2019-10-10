@@ -157,7 +157,7 @@ class TTankServer(object):
 					##???: traceback.print_tb(tb)
 				ete = time.time() - tic
 				tic = time.time()
-				server.Send(pickle.dumps((ok, result)))
+				server.Send(pickle.dumps((ok, result), protocol=2))
 				ett = time.time() - tic
 				self.log('[%.0f/%.0f ms eval/xmit]' % (1000*ete, 1000*ett,))
 				if DEBUG:
@@ -207,7 +207,7 @@ class TTank(object):
 		data typing should be correctly preserved and propagated.
 		"""
 		try:
-			self.client.Send(pickle.dumps(cmdtuple))
+			self.client.Send(pickle.dumps(cmdtuple, protocol=2))
 			p = self.client.Receive()
 			(ok, result) = pickle.loads(p)
 		finally:

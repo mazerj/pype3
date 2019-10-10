@@ -158,19 +158,19 @@ if _WINDOWS:
 
 			# these guys must be called in RUN, but not INIT..
 			if self.TDevAcc.ConnectServer('Local'):
-				self.s.send(pickle.dumps(1))
+				self.s.send(pickle.dumps(1, protocol=2))
 				_Log('thread connected to TDevAcc.X\n')
 			else:
 				self.TDevAcc = None
-				self.s.send(pickle.dumps(0))
+				self.s.send(pickle.dumps(0, protocol=2))
 				_Log('thread failed to connect to TDevAcc.X');
 
 			if self.TTank.ConnectServer('Local', 'Me'):
-				self.s.send(pickle.dumps(1))
+				self.s.send(pickle.dumps(1, protocol=2))
 				_Log('thread connected to TTank.X\n')
 			else:
 				self.TTank = None
-				self.s.send(pickle.dumps(0))
+				self.s.send(pickle.dumps(0, protocol=2))
 				_Log('thread failed to connect to TTank.X\n')
 
 			errcode, descr = None, None
@@ -206,7 +206,7 @@ if _WINDOWS:
 							result = (-1, 'invalid method: %s.%s' % (obj,
 																	 method,))
 					_Log('result: %s\n' % (result,))
-					self.s.send(pickle.dumps(result))
+					self.s.send(pickle.dumps(result, protocol=2))
 
 			except socket.error as value:
 				(errorcode, descr) = value
@@ -293,7 +293,7 @@ else: ## not _WINDOWS (ie, linux) ###########################################
 				preserved and propagated.
 			"""
 			try:
-				self.s.send(pickle.dumps(cmdtuple))
+				self.s.send(pickle.dumps(cmdtuple, protocol=2))
 				p = self.s.recv()
 				(ok, result) = pickle.loads(p)
 			finally:

@@ -33,7 +33,14 @@ def labeled_dump(label, obj, f, bin=0):
 	version of the object.
 	"""
 	f.write('<<<%s>>>\n' % label)
-	pickle.dump(obj, f, bin)
+	pickle.dump(obj, f, bin, protocol=2)
+
+
+# bytes->string
+def b2s(b): return b.decode('ascii')
+
+# string->bytes
+def s2b(s): return bytes(s, 'ascii')
 
 if Numeric is None:
 	def labeled_load(f):
@@ -44,17 +51,22 @@ if Numeric is None:
 		"""
 
 		while 1:
-			l = f.readline()
-			if not l:
+			label = f.readline()
+			if not label:
 				return None, None
-			if l.startswith('<<<') and l.endswith('>>>\n'):
-				return l[3:-4], pickle.load(f)
+			label = b2s(label)
+			if label.startswith('<<<') and label.endswith('>>>\n'):
+				label = label[3:-4]
+				payload = pickle.load(f)
+				return label, payload
 else:
 	def labeled_load(f):
 		"""Wrapper for cPickle.load.
 
 		Inverse of labeled_dump(). This one works with old 32bit
 		Numeric-based pypefiles, but requires Numeric be installed!
+
+		NOTE: Numeric is the predecessor to numpy -- numpy won't work..
 
 		"""
 
@@ -92,6 +104,7 @@ else:
 				l = f.readline()
 				if not l:
 					return None, None
+				l = decode(l)
 				if l.startswith('<<<') and l.endswith('>>>\n'):
 					return l[3:-4], pickle.load(f)
 		finally:
@@ -308,7 +321,7 @@ class PypeRecord(object):
 			times = []
 			events = []
 			for (t, e) in self.rec[2]:
-				if type(e) is bytes:
+				if type(e) is str:
 					times.append(t)
 					events.append(e)
 				else:
@@ -486,14 +499,14 @@ class PypeFile(object):
 				cmd = 'gunzip --quiet -c %s ' % ' '.join(flist)
 			else:
 				cmd = 'cat %s ' % ' '.join(flist)
-			self.fp = posix.popen(cmd, 'r')
+			self.fp = posix.popen(cmd, 'rb')
 			if not quiet:
 				sys.stderr.write('compositing: %s\n' % fname)
 			self.fname = fname
 		elif fname[-3:] == '.gz':
 			# it appears MUCH faster to open a pipe to gunzip
 			# than to use the zlib/gzip module..
-			self.fp = posix.popen('gunzip --quiet <%s 2>/dev/null' % fname, 'r')
+			self.fp = posix.popen('gunzip --quiet <%s 2>/dev/null' % fname, 'rb')
 			if not quiet:
 				sys.stderr.write('decompressing: %s\n' % fname)
 			self.fname = fname[:-3]
@@ -504,13 +517,13 @@ class PypeFile(object):
 			self.fname = fname
 			self.zfname = fname+'.gz'
 			self.fp = posix.popen('gunzip --quiet <%s 2>/dev/null' %
-								  self.zfname, 'r')
+								  self.zfname, 'rb')
 			if not quiet:
 				sys.stderr.write('decompressing: %s\n' % self.zfname)
 		else:
 			self.fname = fname
 			self.zfname = None
-			self.fp = open(self.fname, 'r')
+			self.fp = open(self.fname, 'rb')
 		self.cache = []
 		self.status = status
 		self.filter = filter
@@ -954,11 +967,11 @@ def find_events(events, event):
 	:return: (list) list of matching event **times**
 
 	"""
-	try:
-		# zip(*x) is 'unzip'; see python function docs..
-		return list(zip(*find_events2(events, event))[0])
-	except IndexError:
-		return []						# no matching events
+	tepairs = find_events2(events, event)
+	times = [None] * len(tepairs)
+	for n in range(len(tepairs)):
+		times[n] = tepairs[n][0]
+	return times
 
 def find_events2(events, event):
 	"""Returns a list of actual events (pairs) which match pattern.

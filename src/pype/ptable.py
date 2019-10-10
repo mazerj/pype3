@@ -403,7 +403,7 @@ class ParamTable(object):
 			c.set('params', k, str(x[k]))
 			if k in self._locks:
 				if self._locks[k] == DISABLED:
-					c.set('locks', k, 1)
+					c.set('locks', k, '1')
 					lock = 1
 		c.write(f)
 		f.close()

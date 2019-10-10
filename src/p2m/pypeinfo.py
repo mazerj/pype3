@@ -8,8 +8,6 @@ Fri Mar  7 15:38:19 2008 mazer
 
 import sys, types, string
 from pype import *
-from events import *
-from pypedata import *
 
 if __name__ == '__main__':
 	if len(sys.argv) < 2 or len(sys.argv) > 3:
@@ -29,7 +27,8 @@ if __name__ == '__main__':
 		
 	d.compute()
 
-	ks = d.params.keys()
+	# 2to3: keys returns iterator, not list. need to listify it:
+	ks = list(d.params.keys())
 	ks.sort()
 	sys.stdout.write('PARAMETER TABLE\n')
 	sys.stdout.write('------------------------------------\n')

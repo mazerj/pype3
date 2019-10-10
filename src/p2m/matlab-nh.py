@@ -23,6 +23,7 @@ holdoutput = 1
 last3 = ''
 while 1:
 	c = proc.stdout.read(1)
+	c = c.decode('ascii')
 	if len(c) == 0: break
 	if holdoutput:
 		last3 = (last3 + c)[-3:]

@@ -59,13 +59,13 @@ def tmpvar():
 
 def printify(fp, vname, v):
 	# convert a "value" into a matlab safe function
-	if type(v) is types.IntType:
+	if isinstance(v, int):
 		# If it's an int, just use the integer
 		fp.write("%s=%d;\n" % (vname, v))
-	elif type(v) is types.FloatType:
+	elif isinstance(v, float):
 		# If it's an float, just use the float
 		fp.write("%s=%f;\n" % (vname, v))
-	elif type(v) is types.ListType or type(v) is types.TupleType:
+	elif isinstance(v, list) or isinstance(v, tuple):
 		if len(v) > 0:
 			tv = tmpvar()
 			for n in range(len(v)):
@@ -80,9 +80,13 @@ def printify(fp, vname, v):
 		# strings intact, but this is NOT ROBUST -- ie, won't handle
 		# escaped quotes!!
 		s = '%s' % (v,)
-		s = string.join(string.split(s, "'"), "''")
+		# was: s = string.join(string.split(s, "'"), "''")
+		s = s.split("'")
+		s = "..".join(s)
 		# strip trailing \n's
-		s = string.join(string.split(s, "\n"), "")
+		# was: s = string.join(string.split(s, "\n"), "")
+		s = s.split("\n")
+		s = "".join(s)
 		s = "'%s'" % (s,)
 		fp.write("%s=%s;\n" % (vname, s))
 
@@ -93,24 +97,30 @@ def matlabify(m):
 		m = 'X' + m
 
 	# replace '@' with INT (for internal)
-	m = string.join(string.split(m, '@'), 'INT')
+	# was: m = string.join(string.split(m, '@'), 'INT')
+	m = m.split("@")
+	m = "INT".join(m)
 
 	# replace '*' with STAR(for internal)
-	m = string.join(string.split(m, '*'), 'STAR')
+	# was: m = string.join(string.split(m, '*'), 'STAR')
+	m = m.split("*")
+	m = "STAR".join(m)
 
 	# This one's because Ben Hayden messed up.	Just delete
 	# colons..
-	m = string.join(string.split(m, ':'), '')
+	# was: m = string.join(string.split(m, ':'), '')
+	m = m.split(":")
+	m = "".join(m)
 
 	# matlab wants [a-zA-Z0-9_] only in varnames -- so replace everything
 	# else with '_'
 	s = []
 	for c in m:
-		if c in string.letters+string.digits+'_':
+		if c in string.ascii_letters+string.digits+'_':
 			s.append(c)
 		else:
 			s.append('_')
-	m = string.join(s, '')
+	m = ''.join(s)
 	return m
 
 
@@ -120,7 +130,7 @@ def writeDict(fp, objname, name, dict):
 		# variable name -- replace leading underscores with 'X_'
 		# and '@' with 'XX'
 		m = matlabify(k)
-		if type(dict[k]) is types.StringType:
+		if isinstance(dict[k], str):
 			n = 0
 		else:
 			try:
@@ -152,7 +162,7 @@ def writeVector(fp, objname, name, v, format):
 	else:
 		vs = numpy.array(v, numpy.float64)
 		(fd, tmp) = mkstemp(prefix='px3')
-		t = open(tmp,'w')
+		t = open(tmp,'wb')
 		t.write(vs.tostring())
 		t.close()
 		os.close(fd)
@@ -194,16 +204,16 @@ def expandRecord(fname, fp, n, d, xd):
 		vname = "%s.rest{%d}" % (objname, n+1)
 		printify(fp, vname, d.rest[n])
 
-    v = tmpvar()
-    times = map(lambda e:float(e[0]), d.events)
-    events = map(lambda e:e[1], d.events)
-    
-    fp.write("%s.ev_t=%s;\n" % (objname, times, ))
-    fp.write("%s=sprintf('%s');\n" % \
-             (v, string.join(events, chr(1)),))
-    fp.write("%s.ev_e=strread(%s,'%%s','delimiter',char(1));\n" % \
-             (objname, v, ))
-    fp.write("clear %s;\n" % (v,))
+	v = tmpvar()
+	times = list(map(lambda e:float(e[0]), d.events))
+	events = list(map(lambda e:e[1], d.events))
+	
+	fp.write("%s.ev_t=%s;\n" % (objname, times, ))
+	fp.write("%s=sprintf('%s');\n" % \
+			 (v, chr(1).join(events)))
+	fp.write("%s.ev_e=strread(%s,'%%s','delimiter',char(1));\n" % \
+			 (objname, v, ))
+	fp.write("clear %s;\n" % (v,))
 
 	try:
 		v = d.spike_times

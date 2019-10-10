@@ -220,7 +220,9 @@ class FileDialog(object):
 		self.directory = dir
 		self.set_filter(dir, pat)
 		if self.sortfn:
-			names.sort(self.sortfn)
+			#WAS: names.sort(self.sortfn)
+			import functools
+			names = sorted(names, key=functools.cmp_to_key(self.sortfn))
 		else:
 			names.sort()
 		subdirs = [os.pardir]

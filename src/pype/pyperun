@@ -15,11 +15,7 @@ import glob
 import string
 import traceback
 import code
-# warning: this is decprecated... but need to eat error..
-import warnings
-with warnings.catch_warnings():
-	warnings.simplefilter("ignore")
-	import imp
+import runpy
 
 if "--idebug" in sys.argv:
 	import inspect
@@ -55,33 +51,27 @@ def _addpath(d, atend=None):
 		sys.path = [d] + sys.path
 
 def _run_script(fullname):
+	"""Run module as script (__main__) -- script name should include
+	.py extension.
 
-	"""Run module as script -- script name include .py extension."""
-	name = posixpath.basename(fullname)
-	if name[-3:] == '.py':
-		name = name[:-3]				# strip .py extension
+	"""
 
-	modname = ['/'.join(fullname.split('/')[0:-1])]
-	trylist = ((name, None), (name+'.py', None),
-			   (name, modname), (name+'.py', modname))
+	path = '/'.join(fullname.split('/')[0:-1])
+	modname = posixpath.basename(fullname)
+	if modname[-3:] == '.py':
+		modname = modname[:-3]				# strip .py extension
+
+	# [.../path/MODNAME, .../path/MODNAME.py]
+	trylist = ((modname, path), (modname+'.py', path))
 
 	# look for the module in standard locations, load it if you
 	# find it, otherwise return 1
-	for fname, path in trylist:
+	for modname, path in trylist:
 		try:
-			if path:
-				fp, pathname, description = imp.find_module(fname, path)
-			else:
-				fp, pathname, description = imp.find_module(fname)
-		except ImportError:
-			fp = None
-		if fp:
-			sys.argv[0] = pathname
-			try:
-				mod = imp.load_module('__main__', fp, pathname, description)
-			finally:
-				fp.close()
-			return 1
+			runpy.run_path(path+'/'+modname, run_name='__main__')
+		except FileNotFoundError:
+			continue
+		return 1
 	return 0
 
 av = []

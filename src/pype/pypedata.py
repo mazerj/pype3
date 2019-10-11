@@ -26,21 +26,22 @@ try:
 except ImportError:
 	Numeric = None
 
-def labeled_dump(label, obj, f, bin=0):
-	"""Wrapper for cPickle.dump.
-
-	Prepends ascii tag line and then dumps a pickled
-	version of the object.
-	"""
-	f.write('<<<%s>>>\n' % label)
-	pickle.dump(obj, f, bin, protocol=2)
-
-
 # bytes->string
 def b2s(b): return b.decode('ascii')
 
 # string->bytes
 def s2b(s): return bytes(s, 'ascii')
+
+
+def labeled_dump(label, obj, f):
+	"""Wrapper for cPickle.dump.
+
+	Prepends ascii tag line and then dumps a pickled
+	version of the object.
+	"""
+	f.write(s2b('<<<%s>>>\n' % label))
+	pickle.dump(obj, f, protocol=2)
+
 
 if Numeric is None:
 	def labeled_load(f):

@@ -87,7 +87,7 @@ class _Beeper(object):
 
 		if _Beeper._chans == 2:
 			y = np.transpose(np.array([y,y]))
-		s = pygame.sndarray.make_sound(y)
+		s = pygame.sndarray.make_sound(np.ascontiguousarray(y))
 		return s
 
 def beep(freq=-1, msdur=-1, vol=0.5, risefall=20, wait=1, play=1, disable=None):

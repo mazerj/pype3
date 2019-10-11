@@ -171,8 +171,6 @@ if __show_version:
 		
 	sys.exit(0)
 
-"""
-from importer import importer
 try:
 	from importer import importer
 except ImportError:
@@ -183,7 +181,6 @@ except ImportError:
 if __show_pypeimports:
 	importer(report=1)
 	sys.stderr.write('reporting imports\n')
-"""
 
 try:
 	from pype import *

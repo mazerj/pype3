@@ -1609,28 +1609,36 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                             command=self.loadtask)
 
     def make_toolbar(self, parent):
+        # For toolbar items you only specify the module
+        # name and the path is used to find it. So we
+        # use the path to find it during setup. This
+        # can potentially cause surprising results..
+        
         if self.config.get('TOOLS', None) is None:
             return
 
         toolbar = None
         for tool in self.config.get('TOOLS').split(':'):
             try:
+                # we need to find the requested tool on the
+                # search path. modname is name without the .py
+                # extension
                 modname = os.path.basename(tool).replace('.py','')
-                
-                # this: file, fullpath, descr = imp.find_module(t)
-                # is replaced by this:
                 spec = importlib.util.find_spec(modname)
-                fullpath = spec.origin
-                d = '/'.join(fullpath.split('/')[:-1])
-                if toolbar is None:
-                    toolbar = Frame(parent, borderwidth=2)
-                    toolbar.pack(anchor=CENTER, padx=10, pady=10)
-                b = Button(toolbar, text=tool[:3],
-                           background='white',
-                           font=('Andale Mono', 8),
-                           command=lambda s=self, t=tool, d=d: s.loadtask(t, d))
-                b.pack(side=LEFT)
-                self.balloon.bind(b, fullpath)
+                if spec is None:
+                    Logger('pype:make_toolbar: tool ''%s'' not found.\n' % modname)
+                else:
+                    fullpath = spec.origin
+                    srcdir = '/'.join(fullpath.split('/')[:-1])
+                    if toolbar is None:
+                        toolbar = Frame(parent, borderwidth=2)
+                        toolbar.pack(anchor=CENTER, padx=10, pady=10)
+                    b = Button(toolbar, text=modname[:3],
+                               background='white',
+                               font=('Andale Mono', 8),
+                               command=lambda s=self, t=modname, d=srcdir: s.loadtask(t, d))
+                    b.pack(side=LEFT)
+                    self.balloon.bind(b, fullpath)
             except ImportError:
                 pass
 
@@ -1675,12 +1683,15 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             return
 
         if srcdir:
-            spec = importlib.util.spec_from_file_location(taskname, dir)
+            if srcdir[-1] == '/':
+                filename = srcdir+taskname+'.py'
+            else:
+                filename = srcdir+'/'+taskname+'.py'
+            spec = importlib.util.spec_from_file_location(taskname, filename)
         else:
             spec = importlib.util.find_spec(taskname)
             if spec:
                 srcdir = '/'.join(spec.origin.split('/')[:-1])
-                print('found:', spec.origin)
 
         if spec is None:
             warn(MYNAME(), "Can't find task '%s'" % (taskname,))
@@ -3790,7 +3801,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 ]
 
             f = open(self.record_file, 'ab')
-            labeled_dump('encode', rec, f, 1)
+            labeled_dump('encode', rec, f)
             f.close()
 
         self.record_id = self.record_id + 1
@@ -3833,7 +3844,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         if self.record_file:
             rec = [NOTE, tag, note]
             f = open(self.record_file, 'ab')
-            labeled_dump('note', rec, f, 1)
+            labeled_dump('note', rec, f)
             f.close()
 
     def _guess_fallback(self):
@@ -4075,7 +4086,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         pylab.draw()
 
     def update_rt(self, infotuple=None):
-        import pylab
+        from scipy.stats import norm
 
         if infotuple is None:
             self.rtdata = []
@@ -4100,7 +4111,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                    color='red', transform=a.transAxes)
 
             x = np.linspace(bins[0], bins[-1], 25)
-            g = pylab.normpdf(x, np.mean(h), np.std(h))
+            g = norm.pdf(x, np.mean(h), np.std(h))
             g = g * np.sum(n) / np.sum(g)
             a.plot(x, g, 'r-', linewidth=2)
             a.axvspan(self.sub_common.queryv('minrt'),

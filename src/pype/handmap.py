@@ -715,7 +715,7 @@ def hmap_install(app):
 														 font=('Andale Mono',
 															   8),
 														 fill="orange",
-														 anchor=Tkinter.NW)
+														 anchor=tkinter.NW)
 	#app.hmapstate.infobox = TextWin('handmap', fg='blue',
 	#									 font=('Andale Mono', 8))
 	#app.setgeo(app.hmapstate.infobox, default='-0-0')

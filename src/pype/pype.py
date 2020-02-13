@@ -3593,6 +3593,9 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 #        else:
 #            ain1 = None
 
+        ain0 = np.zeros(n, np.int)
+        ain1 = np.zeros(n, np.int)
+
         if self.rig_common.queryv('save_ain5'):
             ain5 = np.zeros(n, np.int)
         else:

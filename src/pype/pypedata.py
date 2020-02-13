@@ -332,8 +332,11 @@ class PypeRecord(object):
 				#	one frame for sample&hold camera, one frame for
 				#	framegrabber and one more frame because it seems
 				#	correct (check with Rikki Razdan again??)
-				dxy=(np.diff(self.eyex)<>0)&(np.diff(self.eyey)<>0)
-				si = np.median(diff(np.array(self.realt)[dxy <> 0]))
+
+				# find points where x or y has changed
+				dxy= (np.diff(self.eyex)!=0) & (np.diff(self.eyey)!=0)
+				# compute sampling interval (si)
+				si = np.median(diff(np.array(self.realt)[np.where(dxy)]))
 				si = 1000.0 / (60.0 * np.round((1000.0 / si) / 60.0))
 				lag = 3.0 * round(si)
 				self.params['eyelag_user'] = lag

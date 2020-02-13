@@ -212,8 +212,9 @@ def _base_ptables():
               'threshold for spike detection'),
         pslot('spike_polarity', '1', is_int,
               'sign of threshold for spike detection'),
-        pyesno('save_ain0', 0, 'save raw AIN 0'),
-        pyesno('save_ain1', 0, 'save raw AIN 1'),
+        # these guys should always be saved
+        #pyesno('save_ain0', 0, 'save raw AIN 0 (raw eye x)'),
+        #pyesno('save_ain1', 0, 'save raw AIN 1 (raw eye y)'),
         #pyesno('save_ain2', 0, 'save raw AIN 2 (photodiode) -- no effect'),
         #pyesno('save_ain3', 0, 'save raw AIN 3 (spk detection) -- no effect'),
         pyesno('save_ain4', 0, 'save raw AIN 4'),
@@ -614,7 +615,9 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             self.psth = None
 
         if self.config.iget('ELOG', 1) and ('ELOG' in os.environ):
-            # ELOG should specify path to the elog module
+            # ELOG should specify path to the elog module so `elogapi` can
+            # be imported. Usually something like /auto/share/lib
+
             _addpath(os.environ['ELOG'])
             try:
                 import elogapi
@@ -670,7 +673,10 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         # JAM 07-feb-2003: Compute ppd values based on current setup.
         # Then place these in the rig menu automatically.
 
+        # added this to see if it's really elog that's holding things up..
+        Logger("pype: initializing framebuffer device.\n")
         fps = self.init_framebuffer()
+        Logger("pype: fb initialized.\n")
 
         s = 180.0 * 2.0 * math.atan2(monw/2, viewdist) / np.pi
         xppd = self.fb.w / s;
@@ -919,6 +925,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         # Framebuffer initialization will give up root access
         # automatically.. so make sure you start the dacq process
         # first (see above).
+        Logger("pype: dropping root for driver setup.\n")
         try:
             root_drop()
             if not self.config.iget('SOUND'):
@@ -3575,15 +3582,16 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         p0 = np.zeros(n, np.int)
         s0 = np.zeros(n, np.int)
 
-        if self.rig_common.queryv('save_ain0'):
-            ain0 = np.zeros(n, np.int)
-        else:
-            ain0 = None
-
-        if self.rig_common.queryv('save_ain1'):
-            ain1 = np.zeros(n, np.int)
-        else:
-            ain1 = None
+# ain0/1 (raw eye signal) should always be saved
+#        if self.rig_common.queryv('save_ain0'):
+#            ain0 = np.zeros(n, np.int)
+#        else:
+#            ain0 = None
+#
+#        if self.rig_common.queryv('save_ain1'):
+#            ain1 = np.zeros(n, np.int)
+#        else:
+#            ain1 = None
 
         if self.rig_common.queryv('save_ain5'):
             ain5 = np.zeros(n, np.int)
@@ -3611,10 +3619,8 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 self.eyebuf_y[i] = dacq_adbuf_y(i)
                 self.eyebuf_pa[i] = dacq_adbuf_pa(i)
                 self.eyebuf_new[i] = dacq_adbuf_new(i)
-                if not ain0 is None:
-                    ain0[i] = dacq_adbuf_c0(i)
-                if not ain1 is None:
-                    ain1[i] = dacq_adbuf_c1(i)
+                ain0[i] = dacq_adbuf_c0(i)
+                ain1[i] = dacq_adbuf_c1(i)
                 p0[i] = dacq_adbuf_c2(i) # photo diode
                 s0[i] = dacq_adbuf_c3(i) # spike detect
                 if not ain5 is None:

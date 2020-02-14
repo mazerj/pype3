@@ -697,7 +697,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         self.rig_common.set('mon_h_ppd', '%g' % xppd)
         self.rig_common.set('mon_v_ppd', '%g' % yppd)
         self.rig_common.set('mon_ppd', '%g' % ppd)
-
+        
         trackertype = self.config.get('EYETRACKER', 'NONE')
         self.itribe = None
         self.eyemouse = None
@@ -1104,13 +1104,31 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         if self.itribe:
             self.itribe.start()
             
-
         if self.config.iget('HTTP_SERVER'):
             import pypehttpd
             self.server = pypehttpd.PypeHTTPServer(self)
             self.server.start()
         else:
             self.server = None
+
+        # make sure the subject field is set to something.
+        sub = subject()
+        psub = self.sub_common.queryv('subject')
+        if sub != psub:
+            warn('pype', \
+                 '**Warning**\n\n'
+                 'Subject ("%s") doesn\'t match\n'
+                 'parameter table value ("%s").\n\n'
+                 'Setting param table to "%s".' % (sub, psub, sub))
+            self.sub_common.set('subject', sub)
+            self.sub_common.set('full_subject', sub)
+            Logger("pype: autoset subject and full_subject\n" % d)
+
+        ln = logname()
+        if ln:
+            self.sub_common.set('owner', ln)
+            Logger("pype: set owner `%s`\n" % ln)
+             
 
     def open_elog(self):
         # open elog for this animal, today w/o asking for confirmation
@@ -3859,7 +3877,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
         """
 
-        subject = self.sub_common.queryv('subject')
+        subject = subject()
 
         if self.training:
             cell = 0
@@ -3895,7 +3913,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         """
         import elogapi
 
-        animal = self.sub_common.queryv('subject')
+        animal = subject()
         full_animal = self.sub_common.queryv('full_subject')
 
         if len(animal) == 0 or len(full_animal) == 0:
@@ -4272,7 +4290,8 @@ def _safeLookup(dict, key, default):
 def subject():
     """Query subject id string.
 
-    This is usually supplied by starting pype with the -s argument.
+    This is usually supplied by starting pype with the -s argument. The
+    worksheet subject value is overridden by this one (ENV value)
 
     :return: (string) subject id
 
@@ -4281,6 +4300,14 @@ def subject():
         return os.environ['SUBJECT']
     except KeyError:
         return 'none'
+
+def logname():
+    """Get LOGNAME from env - for datafile owner"""
+    try:
+        return os.environ['LOGNAME']
+    except KeyError:
+        return None
+    
 
 def subjectrc(file=""):
     """Query subject-specific config *directory*.

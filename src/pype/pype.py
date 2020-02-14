@@ -3877,7 +3877,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
         """
 
-        subject = subject()
+        subject_ = subject()
 
         if self.training:
             cell = 0
@@ -3885,9 +3885,9 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             cell = self.sub_common.queryv('cell')
 
         try:
-            pat = "%s%04d.*.[0-9][0-9][0-9]" % (subject, int(cell))
+            pat = "%s%04d.*.[0-9][0-9][0-9]" % (subject_, int(cell))
         except ValueError:
-            pat = "%s%s.*.[0-9][0-9][0-9]" % (subject, cell)
+            pat = "%s%s.*.[0-9][0-9][0-9]" % (subject_, cell)
         # generate list of files (including zipped files)
         flist = glob.glob(pat)+glob.glob(pat+'.gz')
 
@@ -3901,10 +3901,10 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 pass
 
         try:
-            return "%s%04d.%s.%03d" % (subject, int(cell),
+            return "%s%04d.%s.%03d" % (subject_, int(cell),
                                        self.task_name, next)
         except ValueError:
-            return "%s%s.%s.%03d" % (subject, cell,
+            return "%s%s.%s.%03d" % (subject_, cell,
                                        self.task_name, next)
 
     def _guess_elog(self):

@@ -2,6 +2,26 @@
 ** author:  jamie mazer
 ** created: Wed Jan  8 17:21:15 2003 mazer 
 ** info:    shm interface to COMEDI devices
+**
+*/
+
+/*
+
+NOTES
+-----
+
+- ISCAN should usually be set up to transmit [H.P-CR, V.P-CR] packets
+  on the serial port. If you want pype to internally compute P-CR, you
+  need to transmit [H.P, H.CR, V.P, V.CR] and recompile this program
+  with "#define PYPE_INTERNAL_CR" set.
+
+- For all trackers, the raw x,y eye position is stored in the first
+  two analog input channels: AIN0 and AIN1. These values are run
+  through the calibration procedure (either gain/offsets or affine
+  cal) and then made available to pype:
+   dacq_data->eye_[xy]: scalar current position
+   dacq_data->adbuf_[xy]: buffer of calibrated positions
+
 */
 
 #include <sys/types.h>
@@ -159,6 +179,7 @@ int iscan_read()
   return(1);
 }
 
+#ifdef XXXXXXXX
 int OLD_iscan_read()
 {
   static unsigned char buf[25];
@@ -262,6 +283,7 @@ int OLD_iscan_read()
   }
   return(1);
 }
+#endif
 
 void eyelink_init(char *ip_address, char *el_opts, char *el_cam)
 {
@@ -653,6 +675,11 @@ void iscan_init(char *dev)
 
   itracker = ISCAN;
   fprintf(stderr, "%s: opened iscan_port (%s)\n", progname, dev);
+#ifdef PYPE_INTERNAL_CR
+  fprintf(stderr, "%s: using pype-internal P-CR calculation\n", progname);
+#else
+  fprintf(stderr, "%s: letting ISCAN compute P-CR\n", progname);
+#endif
 }
 
 #define A(r,c) (dacq_data->eye_affine[(r)-1][(c)-1])
@@ -798,13 +825,6 @@ void mainloop(void)
       }
     }
 
-#ifdef DEBUG_DIN
-    for (int kk=0; kk < NDIGIN; kk++) {
-      fprintf(stderr, "%d", dacq_data->din[kk]);
-    }
-    fprintf(stderr, "\n");
-#endif
-    
     switch (itracker)
       {
       case ISCAN:

@@ -1122,7 +1122,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                  'Setting param table to "%s".' % (sub, psub, sub))
             self.sub_common.set('subject', sub)
             self.sub_common.set('full_subject', sub)
-            Logger("pype: autoset subject and full_subject\n" % d)
+            Logger("pype: autoset subject and full_subject to %s\n" % sub)
 
         ln = logname()
         if ln:

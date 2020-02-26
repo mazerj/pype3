@@ -331,7 +331,7 @@ class FrameBuffer(object):
 			ogl.glEnable(ogl.GL_COLOR_MATERIAL)
 			bpp = pygame.display.gl_get_attribute(GL_DEPTH_SIZE)
 
-			pygame.display.set_caption('framebuf')
+			pygame.display.set_caption('FB')
 			
 
 		if getfocus:
@@ -353,7 +353,7 @@ class FrameBuffer(object):
 			f = self.flags & ~FULLSCREEN
 		else:
 			f = self.flags
-		self.screen = pygame.display.set_mode((100,100), f)
+		self.screen = pygame.display.set_mode((25,25), f)
 		self._screen_visible = 0
 
 	def screen_toggle(self):

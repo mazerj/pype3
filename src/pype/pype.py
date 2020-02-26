@@ -965,6 +965,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             self.udpy.showhide(button=tog_udpy, toggle=True)
         else:
             self.udpy.showhide(button=tog_udpy, toggle=False)
+
         if not rightpane:
             self.udpy.master.protocol("WM_DELETE_WINDOW", self._shutdown)
 
@@ -1128,7 +1129,14 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         if ln:
             self.sub_common.set('owner', ln)
             Logger("pype: set owner `%s`\n" % ln)
-             
+
+        # bind F9 and F10 to toggle viewing of stimulus display and
+        # user display, respetively
+        self.tk.bind_all('<F9>', lambda ev: \
+                         (self.fb.screen_toggle(), self.showtestpat()))
+        self.tk.bind_all('<F10>', \
+                         lambda ev, b=tog_udpy: self.udpy.showhide(button=b, \
+                                                                   toggle=True))
 
     def open_elog(self):
         # open elog for this animal, today w/o asking for confirmation
@@ -2544,8 +2552,9 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             # from the framebuffer window (after executing, wait for
             # key release for framebuffer keys -- sloppy, but works)
             keys = self.fb.checkkeys()
-            (c, ev) = self.tkkeyque.pop()
-            if c: keys.append(c)
+            (tkkey, ev) = self.tkkeyque.pop()
+            if tkkey:
+                keys.append(tkkey)
             for c in keys:
                 c = string.lower(c)
                 if c == 'escape':
@@ -2581,10 +2590,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 elif c == 'f8':
                     self.con("[f8]", color='red')
                     self.eyeshift(zero=1)
-                    while not self.fb.checkkeys() == []:
-                        pass
-                elif c == 'f9':
-                    self.fb.screen_toggle()
                     while not self.fb.checkkeys() == []:
                         pass
                 elif c == 'f12':
@@ -4726,6 +4731,9 @@ def show_about(file, timeout=None):
     w.update_idletasks()
     if timeout:
         w.after(timeout, w.destroy)
+
+def xxx(s):
+    print s
 
 if __name__ == '__main__':
     sys.stderr.write('%s should never be loaded as main.\n' % __file__)

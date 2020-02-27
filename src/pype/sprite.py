@@ -170,7 +170,6 @@ class FrameBuffer(object):
 		self.eyefn = eyefn
 
 		self.record = 0
-		self._keystack = []
 		self._font = None
 		
 		if fbw:
@@ -666,26 +665,21 @@ class FrameBuffer(object):
 				accept downstrokes (default is true) - really down ONLY!
 
 		:param clear: (boolean) if set, then drain the input queue until
-				getkey() returns no more keys available. clears the internal
-				key-queue as well.
+				getkey() returns no more keys available.
 
 		:return: key name if ends with 'up' then it's a KEYUP event; otherwise
 				it's a KEYDOWN event. None is returned for no keys available.
 
 		"""
-		if clear:
-			self._keystack = []
-			while 1:
-				if self.getkey() is None:
-					return None
-				
 		c = None
 		if pygame.display.get_init():
-			if len(self._keystack) > 0:
-				c = self._keystack[0]
-				self._keystack = self._keystack[1:]
+			if clear:
+				while 1:
+					if self.getkey(wait=None, down=0, clear=0) is None:
+						pygame.event.pump()
 			else:
 				while not c:
+					pygame.event.pump()
 					if down:
 						events = pygame.event.get([KEYDOWN])
 					else:
@@ -697,17 +691,6 @@ class FrameBuffer(object):
 					elif not wait:
 						break
 		return c
-
-	def ungetkey(self, c):
-		"""'unget' keystroke.
-
-		Push a keystroke event back onto the keyboard queue. Keyboard queue
-		is simulated in pype as a stack, see getkey() method for details.
-
-		:param c: keystroke to push back (same syntax as getkey() method above.
-
-		"""
-		self._keystack.append(c)
 
 	def snapshot(self, filename, size=None):
 		"""Save screen snapshot to file.

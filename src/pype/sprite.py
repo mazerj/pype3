@@ -665,12 +665,16 @@ class FrameBuffer(object):
 		:param down: (boolean) boolean flag indicating whether to only
 				accept downstrokes (default is true) - really down ONLY!
 
-		:return: keystroke value; negative for key-up, positive for
-				key-down, 0 if no keystrokes are available in the
-				queue.
+		:param clear: (boolean) if set, then drain the input queue until
+				getkey() returns no more keys available. clears the internal
+				key-queue as well.
+
+		:return: key name if ends with 'up' then it's a KEYUP event; otherwise
+				it's a KEYDOWN event. None is returned for no keys available.
 
 		"""
 		if clear:
+			self._keystack = []
 			while 1:
 				if self.getkey() is None:
 					return None

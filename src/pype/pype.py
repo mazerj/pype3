@@ -1132,11 +1132,13 @@ class PypeApp(object):                  # !SINGLETON CLASS!
 
         # bind F9 and F10 to toggle viewing of stimulus display and
         # user display, respetively
-        self.tk.bind_all('<F9>', lambda ev: \
-                         (self.fb.screen_toggle(), self.showtestpat()))
+        self.tk.bind_all('<F9>', \
+                         lambda ev, s=self: \
+                         (s.fb.screen_toggle(), s.showtestpat()))
+                         
         self.tk.bind_all('<F10>', \
-                         lambda ev, b=tog_udpy: self.udpy.showhide(button=b, \
-                                                                   toggle=True))
+                         lambda ev, b=tog_udpy, s=self: \
+                         s.udpy.showhide(button=b, toggle=True))
 
     def open_elog(self):
         # open elog for this animal, today w/o asking for confirmation
@@ -1164,14 +1166,21 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             self.idle_queue.append((dacq_ts()+inms, action,))
 
     def _whereami(self):
-        self._console.writenl('ver: pype %s' % (pypeversion.PypeVersion,),
+        import pygame
+        self._console.writenl('ver: pype-%s' % (pypeversion.PypeVersion,),
+                              'blue')
+        self._console.writenl('pygame: %s' % (pygame.version.ver,),
                               'blue')
         self._console.writenl('id: %s' % (pypeversion.PypeVersionID),
                               'blue')
-        self._console.writenl('pypedir=%s' % self.pypedir, 'blue')
-        self._console.writenl('pyperc=%s' % pyperc(), 'blue')
-        self._console.writenl('cwd=%s' % os.getcwd(), 'blue')
-        self._console.writenl('_'*60)
+        self._console.writenl('pypedir: %s' % self.pypedir,
+                              'blue')
+        self._console.writenl('pyperc: %s' % pyperc(),
+                              'blue')
+        self._console.writenl('cwd: %s' % os.getcwd(),
+                              'blue')
+        self._console.writenl('_'*60,
+                              'blue')
 
     def migrate_pypestate(self):
         fname = subjectrc('pypestate.%s' % self._gethostname())
@@ -2551,47 +2560,37 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             # process keys from the TkInter GUI (user display etc) and
             # from the framebuffer window (after executing, wait for
             # key release for framebuffer keys -- sloppy, but works)
-            keys = self.fb.checkkeys()
+            keys = []
+            keys.append(self.fb.getkey())
             (tkkey, ev) = self.tkkeyque.pop()
             if tkkey:
-                keys.append(tkkey)
+                keys.append(string.lower(tkkey))
             for c in keys:
-                c = string.lower(c)
-                if c == 'escape':
+                if c is None:
+                    continue
+                elif c == 'escape':
                     if self._allowabort:
                         self.encode(ABORT)
                         self.con("[esc]", color='red')
-                        while not self.fb.checkkeys() == []:
-                            pass
                         raise UserAbort
                 elif c == 'f4':
                     self.con("[f4]", color='red')
                     self.reward()
-                    while not self.fb.checkkeys() == []:
-                        pass
                 elif c == 'f5':
                     self.con("[f5]", color='red')
                     if self.running:
                         self.running = 0
-                    while not self.fb.checkkeys() == []:
-                        pass
                 elif c == 'f6':
                     self.con("[f6]", color='red')
                     if self.running:
                         self.running = 0
-                    while not self.fb.checkkeys() == []:
-                        pass
                     raise UserAbort
                 elif c == 'f7' and self.running:
                     self.con("[f7]", color='red')
                     self.dotrialtag()
-                    while not self.fb.checkkeys() == []:
-                        pass
                 elif c == 'f8':
                     self.con("[f8]", color='red')
                     self.eyeshift(zero=1)
-                    while not self.fb.checkkeys() == []:
-                        pass
                 elif c == 'f12':
                     sys.stderr.write('\n[F12 PARACHUTE DEPLOYED]\n')
                     sys.exit(0)

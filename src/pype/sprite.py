@@ -638,32 +638,10 @@ class FrameBuffer(object):
 		pygame.event.pump()
 		return KMOD_RCTL & pygame.key.get_mods()
 
-	def waitkeys(self):
-		"""Wait for keyboard to be clear (no pressed keys)."""
-		while len(self.checkkeys()) > 0:
-			pass
-
-	def checkkeys(self):
-		"""Get list of pressed keys."""
-		pygame.event.pump()
-		return map(pygame.key.name, np.where(pygame.key.get_pressed())[0])
-
 	def checkmouse(self):
 		"""Get list of pressed mouse buttons."""
 		pygame.event.pump()
 		return pygame.mouse.get_pressed()
-
-	def clearkey(self):
-		"""Clear keyboard input queue.
-
-		Clear the keyboard buffer. The way things are currently setup
-		any keystrokes coming into pype are pushed into a queue, the
-		getkey() method below returns the next key in the queue
-
-		"""
-		while 1:
-			if len(pygame.event.get()) == 0:
-				return
 
 	def mouseposition(self):
 		"""Query mouse position.
@@ -675,7 +653,7 @@ class FrameBuffer(object):
 		pos = pygame.mouse.get_pos()
 		return (pos[0] - self.hw, -pos[1] + self.hh)
 	
-	def getkey(self, wait=None, down=1):
+	def getkey(self, wait=None, down=1, clear=0):
 		"""Get next keystroke from queue.
 
 		Return the next key in the keyboard input queue and pop
@@ -692,22 +670,26 @@ class FrameBuffer(object):
 				queue.
 
 		"""
-		c = 0
+		if clear:
+			while 1:
+				if self.getkey() is None:
+					return None
+				
+		c = None
 		if pygame.display.get_init():
 			if len(self._keystack) > 0:
 				c = self._keystack[0]
 				self._keystack = self._keystack[1:]
 			else:
 				while not c:
-					if not down:
-						events = pygame.event.get([KEYUP,KEYDOWN])
-					else:
+					if down:
 						events = pygame.event.get([KEYDOWN])
+					else:
+						events = pygame.event.get([KEYUP,KEYDOWN])
 					if len(events):
+						c = pygame.key.name(events[0].key)
 						if events[0].type == KEYUP:
-							c =	 -(events[0].key)
-						else:
-							c = events[0].key
+							c = c + 'up'
 					elif not wait:
 						break
 		return c

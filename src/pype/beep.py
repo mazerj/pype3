@@ -88,7 +88,7 @@ class _Beeper(object):
 		s = pygame.sndarray.make_sound(y)
 		return s
 
-def beep(freq=-1, msdur=-1, vol=0.5, risefall=20, wait=1, play=1, disable=None):
+def beep(freq=-1, msdur=-1, vol=0.5, risefall=5, wait=1, play=1, disable=None):
 	"""Beep the speaker using sound card.
 
 	:param freq: (Hz/None) tone frequency (None for noise)

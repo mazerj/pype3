@@ -937,6 +937,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 beep()
         finally:
             root_take()
+        beep(220, 100, vol=.1, risefall=1)
 
         # added automatic detection of framerate (13-jan-2004 JAM):
         # Wed Apr 27 17:37:26 2011 mazer moved it into init_framebuffer

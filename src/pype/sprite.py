@@ -2326,24 +2326,37 @@ class DisplayList(object):
 			self.fb.flip()
 		return encodes
 
-def _texture_del(texture):
-	"""Delete existing GL texture on video card.
+# [2020-05-29] - glDeleteTextures()
+#
+# Something changed between 3.0.2 and 3.1.1a1 (that's when I noticed it)
+# and glDeleteTextures() now requires an actual array of textures and it
+# must be a numpy array apparently. Will need to investigate further..
+#
+# this came up once before (10/2017), but I think rig machines were locked
+# at 3.0.xx it wasn't a realy issue... and caused some problems, so JM
+# reverted in 2/2018.
+#
+# for some reason autoupdate today on glacier bumped up OpenGL version and
+# caused problems that needed to be fixed.. glacier is now at `3.1.1a` and
+# rest of systems are at `3.0.2-1`
+# 
 
-	:note: INTERNAL USE ONLY
+if OpenGL.version.__version__ <=	'3.0.2':
+	def _texture_del(texture):
+		"""Delete existing GL texture on video card.
 
-	"""
+		:note: INTERNAL USE ONLY
 
-	if 0:
-		#
-		# THIS IS NOT CORRECT - NEED TO TRACK DOWN SOURCE!!!!
-		#
-		# I think this changed with 3.1.0 release... not sure!
-		if OpenGL.version.__version__ > "3.0.0":
-			(textureid, w, h) = texture
-			ogl.glDeleteTextures(np.array([textureid]))
-		else:
-			ogl.glDeleteTextures(texture[0])
-	ogl.glDeleteTextures(texture[0])
+		"""
+		ogl.glDeleteTextures(texture[0])
+else:
+	def _texture_del(texture):
+		"""Delete existing GL texture on video card.
+
+		:note: INTERNAL USE ONLY
+
+		"""
+		ogl.glDeleteTextures(np.array(texture[0]))
 	
 	
 def _texture_create(rgbastr, w, h):

@@ -13,26 +13,31 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-
-for i in $* ; do
+for src in $* ; do
+    echo $src
   # messy sed calls below mimic csh's :r and :e variable modifiers
-  root="`echo $i | sed -e 's|.[^.]*$||'`"
+  root="`echo $src | sed -e 's|.[^.]*$||'`"
   if test "`expr $root : '.*\.\([^.]*\)$'`" = "gz" ; then
     dst="`echo $root | sed -e 's|.[^.]*$||'`".p2m
   else
-    dst="$i.p2m"
+    dst="$src.p2m"
   fi
 
-  echo "[$i -> $dst]"
-
-  if [ ! -f $i ]; then
-    echo "`basename $0`: $i does not exist."
+  if [ ! -f $src ]; then
+    echo "`basename $0`: $src does not exist."
     exit 1
   fi
 
-  unset DISPLAY
-  echo "p2mBatch('$i', 1, 1); exit(0);" | matlab-nh -nodisplay -nojvm
-  if [ $? -ne 0 ]; then
-    exit 1
+  if [ $src -nt $dst ]; then
+      echo "[$src -> $dst]"
+      unset DISPLAY
+      echo "p2mBatch('$src', 1, 1); exit(0);" | matlab-nh -nodisplay -nojvm
+      if [ $? -ne 0 ]; then
+	  exit 1
+      fi
+  else
+      echo "[$src -> $dst] no update needed"
+      
   fi
+
 done

@@ -804,11 +804,11 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         book = Pmw.NoteBook(f2)
         book.grid(row=0, column=1, sticky=N+S+E)
 
-        runlog = book.add('Pype')
-        triallog = book.add('Trial')
-        stats = book.add('Perf')
-        itrack1 = book.add('iTrak')
-        tally = book.add('Tally')
+        runlog = book.add('console')
+        triallog = book.add('trial')
+        stats = book.add('perf')
+        itrack1 = book.add('eye')
+        tally = book.add('tally')
 
         tallyf = Frame(tally)
         tallyf.pack(side=BOTTOM, fill=X)
@@ -1235,8 +1235,16 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             else:
                 self._console.write(msg, color)
 
+    def trial(self, *args, **kwargs):
+        """Synonym for self.info(). The tab actual says `trial`, so
+        it's sometimes confusing that the `info` method is used to
+        write to the `trial` log.
+
+        """
+        self.info(*args, **kwargs)
+        
     def info(self, msg=None, color='black', nl=1):
-        """Write message to *info* window.
+        """Write message to *trial* window (used to be *info* window).
 
         *Info* is the window that gets cleared at the start of each trial.
 

@@ -62,6 +62,9 @@ def printify(fp, vname, v):
 	if type(v) is types.IntType:
 		# If it's an int, just use the integer
 		fp.write("%s=%d;\n" % (vname, v))
+	elif type(v) is types.LongType:
+		# If it's a long, just use the integer.. same as int
+		fp.write("%s=%d;\n" % (vname, v))
 	elif type(v) is types.FloatType:
 		# If it's an float, just use the float
 		fp.write("%s=%f;\n" % (vname, v))

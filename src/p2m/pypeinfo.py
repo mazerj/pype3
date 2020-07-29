@@ -37,7 +37,7 @@ if __name__ == '__main__':
 		s = "%s" % (d.params[k],)
 		if len(s) > 50:
 			s = s[1:50] + "..."
-		sys.stdout.write('%20s: %s\n' % (k, s))
+		sys.stdout.write('%20s: %s %s\n' % (k, s, type(d.params[k])))
 	sys.stdout.write('\n')
 	sys.stdout.write('ENCODE TABLE\n')
 	sys.stdout.write('------------------------------------\n')

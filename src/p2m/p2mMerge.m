@@ -36,6 +36,9 @@ for n = 1:length(input)
   if ischar(p)
     p = p2mLoad(p, [], 0);
   end
+  for k = 1:length(p.rec)
+    p.rec(k).src = p.src;
+  end
   fprintf('merging: %s (%d trials)\n', p.src, length(p.rec));
   
   pf.extradata{length(pf.extradata)+1} = p.extradata;

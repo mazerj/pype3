@@ -533,8 +533,8 @@ class _Probe(object):
 
 def _step(val, by=1, minval=None, maxval=None):
 	val = val + by
-	if not minval is None: val = max(val,minval)
-	if not maxval is None: val = min(val, maxval)
+	if minval is not None: val = max(val,minval)
+	if maxval is not None: val = min(val, maxval)
 	return val
 
 def _key_handler(app, c, ev):

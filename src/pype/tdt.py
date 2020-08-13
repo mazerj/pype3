@@ -301,11 +301,11 @@ else: ## not _WINDOWS (ie, linux) ###########################################
 			return (ok, result)
 
 		def _invoke(self, which, method, args):
-			if which == _TDEVACC and not self.gotTDevAcc:
+			if which == _TDEVACC and (not self.gotTDevAcc):
 				raise TDTError('No %s.X available; cmd=<%s>\n'
 							   'Make sure TDT circuit is open!' % \
 							   (which, method,))
-			if which == _TTANK and not self.gotTTank:
+			if which == _TTANK and (not self.gotTTank):
 				raise TDTError('No %s.X available; cmd=<%s>\n'
 							   'Make sure TDT circuit is open!' % \
 							   (which, method,))
@@ -460,7 +460,7 @@ else: ## not _WINDOWS (ie, linux) ###########################################
 				nwaits = 0
 				while 1:
 					newblock = self.ttank('GetHotBlock')
-					if not (newblock == oldblock) and len(newblock) > 0:
+					if (newblock != oldblock) and (len(newblock) > 0):
 						break
 					if nwaits == 0:
 						sys.stderr.write('newblock: old=<%s> new=<%s>\n' %

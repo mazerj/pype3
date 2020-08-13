@@ -143,7 +143,11 @@ def _base_ptables():
         pslot('dropsize', '100', is_int,
               'mean drop size in ms (for continuous flow systems)'),
         pslot('mldropsize', '0', is_float,
-              'estimated dropsize in ml (user enters!)'),
+              '(OLD) estimated dropsize in ml (user enters!)'),
+        pslot('drop_slope', '0', is_float,
+              '(NEW) m (ml/ms), where, ml = (m * ms) + b'),
+        pslot('drop_offset', '0', is_float,
+              '(NEW) b (ml), where, ml = (m * ms) + b'),
         pslot('dropvar', '10', is_int,
               'reward variance (sigma^2)'),
         pslot('maxreward', '500', is_gteq_zero,
@@ -1055,7 +1059,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             if len(tankdir) == 0:
                 Logger('pype: no TDTANKDIR set, using C:\\', popup=1)
                 tankdir = 'C:\\'
-            if not tankdir[-1] == '\\':
+            if tankdir[-1] != '\\':
                 # dir must have trailing backslash
                 tankdir = tankdir + '\\'
 
@@ -1351,43 +1355,46 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 pass
 
     def _show_stateinfo(self):
-        barstate = self.bardown()           # this will handle BAR_FLIP setting
+        # indicate eyetribe status
         if self.itribe:
-            t = self.itribe.status + ' '
+            label = self.itribe.status + ' '
         else:
-            t = ''
-            
-        if not self.udpy.isvisible():
-            # only show bar state if udpy not visible
-            if barstate:
-                t = t+'BAR:DN '
-            else:
-                t = t+'BAR:UP '
-        else:
+            label = ''
+
+        # indicate bar up/down (note: bardown() deals with BAR_FLIP setting)
+        barstate = self.bardown()
+        if self.udpy.isvisible():
             if barstate:
                 self.udpy.set_bar_indic('DOWN')
             else:
                 self.udpy.set_bar_indic(' UP ')
-                
+        else:
+            if barstate:
+                label = label+'BAR:DN '
+            else:
+                label = label+'BAR:UP '
+
+        # joystick status
         if dacq_jsbut(-1):
-            t = t + " "
+            label = label + " "
             for n in range(10):
                 if dacq_jsbut(n):
-                    t = t+('%d'%n)
+                    label = label+('%d'%n)
                 else:
-                    t = t+'.'
+                    label = label+'.'
+                    
+        # estimated amount of reward delivered to date
+        if self.mldown is not None:
+            label = label + '%dml %s' % (self.mldown, label)
 
         try:
-            last = self._last_stateinfo
+            self._last_stateinfo
         except AttributeError:
-            last = None
+            self._last_stateinfo = None
             
-        if self.mldown is not None:
-            t = t + '%dml %s' % (self.mldown, t)
-
-        if not last == t:
-            self._stateinfo.configure(text=t)
-            self._last_stateinfo = last 
+        if self._last_stateinfo != label:
+            self._stateinfo.configure(text=label)
+            self._last_stateinfo = label
 
     def isrunning(self):
         """Query to see if a task is running.
@@ -1465,7 +1472,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         keys = self.tallycount.keys()
         keys.sort()
         for k in keys:
-            if not len(k) == 2: continue
+            if len(k) != 2: continue
 
             (task, type) = k
             d = type.split()
@@ -1488,13 +1495,23 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             rn = 0
             rms = 0
         s = s + '\nreward: %d drops (%d ms)' % (rn, rms,)
+
         ml = self.sub_common.queryv('mldropsize')
         if ml > 0:
+            # before [2020-08-13]
+            # mldropsize assumes constant ml/drop
             self.mldown = rn * ml
-            s = s + '\nestimated: %.1f ml' % (self.mldown,)
         else:
-            self.mldown = None
-
+            # after [2020-08-13] 
+            # drop_{slope,offset} assume linear relation between ms & ml
+            ds_m = self.sub_common.queryv('drop_slope')
+            ds_b = self.sub_common.queryv('drop_offset')
+            if ds_m > 0:
+                self.mldown = (rms * ds_m) + ds_b
+            else:
+                self.mldown = None
+        if self.mldown is not None:
+            s = s + '\nestimated: %.1f ml' % (self.mldown,)
         s = s + '\n'
         s = s + '\n'
 
@@ -1552,7 +1569,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         for d in files:
             m = posixpath.basename(d)
             # Tue Jan  4 11:50:19 2005 mazer -- skip _* dirs (disabled)
-            if os.path.isdir(d) and not (m[0] == '_'):
+            if os.path.isdir(d) and (m[0] != '_'):
                 self.add_tasks(menubar, "~"+m, d)
 
         # add tasks in current working dir (in any)
@@ -2615,7 +2632,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             # proxy for bar up/down
             try:
                 ss = lshift or rshift
-                if not ss == self._lastss:
+                if ss != self._lastss:
                     self.proxybar = ss
                     self._lastss = ss
                     self._int_handler(None, None, iclass=1, iarg=0)
@@ -2743,6 +2760,8 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         # large numbers can (rarely) come up, so you MUST clip the
         # distribution to avoid pype locking up in app._reward_finisher()...
 
+        print 'x:', self.dropsize()
+
         if ms is None:
             ms = int(round(multiplier * float(self.dropsize())))
             sigma = self.dropvar()**0.5
@@ -2776,6 +2795,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             actual_reward_size = ms
         self._tally(reward=actual_reward_size)
         self.dropcount = self.dropcount + 1
+        print self.dropcount, self.mldown, self.tallycount['reward_n'], self.tallycount['reward_ms']
 
         # Fri Dec  8 14:02:49 2006 mazer
         #  automatically encode the actual reward size (ms open) in
@@ -3097,7 +3117,7 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             for w in wlist:
                 try:
                     geo = w.geometry()
-                    if not geo[0:3] == '1x1':
+                    if geo[0:3] != '1x1':
                         self._winpos[w.title()] = geo
                 except AttributeError:
                     pass
@@ -4414,9 +4434,9 @@ class FixWin(object):
         :return: nothing
 
         """
-        if not x is None: self.x = x
-        if not y is None: self.y = y
-        if not size is None: self.size = size
+        if x is not None: self.x = x
+        if y is not None: self.y = y
+        if size is not None: self.size = size
 
     def move(self, x, y, size=-1):
         """Move fixwin
@@ -4433,9 +4453,9 @@ class FixWin(object):
         :return: nothing
 
         """
-        if not x is None: self.x = x
-        if not y is None: self.y = y
-        if not size is None: self.size = size
+        if x is not None: self.x = x
+        if y is not None: self.y = y
+        if size is not None: self.size = size
         dacq_fixwin_move(self.fwnum, x, y, size)
 
     def reset(self):

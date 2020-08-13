@@ -161,7 +161,7 @@ class FileDialog(object):
 		self.top.bind('<Alt-W>', self.cancel_command)
 
 	def go(self, initialdir=os.curdir, pattern="*", initialfile="", key=None):
-		if key is not None and key in dialogstates:
+		if (key is not None) and (key in dialogstates):
 			self.directory, pattern = dialogstates[key]
 		else:
 			initialdir = os.path.expanduser(initialdir)

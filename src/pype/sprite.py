@@ -2408,7 +2408,7 @@ def _texture_blit(fb, texture, x, y,
 	ogl.glBindTexture(ogl.GL_TEXTURE_2D, texture)
 
 	# use the GL pipeline to rotate the texture
-	if not rotation == 0:
+	if rotation != 0:
 		ogl.glTranslate(x, y, 0)
 		ogl.glRotate(rotation, 0, 0, 1.0)
 		ogl.glTranslate(-x, -y, 0)

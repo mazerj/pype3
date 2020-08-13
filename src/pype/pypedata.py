@@ -594,7 +594,7 @@ class PypeFile(object):
 							   taskname=self.taskname)
 				self.counter = self.counter + 1
 				trialtime = None
-				if not self.filter or (p.result == self.filter):
+				if (not self.filter) or (p.result == self.filter):
 					if cache:
 						self.cache.append(p)
 				return p
@@ -916,7 +916,7 @@ def findfix(d, thresh=2, dur=50, anneal=10, start=None, stop=None):
 		if (not d.eyevalid is None) and (not d.eyevalid[i]):
 			# outside valid calibration range -- discard completely
 			infix = 0
-		elif not infix and (v[i] <= thresh):
+		elif (not infix) and (v[i] <= thresh):
 			infix = 1
 			fstart = start + i
 		elif infix and ((v[i] > thresh) or i == (len(v)-1)):

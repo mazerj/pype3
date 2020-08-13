@@ -107,7 +107,7 @@ class Logger(object):					# !SINGLETON CLASS!
 	def __init__(self, text=None, window=None, popup=None, once=None):
 		# handle multi-line message recursively..
 		if text:
-			if not text[-1] == '\n':
+			if text[-1] != '\n':
 				text = text + '\n'
 			s = text.split('\n')
 			if len(s) > 2:

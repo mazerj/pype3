@@ -37,7 +37,7 @@ class DynamicConfig(object):
 				self._config = {}
 				for line in open(self.fname, 'r'):
 					line = line.strip()
-					if line and line[0] is not "#" and line[-1] is not "=":
+					if line and line[0] != "#" and line[-1] != "=":
 						var,val = line.rsplit("=",1)
 						self._config[var.strip()] = val.strip()
 			self.timestamp = mtime

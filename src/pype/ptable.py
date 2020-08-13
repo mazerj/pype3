@@ -288,7 +288,7 @@ class ParamTable(object):
 				if validate and not (isinstance(validate, types.TupleType) or
 									 isinstance(validate, types.DictType)):
 					(r, v) = apply(validate, (v,), {"evaluate": 1})
-					if (runlock == _KEEPLOCKED) and not readonly:
+					if (runlock == _KEEPLOCKED) and (not readonly):
 						continue
 					elif r != VALID:
 						return (0, name)

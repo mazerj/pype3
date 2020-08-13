@@ -94,5 +94,3 @@ def nanround(n, digits=0):
         n = round(n, digits)
     return n
 
-if __name__=='__main__' :
-	pass

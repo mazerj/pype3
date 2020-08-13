@@ -199,5 +199,3 @@ class Movie2(object):
 			s.blit()
 
 
-if __name__ == '__main__':
-	sys.stderr.write('%s does nothing as main.\n' % __name__)

@@ -4757,9 +4757,6 @@ def show_about(file, timeout=None):
     if timeout:
         w.after(timeout, w.destroy)
 
-def xxx(s):
-    print s
-
 if __name__ == '__main__':
     sys.stderr.write('%s should never be loaded as main.\n' % __file__)
     sys.exit(1)

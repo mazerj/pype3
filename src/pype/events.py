@@ -173,5 +173,3 @@ WARN = 'WARN'
 ANNOTATION = 'ANNOTATION'
 
 
-if __name__=='__main__' :
-	pass

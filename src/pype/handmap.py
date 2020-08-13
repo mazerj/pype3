@@ -743,5 +743,3 @@ def hmap_uninstall(app):
 	del app.hmapstate
 
 
-if __name__ == '__main__':
-	pass

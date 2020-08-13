@@ -1211,28 +1211,3 @@ def is_list(s, evaluate=None):
 
 	return r
 
-if __name__ == '__main__':
-	import sys
-
-	root = Tk()
-	Pmw.initialise(root)
-	exitButton = Button(root, text = 'Exit', command = root.destroy)
-	exitButton.pack(side = 'bottom')
-	p = ParamTable(root,
-				   (ptitle('test'),
-					pslot('a', default='500+-10%', val=is_param),
-					pslot('l', default='', val=is_list),
-					pslot('b', default='3', val=None),
-					pslot('choice', default=1, val=('true', 'false')),
-					pslot('yn', default=1, val={'no':0, 'yes':1}),
-					pslot('c', default='4', val=None)),
-				   file='foobar', allowalt=False)
-
-	Button(root, text = 'info',
-		   command = lambda p=p:
-				   sys.stdout.write('%s\n'%p.query('yn'))).pack(side='bottom')
-
-	p.load('foobar')
-
-	root.mainloop()
-

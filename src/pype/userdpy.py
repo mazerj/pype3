@@ -1354,9 +1354,3 @@ class FID(object):
 				self.r = float(r)
 		f.close()
 
-if __name__ == '__main__':
-	from Tkinter import *
-	tk = Tk()
-	bb = BlackBoard(tk, 100, 100)
-	bb.frame.pack()
-	tk.mainloop()

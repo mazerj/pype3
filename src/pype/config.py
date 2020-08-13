@@ -97,5 +97,3 @@ class Config(object):
 			f.close()
 		return d
 
-if __name__=='__main__' :
-	pass

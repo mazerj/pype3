@@ -82,9 +82,3 @@ class Optix():
         self.read('CE')
         self.read('CE')
 
-if __name__ == '__main__':
-    o = Optix()
-    o.clear()
-    print o.id()
-    print 'Yxy', o.Yxy()
-    print 'XYZ', o.XYZ()

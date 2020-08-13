@@ -615,16 +615,3 @@ class ConditionBucket(object):
 		else:
 			self.sequence.insert(0,n)
 
-if __name__ == '__main__':
-	"""
-	bucket = ConditionBucket('a,b,c,d'.split(','),
-							 randomize=True, freeze=True)
-	for k in range(10):
-		n, cond, block = bucket.pop()
-		print k, block, cond
-		if k == 5:
-			bucket.push(n)
-	"""
-
-	sys.stderr.write('%s should never be loaded as main.\n' % __file__)
-	sys.exit(1)

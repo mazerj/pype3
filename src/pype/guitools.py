@@ -647,6 +647,3 @@ def createToolTip(widget, text):
 	widget.bind('<Enter>', enter)
 	widget.bind('<Leave>', leave)
 
-if __name__ == '__main__':
-	sys.stderr.write('%s should never be loaded as main.\n' % __file__)
-	sys.exit(1)

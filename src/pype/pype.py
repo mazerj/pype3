@@ -2760,8 +2760,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         # large numbers can (rarely) come up, so you MUST clip the
         # distribution to avoid pype locking up in app._reward_finisher()...
 
-        print 'x:', self.dropsize()
-
         if ms is None:
             ms = int(round(multiplier * float(self.dropsize())))
             sigma = self.dropvar()**0.5
@@ -2795,7 +2793,6 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             actual_reward_size = ms
         self._tally(reward=actual_reward_size)
         self.dropcount = self.dropcount + 1
-        print self.dropcount, self.mldown, self.tallycount['reward_n'], self.tallycount['reward_ms']
 
         # Fri Dec  8 14:02:49 2006 mazer
         #  automatically encode the actual reward size (ms open) in

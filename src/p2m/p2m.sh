@@ -50,7 +50,8 @@ for src in $* ; do
     if [ "$update" = "1" ]; then
 	echo "[$src -> $dst]"
 	unset DISPLAY
-	echo "p2mBatch('$src', 1, 1); exit(0);" | matlab-nh -nodisplay -nojvm
+	#echo "p2mBatch('$src', 1, 1); exit(0);" | matlab-nh -nodisplay -nojvm
+	matlab-batch "p2mBatch('$src', 1, 1);"
 	if [ $? -ne 0 ]; then
 	    exit 1
 	fi

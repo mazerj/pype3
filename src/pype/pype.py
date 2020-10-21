@@ -1156,19 +1156,31 @@ class PypeApp(object):                  # !SINGLETON CLASS!
     def about(self, timeout=None):
         show_about(os.path.join(self.pypedir,'lib', 'logo.gif'), timeout)
 
-    def queue_action(self, inms=None, action=None):
-        """Queue an action to happen about inms from now. Call with
-        no args to clear the actio queue.
+    def queue_action(self, inms=None, action=None, remove=None):
+        """Queue an action to happen about in ms from now. Call with
+        no args to clear the action queue.
 
         Action will be dispatched from the idlefn() on or after the
         specified deadline.
 
+        Returns event being cued, so can be unqueued later or [] when
+        clearing the queue.
+
         """
 
+        if remove:
+            try:
+                self.idle_queue.remove(remove)
+                return 1
+            except ValueError:
+                # not in the cue
+                return 0
         if inms is None:
             self.idle_queue = []
+            return []
         else:
             self.idle_queue.append((dacq_ts()+inms, action,))
+            return self.idle_queue[-1]
 
     def _whereami(self):
         import pygame

@@ -141,15 +141,9 @@ def _base_ptables():
 
         ptitle('Reward Params'),
         pslot('dropsize', '100', is_int,
-              'mean drop size in ms (for continuous flow systems)'),
-        pslot('mldropsize', '0', is_float,
-              '(OLD) estimated dropsize in ml (user enters!)'),
-        pslot('drop_slope', '0', is_float,
-              '(NEW) m (ml/ms), where, ml = (m * ms) + b'),
-        pslot('drop_offset', '0', is_float,
-              '(NEW) b (ml), where, ml = (m * ms) + b'),
+              'mean drop size in ms (neg. for ml)'),
         pslot('dropvar', '10', is_int,
-              'reward variance (sigma^2)'),
+              'reward variance (sigma^2) in ms (neg. for ml)'),
         pslot('maxreward', '500', is_gteq_zero,
               'maximum reward duration (hard limit)'),
         pslot('minreward', '0', is_gteq_zero,
@@ -225,6 +219,12 @@ def _base_ptables():
         pyesno('save_ain5', 0, 'save raw AIN 5'),
         pyesno('save_ain6', 0, 'save raw AIN 6'),
         pyesno('save_ain7', 0, 'save raw AIN 7'),
+
+        ptitle('Reward calibration (read-only: set in Config file)'),
+        pslot_ro('drop_slope', '0', is_float,
+                     'M, where ml = (M * ms) + B (ml/ms)'),
+        pslot_ro('drop_offset', '0', is_float,
+                'B where, ml = (M * ms) + B (ml)'),
 
         ptitle('Monitor (read-only: set in Config file)'),
         pslot_ro('mon_id', '', is_any,
@@ -701,7 +701,10 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         self.rig_common.set('mon_h_ppd', '%g' % xppd)
         self.rig_common.set('mon_v_ppd', '%g' % yppd)
         self.rig_common.set('mon_ppd', '%g' % ppd)
-        
+
+        self.rig_common.set('drop_slope', self.config.fget('DROP_SLOPE'))
+        self.rig_common.set('drop_offset', self.config.fget('DROP_OFFSET'))
+
         trackertype = self.config.get('EYETRACKER', 'NONE')
         self.itribe = None
         self.eyemouse = None
@@ -1508,20 +1511,14 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             rms = 0
         s = s + '\nreward: %d drops (%d ms)' % (rn, rms,)
 
-        ml = self.sub_common.queryv('mldropsize')
-        if ml > 0:
-            # before [2020-08-13]
-            # mldropsize assumes constant ml/drop
-            self.mldown = rn * ml
+        # after [2020-08-13] this replaces `subject:mldropsize`
+        # drop_{slope,offset} assume linear relation between ms & ml
+        ds_m = self.rig_common.queryv('drop_slope')
+        if ds_m > 0:
+            ds_b = self.rig_common.queryv('drop_offset')
+            self.mldown = (rms * ds_m) + ds_b
         else:
-            # after [2020-08-13] 
-            # drop_{slope,offset} assume linear relation between ms & ml
-            ds_m = self.sub_common.queryv('drop_slope')
-            ds_b = self.sub_common.queryv('drop_offset')
-            if ds_m > 0:
-                self.mldown = (rms * ds_m) + ds_b
-            else:
-                self.mldown = None
+            self.mldown = None
         if self.mldown is not None:
             s = s + '\nestimated: %.1f ml' % (self.mldown,)
         s = s + '\n'
@@ -2600,6 +2597,8 @@ class PypeApp(object):                  # !SINGLETON CLASS!
             # key release for framebuffer keys -- sloppy, but works)
             keys = []
             keys.append(self.fb.getkey())
+            if len(keys) > 1 and keys[1] is not None:
+                print keys
             (tkkey, ev) = self.tkkeyque.pop()
             if tkkey:
                 keys.append(string.lower(tkkey))
@@ -2639,6 +2638,9 @@ class PypeApp(object):                  # !SINGLETON CLASS!
                 # mx,my are in physical coords (0-DPYW, 0-DPYH)
                 # inject mouse position into dacq
                 dacq_set_xtracker(mx, my, 0)
+                if rshift:
+                    self.con("[eyezero]", color='red')
+                    self.eyeshift(zero=1)
 
             # check to see if shift-key state (ss) has changed as 
             # proxy for bar up/down
@@ -2741,18 +2743,51 @@ class PypeApp(object):                  # !SINGLETON CLASS!
     def dropsize(self):
         """Query dropsize.
 
-        :return: (ms) mean dropsize
+        :return: (ms,ml) query mean dropsize in ms and ml
 
         """
-        return self.sub_common.queryv('dropsize')
+        d = self.sub_common.queryv('dropsize')
+        m = self.rig_common.queryv('drop_slope')
+        b = self.rig_common.queryv('drop_offset')
+        if d < 0:
+            # negative means specified in ml instead of ms
+            ms = (d - b) / m
+        else:
+            ms = d
+        return ms
 
     def dropvar(self):
         """Query dropsize variance.
 
-        :return: (ms) dropsize variance
+        :return: (ms) query dropsize variance
 
         """
-        return self.sub_common.queryv('dropvar')
+
+        d = self.sub_common.queryv('dropvar')
+        m = self.rig_common.queryv('drop_slope')
+
+        if d < 0:
+            # negative means specified in ml instead of ms
+            ms = d / m
+        else:
+            ms = d
+        return ms
+
+    def dropsize_ms2ml(self, ms):
+        """Convert dropsize in ms to ml.
+        
+        This is necessary because variance specifies distribution, so
+        you can't calculate this until after variance is sampled..
+
+        :return: (ms) dropsize
+
+        """
+
+        m = self.rig_common.queryv('drop_slope')
+        b = self.rig_common.queryv('drop_offset')
+        
+        ml = (m * ms) + b
+        return ml
 
     def reward(self, dobeep=1, multiplier=1.0, ms=None):
         """Give reward.
@@ -2768,16 +2803,19 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         # then drop time is selected randomly from a normal distribution
         # with mean=ms, std=var
 
-        # becasue the distribution is normal, very small and very
-        # large numbers can (rarely) come up, so you MUST clip the
-        # distribution to avoid pype locking up in app._reward_finisher()...
+        # because distribution is normal, very small and very large
+        # numbers can (rarely) come up, so you MUST clip the
+        # distribution to avoid pype locking up in app._reward_finisher()
 
         if ms is None:
-            ms = int(round(multiplier * float(self.dropsize())))
-            sigma = self.dropvar()**0.5
+            ms = self.dropsize()
+            ms = round(multiplier * ms)
+
+            sigma_ms = self.dropvar()
+            sigma_ms = sigma_ms**0.5
         else:
-            # user specified ms, no variance
-            sigma = 0
+            # user specified exact ms, no variance
+            sigma_ms = 0
 
         if ms == 0:
             return
@@ -2785,23 +2823,25 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         maxreward = self.sub_common.queryv('maxreward')
         minreward = self.sub_common.queryv('minreward')
 
-        if sigma > 0:
+        if sigma_ms > 0:
             while 1:
-                t = nrand(mean=ms, sigma=sigma)
+                t = nrand(mean=ms, sigma=sigma_ms)
                 if (t > minreward) and (t < maxreward):
                     break
             if dobeep and self.reward_beep:
                 beep(1000, 40, wait=0)
             thread.start_new_thread(self._reward_finisher, (t,))
             if self.tk:
-                self.con("[ran-reward=%dms]" % t, color='black')
+                self.con("[ran-reward=%dms %.2fml]" % \
+                         (t, self.dropsize_ms2ml(t),), color='black')
             actual_reward_size = t
         else:
             if dobeep and self.reward_beep:
                 beep(1000, 100, wait=0)
             self._juice_drip(ms)
             if self.tk:
-                self.con("[reward=%dms]" % ms, color='black')
+                self.con("[reward=%dms %.2fml]" % \
+                         (ms, self.dropsize_ms2ml(ms),), color='black')
             actual_reward_size = ms
         self._tally(reward=actual_reward_size)
         self.dropcount = self.dropcount + 1

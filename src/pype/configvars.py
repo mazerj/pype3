@@ -184,6 +184,14 @@ def defaults(srcfile=None):
 	c.set('HTTP_PORT', 8080,
 		  doc='port number for built in HTTP server')
 
+	#####################################################
+	# reward/solenoid calibration data
+
+	c.set('DROP_SLOPE', '0',
+		  doc='ml = DROP_SLOPE * ms + DROP_OFFSET (ml/ms)')
+	c.set('DROP_OFFSET', '0',
+		  doc='ml = DROP_SLOPE * ms + DROP_OFFSET (ml/ms)')
+
 	return c
 
 def defaults_show():

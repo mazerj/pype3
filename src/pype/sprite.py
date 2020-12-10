@@ -474,7 +474,7 @@ class FrameBuffer(object):
 		"""Query current mouse position and bar state (any button) in
 		framebuffer window.
 
-		:return: (x, y, bardown, lshift, rshift)
+		:return: (x, y, b1, b2, b3, lshift, rshift)
 		
 		"""
 		(x, y) = pygame.mouse.get_pos()

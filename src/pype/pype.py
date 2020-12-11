@@ -2795,6 +2795,17 @@ class PypeApp(object):                  # !SINGLETON CLASS!
         Deliver a squirt of juice based on current dropsize and
         dropvar settings.
 
+        Notes:
+        Originally dropsize was always in ms and mldropsize was
+        used to convert to ml for display:
+           ml = `subject:dropsize` * mldropsize.
+        This was changed to use drop_slope and drop_offset, such that:
+           ml = `subject:dropsize` * drop_slope + drop_offset.
+        On 12/10/2020 I set it up so you can specify the dropsize in
+        ml directly by using `subect:dropsize` and `subject:dropvar`
+        values less than 0. At the same time, `subject:mldropsize`
+        was eliminated...
+
         :return: (ms) actual size of delivered reward
 
         """

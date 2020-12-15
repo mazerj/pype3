@@ -26,7 +26,7 @@ class CondBlock(object):
 	def __init__(self, randomize=True):
         self._randomize = randomize
 		self._available = []
-		self._nblocks = 0
+		self._nblocks = -1
 
         # task must fill conds after instantiation
 		self.conds = []
@@ -75,5 +75,6 @@ class CondBlock(object):
         return len(self._available)
 
 	def statestr(self):
-		return '%d/%d conds; %d blocks' % \
-			   (len(self._available), len(self.conds), self._nblocks,)
+		return '%d/%d cond complete; %d blocks done' % \
+			   (len(self.conds)-len(self._available),
+                len(self.conds), self._nblocks,)

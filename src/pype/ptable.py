@@ -702,8 +702,12 @@ def piparam(name, default, info='', lockonrun=None):
 	return (name, default, is_iparam, info, lockonrun)
 
 def pcolor(name, default, info='', lockonrun=None):
-	"""Color spec (R,G,B,A)"""
+	"""Color spec (R,G,B)"""
 	return (name, default, is_color, info, lockonrun)
+
+def pcolora(name, default, info='', lockonrun=None):
+	"""Color spec (R,G,B,A)"""
+	return (name, default, is_rgba, info, lockonrun)
 
 def pint(name, default, info='', lockonrun=None):
 	"""Integer"""
